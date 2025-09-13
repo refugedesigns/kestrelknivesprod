@@ -1,0 +1,25 @@
+{
+  "name": "kestrelknives",
+  "version": "1.0.0",
+  "description": "[![Generic badge](https://img.shields.io/badge/course%20available%3F-yes-green.svg)](https://shields.io/)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "build:css": "tailwindcss -i ./src/tailwind.css -o ./assets/application.css --watch",
+    "build:css:prod": "NODE_ENV=production tailwindcss -i ./src/tailwind.css -o ./assets/application.css --minify",
+    "dev": "npm run build:css"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.13",
+    "tailwindcss": "^4.1.13"
+  },
+  "devDependencies": {
+    "@shopify/prettier-plugin-liquid": "^1.10.0",
+    "prettier": "^3.6.2"
+  }
+}
