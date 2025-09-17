@@ -9,6 +9,23 @@
       </a>
     {% endif %}
 
+    {% for part in pagination.parts %}
+      {% assign current_part = part.title | plus: 0 %}
+      {% assign current_page = pagination.current_page %}
+      {% if current_part == current_page %}
+        <span class='border bg-gray-600 text-white px-8 py-3 mx-1 rounded-sm font-medium'>
+          {{ part.title }}
+        </span>
+      {% else %}
+        <a
+          href='{{ part.url }}'
+          class='border border-gray-600 text-gray-600 hover:bg-gray-600 hover:text-white px-8 py-3 mx-1 rounded-sm font-medium'
+        >
+          {{ part.title }}
+        </a>
+      {% endif %}
+    {% endfor %}
+
     {% if pagination.next %}
       <a
         href='{{ pagination.next.url }}'

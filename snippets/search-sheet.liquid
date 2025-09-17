@@ -1,0 +1,277 @@
+<!-- Search Sheet -->
+<div
+  x-data='searchSheet()'
+  x-show='isOpen'
+  x-transition:enter='transition ease-out duration-300'
+  x-transition:enter-start='translate-x-full'
+  x-transition:enter-end='translate-x-0'
+  x-transition:leave='transition ease-in duration-200'
+  x-transition:leave-start='translate-x-0'
+  x-transition:leave-end='translate-x-full'
+  class='fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-xl z-50'
+  style='display: none;'
+  @click.away='isOpen = false'
+>
+  <div class='flex flex-col h-full'>
+    <!-- Search Header -->
+    <div class='flex items-center justify-between p-4 border-b border-gray-200'>
+      <h2 class='text-lg font-semibold text-gray-900'>Search</h2>
+      <button
+        @click='isOpen = false'
+        class='text-gray-400 hover:text-gray-600 transition-colors'
+      >
+        <svg
+          class='w-6 h-6'
+          fill='none'
+          stroke='currentColor'
+          viewBox='0 0 24 24'
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Search Input -->
+    <div class='p-4 border-b border-gray-200'>
+      <div class='relative'>
+        <input
+          type='text'
+          x-model='searchQuery'
+          @input='performSearch()'
+          placeholder='Search products and collections...'
+          class='w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-gray-900'
+        >
+        <div class='absolute inset-y-0 right-0 flex items-center pr-3'>
+          <div x-show='isSearching' class='animate-spin'>
+            <svg
+              class='w-5 h-5 text-gray-400'
+              fill='none'
+              viewBox='0 0 24 24'
+            >
+              <circle class='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' stroke-width='4'></circle>
+              <path class='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path>
+            </svg>
+          </div>
+          <div x-show='!isSearching'>
+            <svg
+              class='w-5 h-5 text-gray-400'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Tabs -->
+    <div class='flex border-b border-gray-200'>
+      <button
+        @click='activeTab = "products"'
+        :class='activeTab === "products" ? "border-gray-900 text-gray-900" : "border-transparent text-gray-500"'
+        class='flex-1 px-4 py-3 text-sm font-medium border-b-2 transition-colors'
+      >
+        Products
+      </button>
+      <button
+        @click='activeTab = "collections"'
+        :class='activeTab === "collections" ? "border-gray-900 text-gray-900" : "border-transparent text-gray-500"'
+        class='flex-1 px-4 py-3 text-sm font-medium border-b-2 transition-colors'
+      >
+        Collections
+      </button>
+    </div>
+
+    <!-- Search Results -->
+    <div class='flex-1 overflow-y-auto'>
+      <!-- Products Tab -->
+      <div x-show='activeTab === "products"' class='p-4'>
+        <div
+          x-show='searchResults.products.length === 0 && !isSearching'
+          class='text-center text-gray-500 py-8'
+        >
+          <p>No products found</p>
+        </div>
+
+        <div x-show='isSearching' class='text-center text-gray-500 py-8'>
+          <div
+            class='animate-spin mx-auto w-6 h-6 border-2 border-gray-900 border-t-transparent rounded-full mb-2'
+          ></div>
+          <p>Searching...</p>
+        </div>
+
+        <div x-show='searchResults.products.length > 0' class='space-y-3'>
+          <template
+            x-for='product in searchResults.products'
+            :key='product.id'
+          >
+            <a
+              :href='product.url'
+              class='flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors'
+            >
+              <div class='w-12 h-12 bg-gray-200 rounded flex items-center justify-center'>
+                <img
+                  :src='product.featured_image?.url || product.image || "{{ "product-1.png" | asset_url }}"'
+                  :alt='product.featured_image?.alt || product.title'
+                  class='w-full h-full object-cover rounded'
+                  @error='$el.style.display = "none"; $el.nextElementSibling.style.display = "flex"'
+                >
+                <div
+                  class='w-full h-full bg-gray-200 rounded flex items-center justify-center'
+                  style='display: none;'
+                >
+                  <svg
+                    class='w-6 h-6 text-gray-400'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'/>
+                  </svg>
+                </div>
+              </div>
+              <div class='flex-1 min-w-0'>
+                <p
+                  class='text-sm font-medium text-gray-900 truncate'
+                  x-text='product.title'
+                ></p>
+                <p
+                  class='text-sm text-gray-500'
+                  x-text='formatPrice(product.price)'
+                ></p>
+              </div>
+            </a>
+          </template>
+        </div>
+      </div>
+
+      <!-- Collections Tab -->
+      <div x-show='activeTab === "collections"' class='p-4'>
+        <div
+          x-show='searchResults.collections.length === 0 && !isSearching'
+          class='text-center text-gray-500 py-8'
+        >
+          <p>No collections found</p>
+        </div>
+
+        <div x-show='isSearching' class='text-center text-gray-500 py-8'>
+          <div
+            class='animate-spin mx-auto w-6 h-6 border-2 border-gray-900 border-t-transparent rounded-full mb-2'
+          ></div>
+          <p>Searching...</p>
+        </div>
+
+        <div x-show='searchResults.collections.length > 0' class='space-y-3'>
+          <template
+            x-for='collection in searchResults.collections'
+            :key='collection.id'
+          >
+            <a
+              :href='collection.url'
+              class='block p-3 hover:bg-gray-50 rounded-lg transition-colors'
+            >
+              <p
+                class='text-sm font-medium text-gray-900'
+                x-text='collection.title'
+              ></p>
+            </a>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <!-- View All Results Button -->
+    <div class='p-4 border-t border-gray-200'>
+      <a
+        :href='`/search?q=${searchQuery}`'
+        class='w-full bg-black text-white py-3 px-4 font-medium text-center block hover:bg-gray-900 transition-colors'
+      >
+        View All Results
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  function searchSheet() {
+    return {
+      isOpen: false,
+      searchQuery: '',
+      activeTab: 'products',
+      isSearching: false,
+      searchResults: {
+        products: [],
+        collections: [],
+      },
+      searchTimeout: null,
+
+      init() {
+        // Listen for open search events
+        window.addEventListener('open-search', () => {
+          this.openSearch()
+        })
+      },
+
+      openSearch() {
+        this.isOpen = true
+        document.body.style.overflow = 'hidden'
+      },
+
+      closeSearch() {
+        this.isOpen = false
+        document.body.style.overflow = ''
+      },
+
+      performSearch() {
+        // Clear previous timeout
+        if (this.searchTimeout) {
+          clearTimeout(this.searchTimeout)
+        }
+
+        // Don't search if query is too short
+        if (this.searchQuery.length < 2) {
+          this.searchResults = { products: [], collections: [] }
+          return
+        }
+
+        // Set loading state
+        this.isSearching = true
+
+        // Debounce search
+        this.searchTimeout = setTimeout(() => {
+          this.executeSearch()
+        }, 300)
+      },
+
+      async executeSearch() {
+        try {
+          const response = await fetch(
+            `/search/suggest.json?q=${encodeURIComponent(this.searchQuery)}&resources[type]=product,collection&resources[limit]=5`
+          )
+          const data = await response.json()
+
+          this.searchResults = {
+            products: data.resources.results.products || [],
+            collections: data.resources.results.collections || [],
+          }
+        } catch (error) {
+          console.error('Search error:', error)
+          this.searchResults = { products: [], collections: [] }
+        } finally {
+          this.isSearching = false
+        }
+      },
+
+      formatPrice(price) {
+        if (!price) return '$0.00'
+        const numPrice = typeof price === 'string' ? parseFloat(price) : price
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+        }).format(numPrice)
+      },
+    }
+  }
+</script>

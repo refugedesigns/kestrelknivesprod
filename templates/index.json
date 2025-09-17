@@ -1,11 +1,32 @@
 {
   "sections": {
+    "hero-section": {
+      "type": "hero"
+    },
     "featured-collection": {
       "type": "featured-collection",
       "settings": {
         "featured_collection": "all"
       }
+    },
+    "index-section-2": {
+      "type": "index-section-2"
+    },
+    "big-timer": {
+      "type": "big-timer",
+      "settings": {
+        "show_timer": true
+      }
+    },
+    "index-section-1": {
+      "type": "index-section-1"
     }
   },
-  "order": ["featured-collection"]
+  "order": [
+    "hero-section",
+    "featured-collection",
+    "index-section-2",
+    "big-timer",
+    "index-section-1"
+  ]
 }

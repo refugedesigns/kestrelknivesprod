@@ -1,0 +1,112 @@
+<!-- Index Section 2 - Full Width Image with Text Overlay -->
+<div class='relative w-full h-[70vh] min-h-[500px] overflow-hidden'>
+  <!-- Background Image -->
+  {% if section.settings.image != blank %}
+    <img
+      src='{{ section.settings.image | img_url: '1920x1080' }}'
+      alt='{{ section.settings.image.alt | default: section.settings.title }}'
+      class='absolute inset-0 w-full h-full object-cover'
+    >
+  {% else %}
+    {{
+      "lifestyle-1"
+      | placeholder_svg_tag: "absolute inset-0 w-full h-full object-cover bg-gray-300"
+    }}
+  {% endif %}
+
+  <!-- Dark Overlay for Better Text Readability -->
+  <div class='absolute inset-0 w-full h-full bg-gray-900/50'></div>
+
+  <!-- Text Content Overlay -->
+  <div class='absolute inset-0 flex items-center justify-center'>
+    <div class='text-center max-w-4xl px-4'>
+      {% if section.settings.title != blank %}
+        <h2 class='text-4xl md:text-6xl font-bold text-white mb-6 leading-tight'>
+          {{ section.settings.title }}
+        </h2>
+      {% endif %}
+
+      {% if section.settings.subtitle != blank %}
+        <p class='text-xl md:text-2xl text-white mb-8 leading-relaxed'>
+          {{ section.settings.subtitle }}
+        </p>
+      {% endif %}
+
+      {% if section.settings.description != blank %}
+        <p class='text-lg text-white mb-10 leading-relaxed max-w-2xl mx-auto'>
+          {{ section.settings.description }}
+        </p>
+      {% endif %}
+
+      {% if section.settings.button_text != blank
+        and section.settings.button_url != blank
+      %}
+        <a
+          href='{{ section.settings.button_url }}'
+          class='inline-block bg-white hover:bg-gray-100 text-black font-semibold py-4 px-10 rounded-lg transition-colors duration-200 text-lg'
+        >
+          {{ section.settings.button_text }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Index Section 2",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content Settings"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Premium Quality"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Crafted with precision and passion"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Experience the difference that quality craftsmanship makes. Our products are designed to exceed your expectations and stand the test of time."
+    },
+    {
+      "type": "header",
+      "content": "Image Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "header",
+      "content": "Button Settings"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Explore Collection"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button URL"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Index Section 2"
+    }
+  ]
+}
+{% endschema %}

@@ -10,7 +10,7 @@ module.exports = {
     // Include any JavaScript files that might contain classes
     './assets/**/*.js',
     // Include any additional files that might contain Tailwind classes
-    './locales/**/*.json'
+    './locales/**/*.json',
   ],
   theme: {
     extend: {
@@ -25,12 +25,12 @@ module.exports = {
     enabled: process.env.NODE_ENV === 'production',
     content: [
       './layout/**/*.liquid',
-      './sections/**/*.liquid', 
+      './sections/**/*.liquid',
       './snippets/**/*.liquid',
       './templates/**/*.liquid',
       './templates/**/*.json',
       './assets/**/*.js',
-      './locales/**/*.json'
+      './locales/**/*.json',
     ],
     // Safelist any classes that might be dynamically generated
     safelist: [
@@ -39,6 +39,8 @@ module.exports = {
       'bg-green-500',
       'text-red-500',
       'text-green-500',
+      'bg-black',
+      'bg-[#000000]',
       // Flowbite classes that might be dynamically generated (CDN version)
       'flowbite',
       'flowbite-*',
@@ -73,13 +75,13 @@ module.exports = {
       'transform',
       'transition',
       'duration-300',
-      'ease-in-out'
+      'ease-in-out',
     ],
     // Options for purging
     options: {
       // Preserve keyframes and font-face rules
       keyframes: true,
       fontFace: true,
-    }
-  }
-}
+    },
+  },
+};

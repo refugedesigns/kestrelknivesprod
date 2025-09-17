@@ -1,35 +1,169 @@
-<div class="px-4 py-8">
-     <a href="{{ routes.collections_url }}" class="text-base text-gray-500 hover:underline text-center block my-4">Go back to collections</a>
-    {% paginate collection.products by 6 %}
-        <h1 class="text-3xl text-center">{{ collection.title }}</h1>
+<div class='px-4 py-8 mx-auto' x-data='collectionPage()'>
+  {% comment %}
+    <a
+      href='{{ routes.collections_url }}'
+      class='text-base text-gray-500 hover:underline text-center block my-4'
+      >Go back to collections</a
+    >
+  {% endcomment %}
 
-        <div class="max-w-6xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {% for product in collection.products %}
-                    {% render 'product-card', product_product: product %}
-                    
-                {% else %}
-                    <p>There are no products inside of this collection</p>
-                {% endfor %}
+  {% paginate collection.products by 6 %}
+    <h1 class='text-3xl font-bold text-center mb-8'>{{ collection.title }}</h1>
+
+    <div class='max-w-7xl mx-auto'>
+      <div class='flex flex-col md:flex-row gap-8'>
+        <!-- Filters Sidebar -->
+        {% render "collection-filters", collection: collection %}
+
+        <!-- Products Grid -->
+        <div class='flex-1'>
+          <!-- Products Count -->
+          <div class='mb-6'>
+            <p class='text-gray-600'>{{ collection.products.size }} products</p>
+          </div>
+
+          <!-- Products Grid -->
+          <div
+            class='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+            id='products-grid'
+          >
+            {% for product in collection.products %}
+              {% render "product-card", product_product: product %}
+            {% else %}
+              <div class='col-span-full text-center py-12'>
+                <p class='text-gray-500 text-lg'>
+                  There are no products in this collection
+                </p>
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Pagination -->
+          {% if paginate.pages > 1 %}
+            <div class='mt-12'>
+              {% render "pagination", pagination: paginate %}
             </div>
+          {% endif %}
         </div>
-        
-
-        {% render 'pagination', pagination: paginate %}
-    {% endpaginate %}
+      </div>
+    </div>
+  {% endpaginate %}
 </div>
 
+<script>
+  function collectionPage() {
+    return {
+      init() {
+        // Listen for filter changes
+        window.addEventListener('filter-products', event => {
+          this.applyFilters(event.detail)
+        })
+      },
+
+      applyFilters(filterData) {
+        console.log('Applying filters:', filterData)
+
+        // Get all product cards
+        const productCards = document.querySelectorAll('[data-product]')
+        let visibleCount = 0
+
+        productCards.forEach(card => {
+          const productData = JSON.parse(card.dataset.product)
+          let shouldShow = true
+
+          // Filter by availability
+          if (filterData.filters.availability.length > 0) {
+            const isInStock = productData.available
+            const hasInStockFilter =
+              filterData.filters.availability.includes('in-stock')
+            const hasOutOfStockFilter =
+              filterData.filters.availability.includes('out-of-stock')
+
+            if (hasInStockFilter && hasOutOfStockFilter) {
+              // Show all products
+            } else if (hasInStockFilter && !isInStock) {
+              shouldShow = false
+            } else if (hasOutOfStockFilter && isInStock) {
+              shouldShow = false
+            } else if (!hasInStockFilter && !hasOutOfStockFilter) {
+              shouldShow = false
+            }
+          }
+
+          // Filter by price range
+          if (shouldShow && filterData.priceRange) {
+            const productPrice = productData.price / 100 // Convert from cents
+            if (
+              productPrice < filterData.priceRange.min ||
+              productPrice > filterData.priceRange.max
+            ) {
+              shouldShow = false
+            }
+          }
+
+          // Show/hide the product card
+          if (shouldShow) {
+            card.style.display = 'block'
+            visibleCount++
+          } else {
+            card.style.display = 'none'
+          }
+        })
+
+        // Update product count
+        const countElement = document.querySelector('.text-gray-600')
+        if (countElement) {
+          countElement.textContent = `${visibleCount} products`
+        }
+      },
+    }
+  }
+</script>
 
 {% schema %}
 {
-    "name": "Template Collection",
-    "settings": [
-        {
-            "type": "number",
-            "id": "number_of_products_per_page",
-            "default": 6,
-            "label": "Number of products per page"
-        }
-    ]
+  "name": "Template Collection",
+  "settings": [
+    {
+      "type": "number",
+      "id": "number_of_products_per_page",
+      "default": 6,
+      "label": "Number of products per page"
+    },
+    {
+      "type": "header",
+      "content": "Color Variant Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "orange_image",
+      "label": "Orange Color Image",
+      "info": "Upload an image for orange color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "black_orange_image",
+      "label": "Black w/Orange Liner Image",
+      "info": "Upload an image for black with orange liner variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "black_image",
+      "label": "Black Color Image",
+      "info": "Upload an image for black color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "green_image",
+      "label": "Green Color Image",
+      "info": "Upload an image for green color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "camo_image",
+      "label": "Camo/Earth Color Image",
+      "info": "Upload an image for camo or earth color variants"
+    }
+  ]
 }
 {% endschema %}

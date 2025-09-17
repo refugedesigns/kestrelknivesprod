@@ -1,23 +1,329 @@
-<div class="w-full py-6 px-3">
-    <div class="border bg-white shadow-lg rounded-lg overflow-hidden">
-        <a href="{{ product_product.url }}">
-            {% if product_product.featured_image %}
-                <div class="h-80 overflow-hidden">
-                   <img class="w-full h-full object-cover transition duration-1000 ease-in-out hover:scale-105 transform" src="{{ product_product.featured_image | img_url: 'medium' }}" alt="{{ product_product.featured_image.alt }}">
-                </div>
-                
-            {% else %}
-                {{ 'product-1' | placeholder_svg_tag: 'w-full h-full object-cover bg-gray-100' }}
-            {% endif %}
-        </a>
-        
-        <div class="flex flex-col p-4">
-            <span class="text-sm text-gray-400">{{ product_product.vendor }}</span>
+{% comment %}
+  Product Card
+  This snippet is used to display a product card on the product page.
+  It is used to display the product image, title, price, and add to cart button.
+  It is also used to display the product variants and their images.
+  It is also used to display the product images and their images.
+  It is also used to display the product images and their images.
+{% endcomment %}
 
-            <a href="{{ product_product.url }}" class="text-gray-700 uppercase font-medium">{{ product_product.title }}</a>
+<div
+  class='w-full py-6 px-3 hover:cursor-pointer'
+  data-product='{{ product_product | json | escape }}'
+  data-variants='{{ product_product.variants | json | escape }}'
+  data-images='{{ product_product.images | json | escape }}'
+  x-data="productCard({{ product_product.selected_or_first_available_variant.id }}, '{{ product_product.title }}', '{{ product_product.featured_image | img_url: "400x400" }}', '{{ product_product.images[1] | img_url: "400x400" }}', '{{ product_product | json | escape }}')"
+>
+  <div class='bg-white overflow-hidden w-full h-[600px] flex flex-col transition-none'>
+    <!-- Product Image -->
+    <div
+      class='relative h-96 bg-gray-100 overflow-hidden'
+      @mouseenter='hoverImage = true'
+      @mouseleave='hoverImage = false'
+    >
+      <!-- SOLD OUT Badge -->
+      <div
+        x-show='!isAvailable'
+        class='absolute top-4 left-4 bg-black text-white font-bold px-3 py-1 text-sm uppercase z-10'
+      >
+        SOLD OUT
+      </div>
 
-            <p class="text-gray-500">{{ product_product.price | money }}</p>
-        </div>
-        
+      <!-- Default Image -->
+      <a href='{{ product_product.url }}'>
+        <img
+          :src='currentImage'
+          :alt="'{{ product_product.title }}'"
+          class='absolute inset-0 w-full h-full object-cover transition-opacity duration-300'
+          :class="hoverImage ? 'opacity-0' : 'opacity-100'"
+          style='width: 100%; height: 384px;'
+        >
+        <!-- Hover Image -->
+        <img
+          :src='secondImage'
+          :alt="'{{ product_product.title }}'"
+          class='absolute inset-0 w-full h-full object-cover transition-opacity duration-300'
+          :class="hoverImage ? 'opacity-100' : 'opacity-0'"
+          style='width: 100%; height: 384px;'
+        >
+      </a>
     </div>
+
+    <!-- Product Info -->
+    <div class='p-6 flex flex-col flex-grow justify-between'>
+      <div>
+        <!-- Product Name -->
+        <a href='{{ product_product.url }}'>
+          <h2
+            class='text-lg uppercase font-semibold text-gray-900 mb-2 text-center'
+            x-text='baseTitle'
+          >
+            {{ product_product.title }}
+          </h2>
+
+          <!-- Price -->
+          <div class='text-2xl font-bold text-gray-900 mb-4 text-center'>
+            {{ product_product.price | money }}
+          </div>
+        </a>
+
+        <!-- Handle Color Variants -->
+        {% unless product_product.has_only_default_variant %}
+          <div class='mb-4'>
+            <div class='flex space-x-2 justify-center'>
+              {% assign unique_handle_colors = "" %}
+              {% for variant in product_product.variants %}
+                {% if variant.option1 and variant.title != "Default Title" %}
+                  {% unless unique_handle_colors contains variant.option1 %}
+                    {% assign unique_handle_colors = unique_handle_colors
+                      | append: variant.option1
+                      | append: ","
+                    %}
+                    <button
+                      @click='selectVariant({{ variant.id }})'
+                      :class="selectedVariant === {{ variant.id }} ? 'ring-2 ring-gray-400' : ''"
+                      class='w-10 h-10 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 overflow-hidden'
+                      title='{{ variant.option1 }}'
+                    >
+                      {% assign color_image = "" %}
+                      {% assign option_lower = variant.option1 | downcase %}
+
+                      {% comment %} Check for custom uploaded images first, then fallback to assets {% endcomment %}
+                      {% if option_lower contains "black"
+                        and option_lower contains "orange"
+                      %}
+                        {% if section.settings.black_orange_image %}
+                          {% assign color_image = section.settings.black_orange_image
+                            | img_url: "48x48"
+                          %}
+                        {% else %}
+                          {% assign color_image = "black_w_orange_liner.png" %}
+                        {% endif %}
+                      {% elsif option_lower contains "orange" %}
+                        {% if section.settings.orange_image %}
+                          {% assign color_image = section.settings.orange_image
+                            | img_url: "48x48"
+                          %}
+                        {% else %}
+                          {% assign color_image = "orange.png" %}
+                        {% endif %}
+                      {% elsif option_lower contains "black" %}
+                        {% if section.settings.black_image %}
+                          {% assign color_image = section.settings.black_image
+                            | img_url: "48x48"
+                          %}
+                        {% else %}
+                          {% assign color_image = "black_w_orange_liner.png" %}
+                        {% endif %}
+                      {% elsif option_lower contains "green" %}
+                        {% if section.settings.green_image %}
+                          {% assign color_image = section.settings.green_image
+                            | img_url: "48x48"
+                          %}
+                        {% else %}
+                          {% assign color_image = "od_green.png" %}
+                        {% endif %}
+                      {% elsif option_lower contains "camo" %}
+                        {% if section.settings.camo_image %}
+                          {% assign color_image = section.settings.camo_image
+                            | img_url: "48x48"
+                          %}
+                        {% else %}
+                          {% assign color_image = "earth_camo.png" %}
+                        {% endif %}
+                      {% elsif option_lower contains "earth" %}
+                        {% if section.settings.camo_image %}
+                          {% assign color_image = section.settings.camo_image
+                            | img_url: "48x48"
+                          %}
+                        {% else %}
+                          {% assign color_image = "earth_camo.png" %}
+                        {% endif %}
+                      {% endif %}
+
+                      {% if color_image != "" %}
+                        {% if color_image contains "//" %}
+                          <img
+                            src='{{ color_image }}'
+                            alt='{{ variant.option1 }}'
+                            class='w-full h-full object-cover'
+                          >
+                        {% else %}
+                          <img
+                            src='{{ color_image | asset_url }}'
+                            alt='{{ variant.option1 }}'
+                            class='w-full h-full object-cover'
+                          >
+                        {% endif %}
+                      {% elsif variant.featured_image %}
+                        <img
+                          src='{{ variant.featured_image | img_url: "48x48" }}'
+                          alt='{{ variant.option1 }}'
+                          class='w-full h-full object-cover'
+                        >
+                      {% else %}
+                        <div
+                          class='w-full h-full rounded-full'
+                          style='background-color: {{ variant.option1 | downcase | replace: ' ', '' }}'
+                        ></div>
+                      {% endif %}
+                    </button>
+                  {% endunless %}
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endunless %}
+      </div>
+
+      <!-- Add to Cart Button (only show when available) -->
+      <div x-show='isAvailable'>
+        <button
+          @click='addToCart'
+          :disabled='isAddingToCart'
+          class='w-full bg-black cursor-pointer hover:bg-gray-900 text-white font-semibold py-3 px-4 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+        >
+          <span
+            x-text="isAddingToCart ? 'Adding...' : '+ ADD TO CART'"
+          ></span>
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
+
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data(
+      'productCard',
+      (
+        selectedVariantId,
+        productTitle,
+        currentImage,
+        secondImage,
+        productData
+      ) => ({
+        selectedVariant: selectedVariantId,
+        hoverImage: false,
+        currentImage: currentImage,
+        secondImage: secondImage,
+        productData: productData,
+        variantsData: null,
+        baseTitle: productTitle,
+        isAddingToCart: false,
+        isAvailable: true,
+
+        init() {
+          console.log(productData)
+          // Get product data from data attributes
+          this.productData = JSON.parse(this.$el.dataset.product)
+          this.variantsData = JSON.parse(this.$el.dataset.variants)
+
+          // Console log complete objects
+          console.log('=== COMPLETE PRODUCT OBJECT ===')
+          console.log(this.productData)
+          console.log('=== COMPLETE VARIANTS ARRAY ===')
+          console.log(this.variantsData)
+
+          // Set initial title with first variant color
+          this.updateTitle()
+
+          // Check availability
+          this.checkAvailability()
+        },
+
+        selectVariant(variantId) {
+          this.selectedVariant = variantId
+          this.updateTitle()
+          this.checkAvailability()
+        },
+
+        checkAvailability() {
+          if (this.variantsData && this.variantsData.length > 0) {
+            const selectedVariant = this.variantsData.find(
+              v => v.id === this.selectedVariant
+            )
+            this.isAvailable = selectedVariant
+              ? selectedVariant.available
+              : false
+          } else {
+            this.isAvailable = this.productData.available
+          }
+        },
+
+        async addToCart() {
+          if (!this.isAvailable || this.isAddingToCart) return
+
+          this.isAddingToCart = true
+
+          try {
+            // Get the cart sheet component
+            const cartSheet = document.querySelector('[x-data*="cartSheet"]')
+            if (
+              cartSheet &&
+              cartSheet._x_dataStack &&
+              cartSheet._x_dataStack[0]
+            ) {
+              await cartSheet._x_dataStack[0].addToCart(this.selectedVariant, 1)
+            } else {
+              // Fallback: direct API call
+              const response = await fetch('/cart/add.js', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  id: this.selectedVariant,
+                  quantity: 1,
+                }),
+              })
+
+              if (response.ok) {
+                // Dispatch event to open cart
+                window.dispatchEvent(new CustomEvent('open-cart'))
+              } else {
+                throw new Error('Failed to add to cart')
+              }
+            }
+          } catch (error) {
+            console.error('Error adding to cart:', error)
+            alert('Failed to add item to cart. Please try again.')
+          } finally {
+            this.isAddingToCart = false
+          }
+        },
+
+        updateTitle() {
+          if (this.variantsData && this.variantsData.length > 0) {
+            // Filter out variants with "Default Title"
+            const validVariants = this.variantsData.filter(
+              variant => variant.title !== 'Default Title'
+            )
+
+            if (validVariants.length > 0) {
+              const selectedVariant = validVariants.find(
+                v => v.id === this.selectedVariant
+              )
+              if (selectedVariant && selectedVariant.option1) {
+                // Add variant color to title
+                this.baseTitle =
+                  this.productData.title +
+                  ' - ' +
+                  selectedVariant.option1.toUpperCase()
+              } else {
+                // Fallback to original title
+                this.baseTitle = this.productData.title
+              }
+            } else {
+              // No valid variants (all were "Default Title"), use original title
+              this.baseTitle = this.productData.title
+            }
+          } else {
+            // No variants, use original title
+            this.baseTitle = this.productData.title
+          }
+        },
+      })
+    )
+  })
+</script>

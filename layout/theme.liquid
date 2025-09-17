@@ -7,21 +7,23 @@
     <meta name='description' content='{{ page_description | escape }}'>
     <link rel='canonical' href='{{ canonical_url }}'>
     <!-- Flowbite CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
+    <link
+      href='https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css'
+      rel='stylesheet'
+    >
     <meta
       name='viewport'
       content='width=device-width,initial-scale=1,shrink-to-fit=no'
     >
     {{ content_for_header }}
     <!-- Header hook for plugins -->
-    {{ 'application.css' | asset_url | stylesheet_tag }}
-    <script src="{{ application.js | asset_url }}" defer></script>
+    {{ "application.css" | asset_url | stylesheet_tag }}
+    <script src='{{ application.js | asset_url }}' defer></script>
     <script
       defer
       src='https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js'
     ></script>
-    <!-- Flowbite CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js" async></script>
+
     <style>
       [x-cloak] {
         display: none;
@@ -29,9 +31,21 @@
     </style>
   </head>
   <body>
-    {% section 'header' %}
-    <main role='main'>
+    {% section "header" %}
+    <main role='main' class='pt-16'>
       {{ content_for_layout }}
     </main>
+
+    <!-- Cart Sheet -->
+    {% render "cart-sheet" %}
+
+    <!-- Search Sheet -->
+    {% render "search-sheet" %}
+
+    {% section "footer" %}
+    <!-- Flowbite CDN -->
+    <script
+      src='https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js'
+    ></script>
   </body>
 </html>

@@ -1,40 +1,192 @@
-<div class="container mx-auto">
-    {% paginate search.results by 10 %}
-        <h1 class="text-xl my-4 text-center">Search Results</h1>
+<div class='container mx-auto min-h-[calc(100vh-40vh)]' x-data='searchPage()'>
+  {% paginate search.results by 9 %}
+    <h1 class='text-xl my-4 text-center'>Search Results</h1>
 
-        <div class="flex justify-center items-center">
-            <form action="{{ routes.search_url }}" method="get" class="border flex rounded">
-                <input type="search" name="q" placeholder="Search" value="{{ search.terms | escape }}"
-                    class="px-4 py-2 w-80 border-none"
-                >
+    <div class='flex justify-center items-center'>
+      <form
+        action='{{ routes.search_url }}'
+        method='get'
+        class='border flex rounded'
+      >
+        <input
+          type='search'
+          name='q'
+          placeholder='Search'
+          value='{{ search.terms | escape }}'
+          class='px-4 py-2 w-80 border-none'
+        >
 
-                <button type="submit" class="bg-gray-900 hover:bg-gray-700 text-white border px-4">Search</button>
-            </form>
-        </div>
-        {% if search.performed %}
-            {% if search.results.size > 0 %}
-                <div class="max-w-6xl mx-auto">
-                    <p class="text-gray-500 text-center my-10">{{ search.results.size }} results for the search term {{ search.terms | escape }}</p>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {% for item in search.results %}
-                            {% case item.object_type %}
-                                {% when 'product' %}
-                                    {% render 'product-card', product_product: item %}
-                                {% else %}
-                                    
-                            {% endcase %}
-                        {% endfor %}
+        <button
+          type='submit'
+          class='bg-gray-900 hover:bg-gray-700 text-white border px-4'
+        >
+          Search
+        </button>
+      </form>
+    </div>
+
+    {% if search.performed %}
+      {% if search.results.size > 0 %}
+        <div class='flex flex-col md:flex-row gap-8 max-w-7xl mx-auto'>
+          <!-- Filters Sidebar -->
+          <div class='hidden md:block w-full md:w-1/3 lg:w-1/4'>
+            {% render "search-filters", search: search %}
+          </div>
+
+          <!-- Search Results -->
+          <div class='flex-1'>
+            <p class='text-gray-500 text-center my-10'>
+              {{ search.results.size }} results for the search term
+              {{ search.terms | escape }}
+            </p>
+            <div
+              class='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'
+              id='search-results-grid'
+            >
+              {% for item in search.results %}
+                {% case item.object_type %}
+                  {% when "product" %}
+                    <div data-product='{{ item | json | escape }}'>
+                      {% render "product-card", product_product: item %}
                     </div>
-                </div>
-                
-            {% else %}
-                <div class="text-center my-4">
-                    <p>No results found for the search term: {{ search.terms | escape }}. Try to use a different keyword</p>
-                </div>
-            {% endif %}
-        {% endif %}
-        
+                  {% else %}
 
-        {% render 'pagination', pagination: paginate %}
-    {% endpaginate %}
+                {% endcase %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+      {% else %}
+        <div class='text-center my-4'>
+          <p>
+            No results found for the search term: {{ search.terms | escape }}.
+            Try to use a different keyword
+          </p>
+        </div>
+      {% endif %}
+    {% endif %}
+
+    {% render "pagination", pagination: paginate %}
+  {% endpaginate %}
 </div>
+
+<script>
+  function searchPage() {
+    return {
+      init() {
+        // Listen for filter changes
+        window.addEventListener('filter-products', event => {
+          this.applyFilters(event.detail)
+        })
+      },
+
+      applyFilters(filterData) {
+        console.log('Applying filters:', filterData)
+
+        // Get all product cards
+        const productCards = document.querySelectorAll('[data-product]')
+        let visibleCount = 0
+
+        productCards.forEach(card => {
+          const productData = JSON.parse(card.dataset.product)
+          let shouldShow = true
+
+          // Filter by product type
+          if (filterData.filters.productType.length > 0) {
+            const productType = productData.type || 'uncategorized'
+            if (!filterData.filters.productType.includes(productType)) {
+              shouldShow = false
+            }
+          }
+
+          // Filter by availability
+          if (filterData.filters.availability.length > 0) {
+            const isInStock = productData.available
+            const hasInStockFilter =
+              filterData.filters.availability.includes('in-stock')
+            const hasOutOfStockFilter =
+              filterData.filters.availability.includes('out-of-stock')
+
+            if (hasInStockFilter && hasOutOfStockFilter) {
+              // Show all products
+            } else if (hasInStockFilter && !isInStock) {
+              shouldShow = false
+            } else if (hasOutOfStockFilter && isInStock) {
+              shouldShow = false
+            } else if (!hasInStockFilter && !hasOutOfStockFilter) {
+              shouldShow = false
+            }
+          }
+
+          // Filter by price range
+          if (shouldShow && filterData.priceRange) {
+            const productPrice = productData.price / 100 // Convert from cents
+            if (
+              productPrice < filterData.priceRange.min ||
+              productPrice > filterData.priceRange.max
+            ) {
+              shouldShow = false
+            }
+          }
+
+          // Show/hide the product card
+          if (shouldShow) {
+            card.style.display = 'block'
+            visibleCount++
+          } else {
+            card.style.display = 'none'
+          }
+        })
+
+        // Update result count
+        const countElement = document.querySelector('.text-gray-500')
+        if (countElement) {
+          countElement.textContent = `${visibleCount} results for the search term {{ search.terms | escape }}`
+        }
+      },
+    }
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Template Search",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Color Variant Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "orange_image",
+      "label": "Orange Color Image",
+      "info": "Upload an image for orange color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "black_orange_image",
+      "label": "Black w/Orange Liner Image",
+      "info": "Upload an image for black with orange liner variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "black_image",
+      "label": "Black Color Image",
+      "info": "Upload an image for black color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "green_image",
+      "label": "Green Color Image",
+      "info": "Upload an image for green color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "camo_image",
+      "label": "Camo/Earth Color Image",
+      "info": "Upload an image for camo or earth color variants"
+    }
+  ]
+}
+{% endschema %}

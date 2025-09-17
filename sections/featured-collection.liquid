@@ -1,49 +1,83 @@
-<div class="flex flex-col items-center my-8">
-    <h1 class="text-center text-3xl">{{ section.settings.title }}</h1>
+<div class='flex flex-col items-center my-8'>
+  <h1 class='text-center text-3xl'>{{ section.settings.title }}</h1>
 
-    <div class="max-w-6xl mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {% for product in section.settings.featured_collection.products limit: section.settings.number_of_products_to_show %}
-                {% render 'product-card', product_product: product %}
-            {% else %}
-                {% for item in (1..4) %}
-                    {% render 'product-card-placeholder' %}
-                {% endfor %}
-            {% endfor %}
-        </div>
+  <div class='max-w-6xl mx-auto flex flex-col items-center w-full'>
+    <div class='grid grid-cols-1 md:grid-cols-3 gap-4'>
+      {% for product in section.settings.featured_collection.products
+        limit: section.settings.number_of_products_to_show
+      %}
+        {% render "product-card", product_product: product %}
+      {% else %}
+        {% for item in (1..4) %}
+          {% render "product-card-placeholder" %}
+        {% endfor %}
+      {% endfor %}
     </div>
+  </div>
 </div>
-
-
 
 {% schema %}
 {
-    "name": "Featured Collection",
-    "settings": [
-        {
-            "type": "text",
-            "id": "title",
-            "default": "Featured Collection",
-            "label": "Title"
-        },
-        {
-            "type": "collection",
-            "id": "featured_collection",
-            "label": "Collection"
-        },
-        {
-            "type": "range",
-            "id": "number_of_products_to_show",
-            "min": 4,
-            "max": 12,
-            "default": 4,
-            "label": "Number of products to show"
-        }
-    ],
-    "presets": [
-        {
-            "name": "Featured Collection"
-        }
-    ]
+  "name": "Featured Collection",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Featured Collection",
+      "label": "Title"
+    },
+    {
+      "type": "collection",
+      "id": "featured_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "number_of_products_to_show",
+      "min": 3,
+      "max": 12,
+      "default": 3,
+      "label": "Number of products to show"
+    },
+    {
+      "type": "header",
+      "content": "Color Variant Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "orange_image",
+      "label": "Orange Color Image",
+      "info": "Upload an image for orange color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "black_orange_image",
+      "label": "Black w/Orange Liner Image",
+      "info": "Upload an image for black with orange liner variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "black_image",
+      "label": "Black Color Image",
+      "info": "Upload an image for black color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "green_image",
+      "label": "Green Color Image",
+      "info": "Upload an image for green color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "camo_image",
+      "label": "Camo/Earth Color Image",
+      "info": "Upload an image for camo or earth color variants"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Collection"
+    }
+  ]
 }
 {% endschema %}

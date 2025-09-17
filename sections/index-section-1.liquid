@@ -1,0 +1,115 @@
+<!-- Index Section 1 - Placeholder with Image and Text -->
+<div class='py-16 bg-gray-50'>
+  <div class='max-w-6xl mx-auto px-4'>
+    <div class='grid grid-cols-1 lg:grid-cols-2 gap-12 items-center'>
+      <!-- Image Section -->
+      <div class='order-2 lg:order-1'>
+        {% if section.settings.image != blank %}
+          <img
+            src='{{ section.settings.image | img_url: '800x600' }}'
+            alt='{{ section.settings.image.alt | default: section.settings.title }}'
+            class='w-full h-auto rounded-lg shadow-lg'
+          >
+        {% else %}
+          {{
+            "lifestyle-1"
+            | placeholder_svg_tag: "w-full h-96 bg-gray-200 rounded-lg"
+          }}
+        {% endif %}
+      </div>
+
+      <!-- Text Content Section -->
+      <div class='order-1 lg:order-2'>
+        <div class='max-w-lg'>
+          {% if section.settings.title != blank %}
+            <h2 class='text-3xl md:text-4xl font-bold text-gray-900 mb-6'>
+              {{ section.settings.title }}
+            </h2>
+          {% endif %}
+
+          {% if section.settings.subtitle != blank %}
+            <p class='text-lg text-gray-600 mb-8 leading-relaxed'>
+              {{ section.settings.subtitle }}
+            </p>
+          {% endif %}
+
+          {% if section.settings.description != blank %}
+            <p class='text-base text-gray-700 mb-8 leading-relaxed'>
+              {{ section.settings.description }}
+            </p>
+          {% endif %}
+
+          {% if section.settings.button_text != blank
+            and section.settings.button_url != blank
+          %}
+            <a
+              href='{{ section.settings.button_url }}'
+              class='inline-block bg-black hover:bg-gray-800 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200'
+            >
+              {{ section.settings.button_text }}
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Index Section 1",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content Settings"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Welcome to Our Store"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Discover premium quality products"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    },
+    {
+      "type": "header",
+      "content": "Image Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "header",
+      "content": "Button Settings"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Learn More"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button URL"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Index Section 1"
+    }
+  ]
+}
+{% endschema %}
