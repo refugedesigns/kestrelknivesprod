@@ -1,0 +1,10 @@
+{
+    "sections": {
+        "template-media": {
+            "type": "template-media"
+        }
+    },
+    "order": [
+        "template-media"
+    ]
+}

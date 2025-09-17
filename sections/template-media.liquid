@@ -1,0 +1,267 @@
+{% schema %}
+{
+  "name": "Media Gallery",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero Section"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero Image"
+    },
+    {
+      "type": "text",
+      "id": "hero_alt",
+      "label": "Hero Image Alt Text",
+      "default": "Hero image"
+    },
+    {
+      "type": "header",
+      "content": "Social Media Links"
+    },
+    {
+      "type": "url",
+      "id": "youtube_url",
+      "label": "YouTube URL"
+    },
+    {
+      "type": "url",
+      "id": "facebook_url",
+      "label": "Facebook URL"
+    },
+    {
+      "type": "url",
+      "id": "email_url",
+      "label": "Email URL"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "header",
+      "content": "Gallery Settings"
+    },
+    {
+      "type": "text",
+      "id": "gallery_title",
+      "label": "Gallery Title",
+      "default": "Gallery"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columns on Desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "columns_tablet",
+      "label": "Columns on Tablet",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "columns_mobile",
+      "label": "Columns on Mobile",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "checkbox",
+      "id": "show_captions",
+      "label": "Show image captions",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "media_image",
+      "name": "Media Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Caption"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link (optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Media Gallery",
+      "blocks": [
+        {
+          "type": "media_image"
+        },
+        {
+          "type": "media_image"
+        },
+        {
+          "type": "media_image"
+        },
+        {
+          "type": "media_image"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+<!-- Hero Section -->
+{% if section.settings.hero_image %}
+  <div class='relative w-full h-[60vh] md:h-[70vh]'>
+    <img
+      src='{{ section.settings.hero_image | image_url: width: 2000 }}'
+      alt='{{ section.settings.hero_alt | escape }}'
+      class='w-full h-full object-cover'
+    >
+  </div>
+{% endif %}
+
+<!-- Social Media Links -->
+<div class='bg-gray-50 py-4'>
+  <div class='max-w-6xl mx-auto px-4'>
+    <div class='flex justify-center space-x-6'>
+      {% if section.settings.youtube_url != blank %}
+        <a
+          href='{{ section.settings.youtube_url }}'
+          target='_blank'
+          rel='noopener'
+          class='text-gray-600 hover:text-gray-900 transition-colors'
+          aria-label='YouTube'
+        >
+          <svg class='w-6 h-6' fill='currentColor' viewBox='0 0 24 24'>
+            <path d='M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z'/>
+          </svg>
+        </a>
+      {% endif %}
+
+      {% if section.settings.facebook_url != blank %}
+        <a
+          href='{{ section.settings.facebook_url }}'
+          target='_blank'
+          rel='noopener'
+          class='text-gray-600 hover:text-gray-900 transition-colors'
+          aria-label='Facebook'
+        >
+          <svg class='w-6 h-6' fill='currentColor' viewBox='0 0 24 24'>
+            <path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z'/>
+          </svg>
+        </a>
+      {% endif %}
+
+      {% if section.settings.email_url != blank %}
+        <a
+          href='{{ section.settings.email_url }}'
+          target='_blank'
+          rel='noopener'
+          class='text-gray-600 hover:text-gray-900 transition-colors'
+          aria-label='Email'
+        >
+          <svg class='w-6 h-6' fill='currentColor' viewBox='0 0 24 24'>
+            <path d='M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z'/>
+          </svg>
+        </a>
+      {% endif %}
+
+      {% if section.settings.instagram_url != blank %}
+        <a
+          href='{{ section.settings.instagram_url }}'
+          target='_blank'
+          rel='noopener'
+          class='text-gray-600 hover:text-gray-900 transition-colors'
+          aria-label='Instagram'
+        >
+          <svg class='w-6 h-6' fill='currentColor' viewBox='0 0 24 24'>
+            <path d='M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.297-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.807.875 1.297 2.026 1.297 3.323s-.49 2.448-1.297 3.323c-.875.807-2.026 1.297-3.323 1.297zm7.83-9.281c-.49 0-.98-.49-.98-.98s.49-.98.98-.98.98.49.98.98-.49.98-.98.98zm-7.83 1.297c-1.297 0-2.448.49-3.323 1.297-.807.875-1.297 2.026-1.297 3.323s.49 2.448 1.297 3.323c.875.807 2.026 1.297 3.323 1.297s2.448-.49 3.323-1.297c.807-.875 1.297-2.026 1.297-3.323s-.49-2.448-1.297-3.323c-.875-.807-2.026-1.297-3.323-1.297z'/>
+          </svg>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Media Gallery -->
+<div class='py-12 px-4'>
+  <div class='max-w-7xl mx-auto'>
+    {% if section.settings.gallery_title != blank %}
+      <h2 class='text-2xl md:text-3xl font-bold text-gray-900 text-center mb-8'>
+        {{ section.settings.gallery_title }}
+      </h2>
+    {% endif %}
+
+    {% if section.blocks.size > 0 %}
+      <div class='grid gap-3 grid-cols-{{ section.settings.columns_mobile }} sm:grid-cols-{{ section.settings.columns_tablet }} md:grid-cols-{{ section.settings.columns_desktop }}'>
+        {% for block in section.blocks %}
+          {% case block.type %}
+            {% when "media_image" %}
+              <div
+                class='group relative overflow-hidden rounded-lg aspect-square'
+                {{ block.shopify_attributes }}
+              >
+                {% if block.settings.link != blank %}
+                  <a href='{{ block.settings.link }}' class='block'>
+                {% endif %}
+
+                {% if block.settings.image %}
+                  <img
+                    src='{{ block.settings.image | image_url: width: 600 }}'
+                    alt='{{ block.settings.caption | escape }}'
+                    class='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'
+                    loading='lazy'
+                  >
+                {% else %}
+                  <div class='w-full h-full bg-gray-200 flex items-center justify-center'>
+                    <span class='text-gray-500 text-sm'>No image</span>
+                  </div>
+                {% endif %}
+
+                {% if section.settings.show_captions
+                  and block.settings.caption != blank
+                %}
+                  <div class='absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-end'>
+                    <div class='p-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
+                      <p class='text-sm'>{{ block.settings.caption }}</p>
+                    </div>
+                  </div>
+                {% endif %}
+
+                {% if block.settings.link != blank %}
+                  </a>
+                {% endif %}
+              </div>
+          {% endcase %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class='text-center py-12'>
+        <p class='text-gray-500 text-lg'>
+          No media added yet. Add some images in the theme editor.
+        </p>
+      </div>
+    {% endif %}
+  </div>
+</div>
