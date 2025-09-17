@@ -1,0 +1,8 @@
+{
+  "sections": {
+    "template-testimonials": {
+      "type": "template-testimonials"
+    }
+  },
+  "order": ["template-testimonials"]
+}

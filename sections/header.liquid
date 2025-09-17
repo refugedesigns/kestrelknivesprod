@@ -208,7 +208,7 @@
 
                       <div
                         x-show='{{ mobile_link_handle }}'
-                        class='grid gap-y-7 py-3'
+                        class='grid gap-y-2 py-3'
                       >
                         {% for childlink in link.links %}
                           <a
@@ -231,6 +231,56 @@
                     </a>
                   {% endif %}
                 {% endfor %}
+
+                <!-- Mobile Menu Actions -->
+                <div class='border-t border-gray-700 pt-4'>
+                  <!-- Search -->
+                  <button
+                    @click='window.dispatchEvent(new CustomEvent("open-search")); mobileMenuOpen = false'
+                    class='-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700 w-full text-left'
+                  >
+                    Search
+                  </button>
+
+                  <!-- Cart -->
+                  <button
+                    @click='window.dispatchEvent(new CustomEvent("open-cart")); mobileMenuOpen = false'
+                    class='-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700 w-full text-left'
+                  >
+                    Cart
+                  </button>
+
+                  <!-- Account Links -->
+                  {% if shop.customer_accounts_enabled %}
+                    {% if customer %}
+                      <a
+                        href='{{ routes.account_url }}'
+                        class='-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700'
+                      >
+                        Account
+                      </a>
+                      {{
+                        "Log out"
+                        | customer_logout_link
+                        | replace: "<a",
+                          '<a class="-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700"'
+                      }}
+                    {% else %}
+                      {{
+                        "Log in"
+                        | customer_login_link
+                        | replace: "<a",
+                          '<a class="-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700"'
+                      }}
+                      {{
+                        "Register"
+                        | customer_register_link
+                        | replace: "<a",
+                          '<a class="-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700"'
+                      }}
+                    {% endif %}
+                  {% endif %}
+                </div>
               </nav>
             </div>
           </div>

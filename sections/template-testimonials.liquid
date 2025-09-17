@@ -1,0 +1,57 @@
+{% schema %}
+{
+  "name": "Testimonials Section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "Section Headline",
+      "default": "What our customers say"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "text",
+          "id": "quote",
+          "label": "Quote"
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author name"
+        },
+        {
+          "type": "image_picker",
+          "id": "author_image",
+          "label": "Author photo"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Default testimonials"
+    }
+  ]
+}
+{% endschema %}
+
+<div class='testimonials-section'>
+  <h2>{{ section.settings.headline }}</h2>
+  {% for block in section.blocks %}
+    <div class='testimonial'>
+      {% if block.settings.author_image %}
+        <img
+          src='{{ block.settings.author_image | image_url: width: 100 }}'
+          alt='Photo of {{ block.settings.author }}'
+        >
+      {% endif %}
+      <blockquote>{{ block.settings.quote }}</blockquote>
+      <cite>{{ block.settings.author }}</cite>
+    </div>
+  {% endfor %}
+</div>
