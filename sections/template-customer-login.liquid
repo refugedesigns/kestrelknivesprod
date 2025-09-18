@@ -46,11 +46,13 @@
       <!-- Brand Logo/Name -->
       <div class='text-center mb-8'>
         <a href='{{ routes.root_url }}' class='inline-block'>
-          {% if section.settings.logo_image %}
+          {% if section.settings.logo_image and section.settings.logo_image != blank %}
             <img
               src='{{ section.settings.logo_image | image_url: width: 200 }}'
               alt='{{ section.settings.shop_name }} Logo'
-              class='h-12 mx-auto'
+              class='h-20 mx-auto'
+              width='200'
+              height='80'
             >
           {% else %}
             <h1 class='text-3xl font-bold text-gray-900'>
@@ -58,6 +60,14 @@
             </h1>
           {% endif %}
         </a>
+
+        <!-- Debug Information -->
+        <div class='text-xs text-gray-500 mt-2'>
+          <p>Logo Image: {{ section.settings.logo_image }}</p>
+          <p>Shop Name: {{ section.settings.shop_name }}</p>
+          <p>Section ID: {{ section.id }}</p>
+          <p>All Settings: {{ section.settings | json }}</p>
+        </div>
       </div>
 
       <!-- Login Form -->
@@ -278,7 +288,10 @@
   ],
   "presets": [
     {
-      "name": "Customer Login"
+      "name": "Customer Login",
+      "settings": {
+        "shop_name": "Kestrel Knives"
+      }
     }
   ]
 }
