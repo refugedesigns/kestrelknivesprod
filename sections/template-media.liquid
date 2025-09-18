@@ -42,6 +42,11 @@
       "label": "Instagram URL"
     },
     {
+      "type": "url",
+      "id": "twitter_url",
+      "label": "Twitter URL"
+    },
+    {
       "type": "header",
       "content": "Gallery Settings"
     },
@@ -132,17 +137,17 @@
 
 <!-- Hero Section -->
 {% if section.settings.hero_image %}
-  <div class='relative w-full h-[60vh] md:h-[70vh]'>
+  <div class='relative max-w-8xl mx-auto px-2 md:px-0 pt-20'>
     <img
       src='{{ section.settings.hero_image | image_url: width: 2000 }}'
       alt='{{ section.settings.hero_alt | escape }}'
-      class='w-full h-full object-cover'
+      class='w-full h-full object-fit'
     >
   </div>
 {% endif %}
 
 <!-- Social Media Links -->
-<div class='bg-gray-50 py-4'>
+<div class='py-4'>
   <div class='max-w-6xl mx-auto px-4'>
     <div class='flex justify-center space-x-6'>
       {% if section.settings.youtube_url != blank %}
@@ -196,7 +201,21 @@
           aria-label='Instagram'
         >
           <svg class='w-6 h-6' fill='currentColor' viewBox='0 0 24 24'>
-            <path d='M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.014 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.49-3.323-1.297C4.198 14.895 3.708 13.744 3.708 12.447s.49-2.448 1.297-3.323c.875-.807 2.026-1.297 3.323-1.297s2.448.49 3.323 1.297c.807.875 1.297 2.026 1.297 3.323s-.49 2.448-1.297 3.323c-.875.807-2.026 1.297-3.323 1.297zm7.83-9.281c-.49 0-.98-.49-.98-.98s.49-.98.98-.98.98.49.98.98-.49.98-.98.98zm-7.83 1.297c-1.297 0-2.448.49-3.323 1.297-.807.875-1.297 2.026-1.297 3.323s.49 2.448 1.297 3.323c.875.807 2.026 1.297 3.323 1.297s2.448-.49 3.323-1.297c.807-.875 1.297-2.026 1.297-3.323s-.49-2.448-1.297-3.323c-.875-.807-2.026-1.297-3.323-1.297z'/>
+            <path d='M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z'/>
+          </svg>
+        </a>
+      {% endif %}
+
+      {% if section.settings.twitter_url != blank %}
+        <a
+          href='{{ section.settings.twitter_url }}'
+          target='_blank'
+          rel='noopener'
+          class='text-gray-600 hover:text-gray-900 transition-colors'
+          aria-label='Twitter'
+        >
+          <svg class='w-6 h-6' fill='currentColor' viewBox='0 0 24 24'>
+            <path d='M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z'/>
           </svg>
         </a>
       {% endif %}
@@ -206,7 +225,7 @@
 
 <!-- Media Gallery -->
 <div class='py-12 px-4'>
-  <div class='max-w-7xl mx-auto'>
+  <div class='mx-auto'>
     {% if section.settings.gallery_title != blank %}
       <h2 class='text-2xl md:text-3xl font-bold text-gray-900 text-center mb-8'>
         {{ section.settings.gallery_title }}
@@ -219,22 +238,26 @@
           {% case block.type %}
             {% when "media_image" %}
               <div
-                class='group relative overflow-hidden rounded-lg aspect-square'
+                class='group relative overflow-hidden bg-blue-400 rounded-lg aspect-square w-full h-full'
                 {{ block.shopify_attributes }}
               >
                 {% if block.settings.link != blank %}
-                  <a href='{{ block.settings.link }}' class='block'>
+                  <a
+                    href='{{ block.settings.link }}'
+                    target='_blank'
+                    class='block w-full h-full bg-green-400'
+                  >
                 {% endif %}
 
                 {% if block.settings.image %}
                   <img
-                    src='{{ block.settings.image | image_url: width: 600 }}'
+                    src='{{ block.settings.image | image_url: width: 800 }}'
                     alt='{{ block.settings.caption | escape }}'
-                    class='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300'
+                    class='w-full h-full bg-red-400 object-cover object-center group-hover:scale-105 transition-transform duration-300'
                     loading='lazy'
                   >
                 {% else %}
-                  <div class='w-full h-full bg-gray-200 flex items-center justify-center'>
+                  <div class='w-full h-full bg-gray-200 flex items-center justify-center aspect-square'>
                     <span class='text-gray-500 text-sm'>No image</span>
                   </div>
                 {% endif %}
