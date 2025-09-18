@@ -46,7 +46,9 @@
       <!-- Brand Logo/Name -->
       <div class='text-center mb-8'>
         <a href='{{ routes.root_url }}' class='inline-block'>
-          {% if section.settings.logo_image and section.settings.logo_image != blank %}
+          {% if section.settings.logo_image
+            and section.settings.logo_image != blank
+          %}
             <img
               src='{{ section.settings.logo_image | image_url: width: 200 }}'
               alt='{{ section.settings.shop_name }} Logo'
