@@ -1,137 +1,285 @@
 <div
-  class='h-full flex items-center justify-center py-12 px-6 md:px-4 lg:px-8'
+  class='min-h-screen flex'
   x-data='{ loginForm: true, pwRecoverForm: false }'
 >
-  <div x-show='loginForm' class='max-w-md w-full space-y-8'>
-    <div>
-      <h1 class='text-center text-3xl font-bold mt-6'>
-        Sign in to your account
-      </h1>
-    </div>
-    <div class='mt-8'>
-      {% form 'customer_login' %}
-        {% if form.errors %}
-          <div
-            class='relative border border-red-400 bg-red-100 text-red 700 px-4 py-3'
-            role='alert'
-          >
-            <strong class='font-bold'>Error!</strong>
-            <p class='block sm:inline'>{{ form.errors | default_errors }}</p>
-          </div>
-        {% endif %}
-
-        <div class='my-2'>
-          <label for='email_address' class='sr-only'>Email address</label>
-          <input
-            type='email'
-            name='customer[email]'
-            id='email_address'
-            autocomplete='email'
-            class='relative block w-full px-3 py-2 border'
-            placeholder='Email address'
-          >
+  <!-- Left Side - Image -->
+  <div class='hidden lg:flex lg:w-1/2 relative'>
+    <img
+      src='{{ "login.webp" | asset_url }}'
+      alt='Login background'
+      class='w-full h-full object-cover'
+    >
+    <!-- Overlay content -->
+    <div class='absolute inset-0 bg-black/20 flex flex-col justify-between p-8'>
+      <!-- Top content -->
+      <div class='flex justify-between items-start'>
+        <div class='text-white'>
+          <h2 class='text-2xl font-bold mb-2'>
+            Welcome to {{ section.settings.shop_name }}
+          </h2>
+          <p class='text-lg opacity-90'>
+            Join our community of knife enthusiasts
+          </p>
         </div>
-
-        {% if form.password_needed %}
-          <div class='my-2'>
-            <label for='password' class='sr-only'>Password</label>
-            <input
-              type='password'
-              name='customer[password]'
-              id='password'
-              autocomplete='current-password'
-              class='relative block w-full px-3 py-2 border'
-              placeholder='Password'
-            >
-          </div>
-        {% endif %}
-
-        <div class='my-2 text-sm'>
-          <a
-            x-on:click='loginForm = false; pwRecoverForm = true'
-            href='#'
-            class='underline text-gray-500 hover:text-gray-900'
-          >
-            Forgot your password?
-          </a>
-        </div>
-        <div>
-          <button
-            type='submit'
-            class='relative w-full py-2 px-4 text-sm font-medium text-white bg-gray-600 hover:bg-gray-900'
-          >
-            Sign in
-          </button>
-        </div>
-      {% endform %}
-    </div>
-
-    {% if shop.checkout.guest_login %}
-      <hr class='my-12'>
-
-      <div>
-        <h1 class='mt-6 text-center text-3xl font-bold'>Continue as a guest</h1>
       </div>
 
-      {% form 'guest_login' %}
-        <div>
-          <button
-            type='submit'
-            class='relative w-full py-2 px-4 text-sm font-medium text-white bg-gray-600 hover:bg-gray-900'
-          >
-            Continue
-          </button>
+      <!-- Bottom content -->
+      <div class='text-white'>
+        <div class='flex items-center mb-4'>
+          <div class='w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-3'>
+            <svg class='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
+              <path d='M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z'/>
+            </svg>
+          </div>
+          <span class='text-lg font-medium'>Premium Knife Community</span>
         </div>
-      {% endform %}
-    {% endif %}
-  </div>
-  <div x-show='pwRecoverForm' class='max-w-md w-full space-y-8'>
-    <div>
-      <h1 class='text-center text-3xl font-bold mt-6'>Recover your password</h1>
+        <blockquote class='text-xl italic'>
+          "Craftsmanship that cuts through the ordinary"
+        </blockquote>
+      </div>
     </div>
-    <div class='mt-8'>
-      {% form 'recover_customer_password' %}
-        {% if form.errors %}
-          <div
-            class='relative border border-red-400 bg-red-100 text-red 700 px-4 py-3'
-            role='alert'
-          >
-            <strong class='font-bold'>Error!</strong>
-            <p class='block sm:inline'>{{ form.errors | default_errors }}</p>
+  </div>
+
+  <!-- Right Side - Login Form -->
+  <div class='w-full lg:w-1/2 flex items-center justify-center px-6 py-12'>
+    <div class='w-full max-w-md'>
+      <!-- Brand Logo/Name -->
+      <div class='text-center mb-8'>
+        <a href='{{ routes.root_url }}' class='inline-block'>
+          {% if section.settings.logo_image %}
+            <img
+              src='{{ section.settings.logo_image | image_url: width: 200 }}'
+              alt='{{ section.settings.shop_name }} Logo'
+              class='h-12 mx-auto'
+            >
+          {% else %}
+            <h1 class='text-3xl font-bold text-gray-900'>
+              {{ section.settings.shop_name }}
+            </h1>
+          {% endif %}
+        </a>
+      </div>
+
+      <!-- Login Form -->
+      <div x-show='loginForm'>
+        <div class='mb-8'>
+          <h2 class='text-2xl font-bold text-gray-900 mb-2'>Hi there!</h2>
+          <p class='text-gray-600'>
+            Welcome to {{ section.settings.shop_name }} Community Dashboard
+          </p>
+        </div>
+
+        {% form "customer_login" %}
+          {% if form.errors %}
+            <div class='mb-4 p-4 bg-red-50 border border-red-200 rounded-md'>
+              <div class='flex'>
+                <div class='flex-shrink-0'>
+                  <svg
+                    class='h-5 w-5 text-red-400'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
+                  >
+                    <path fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' clip-rule='evenodd'/>
+                  </svg>
+                </div>
+                <div class='ml-3'>
+                  <h3 class='text-sm font-medium text-red-800'>Error!</h3>
+                  <div class='mt-2 text-sm text-red-700'>
+                    {{ form.errors | default_errors }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+
+          <div class='space-y-4'>
+            <div>
+              <label
+                for='email_address'
+                class='block text-sm font-medium text-gray-700 mb-1'
+              >
+                Your email
+              </label>
+              <input
+                type='email'
+                name='customer[email]'
+                id='email_address'
+                autocomplete='email'
+                class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
+                placeholder='Enter your email'
+                required
+              >
+            </div>
+
+            {% if form.password_needed %}
+              <div>
+                <label
+                  for='password'
+                  class='block text-sm font-medium text-gray-700 mb-1'
+                >
+                  Password
+                </label>
+                <input
+                  type='password'
+                  name='customer[password]'
+                  id='password'
+                  autocomplete='current-password'
+                  class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
+                  placeholder='Enter your password'
+                  required
+                >
+              </div>
+            {% endif %}
+
+            <div class='flex justify-end'>
+              <button
+                type='button'
+                x-on:click='loginForm = false; pwRecoverForm = true'
+                class='text-sm text-blue-600 hover:text-blue-500'
+              >
+                Forgot password?
+              </button>
+            </div>
+
+            <button
+              type='submit'
+              class='w-full bg-black text-white py-3 px-4 rounded-md hover:bg-gray-800 transition-colors font-medium'
+            >
+              Log In
+            </button>
+          </div>
+        {% endform %}
+
+        <!-- Sign Up Link -->
+        <div class='mt-6 text-center'>
+          <p class='text-sm text-gray-600'>
+            Don't have an account?
+            <a
+              href='{{ routes.account_register_url }}'
+              class='text-blue-600 hover:text-blue-500 font-medium'
+            >
+              Sign up
+            </a>
+          </p>
+        </div>
+
+        <!-- Guest Checkout -->
+        {% if shop.checkout.guest_login %}
+          <div class='mt-8 pt-6 border-t border-gray-200'>
+            <div class='text-center'>
+              <h3 class='text-lg font-medium text-gray-900 mb-4'>
+                Continue as a guest
+              </h3>
+              {% form "guest_login" %}
+                <button
+                  type='submit'
+                  class='w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-md hover:bg-gray-50 transition-colors font-medium'
+                >
+                  Continue as Guest
+                </button>
+              {% endform %}
+            </div>
           </div>
         {% endif %}
+      </div>
 
-        <div class='my-2'>
-          <label for='email' class='sr-only'>Email address</label>
-          <input
-            type='email'
-            name='email'
-            id='email'
-            autocomplete='email'
-            class='relative block w-full px-3 py-2 border'
-            placeholder='Email address'
-          >
+      <!-- Password Recovery Form -->
+      <div x-show='pwRecoverForm'>
+        <div class='mb-8'>
+          <h2 class='text-2xl font-bold text-gray-900 mb-2'>
+            Recover your password
+          </h2>
+          <p class='text-gray-600'>
+            Enter your email address and we'll send you a link to reset your
+            password.
+          </p>
         </div>
 
-        <div>
+        {% form "recover_customer_password" %}
+          {% if form.errors %}
+            <div class='mb-4 p-4 bg-red-50 border border-red-200 rounded-md'>
+              <div class='flex'>
+                <div class='flex-shrink-0'>
+                  <svg
+                    class='h-5 w-5 text-red-400'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
+                  >
+                    <path fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' clip-rule='evenodd'/>
+                  </svg>
+                </div>
+                <div class='ml-3'>
+                  <h3 class='text-sm font-medium text-red-800'>Error!</h3>
+                  <div class='mt-2 text-sm text-red-700'>
+                    {{ form.errors | default_errors }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+
+          <div class='space-y-4'>
+            <div>
+              <label
+                for='email'
+                class='block text-sm font-medium text-gray-700 mb-1'
+              >
+                Email address
+              </label>
+              <input
+                type='email'
+                name='email'
+                id='email'
+                autocomplete='email'
+                class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
+                placeholder='Enter your email'
+                required
+              >
+            </div>
+
+            <button
+              type='submit'
+              class='w-full bg-black text-white py-3 px-4 rounded-md hover:bg-gray-800 transition-colors font-medium'
+            >
+              Recover password
+            </button>
+          </div>
+        {% endform %}
+
+        <div class='mt-6 text-center'>
           <button
-            type='submit'
-            class='relative w-full py-2 px-4 text-sm font-medium text-white bg-gray-600 hover:bg-gray-900'
+            type='button'
+            x-on:click='loginForm = true; pwRecoverForm = false'
+            class='text-sm text-blue-600 hover:text-blue-500'
           >
-            Recover password
+            ← Back to login
           </button>
         </div>
-
-        <div class='mt-8 text-sm'>
-          <a
-            x-on:click='loginForm = true; pwRecoverForm = false'
-            href='#'
-            class='underline text-gray-500 hover:text-gray-900'
-          >
-            Back to login
-          </a>
-        </div>
-      {% endform %}
+      </div>
     </div>
   </div>
 </div>
+
+{% schema %}
+{
+  "name": "Customer Login",
+  "settings": [
+    {
+      "type": "text",
+      "id": "shop_name",
+      "label": "Shop Name",
+      "default": "Kestrel Knives"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_image",
+      "label": "Logo Image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Customer Login"
+    }
+  ]
+}
+{% endschema %}

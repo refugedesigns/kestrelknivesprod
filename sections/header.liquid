@@ -130,25 +130,22 @@
               class='text-base text-white hover:text-gray-100'
               >account</a
             >
-            {{
-              "Log out"
-              | customer_logout_link
-              | replace: "<a",
-                '<a class="text-base text-white hover:text-blue-400"'
-            }}
+            <a
+              href='{{ routes.account_logout_url }}'
+              class='text-base text-white hover:text-blue-400'
+              >Log out</a
+            >
           {% else %}
-            {{
-              "Log in "
-              | customer_login_link
-              | replace: "<a",
-                '<a class="text-base text-white hover:text-blue-400"'
-            }}
-            {{
-              "Register"
-              | customer_register_link
-              | replace: "<a",
-                '<a class="text-base text-white hover:text-blue-400"'
-            }}
+            <a
+              href='{{ routes.account_login_url }}'
+              class='text-base text-white hover:text-blue-400'
+              >Log in</a
+            >
+            <a
+              href='{{ routes.account_register_url }}'
+              class='text-base text-white hover:text-blue-400'
+              >Register</a
+            >
           {% endif %}
         {% endif %}
       </div>
@@ -259,25 +256,25 @@
                       >
                         Account
                       </a>
-                      {{
-                        "Log out"
-                        | customer_logout_link
-                        | replace: "<a",
-                          '<a class="-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700"'
-                      }}
+                      <a
+                        href='{{ routes.account_logout_url }}'
+                        class='-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700'
+                      >
+                        Log out
+                      </a>
                     {% else %}
-                      {{
-                        "Log in"
-                        | customer_login_link
-                        | replace: "<a",
-                          '<a class="-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700"'
-                      }}
-                      {{
-                        "Register"
-                        | customer_register_link
-                        | replace: "<a",
-                          '<a class="-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700"'
-                      }}
+                      <a
+                        href='{{ routes.account_login_url }}'
+                        class='-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700'
+                      >
+                        Log in
+                      </a>
+                      <a
+                        href='{{ routes.account_register_url }}'
+                        class='-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700'
+                      >
+                        Register
+                      </a>
                     {% endif %}
                   {% endif %}
                 </div>
