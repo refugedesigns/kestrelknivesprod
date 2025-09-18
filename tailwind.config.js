@@ -19,6 +19,7 @@ module.exports = {
   },
   plugins: [
     // No plugins needed for CDN-based Flowbite
+    '@tailwindcss/typography',
   ],
   // Enable purging in production
   purge: {
