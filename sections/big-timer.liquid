@@ -211,10 +211,35 @@
       hours: '00',
       minutes: '00',
       seconds: '00',
+      timerInterval: null,
 
       init() {
         this.updateCountdown()
-        setInterval(() => this.updateCountdown(), 1000)
+        // Only start interval if we have a valid target date
+        if (this.isValidTargetDate()) {
+          this.timerInterval = setInterval(() => this.updateCountdown(), 1000)
+        }
+      },
+
+      isValidTargetDate() {
+        var targetDateString =
+          '{{ section.settings.target_date | default: "2024-12-31T23:59:59" }}'
+        var cleanDateString = targetDateString.trim()
+
+        if (!cleanDateString.includes('T')) {
+          cleanDateString += 'T23:59:59'
+        }
+
+        if (
+          !cleanDateString.includes('Z') &&
+          !cleanDateString.includes('+') &&
+          !cleanDateString.includes('-', 10)
+        ) {
+          cleanDateString += 'Z'
+        }
+
+        var targetDate = new Date(cleanDateString).getTime()
+        return !isNaN(targetDate) && targetDate > 0
       },
 
       updateCountdown() {
@@ -222,26 +247,29 @@
           '{{ section.settings.target_date | default: "2024-12-31T23:59:59" }}'
         console.log('Target date string:', targetDateString)
 
-        // Normalize the date format to ensure proper parsing
-        var normalizedDate = targetDateString.replace(
-          /(\d{4})-(\d{1,2})-(\d{1,2})T/,
-          function (match, year, month, day) {
-            return (
-              year +
-              '-' +
-              month.padStart(2, '0') +
-              '-' +
-              day.padStart(2, '0') +
-              'T'
-            )
-          }
-        )
+        // Clean and validate the date string
+        var cleanDateString = targetDateString.trim()
 
-        var targetDate = new Date(normalizedDate).getTime()
+        // Ensure proper ISO format
+        if (!cleanDateString.includes('T')) {
+          cleanDateString += 'T23:59:59'
+        }
+
+        // Add timezone if not present
+        if (
+          !cleanDateString.includes('Z') &&
+          !cleanDateString.includes('+') &&
+          !cleanDateString.includes('-', 10)
+        ) {
+          cleanDateString += 'Z'
+        }
+
+        var targetDate = new Date(cleanDateString).getTime()
 
         // If date is invalid, use a fallback date
-        if (isNaN(targetDate)) {
-          targetDate = new Date('2025-12-31T23:59:59').getTime()
+        if (isNaN(targetDate) || targetDate <= 0) {
+          console.warn('Invalid target date, using fallback')
+          targetDate = new Date('2025-12-31T23:59:59Z').getTime()
         }
 
         var now = new Date().getTime()
@@ -252,6 +280,12 @@
           this.hours = '00'
           this.minutes = '00'
           this.seconds = '00'
+          console.log('Countdown reached zero - timer stopped')
+          // Clear the interval to stop the infinite loop
+          if (this.timerInterval) {
+            clearInterval(this.timerInterval)
+            this.timerInterval = null
+          }
           return
         }
 
