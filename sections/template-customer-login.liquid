@@ -1,6 +1,7 @@
 <div
   class='min-h-screen flex'
   x-data='{ loginForm: true, pwRecoverForm: false }'
+  x-cloak
 >
   <!-- Left Side - Image -->
   <div class='hidden lg:flex lg:w-1/2 relative'>
@@ -52,9 +53,13 @@
             <img
               src='{{ section.settings.logo_image | image_url: width: 200 }}'
               alt='{{ section.settings.shop_name }} Logo'
-              class='h-20 mx-auto'
-              width='200'
-              height='80'
+              class='h-28 mx-auto'
+            >
+          {% elsif "logo.png" %}
+            <img
+              src='{{ "logo.png" | asset_url }}'
+              alt='{{ section.settings.shop_name }} Logo'
+              class='h-28 mx-auto'
             >
           {% else %}
             <h1 class='text-3xl font-bold text-gray-900'>
@@ -62,14 +67,6 @@
             </h1>
           {% endif %}
         </a>
-
-        <!-- Debug Information -->
-        <div class='text-xs text-gray-500 mt-2'>
-          <p>Logo Image: {{ section.settings.logo_image }}</p>
-          <p>Shop Name: {{ section.settings.shop_name }}</p>
-          <p>Section ID: {{ section.id }}</p>
-          <p>All Settings: {{ section.settings | json }}</p>
-        </div>
       </div>
 
       <!-- Login Form -->
@@ -147,7 +144,7 @@
               <button
                 type='button'
                 x-on:click='loginForm = false; pwRecoverForm = true'
-                class='text-sm text-blue-600 hover:text-blue-500'
+                class='text-sm cursor-pointer text-blue-600 hover:text-blue-500'
               >
                 Forgot password?
               </button>

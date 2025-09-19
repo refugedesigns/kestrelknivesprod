@@ -5,5 +5,5 @@
     }
   },
   "order": ["template-customer-login"],
-  "layout": "customers"
+  "layout": "authentication"
 }

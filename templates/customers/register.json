@@ -4,5 +4,6 @@
       "type": "template-customer-register"
     }
   },
-  "order": ["template-customer-register"]
+  "order": ["template-customer-register"],
+  "layout": "authentication"
 }
