@@ -1,0 +1,272 @@
+<div class='max-w-4xl mx-auto py-12 md:py-16'>
+  <!-- Page Header -->
+  <div class='text-center mb-12 border-b border-gray-200 pb-8'>
+    <h1 class='text-3xl md:text-4xl font-bold text-gray-900 mb-4'>
+      Guide and Outfitter Application
+    </h1>
+    <p class='text-gray-700 text-lg'>
+      Join our network of professional guides and outfitters
+    </p>
+  </div>
+
+  <!-- Application Form -->
+  <div class='bg-white rounded-lg shadow-sm border border-gray-200 p-8'>
+    {% form "contact" %}
+      {% if form.errors %}
+        <div class='border border-red-300 bg-red-50 p-4 mb-6 rounded'>
+          <div class='flex items-center mb-2'>
+            <div class='text-red-500 mr-2'>
+              <svg class='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
+                <path fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' clip-rule='evenodd'></path>
+              </svg>
+            </div>
+            <div class='text-sm font-medium text-red-800'>
+              Please correct the following errors:
+            </div>
+          </div>
+          <ul class='text-sm text-red-700 ml-7 list-disc'>
+            {% for error in form.errors %}
+              <li>{{ form.errors.messages[error] }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% elsif form.posted_successfully? %}
+        <div class='border border-green-300 bg-green-50 p-4 mb-6 rounded'>
+          <div class='flex items-center'>
+            <div class='text-green-500 mr-2'>
+              <svg class='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
+                <path fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' clip-rule='evenodd'></path>
+              </svg>
+            </div>
+            <div class='text-sm font-medium text-green-800'>
+              Application submitted successfully! We'll review your application
+              and get back to you soon.
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Hidden field for email subject -->
+      <input
+        type='hidden'
+        name='contact[subject]'
+        value='Someone requested a guide and outfitter'
+      >
+
+      <!-- Name of Outfitter/Company -->
+      <div class='mb-6'>
+        <label class='block text-sm font-medium text-gray-700 mb-2'>
+          Name of Outfitter/Company (required)
+        </label>
+        <input
+          type='text'
+          name='contact[company_name]'
+          placeholder='Enter company or outfitter name'
+          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
+          required
+        >
+      </div>
+
+      <!-- Name of Applicant -->
+      <div class='mb-6'>
+        <label class='block text-sm font-medium text-gray-700 mb-2'>
+          Name of Applicant (required)
+        </label>
+        <div class='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <div>
+            <input
+              type='text'
+              name='contact[first_name]'
+              placeholder='First Name'
+              class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
+              required
+            >
+          </div>
+          <div>
+            <input
+              type='text'
+              name='contact[last_name]'
+              placeholder='Last Name'
+              class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
+              required
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- License ID # -->
+      <div class='mb-6'>
+        <label class='block text-sm font-medium text-gray-700 mb-2'>
+          License ID # (required)
+        </label>
+        <input
+          type='text'
+          name='contact[license_id]'
+          placeholder='Enter your license ID'
+          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
+          required
+        >
+        <p class='text-sm text-gray-600 mt-2'>
+          You will also be required to email a copy of your Guide or Outfitter
+          License
+        </p>
+      </div>
+
+      <!-- Email Address -->
+      <div class='mb-6'>
+        <label class='block text-sm font-medium text-gray-700 mb-2'>
+          Email Address (required)
+        </label>
+        <input
+          type='email'
+          name='contact[email]'
+          placeholder='Enter your email address'
+          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
+          required
+        >
+      </div>
+
+      <!-- Geographic Area of Services Provided -->
+      <div class='mb-6'>
+        <label class='block text-sm font-medium text-gray-700 mb-2'>
+          Geographic Area of Services Provided (required)
+        </label>
+        <input
+          type='text'
+          name='contact[service_area]'
+          placeholder='Enter geographic area of services'
+          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
+          required
+        >
+      </div>
+
+      <!-- Summary of Services Provided -->
+      <div class='mb-6'>
+        <label class='block text-sm font-medium text-gray-700 mb-2'>
+          Summary of Services Provided (required)
+        </label>
+        <textarea
+          name='contact[services_summary]'
+          rows='4'
+          placeholder='Describe the services you provide...'
+          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black resize-vertical'
+          required
+        ></textarea>
+      </div>
+
+      <!-- Employment/Business -->
+      <div class='mb-6'>
+        <label class='block text-sm font-medium text-gray-700 mb-2'>
+          Employment/Business
+        </label>
+        <div class='flex space-x-6'>
+          <label class='flex items-center'>
+            <input
+              type='radio'
+              name='contact[employment_type]'
+              value='Full Time'
+              class='mr-2 text-black focus:ring-black'
+            >
+            <span class='text-sm text-gray-700'>Full Time</span>
+          </label>
+          <label class='flex items-center'>
+            <input
+              type='radio'
+              name='contact[employment_type]'
+              value='Part Time'
+              class='mr-2 text-black focus:ring-black'
+            >
+            <span class='text-sm text-gray-700'>Part Time</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Number of Trips Per Year -->
+      <div class='mb-6'>
+        <label class='block text-sm font-medium text-gray-700 mb-2'>
+          Number of Trips Per Year (required)
+        </label>
+        <input
+          type='text'
+          name='contact[trips_per_year]'
+          placeholder='Enter number of trips per year'
+          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
+          required
+        >
+      </div>
+
+      <!-- Website -->
+      <div class='mb-6'>
+        <label class='block text-sm font-medium text-gray-700 mb-2'>
+          Website
+        </label>
+        <input
+          type='url'
+          name='contact[website]'
+          placeholder='http://'
+          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
+        >
+      </div>
+
+      <!-- Phone -->
+      <div class='mb-6'>
+        <label class='block text-sm font-medium text-gray-700 mb-2'>
+          Phone (required)
+        </label>
+        <input
+          type='tel'
+          name='contact[phone]'
+          placeholder='Enter your phone number'
+          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
+          required
+        >
+      </div>
+
+      <!-- Message -->
+      <div class='mb-8'>
+        <label class='block text-sm font-medium text-gray-700 mb-2'>
+          Message
+        </label>
+        <textarea
+          name='contact[body]'
+          rows='4'
+          placeholder='Additional information or comments...'
+          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black resize-vertical'
+        ></textarea>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type='submit'
+        class='w-full rounded-md cursor-pointer bg-black text-white py-3 px-6 border-2 border-black hover:bg-white hover:text-black transition-colors duration-200 font-medium uppercase tracking-wide'
+      >
+        Submit
+      </button>
+    {% endform %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Guide Application",
+  "settings": [
+    {
+      "type": "text",
+      "id": "page_title",
+      "label": "Page Title",
+      "default": "Guide and Outfitter Application"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Join our network of professional guides and outfitters"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Guide Application"
+    }
+  ]
+}
+{% endschema %}
