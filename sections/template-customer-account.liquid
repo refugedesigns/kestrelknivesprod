@@ -1,59 +1,251 @@
-<div class="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
-    <h1 class="text-2xl font-bold text-gray-700">Account</h1>
+<div class='min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 mt-20'>
+  <div class='max-w-7xl mx-auto px-4 py-8 lg:px-8'>
+    <div class='grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8'>
+      <!-- Sidebar - Account Section -->
+      <aside class='lg:sticky lg:top-8'>
+        <div class='bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden'>
+          <!-- Account Header -->
+          <div class='bg-gradient-to-br from-black to-gray-800 px-8 py-8 text-center text-white'>
+            <div class='w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm'>
+              <span class='text-2xl font-bold text-black'>
+                {{ customer.first_name | slice: 0 -}}
+                {{- customer.last_name | slice: 0 }}
+              </span>
+            </div>
+            <h2 class='text-2xl font-semibold'>Account</h2>
+          </div>
 
-    <div class="block md:flex gap-4">
+          <!-- Account Details -->
+          <div class='p-8'>
+            <h3 class='text-lg font-semibold text-gray-900 mb-6'>
+              Account details
+            </h3>
+            <div class='space-y-4'>
+              <div class='text-base font-semibold text-gray-900'>
+                {{ customer.first_name }}
+                {{ customer.last_name }}
+              </div>
+              {% if customer.default_address %}
+                <div class='space-y-1'>
+                  {% if customer.default_address.address1 != blank %}
+                    <div class='text-sm text-gray-600'>
+                      {{ customer.default_address.address1 }}
+                    </div>
+                  {% endif %}
+                  {% if customer.default_address.address2 != blank %}
+                    <div class='text-sm text-gray-600'>
+                      {{ customer.default_address.address2 }}
+                    </div>
+                  {% endif %}
+                  {% if customer.default_address.city != blank %}
+                    <div class='text-sm text-gray-600'>
+                      {{ customer.default_address.city }}
+                    </div>
+                  {% endif %}
+                  {% if customer.default_address.province != blank %}
+                    <div class='text-sm text-gray-600'>
+                      {{ customer.default_address.province }}
+                    </div>
+                  {% endif %}
+                  {% if customer.default_address.country != blank %}
+                    <div class='text-sm text-gray-600'>
+                      {{ customer.default_address.country }}
+                    </div>
+                  {% endif %}
+                </div>
+              {% endif %}
+              <a
+                href='{{ routes.account_addresses_url }}'
+                class='text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors'
+              >
+                View addresses
+              </a>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content - Order History -->
+      <main class='bg-white rounded-2xl shadow-sm border border-gray-200 p-8'>
+        <div class='border-b border-gray-200 pb-6 mb-8'>
+          <h1 class='text-3xl font-bold text-gray-900 mb-2'>Order history</h1>
+          <p class='text-gray-600'>Track and manage your recent orders</p>
+        </div>
+
         {% assign number_of_orders = customer.orders | size %}
         {% if number_of_orders > 0 %}
-            <div class="w-full my-6 md:my-12">
-                <h2 class="text-xl font-bold text-gray-700">Order history</h2>
+          {% paginate customer.orders by 10 %}
+            <div class='space-y-6'>
+              {% for order in customer.orders %}
+                <div class='border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-gray-300 bg-white'>
+                  <!-- Order Header -->
+                  <div class='flex justify-between items-center px-6 py-4 bg-gray-50 border-b border-gray-200'>
+                    <div class='text-lg font-semibold text-gray-700'>
+                      {{ order.name | link_to: order.customer_url }}
+                    </div>
+                    <div class='flex gap-3'>
+                      <!-- Status Badge -->
+                      <span
+                        class='
+                          inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide
+                          {% if order.fulfillment_status == 'fulfilled' %}
+                            bg-green-50 text-green-700 border border-green-200
+                          {% else %}
+                            bg-yellow-50 text-yellow-700 border border-yellow-200
+                          {% endif %}
+                        '
+                      >
+                        <svg
+                          class='w-3.5 h-3.5'
+                          fill='none'
+                          stroke='currentColor'
+                          viewBox='0 0 24 24'
+                        >
+                          {% if order.fulfillment_status == 'fulfilled' %}
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                          {% else %}
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                          {% endif %}
+                        </svg>
+                        {{ order.fulfillment_status_label }}
+                      </span>
+                      <!-- Payment Badge -->
+                      <span
+                        class='
+                          inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide
+                          {% if order.financial_status == 'paid' %}
+                            bg-green-50 text-green-700 border border-green-200
+                          {% else %}
+                            bg-red-50 text-red-700 border border-red-200
+                          {% endif %}
+                        '
+                      >
+                        <svg
+                          class='w-3.5 h-3.5'
+                          fill='none'
+                          stroke='currentColor'
+                          viewBox='0 0 24 24'
+                        >
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {{ order.financial_status_label }}
+                      </span>
+                    </div>
+                  </div>
 
-                {% paginate customer.orders by 10 %}
-                    <div class="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-                        {% for order in customer.orders %}
-                            <div class="relative">
-                                <div class="w-full min-80 bg-gray-200 rounded-md overflow-hidden lg:h-80">
-                                    {% if order.line_items.first.image %}
-                                        <img class="w-full h-full object-center object-cover" src="{{ order.line_items.first.image | img_url: 'medium' }}" alt="{{ order.line_items.first.image.alt }}">
-                                    {% else %}
-                                        {{ 'product-1' | placeholder_svg_tag: 'w-full h-full object-center object-cover' }}
-                                    {% endif %}
-                                </div>
-
-                                <div class="mt-4 flex items-start justify-between">
-                                    <div>
-                                        <h3 class="text-sm text-gray-700">{{ order.name | link_to: order.customer_url }}</h3>
-
-                                        <p class="mt-1 text-sm text-gray-500">{{ order.financial_status_label }}</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-sm font-medium text-white bg-gray-700 rounded-full px-3 py-1">{{ order.fulfillment_status_label }}</p>
-                                        <p class="text-sm">{{ order.total_price | money }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-
+                  <!-- Order Content -->
+                  <div class='flex gap-6 p-6'>
+                    <!-- Product Image -->
+                    <div class='w-24 h-24 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0'>
+                      {% if order.line_items.first.image %}
+                        <img
+                          class='w-full h-full object-cover'
+                          src='{{ order.line_items.first.image | img_url: 'medium' }}'
+                          alt='{{ order.line_items.first.image.alt }}'
+                        >
+                      {% else %}
+                        {{
+                          "product-1"
+                          | placeholder_svg_tag: "w-full h-full object-cover"
+                        }}
+                      {% endif %}
                     </div>
 
-                    <div class="max-w-6xl mx-auto">
-                        {% render 'pagination', pagination: paginate %}
+                    <!-- Order Details -->
+                    <div class='flex-1'>
+                      <div class='text-base font-semibold text-gray-900 mb-4'>
+                        {{ order.line_items.first.product.title }}
+                        {% if order.line_items.size > 1 %}
+                          <span class='text-sm text-gray-500'
+                            >+ {{ order.line_items.size | minus: 1 }} more item
+                            {%- if order.line_items.size > 2 %}s{% endif -%}
+                          </span>
+                        {% endif %}
+                      </div>
+                      <div class='flex justify-between items-center'>
+                        <div class='flex items-center gap-2 text-sm text-gray-600'>
+                          <svg
+                            class='w-4 h-4'
+                            fill='none'
+                            stroke='currentColor'
+                            viewBox='0 0 24 24'
+                          >
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                          </svg>
+                          {{ order.created_at | date: "%b %d, %Y" }}
+                        </div>
+                        <div class='text-xl font-bold text-gray-900'>
+                          {{ order.total_price | money }}
+                        </div>
+                      </div>
                     </div>
+                  </div>
 
-                {% endpaginate %}
+                  <!-- Order Actions -->
+                  <div class='px-6 py-4 bg-gray-50 border-t border-gray-200'>
+                    <a
+                      href='{{ order.customer_url }}'
+                      class='inline-flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors'
+                    >
+                      <svg
+                        class='w-4 h-4'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
+                      View Details
+                    </a>
+                  </div>
+                </div>
+              {% endfor %}
             </div>
+
+            <!-- Pagination -->
+            {% if paginate.pages > 1 %}
+              <div class='mt-8'>
+                {% render "pagination", pagination: paginate %}
+              </div>
+            {% endif %}
+          {% endpaginate %}
         {% else %}
-            <div class="w-full h-80 flex items-center justify-center">
-                <h2 class="text-base md:text-2xl font-medium">You currently don't have any orders</h2>
+          <div class='text-center py-16'>
+            <div class='w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6'>
+              <svg
+                class='w-12 h-12 text-gray-400'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+              </svg>
             </div>
+            <h2 class='text-2xl font-semibold text-gray-900 mb-2'>
+              No orders yet
+            </h2>
+            <p class='text-gray-600 mb-8'>
+              You haven't placed any orders yet. Start shopping to see your
+              order history here.
+            </p>
+            <a
+              href='{{ routes.root_url }}'
+              class='inline-flex items-center gap-2 px-6 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors'
+            >
+              <svg
+                class='w-5 h-5'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
+              </svg>
+              Start Shopping
+            </a>
+          </div>
         {% endif %}
-
-
-        <div class="w-full md:w-1/4">
-            <h2 class="text-xl font-bold text-gray-700 mb-12">Account details</h2>
-
-            {{ customer.default_address | format_address }}
-
-            <a href="{{ routes.account_addresses_url }}" class="text-sm text-blue-600 hover:text-blue-900 underline">View addresses</a>
-        </div>
+      </main>
     </div>
+  </div>
 </div>

@@ -4,5 +4,6 @@
       "type": "template-customer-addresses",
     }
   },
+  "layout": "customers",
   "order": ["template-customer-addresses"]
 }
