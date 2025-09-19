@@ -1,4 +1,4 @@
-<div class='px-4 py-8 mx-auto' x-data='collectionPage()'>
+<div class='px-4 py-8 mx-auto' x-data='collectionPage()' x-cloak>
   {% comment %}
     <a
       href='{{ routes.collections_url }}'
@@ -61,7 +61,6 @@
       },
 
       applyFilters(filterData) {
-        console.log('Applying filters:', filterData)
 
         // Get all product cards
         const productCards = document.querySelectorAll('[data-product]')

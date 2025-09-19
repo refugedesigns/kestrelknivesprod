@@ -1,0 +1,8 @@
+{
+  "sections": {
+    "template-page-guide-and-outfitter": {
+      "type": "template-guide-and-outfitter"
+    }
+  },
+  "order": ["template-page-guide-and-outfitter"],
+}

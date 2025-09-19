@@ -54,7 +54,7 @@
               <button
                 type='button'
                 x-on:click='{{ link_handle }} = ! {{ link_handle }}'
-                class='inline-flex items-center cursor-pointer text-white hover:text-blue-400'
+                class='inline-flex items-center cursor-pointer text-white hover:text-gray-100'
               >
                 {{ link.title }}
                 {% render "icon-dropdown" %}
@@ -92,7 +92,7 @@
           {% else %}
             <a
               href='{{ link.url }}'
-              class='text-base text-white hover:text-blue-400'
+              class='text-base text-white hover:text-gray-100'
             >
               {{- link.title -}}
             </a>
@@ -132,18 +132,18 @@
             >
             <a
               href='{{ routes.account_logout_url }}'
-              class='text-base text-white hover:text-blue-400'
+              class='text-base text-white hover:text-gray-100'
               >Log out</a
             >
           {% else %}
             <a
               href='{{ routes.account_login_url }}'
-              class='text-base text-white hover:text-blue-400'
+              class='text-base text-white hover:text-gray-100'
               >Log in</a
             >
             <a
               href='{{ routes.account_register_url }}'
-              class='text-base text-white hover:text-blue-400'
+              class='text-base text-white hover:text-gray-100'
               >Register</a
             >
           {% endif %}
@@ -197,7 +197,7 @@
                       <button
                         x-on:click='{{ mobile_link_handle }} = ! {{ mobile_link_handle }}'
                         type='button'
-                        class='text-base text-white hover:text-blue-400 flex items-center justify-between w-full'
+                        class='text-base text-white hover:text-gray-100 flex items-center justify-between w-full'
                       >
                         <div>{{ link.title }}</div>
                         {% render "icon-dropdown" %}
@@ -210,7 +210,7 @@
                         {% for childlink in link.links %}
                           <a
                             href='{{ childlink.url }}'
-                            class='-m-3 p-3 mt-2 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700'
+                            class='-m-3 p-3 mt-2 flex items-center rounded-md text-white hover:text-gray-100 hover:bg-gray-700'
                           >
                             <span class='ml-3 text-base font-medium text-white'>
                               {{- childlink.title -}}
@@ -222,7 +222,7 @@
                   {% else %}
                     <a
                       href='{{ link.url }}'
-                      class='-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700'
+                      class='-m-3 p-3 flex items-center rounded-md text-white hover:text-gray-100 hover:bg-gray-700'
                     >
                       {{ link.title }}
                     </a>
@@ -234,7 +234,7 @@
                   <!-- Search -->
                   <button
                     @click='window.dispatchEvent(new CustomEvent("open-search")); mobileMenuOpen = false'
-                    class='-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700 w-full text-left'
+                    class='-m-3 p-3 flex items-center rounded-md text-white hover:text-gray-100 hover:bg-gray-700 w-full text-left'
                   >
                     Search
                   </button>
@@ -242,7 +242,7 @@
                   <!-- Cart -->
                   <button
                     @click='window.dispatchEvent(new CustomEvent("open-cart")); mobileMenuOpen = false'
-                    class='-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700 w-full text-left'
+                    class='-m-3 p-3 flex items-center rounded-md text-white hover:text-gray-100 hover:bg-gray-700 w-full text-left'
                   >
                     Cart
                   </button>
@@ -252,26 +252,26 @@
                     {% if customer %}
                       <a
                         href='{{ routes.account_url }}'
-                        class='-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700'
+                        class='-m-3 p-3 flex items-center rounded-md text-white hover:text-gray-100 hover:bg-gray-700'
                       >
                         Account
                       </a>
                       <a
                         href='{{ routes.account_logout_url }}'
-                        class='-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700'
+                        class='-m-3 p-3 flex items-center rounded-md text-white hover:text-gray-100 hover:bg-gray-700'
                       >
                         Log out
                       </a>
                     {% else %}
                       <a
                         href='{{ routes.account_login_url }}'
-                        class='-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700'
+                        class='-m-3 p-3 flex items-center rounded-md text-white hover:text-gray-100 hover:bg-gray-700'
                       >
                         Log in
                       </a>
                       <a
                         href='{{ routes.account_register_url }}'
-                        class='-m-3 p-3 flex items-center rounded-md text-white hover:text-blue-400 hover:bg-gray-700'
+                        class='-m-3 p-3 flex items-center rounded-md text-white hover:text-gray-100 hover:bg-gray-700'
                       >
                         Register
                       </a>

@@ -4,46 +4,58 @@
   x-cloak
 >
   <!-- Left Side - Image -->
-  <div class='hidden lg:flex lg:w-1/2 relative'>
-    <img
-      src='{{ "register.webp" | asset_url }}'
-      alt='Register background'
-      class='w-full h-full object-cover'
-      width='800'
-      height='600'
-    >
-    <!-- Overlay content -->
-    <div class='absolute inset-0 bg-black/20 flex flex-col justify-between p-8'>
-      <!-- Top content -->
-      <div class='flex justify-between items-start'>
-        <div class='text-white'>
-          <h2 class='text-2xl font-bold mb-2'>
-            Join {{ section.settings.shop_name }}
-          </h2>
-          <p class='text-lg opacity-90'>
-            Create your account and start your journey
-          </p>
-        </div>
-      </div>
-      <!-- Bottom content -->
-      <div class='text-white'>
-        <div class='flex items-center mb-4'>
-          <div class='w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-3'>
-            <svg class='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
-              <path d='M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z'/>
-            </svg>
+  {% if section.settings.show_left_image %}
+    <div class='hidden lg:flex lg:w-1/2 relative'>
+      {% if section.settings.left_image
+        and section.settings.left_image != blank
+      %}
+        <img
+          src='{{ section.settings.left_image | image_url: width: 800 }}'
+          alt='{{ section.settings.left_image.alt | default: "Register background" }}'
+          class='w-full h-full object-cover'
+        >
+      {% else %}
+        <img
+          src='{{ "register.webp" | asset_url }}'
+          alt='Register background'
+          class='w-full h-full object-cover'
+          width='800'
+          height='600'
+        >
+      {% endif %}
+      <!-- Overlay content -->
+      <div class='absolute inset-0 bg-black/20 flex flex-col justify-between p-8'>
+        <!-- Top content -->
+        <div class='flex justify-between items-start'>
+          <div class='text-white'>
+            <h2 class='text-2xl font-bold mb-2'>
+              Join {{ section.settings.shop_name }}
+            </h2>
+            <p class='text-lg opacity-90'>
+              Create your account and start your journey
+            </p>
           </div>
-          <span class='text-lg font-medium'>Join Our Community</span>
         </div>
-        <blockquote class='text-xl italic'>
-          "Where craftsmanship meets passion"
-        </blockquote>
+        <!-- Bottom content -->
+        <div class='text-white'>
+          <div class='flex items-center mb-4'>
+            <div class='w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-3'>
+              <svg class='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
+                <path d='M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z'/>
+              </svg>
+            </div>
+            <span class='text-lg font-medium'>Join Our Community</span>
+          </div>
+          <blockquote class='text-xl italic'>
+            "Where craftsmanship meets passion"
+          </blockquote>
+        </div>
       </div>
     </div>
-  </div>
+  {% endif %}
 
   <!-- Right Side - Register Form -->
-  <div class='w-full lg:w-1/2 flex items-center justify-center px-6 py-12'>
+  <div class='w-full {% if section.settings.show_left_image %}lg:w-1/2{% endif %} flex items-center justify-center px-6 py-12'>
     <div class='w-full max-w-md'>
       <!-- Brand Logo/Name -->
       <div class='text-center mb-8'>
@@ -252,13 +264,30 @@
       "type": "image_picker",
       "id": "logo_image",
       "label": "Logo Image"
+    },
+    {
+      "type": "header",
+      "content": "Left Side Image"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_left_image",
+      "label": "Show left side image",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "left_image",
+      "label": "Custom left side image",
+      "info": "If not uploaded, the default register image will be used"
     }
   ],
   "presets": [
     {
       "name": "Customer Register",
       "settings": {
-        "shop_name": "Kestrel Knives"
+        "shop_name": "Kestrel Knives",
+        "show_left_image": true
       }
     }
   ]

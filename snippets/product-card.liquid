@@ -214,16 +214,9 @@
         isAvailable: true,
 
         init() {
-          console.log(productData)
           // Get product data from data attributes
           this.productData = JSON.parse(this.$el.dataset.product)
           this.variantsData = JSON.parse(this.$el.dataset.variants)
-
-          // Console log complete objects
-          console.log('=== COMPLETE PRODUCT OBJECT ===')
-          console.log(this.productData)
-          console.log('=== COMPLETE VARIANTS ARRAY ===')
-          console.log(this.variantsData)
 
           // Set initial title with first variant color
           this.updateTitle()

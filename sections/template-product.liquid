@@ -1,312 +1,493 @@
-<script
-  src='https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js'
-></script>
-
 {% assign selected_variant = product.selected_or_first_available_variant %}
 
 <style>
-  swiper-container {
-    width: 100%;
-    height: 100%;
+  /* Custom styles for enhanced functionality */
+  html {
+    scroll-behavior: smooth;
   }
 
-  swiper-slide {
-    text-align: center;
-    font-size: 18px;
-    background: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  /* Image transition effects */
+  .image-transition {
+    transition: opacity 0.3s ease-in-out;
   }
 
-  swiper-slide img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+  /* Button hover effects */
+  .button-hover-scale {
+    transition: transform 0.2s ease-in-out;
   }
 
-  .mainSwiper {
-    height: 600px;
-    width: 100%;
-    margin-bottom: 10px;
+  .button-hover-scale:hover {
+    transform: scale(1.02);
   }
 
-  .thumbSwiper {
-    height: 80px;
-    box-sizing: border-box;
-    padding: 10px 0;
+  .button-hover-scale:active {
+    transform: scale(0.98);
   }
 
-  .thumbSwiper swiper-slide {
-    width: 25%;
-    height: 100%;
-    opacity: 0.4;
-    cursor: pointer;
+  /* Color selection hover effects */
+  .color-option {
+    transition: all 0.2s ease-in-out;
   }
 
-  .thumbSwiper .swiper-slide-thumb-active {
-    opacity: 1;
+  .color-option:hover {
+    transform: translateY(-2px);
   }
 
-  .thumbSwiper swiper-slide img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+  /* Quantity input styling */
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 
-  .product--information {
-    height: fit-content;
+  input[type='number'] {
+    -moz-appearance: textfield;
   }
 
-  .prose {
-    line-height: 1.4;
+  /* Focus states for accessibility */
+  button:focus-visible,
+  input:focus-visible {
+    outline: 2px solid #ff6b35;
+    outline-offset: 2px;
   }
 
-  .prose p {
-    margin-bottom: 0.5rem;
+  /* Responsive image container */
+  .aspect-square {
+    aspect-ratio: 1 / 1;
   }
 
-  /* .prose br {
-    line-height: 0.4;
-  } */
+  /* Mobile sticky positioning */
+  @media (max-width: 1024px) {
+    .mobile-sticky {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: white;
+      border-top: 1px solid #e5e7eb;
+      border-radius: 16px 16px 0 0;
+      box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+  }
 </style>
 
-<div class='max-w-6xl mx-auto my-8' x-data='productPage()'>
-  <div class='grid grid-cols-1 md:grid-cols-2 gap-8'>
-    <!-- Product Media Gallery -->
-    <div class='product--medias'>
-      <!-- Main Swiper with Thumbs -->
-      <div class='relative'>
-        <swiper-container
-          style='--swiper-navigation-color: #000; --swiper-pagination-color: #000'
-          class='mainSwiper'
-          thumbs-swiper='.thumbSwiper'
-          space-between='10'
-          navigation='true'
-        >
-          {% for media in product.media %}
-            <swiper-slide>
-              {% render "product-media", media: media %}
-            </swiper-slide>
-          {% endfor %}
-        </swiper-container>
+<div class='bg-gray-50 min-h-screen' x-data='productPage()'>
+  <!-- Main Content -->
+  <main class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+    <div class='lg:grid lg:grid-cols-12 lg:gap-8'>
+      <!-- Left Column - Product Images & Description -->
+      <div class='lg:col-span-7'>
+        <!-- Product Images -->
+        <div class='mb-8'>
+          <!-- Main Image -->
+          <div class='aspect-square bg-white rounded-lg overflow-hidden mb-4 relative group'>
+            <img
+              id='mainImage'
+              src='{{ product.featured_image | img_url: '600x600' }}'
+              alt='{{ product.title | escape }}'
+              class='w-full h-full object-contain transition-transform group-hover:scale-105'
+            >
 
-        <!-- Magnifying Glass Icon -->
-        <button
-          @click='openFullscreenGallery()'
-          class='absolute bottom-4 right-4 hover:cursor-pointer bg-white hover:bg-gray-50 p-3 transition-all duration-200 hover:scale-110 z-10 border border-gray-200'
-          title='View fullscreen'
-        >
-          <svg
-            class='w-6 h-6 text-gray-800'
-            fill='none'
-            stroke='currentColor'
-            viewBox='0 0 24 24'
-          >
-            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7'/>
-          </svg>
-        </button>
+            <!-- Navigation Arrows -->
+            <button
+              @click='previousImage()'
+              class='absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity'
+            >
+              <svg
+                class='w-5 h-5'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+            <button
+              @click='nextImage()'
+              class='absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity'
+            >
+              <svg
+                class='w-5 h-5'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+
+            <!-- Zoom Icon -->
+            <button
+              @click='openFullscreenGallery()'
+              class='absolute top-4 right-4 bg-white/80 hover:bg-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity'
+            >
+              <svg
+                class='w-5 h-5'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Thumbnail Images -->
+          <div class='flex space-x-3 overflow-x-auto pb-2'>
+            {% for media in product.media %}
+              <button
+                @click='changeImage({{ forloop.index0 }})'
+                class='thumbnail flex-shrink-0 w-20 h-20 bg-white rounded-lg overflow-hidden border-2 {% if forloop.first %}border-black{% else %}border-gray-200 hover:border-black{% endif %} transition-colors'
+              >
+                {% render "product-media", media: media %}
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Product Description -->
+        {% if product.description != blank %}
+          <div class='bg-white rounded-lg p-6 shadow-sm h-auto'>
+            <h3 class='text-xl font-semibold mb-4'>Product Description</h3>
+            <div class='prose prose-gray max-w-none h-auto'>
+              {{ product.description | newline_to_br }}
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Specifications -->
+
+        {% comment %} Check if we have any custom metafields {% endcomment %}
+        {% assign has_specs = false %}
+        {% for metafield in product.metafields.custom %}
+          {% if metafield != blank %}
+            {% assign has_specs = true %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+
+        {% if has_specs %}
+          <div class='bg-white rounded-lg p-6 shadow-sm mt-6'>
+            <h3 class='text-xl font-semibold mb-4'>Specifications</h3>
+            <dl class='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+              {% comment %} Display individual metafields in a specific order {% endcomment %}
+              {% if product.metafields.custom.material != blank %}
+                <div>
+                  <dt class='font-medium text-gray-900'>Material</dt>
+                  <dd class='text-gray-700'>
+                    {{ product.metafields.custom.material }}
+                  </dd>
+                </div>
+              {% endif %}
+              {% if product.metafields.custom.handle_length != blank %}
+                <div>
+                  <dt class='font-medium text-gray-900'>Handle Length</dt>
+                  <dd class='text-gray-700'>
+                    {{ product.metafields.custom.handle_length }}
+                  </dd>
+                </div>
+              {% endif %}
+              {% if product.metafields.custom.thickness != blank %}
+                <div>
+                  <dt class='font-medium text-gray-900'>Thickness</dt>
+                  <dd class='text-gray-700'>
+                    {{ product.metafields.custom.thickness }}
+                  </dd>
+                </div>
+              {% endif %}
+              {% if product.metafields.custom.weight != blank %}
+                <div>
+                  <dt class='font-medium text-gray-900'>Weight</dt>
+                  <dd class='text-gray-700'>
+                    {{ product.metafields.custom.weight }}
+                  </dd>
+                </div>
+              {% endif %}
+              {% if product.metafields.custom.features != blank %}
+                <div>
+                  <dt class='font-medium text-gray-900'>Features</dt>
+                  <dd class='text-gray-700'>
+                    {{ product.metafields.custom.features }}
+                  </dd>
+                </div>
+              {% endif %}
+              {% if product.metafields.custom.overall_length != blank %}
+                <div>
+                  <dt class='font-medium text-gray-900'>Overall Length</dt>
+                  <dd class='text-gray-700'>
+                    {{ product.metafields.custom.overall_length }}
+                  </dd>
+                </div>
+              {% endif %}
+              {% if product.metafields.custom.finish != blank %}
+                <div>
+                  <dt class='font-medium text-gray-900'>Finish</dt>
+                  <dd class='text-gray-700'>
+                    {{ product.metafields.custom.finish }}
+                  </dd>
+                </div>
+              {% endif %}
+              {% if product.metafields.custom.sheath != blank %}
+                <div>
+                  <dt class='font-medium text-gray-900'>Sheath</dt>
+                  <dd class='text-gray-700'>
+                    {{ product.metafields.custom.sheath }}
+                  </dd>
+                </div>
+              {% endif %}
+              {% if product.metafields.custom.dimensions != blank %}
+                <div>
+                  <dt class='font-medium text-gray-900'>Dimensions</dt>
+                  <dd class='text-gray-700'>
+                    {{ product.metafields.custom.dimensions }}
+                  </dd>
+                </div>
+              {% endif %}
+            </dl>
+          </div>
+        {% endif %}
       </div>
 
-      <!-- Thumbnail Swiper -->
-      <swiper-container
-        class='thumbSwiper'
-        space-between='2'
-        slides-per-view='4'
-        free-mode='true'
-        watch-slides-progress='true'
-      >
-        {% for media in product.media %}
-          <swiper-slide>
-            {% render "product-media", media: media %}
-          </swiper-slide>
-        {% endfor %}
-      </swiper-container>
-    </div>
+      <!-- Right Column - Sticky Product Info -->
+      <div class='lg:col-span-5 mt-8 lg:mt-0'>
+        <div id='productInfo' class='lg:sticky lg:top-8'>
+          <div class='bg-white rounded-lg p-6 shadow-sm'>
+            {% form "product",
+              product,
+              id: "product-form",
+              novalidate: "novalidate"
+            %}
+              <input type='hidden' name='id' value='{{ selected_variant.id }}'>
 
-    <div class='product--information sticky top-5 p-2'>
-      {% form "product",
-        product,
-        id: "product-form",
-        novalidate: "novalidate"
-      %}
-        <input type='hidden' name='id' value='{{ selected_variant.id }}'>
-        <input type='hidden' name='return_to' value='/cart'>
+              <!-- Brand -->
+              <p class='text-sm text-gray-600 mb-2'>{{ product.vendor }}</p>
 
-        {% for block in section.blocks %}
-          {% case block.type %}
-            {% when "vendor" %}
-              <div class='my-3'>
-                <span class='text-xs text-gray-500'>{{ product.vendor }}</span>
-              </div>
-            {% when "title" %}
-              <div class='my-3'>
-                <h1 class='text-3xl font-bold text-gray-900'>
-                  {{ product.title }}
-                </h1>
-              </div>
-            {% when "price" %}
-              <div class='my-3' id='price-{{ section.id }}'>
-                <span class='text-base text-gray-500 line-through'>
-                  {{ selected_variant.compare_at_price | money }}
-                </span>
-                <span class='text-lg text-gray-900'>
-                  {{ selected_variant.price | money }}
-                </span>
+              <!-- Product Title -->
+              <h1 class='text-3xl font-bold text-gray-900 mb-4'>
+                {{ product.title }}
+              </h1>
 
-                {% if selected_variant.price < selected_variant.compare_at_price
+              <!-- Price -->
+              <div class='mb-6'>
+                {% if selected_variant.compare_at_price > selected_variant.price
                 %}
-                  <span class='px-5 py-1 text-sm font-bold bg-red-500 rounded-full text-white mx-4'>
-                    Sale
+                  <span class='text-lg text-gray-500 line-through'>
+                    {{- selected_variant.compare_at_price | money -}}
+                  </span>
+                  <span class='text-3xl font-bold text-gray-900 ml-2'>
+                    {{- selected_variant.price | money -}}
+                  </span>
+                  <span class='px-3 py-1 text-sm font-bold bg-red-500 rounded-full text-white ml-4'
+                    >Sale</span
+                  >
+                {% else %}
+                  <span class='text-3xl font-bold text-gray-900'>
+                    {{- selected_variant.price | money -}}
                   </span>
                 {% endif %}
               </div>
-            {% when "description" %}
-              <div class='my-3'>
-                <div class='text-gray-700 prose prose-sm max-w-none'>
-                  {{ product.description | newline_to_br }}
-                </div>
-              </div>
-            {% when "variant_selector" %}
-              <div class='my-3'>
-                {% unless product.has_only_default_variant %}
-                  <variant-selector
-                    data-url='{{ product.url}}'
-                    data-section='{{ section.id }}'
-                  >
-                    {% for option in product.options_with_values %}
-                      <div class='my-4'>
-                        <label
-                          for='Option-{{ section.id }}-{{ forloop.index0 }}'
-                          class='block font-medium text-black text-xl mb-2'
-                        >
-                          {{ option.name }}
-                        </label>
 
-                        <div class='flex flex-wrap gap-3'>
-                          {% for value in option.values %}
-                            {% assign is_selected = false %}
-                            {% if option.selected_value == value %}
-                              {% assign is_selected = true %}
-                            {% endif %}
+              <!-- Handle Color Selection -->
+              {% unless product.has_only_default_variant %}
+                {% for option in product.options_with_values %}
+                  {% if option.name contains "Color"
+                    or option.name contains "Handle"
+                  %}
+                    <div class='mb-6'>
+                      <h3 class='text-lg font-semibold mb-3'>
+                        {{ option.name }}
+                      </h3>
+                      <div class='grid grid-cols-4 gap-3'>
+                        {% for value in option.values %}
+                          {% assign is_selected = false %}
+                          {% if option.selected_value == value %}
+                            {% assign is_selected = true %}
+                          {% endif %}
 
-                            {% comment %} Find a variant with this option value to get featured image {% endcomment %}
-                            {% assign option_image = null %}
-                            {% for variant in product.variants %}
-                              {% if option.name == product.options[0]
-                                and variant.option1 == value
-                              %}
-                                {% if variant.featured_image %}
-                                  {% assign option_image = variant.featured_image %}
-                                  {% break %}
-                                {% endif %}
-                              {% elsif option.name == product.options[1]
-                                and variant.option2 == value
-                              %}
-                                {% if variant.featured_image %}
-                                  {% assign option_image = variant.featured_image %}
-                                  {% break %}
-                                {% endif %}
+                          {% comment %} Find a variant with this option value to get featured image {% endcomment %}
+                          {% assign option_image = null %}
+                          {% for variant in product.variants %}
+                            {% if option.name == product.options[0]
+                              and variant.option1 == value
+                            %}
+                              {% if variant.featured_image %}
+                                {% assign option_image = variant.featured_image %}
+                                {% break %}
                               {% endif %}
-                            {% endfor %}
-
-                            <div class='flex flex-col items-center space-y-2'>
-                              <button
-                                type='button'
-                                class='
-                                  variant-option-btn flex items-center justify-center p-2 border-2 transition-colors w-16 h-16 cursor-pointer
-                                  {% if is_selected %}border-black{% else %}border-gray-300 hover:border-gray-400{% endif %}
-                                '
-                                data-option='{{ option.name | escape }}'
-                                data-value='{{ value | escape }}'
-                              >
-                                {% if option_image %}
-                                  <img
-                                    src='{{ option_image | img_url: "48x48" }}'
-                                    alt='{{ value }}'
-                                    class='w-full h-full object-cover'
-                                  >
-                                {% else %}
-                                  <div class='w-full h-full bg-gray-100 flex items-center justify-center'>
-                                    <span class='text-gray-400 text-xs'>
-                                      {{- value | slice: 0, 1 -}}
-                                    </span>
-                                  </div>
-                                {% endif %}
-                              </button>
-
-                              <span class='text-xs font-bold text-gray-900 uppercase text-center break-words leading-tight max-w-16'>
-                                {{- value -}}
-                              </span>
-                            </div>
+                            {% elsif option.name == product.options[1]
+                              and variant.option2 == value
+                            %}
+                              {% if variant.featured_image %}
+                                {% assign option_image = variant.featured_image %}
+                                {% break %}
+                              {% endif %}
+                            {% endif %}
                           {% endfor %}
-                        </div>
+
+                          <label class='relative cursor-pointer color-option'>
+                            <input
+                              type='radio'
+                              name='options[{{ option.name }}]'
+                              value='{{ value | escape }}'
+                              class='sr-only'
+                              {% if is_selected %}
+                                checked
+                              {% endif %}
+                            >
+                            <div class='w-full aspect-square border-2 {% if is_selected %}border-black{% else %}border-gray-300 hover:border-black{% endif %} rounded-lg p-2 bg-gray-50 hover:bg-gray-100 transition-colors'>
+                              {% if option_image %}
+                                <img
+                                  src='{{ option_image | img_url: '48x48' }}'
+                                  alt='{{ value }}'
+                                  class='w-full h-full object-cover rounded-md'
+                                >
+                              {% else %}
+                                <div class='w-full h-full bg-gray-100 rounded-md flex items-center justify-center'>
+                                  <span class='text-gray-400 text-xs'>
+                                    {{- value | slice: 0, 1 -}}
+                                  </span>
+                                </div>
+                              {% endif %}
+                            </div>
+                            <span class='text-xs text-center block mt-1 font-medium {% if is_selected %}text-black{% endif %}'>
+                              {{- value | upcase -}}
+                            </span>
+                          </label>
+                        {% endfor %}
                       </div>
-                    {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              {% endunless %}
 
-                    <script type='application/json'>
-                      {{ product.variants | json }}
-                    </script>
-                  </variant-selector>
-                {% endunless %}
-              </div>
-
-            {% when "checkout_buttons" %}
-              <div class='my-3'>
-                <div class='flex items-center gap-4'>
-                  <!-- Quantity Selector -->
-                  <div class='flex items-center border border-gray-300'>
-                    <button
-                      type='button'
-                      class='quantity-btn px-3 py-2 text-lg font-medium hover:bg-gray-100'
-                      data-action='decrease'
-                    >
-                      -
-                    </button>
-                    <input
-                      type='number'
-                      name='quantity'
-                      id='Quantity-{{ section.id }}'
-                      value='1'
-                      min='1'
-                      class='w-16 text-center border-0 focus:outline-none focus:ring-0'
-                      readonly
-                    >
-                    <button
-                      type='button'
-                      class='quantity-btn px-3 py-2 text-lg font-medium hover:bg-gray-100'
-                      data-action='increase'
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  <!-- Add to Cart Button -->
+              <!-- Quantity Selector -->
+              <div class='mb-6'>
+                <label class='block text-sm font-medium text-gray-700 mb-2'
+                  >Quantity</label
+                >
+                <div class='flex items-center space-x-3'>
                   <button
-                    type='submit'
-                    name='add'
-                    class='flex-1 bg-black hover:bg-gray-900 cursor-pointer text-white font-bold py-3 px-6 transition-colors duration-200 {% if selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
-                    {% if selected_variant.available == false %}
-                      disabled
-                    {% endif %}
+                    type='button'
+                    @click='decreaseQuantity()'
+                    class='w-10 h-10 rounded-md border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors'
                   >
-                    {% if selected_variant.available == false %}
-                      Sold out
-                    {% else %}
-                      ADD TO CART
-                    {% endif %}
+                    <svg
+                      class='w-4 h-4'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                    </svg>
+                  </button>
+                  <input
+                    type='number'
+                    x-model='quantity'
+                    min='1'
+                    class='w-20 text-center border border-gray-300 rounded-md py-2 focus:ring-2 focus:ring-black focus:border-black'
+                  >
+                  <button
+                    type='button'
+                    @click='increaseQuantity()'
+                    class='w-10 h-10 rounded-md border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors'
+                  >
+                    <svg
+                      class='w-4 h-4'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
                   </button>
                 </div>
               </div>
-            {% else %}
 
-          {% endcase %}
-        {% endfor %}
-      {% endform %}
+              <!-- Add to Cart Button -->
+              <button
+                type='submit'
+                class='w-full cursor-pointer bg-black hover:bg-gray-800 text-white font-semibold py-4 px-6 rounded-md transition-colors duration-200 transform hover:scale-[1.02] active:scale-[0.98] button-hover-scale {% if selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
+                {% if selected_variant.available == false %}
+                  disabled
+                {% endif %}
+              >
+                {% if selected_variant.available == false %}
+                  SOLD OUT
+                {% else %}
+                  ADD TO CART
+                {% endif %}
+              </button>
+
+              <!-- Additional Info -->
+              {% comment %}
+                <div class='mt-6 space-y-3 text-sm text-gray-600'>
+                  <div class='flex items-center'>
+                    <svg
+                      class='w-5 h-5 mr-2 text-green-600'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Free shipping on orders over $100
+                  </div>
+                  <div class='flex items-center'>
+                    <svg
+                      class='w-5 h-5 mr-2 text-green-600'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
+                    </svg>
+                    30-day return policy
+                  </div>
+                  <div class='flex items-center'>
+                    <svg
+                      class='w-5 h-5 mr-2 text-green-600'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                    Secure checkout
+                  </div>
+                </div>
+              {% endcomment %}
+            {% endform %}
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+
+    {% comment %}
+      <!-- Reviews Section -->
+      <div class='mt-12'>
+        <div class='bg-white rounded-lg p-6 shadow-sm'>
+          <h3 class='text-2xl font-semibold mb-6'>Customer Reviews</h3>
+          <div class='flex items-center mb-6'>
+            <div class='flex items-center'>
+              <div class='flex text-yellow-400'>
+                {% for i in (1..5) %}
+                  <svg class='w-5 h-5 fill-current' viewBox='0 0 20 20'>
+                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                  </svg>
+                {% endfor %}
+              </div>
+              <span class='ml-2 text-sm font-medium text-gray-900'
+                >4.8 out of 5</span
+              >
+              <span class='ml-2 text-sm text-gray-600'>(124 reviews)</span>
+            </div>
+          </div>
+          <p class='text-gray-600'>Reviews and ratings coming soon...</p>
+        </div>
+      </div>
+    {% endcomment %}
+  </main>
 </div>
 
 <!-- Fullscreen Gallery Modal -->
@@ -319,7 +500,7 @@
   x-transition:leave='transition ease-in duration-200'
   x-transition:leave-start='opacity-100'
   x-transition:leave-end='opacity-0'
-  class='fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center'
+  class='fixed inset-0 bg-black/60 z-50 flex items-center justify-center'
   style='display: none;'
   @click.self='closeGallery'
 >
@@ -329,14 +510,14 @@
     class='absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10'
   >
     <svg class='w-8 h-8' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-      <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 18L18 6M6 6l12 12'/>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
     </svg>
   </button>
 
   <!-- Fullscreen Swiper -->
   <div class='w-full h-full max-w-6xl max-h-[90vh] mx-4'>
     <swiper-container
-      style='--swiper-navigation-color: #000; --swiper-pagination-color: #000'
+      style='--swiper-navigation-color: #fff; --swiper-pagination-color: #fff'
       class='w-full h-full'
       space-between='10'
       navigation='true'
@@ -344,7 +525,11 @@
     >
       {% for media in product.media %}
         <swiper-slide class='flex items-center justify-center'>
-          {% render "product-media", media: media %}
+          <img
+            src='{{ media | img_url: 'large' }}'
+            alt='{{ media.preview_image.alt }}'
+            class='w-full h-full object-contain'
+          >
         </swiper-slide>
       {% endfor %}
     </swiper-container>
@@ -352,191 +537,193 @@
 </div>
 
 <script>
-  class VariantSelector extends HTMLElement {
-    constructor() {
-      super()
-      this.addEventListener('click', this.onVariantChange)
-      this.selectedOptions = {}
-    }
+  function productPage() {
+    return {
+      currentImageIndex: 0,
+      quantity: 1,
+      productImages: [
+        {% for media in product.media %}
+          '{{ media | img_url: "600x600" }}'{% unless forloop.last %},{% endunless %}
+        {% endfor %}
+      ],
 
-    connectedCallback() {
-      this.initializeSelectedOptions()
-    }
+      init() {
+        this.changeImage(0);
+        this.handleStickyBehavior();
+      },
 
-    initializeSelectedOptions() {
-      // Set initial selected options based on current variant
-      const currentVariant = this.getVariantJSON().find(v => v.id === {{ selected_variant.id }})
-      if (currentVariant) {
-        this.selectedOptions = {}
-        
-        // Get all option names from the buttons
-        const optionNames = Array.from(this.querySelectorAll('[data-option]')).map(btn => btn.dataset.option)
-        const uniqueOptionNames = [...new Set(optionNames)]
-        
-        // Map current variant options to option names
-        uniqueOptionNames.forEach((optionName, index) => {
-          if (currentVariant.options[index]) {
-            this.selectedOptions[optionName] = currentVariant.options[index]
+      changeImage(index) {
+        const mainImage = document.getElementById('mainImage');
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        const thumbnailContainer = document.querySelector('.flex.space-x-3.overflow-x-auto');
+
+        if (index >= 0 && index < this.productImages.length) {
+          this.currentImageIndex = index;
+          if (mainImage) {
+            mainImage.src = this.productImages[index];
           }
-        })
-        
-        // Update button states
-        Object.entries(this.selectedOptions).forEach(([option, value]) => {
-          const button = this.querySelector(`[data-option="${option}"][data-value="${value}"]`)
-          if (button) {
-            this.updateButtonStates(option, button)
-          }
-        })
-        
-        console.log('Initialized with options:', this.selectedOptions)
-      }
-    }
 
-    onVariantChange(event) {
-      // Find the closest button with variant-option-btn class
-      const button = event.target.closest('.variant-option-btn')
-      
-      if (button) {
-        event.preventDefault()
-        event.stopPropagation()
-        
-        const option = button.dataset.option
-        const value = button.dataset.value
-        
-        console.log('Clicked option:', option, 'value:', value)
-        
-        // Update selected option
-        this.selectedOptions[option] = value
-        
-        // Update button states
-        this.updateButtonStates(option, button)
-        
-        // Get selected variant and update
-        this.getSelectedVariant()
-        
-        if (this.currentVariant) {
-          this.updateURL()
-          this.updateFormID()
-          this.updatePrice()
+          // Update thumbnail borders
+          thumbnails.forEach((thumbnail, i) => {
+            if (i === index) {
+              thumbnail.classList.remove('border-gray-200');
+              thumbnail.classList.add('border-black');
+            } else {
+              thumbnail.classList.remove('border-black');
+              thumbnail.classList.add('border-gray-200');
+            }
+          });
+
+          // Auto-scroll to make the selected thumbnail visible
+          if (thumbnailContainer && thumbnails[index]) {
+            const selectedThumbnail = thumbnails[index];
+            const containerRect = thumbnailContainer.getBoundingClientRect();
+            const thumbnailRect = selectedThumbnail.getBoundingClientRect();
+
+            // Check if thumbnail is not fully visible
+            if (thumbnailRect.right > containerRect.right || thumbnailRect.left < containerRect.left) {
+              // Scroll to center the selected thumbnail
+              const scrollLeft = selectedThumbnail.offsetLeft - (thumbnailContainer.offsetWidth / 2) + (selectedThumbnail.offsetWidth / 2);
+              thumbnailContainer.scrollTo({
+                left: scrollLeft,
+                behavior: 'smooth'
+              });
+            }
+          }
+        }
+      },
+
+      previousImage() {
+        const newIndex = this.currentImageIndex > 0 ? this.currentImageIndex - 1 : this.productImages.length - 1;
+        this.changeImage(newIndex);
+      },
+
+      nextImage() {
+        const newIndex = this.currentImageIndex < this.productImages.length - 1 ? this.currentImageIndex + 1 : 0;
+        this.changeImage(newIndex);
+      },
+
+      decreaseQuantity() {
+        if (this.quantity > 1) {
+          this.quantity--;
+        }
+      },
+
+      increaseQuantity() {
+        this.quantity++;
+      },
+
+      openFullscreenGallery() {
+        console.log('Opening fullscreen gallery...');
+
+        // Get current slide index from main swiper
+        const mainSwiper = document.querySelector('.mainSwiper');
+        let currentSlide = 0;
+        if (mainSwiper && mainSwiper.swiper) {
+          currentSlide = mainSwiper.swiper.activeIndex;
+        }
+
+        // Open fullscreen gallery
+        const fullscreenGallery = document.querySelector('[x-data*="fullscreenGallery"]');
+        if (fullscreenGallery && fullscreenGallery._x_dataStack && fullscreenGallery._x_dataStack[0]) {
+          fullscreenGallery._x_dataStack[0].currentSlide = currentSlide;
+          fullscreenGallery._x_dataStack[0].isOpen = true;
+          document.body.style.overflow = 'hidden';
+          console.log('Fullscreen gallery opened');
+        } else {
+          console.log('Fullscreen gallery element not found');
+        }
+      },
+
+      handleStickyBehavior() {
+        const productInfo = document.getElementById('productInfo');
+        const isMobile = window.innerWidth < 1024;
+
+        if (isMobile && productInfo) {
+          // On mobile, make the entire product info sticky at bottom
+          const isSticky = window.scrollY > 400;
+
+          if (isSticky && !productInfo.classList.contains('mobile-sticky')) {
+            productInfo.classList.add('mobile-sticky');
+            productInfo.style.position = 'fixed';
+            productInfo.style.bottom = '0';
+            productInfo.style.left = '0';
+            productInfo.style.right = '0';
+            productInfo.style.zIndex = '50';
+            productInfo.style.backgroundColor = 'white';
+            productInfo.style.borderTop = '1px solid #e5e7eb';
+            productInfo.style.borderRadius = '16px 16px 0 0';
+            productInfo.style.boxShadow = '0 -4px 6px -1px rgba(0, 0, 0, 0.1)';
+            productInfo.style.padding = '1rem';
+            productInfo.style.margin = '0';
+          } else if (!isSticky && productInfo.classList.contains('mobile-sticky')) {
+            productInfo.classList.remove('mobile-sticky');
+            productInfo.style.position = 'static';
+            productInfo.style.bottom = 'auto';
+            productInfo.style.left = 'auto';
+            productInfo.style.right = 'auto';
+            productInfo.style.zIndex = 'auto';
+            productInfo.style.backgroundColor = '';
+            productInfo.style.borderTop = '';
+            productInfo.style.borderRadius = '';
+            productInfo.style.boxShadow = '';
+            productInfo.style.padding = '';
+            productInfo.style.margin = '';
+          }
         }
       }
-    }
-
-    updateButtonStates(option, clickedButton) {
-      // Remove selected state from all buttons for this option
-      const allButtons = this.querySelectorAll(`[data-option="${option}"]`)
-      allButtons.forEach(btn => {
-        btn.classList.remove('border-black')
-        btn.classList.add('border-gray-300')
-      })
-      
-      // Add selected state to clicked button
-      clickedButton.classList.remove('border-gray-300')
-      clickedButton.classList.add('border-black')
-    }
-
-    getSelectedOptions() {
-      this.options = Object.values(this.selectedOptions)
-      console.log(this.options)
-    }
-
-    getVariantJSON() {
-      this.variantData =
-        this.variantData ||
-        JSON.parse(this.querySelector('[type="application/json"]').textContent)
-      return this.variantData
-    }
-
-    getSelectedVariant() {
-      this.getSelectedOptions()
-      this.currentVariant = this.getVariantJSON().find(variant => {
-        // Get the selected options in the correct order
-        const selectedOptions = Object.values(this.selectedOptions)
-        
-        // Check if all selected options match the variant options
-        const findings = !variant.options
-          .map((option, index) => {
-            return selectedOptions[index] === option
-          })
-          .includes(false)
-
-        if (findings) return variant
-      })
-
-      console.log('Selected variant:', this.currentVariant)
-    }
-
-    updateURL() {
-      if (!this.currentVariant) return
-      window.history.replaceState(
-        {},
-        '',
-        `${this.dataset.url}?variant=${this.currentVariant.id}`
-      )
-    }
-
-    updateFormID() {
-      const form_input = document
-        .querySelector('#product-form')
-        .querySelector('input[name="id"]')
-      form_input.value = this.currentVariant.id
-    }
-
-    updatePrice() {
-      fetch(
-        `${this.dataset.url}?variant=${this.currentVariant.id}&section_id=${this.dataset.section}`
-      )
-        .then(response => response.text())
-        .then(responseText => {
-          const id = `price-${this.dataset.section}`
-          const html = new DOMParser().parseFromString(
-            responseText,
-            'text/html'
-          )
-
-          const oldPrice = document.getElementById(id)
-          const newPrice = html.getElementById(id)
-
-          if (oldPrice && newPrice) oldPrice.innerHTML = newPrice.innerHTML
-        })
     }
   }
 
-  customElements.define('variant-selector', VariantSelector)
+  function fullscreenGallery() {
+    return {
+      isOpen: false,
+      currentSlide: 0,
 
-  // Quantity selector functionality
+      closeGallery() {
+        this.isOpen = false;
+        document.body.style.overflow = '';
+      }
+    }
+  }
+
+  // Handle window resize and scroll
+  window.addEventListener('scroll', () => {
+    const productPage = document.querySelector('[x-data*="productPage"]');
+    if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
+      productPage._x_dataStack[0].handleStickyBehavior();
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    const productPage = document.querySelector('[x-data*="productPage"]');
+    if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
+      productPage._x_dataStack[0].handleStickyBehavior();
+    }
+  });
+
+  // Intercept product form submission to use cart sheet
   document.addEventListener('DOMContentLoaded', function() {
-    const quantityBtns = document.querySelectorAll('.quantity-btn')
-    const quantityInput = document.querySelector('input[name="quantity"]')
-    
-    quantityBtns.forEach(btn => {
-      btn.addEventListener('click', function() {
-        const action = this.dataset.action
-        const currentValue = parseInt(quantityInput.value)
-        
-        if (action === 'increase') {
-          quantityInput.value = currentValue + 1
-        } else if (action === 'decrease' && currentValue > 1) {
-          quantityInput.value = currentValue - 1
-        }
-      })
-    })
-
-    // Intercept product form submission
-    const productForm = document.getElementById('product-form')
+    const productForm = document.getElementById('product-form');
     if (productForm) {
       productForm.addEventListener('submit', async function(e) {
-        e.preventDefault()
-        
-        const formData = new FormData(this)
-        const variantId = formData.get('id')
-        const quantity = parseInt(formData.get('quantity')) || 1
-        
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const variantId = formData.get('id');
+
+        // Get quantity from Alpine.js component
+        const productPage = document.querySelector('[x-data*="productPage"]');
+        let quantity = 1;
+        if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
+          quantity = productPage._x_dataStack[0].quantity || 1;
+        }
+
         try {
           // Get the cart sheet component
-          const cartSheet = document.querySelector('[x-data*="cartSheet"]')
+          const cartSheet = document.querySelector('[x-data*="cartSheet"]');
           if (cartSheet && cartSheet._x_dataStack && cartSheet._x_dataStack[0]) {
-            await cartSheet._x_dataStack[0].addToCart(variantId, quantity)
+            await cartSheet._x_dataStack[0].addToCart(variantId, quantity);
           } else {
             // Fallback: direct API call
             const response = await fetch('/cart/add.js', {
@@ -548,62 +735,34 @@
                 id: variantId,
                 quantity: quantity,
               }),
-            })
+            });
 
             if (response.ok) {
               // Dispatch event to open cart
-              window.dispatchEvent(new CustomEvent('open-cart'))
+              window.dispatchEvent(new CustomEvent('open-cart'));
             } else {
-              throw new Error('Failed to add to cart')
+              throw new Error('Failed to add to cart');
             }
           }
         } catch (error) {
-          console.error('Error adding to cart:', error)
-          alert('Failed to add item to cart. Please try again.')
+          console.error('Error adding to cart:', error);
+          alert('Failed to add item to cart. Please try again.');
         }
-      })
+      });
     }
-  })
+  });
 
-  // Product page functionality
-  function productPage() {
-    return {
-      openFullscreenGallery() {
-        console.log('Opening fullscreen gallery...')
-        
-        // Get current slide index from main swiper
-        const mainSwiper = document.querySelector('.mainSwiper')
-        let currentSlide = 0
-        if (mainSwiper && mainSwiper.swiper) {
-          currentSlide = mainSwiper.swiper.activeIndex
-        }
-        
-        // Open fullscreen gallery
-        const fullscreenGallery = document.querySelector('[x-data*="fullscreenGallery"]')
-        if (fullscreenGallery && fullscreenGallery._x_dataStack && fullscreenGallery._x_dataStack[0]) {
-          fullscreenGallery._x_dataStack[0].currentSlide = currentSlide
-          fullscreenGallery._x_dataStack[0].isOpen = true
-          document.body.style.overflow = 'hidden'
-          console.log('Fullscreen gallery opened')
-        } else {
-          console.log('Fullscreen gallery element not found')
-        }
+  // Keyboard navigation for images
+  document.addEventListener('keydown', function(e) {
+    const productPage = document.querySelector('[x-data*="productPage"]');
+    if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
+      if (e.key === 'ArrowLeft') {
+        productPage._x_dataStack[0].previousImage();
+      } else if (e.key === 'ArrowRight') {
+        productPage._x_dataStack[0].nextImage();
       }
     }
-  }
-
-  // Fullscreen gallery functionality
-  function fullscreenGallery() {
-    return {
-      isOpen: false,
-      currentSlide: 0,
-
-      closeGallery() {
-        this.isOpen = false
-        document.body.style.overflow = ''
-      }
-    }
-  }
+  });
 </script>
 
 {% schema %}
