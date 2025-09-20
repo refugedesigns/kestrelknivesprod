@@ -1,6 +1,45 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
-  "current": "Default",
+  "current": {
+    "sections": {
+      "header": {
+        "type": "header",
+        "settings": {
+          "mobile_menu_title": "Menu",
+          "logo_image": "shopify://shop_images/bird-white.png",
+          "menu": "customer-account-main-menu"
+        }
+      },
+      "footer": {
+        "type": "footer",
+        "settings": {
+          "twitter_url": "",
+          "youtube_url": "",
+          "facebook_url": "",
+          "email": "",
+          "instagram_url": "",
+          "guide_url": "",
+          "shipping_url": "",
+          "faq_url": "",
+          "contact_url": "",
+          "notification_title": "Sign up to get notifications for our",
+          "notification_subtitle": "Next Blade Drop:",
+          "notification_success_message": "Thanks for signing up!",
+          "notification_button_color": "bg-black"
+        }
+      }
+    },
+    "content_for_index": []
+  },
   "presets": {
-    "Default": { }
+    "Default": {}
   }
 }
