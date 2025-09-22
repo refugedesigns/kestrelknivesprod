@@ -258,7 +258,12 @@
               id: "product-form",
               novalidate: "novalidate"
             %}
-              <input type='hidden' name='id' value='{{ selected_variant.id }}'>
+              <input
+                type='hidden'
+                name='id'
+                id='variantIdInput'
+                value='{{ selected_variant.id }}'
+              >
 
               <!-- Brand -->
               <p class='text-sm text-gray-600 mb-2'>{{ product.vendor }}</p>
@@ -270,34 +275,53 @@
 
               <!-- Price -->
               <div class='mb-6'>
-                {% if selected_variant.compare_at_price > selected_variant.price
-                %}
-                  <span class='text-lg text-gray-500 line-through'>
-                    {{- selected_variant.compare_at_price | money -}}
-                  </span>
-                  <span class='text-3xl font-bold text-gray-900 ml-2'>
-                    {{- selected_variant.price | money -}}
-                  </span>
-                  <span class='px-3 py-1 text-sm font-bold bg-red-500 rounded-full text-white ml-4'
-                    >Sale</span
-                  >
-                {% else %}
-                  <span class='text-3xl font-bold text-gray-900'>
-                    {{- selected_variant.price | money -}}
-                  </span>
-                {% endif %}
+                <span
+                  id='comparePrice'
+                  class='text-lg text-gray-500 line-through'
+                  style='display: {% if selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
+                >
+                  {{- selected_variant.compare_at_price | money -}}
+                </span>
+                <span id='price' class='text-3xl font-bold text-gray-900 ml-2'>
+                  {{- selected_variant.price | money -}}
+                </span>
+                <span
+                  id='saleBadge'
+                  class='px-3 py-1 text-sm font-bold bg-red-500 rounded-full text-white ml-4'
+                  style='display: {% if selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
+                  >Sale</span
+                >
+                <div id='availability' class='mt-1 text-sm text-gray-600'></div>
               </div>
 
-              <!-- Handle Color Selection -->
+              <!--
+                Dynamic Variant Options (supports Knives, Apparel, Accessories)
+              -->
               {% unless product.has_only_default_variant %}
                 {% for option in product.options_with_values %}
-                  {% if option.name contains "Color"
-                    or option.name contains "Handle"
+                  {% assign option_name_downcase = option.name
+                    | downcase
+                    | strip
                   %}
-                    <div class='mb-6'>
-                      <h3 class='text-lg font-semibold mb-3'>
-                        {{ option.name }}
-                      </h3>
+                  {% assign option_position = forloop.index %}
+
+                  <div class='mb-6'>
+                    <h3 class='text-lg font-semibold mb-3'>
+                      {{ option.name }}
+                    </h3>
+
+                    {% comment %}
+                      Determine renderer by option name:
+                      - color-like: color/colour/handle/colourway → swatches with images
+                      - size-like: size → text square buttons
+                      - default: text buttons
+                    {% endcomment %}
+
+                    {% if option_name_downcase contains "color"
+                      or option_name_downcase contains "colour"
+                      or option_name_downcase contains "handle"
+                      or option_name_downcase contains "colourway"
+                    %}
                       <div class='grid grid-cols-4 gap-3'>
                         {% for value in option.values %}
                           {% assign is_selected = false %}
@@ -305,24 +329,28 @@
                             {% assign is_selected = true %}
                           {% endif %}
 
-                          {% comment %} Find a variant with this option value to get featured image {% endcomment %}
                           {% assign option_image = null %}
                           {% for variant in product.variants %}
-                            {% if option.name == product.options[0]
+                            {% if option_position == 1
                               and variant.option1 == value
                             %}
-                              {% if variant.featured_image %}
-                                {% assign option_image = variant.featured_image %}
-                                {% break %}
-                              {% endif %}
-                            {% elsif option.name == product.options[1]
+                              {% if variant.featured_image -%}
+                                {%- assign option_image = variant.featured_image -%}
+                              {%- endif %}
+                            {% elsif option_position == 2
                               and variant.option2 == value
                             %}
-                              {% if variant.featured_image %}
-                                {% assign option_image = variant.featured_image %}
-                                {% break %}
-                              {% endif %}
+                              {% if variant.featured_image -%}
+                                {%- assign option_image = variant.featured_image -%}
+                              {%- endif %}
+                            {% elsif option_position == 3
+                              and variant.option3 == value
+                            %}
+                              {% if variant.featured_image -%}
+                                {%- assign option_image = variant.featured_image -%}
+                              {%- endif %}
                             {% endif %}
+                            {% if option_image %}{% break %}{% endif %}
                           {% endfor %}
 
                           <label class='relative cursor-pointer color-option'>
@@ -338,14 +366,14 @@
                             <div class='w-full aspect-square border-2 {% if is_selected %}border-black{% else %}border-gray-300 hover:border-black{% endif %} rounded-lg p-2 bg-gray-50 hover:bg-gray-100 transition-colors'>
                               {% if option_image %}
                                 <img
-                                  src='{{ option_image | img_url: '48x48' }}'
+                                  src='{{ option_image | img_url: '96x96' }}'
                                   alt='{{ value }}'
                                   class='w-full h-full object-cover rounded-md'
                                 >
                               {% else %}
                                 <div class='w-full h-full bg-gray-100 rounded-md flex items-center justify-center'>
-                                  <span class='text-gray-400 text-xs'>
-                                    {{- value | slice: 0, 1 -}}
+                                  <span class='text-gray-600 text-xs'>
+                                    {{- value | escape -}}
                                   </span>
                                 </div>
                               {% endif %}
@@ -356,8 +384,68 @@
                           </label>
                         {% endfor %}
                       </div>
-                    </div>
-                  {% endif %}
+
+                    {% elsif option_name_downcase contains "size" %}
+                      <div class='flex flex-wrap gap-2'>
+                        {% for value in option.values %}
+                          {% assign is_selected = false %}
+                          {% if option.selected_value == value %}
+                            {% assign is_selected = true %}
+                          {% endif %}
+
+                          <label class='cursor-pointer'>
+                            <input
+                              type='radio'
+                              name='options[{{ option.name }}]'
+                              value='{{ value | escape }}'
+                              class='sr-only'
+                              {% if is_selected %}
+                                checked
+                              {% endif %}
+                            >
+                            <div
+                              class='
+                                min-w-[3rem] px-3 h-10 inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors
+                                {% if is_selected %} border-black bg-black text-white {% else %} border-gray-300 hover:border-black bg-white text-gray-900 {% endif %}
+                              '
+                            >
+                              {{ value | upcase }}
+                            </div>
+                          </label>
+                        {% endfor %}
+                      </div>
+
+                    {% else %}
+                      <div class='flex flex-wrap gap-2'>
+                        {% for value in option.values %}
+                          {% assign is_selected = false %}
+                          {% if option.selected_value == value %}
+                            {% assign is_selected = true %}
+                          {% endif %}
+
+                          <label class='cursor-pointer'>
+                            <input
+                              type='radio'
+                              name='options[{{ option.name }}]'
+                              value='{{ value | escape }}'
+                              class='sr-only'
+                              {% if is_selected %}
+                                checked
+                              {% endif %}
+                            >
+                            <div
+                              class='
+                                px-3 h-10 inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors
+                                {% if is_selected %} border-black bg-black text-white {% else %} border-gray-300 hover:border-black bg-white text-gray-900 {% endif %}
+                              '
+                            >
+                              {{ value }}
+                            </div>
+                          </label>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
                 {% endfor %}
               {% endunless %}
 
@@ -406,6 +494,7 @@
 
               <!-- Add to Cart Button -->
               <button
+                id='addToCartBtn'
                 type='submit'
                 class='w-full cursor-pointer bg-black hover:bg-gray-800 text-white font-semibold py-4 px-6 transition-colors duration-200 transform hover:scale-[1.02] active:scale-[0.98] button-hover-scale {% if selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
                 {% if selected_variant.available == false %}
@@ -421,40 +510,40 @@
 
               <!-- Additional Info -->
               {% comment %}
-                <div class='mt-6 space-y-3 text-sm text-gray-600'>
-                  <div class='flex items-center'>
-                    <svg
-                      class='w-5 h-5 mr-2 text-green-600'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                    >
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    Free shipping on orders over $100
-                  </div>
-                  <div class='flex items-center'>
-                    <svg
-                      class='w-5 h-5 mr-2 text-green-600'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                    >
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
-                    </svg>
-                    30-day return policy
-                  </div>
-                  <div class='flex items-center'>
-                    <svg
-                      class='w-5 h-5 mr-2 text-green-600'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                    >
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                    </svg>
-                    Secure checkout
-                  </div>
+                  <div class='mt-6 space-y-3 text-sm text-gray-600'>
+                    <div class='flex items-center'>
+                      <svg
+                        class='w-5 h-5 mr-2 text-green-600'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      Free shipping on orders over $100
+                    </div>
+                    <div class='flex items-center'>
+                      <svg
+                        class='w-5 h-5 mr-2 text-green-600'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
+                      </svg>
+                      30-day return policy
+                    </div>
+                    <div class='flex items-center'>
+                      <svg
+                        class='w-5 h-5 mr-2 text-green-600'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                      </svg>
+                      Secure checkout
+                    </div>
                 </div>
               {% endcomment %}
             {% endform %}
@@ -537,144 +626,575 @@
 </div>
 
 <script>
-  function productPage() {
-    return {
-      currentImageIndex: 0,
-      quantity: 1,
-      productImages: [
-        {% for media in product.media %}
-          '{{ media | img_url: "600x600" }}'{% unless forloop.last %},{% endunless %}
-        {% endfor %}
-      ],
+  window.__product = {{ product | json }};
+  // Pre-format all variant prices using Shopify's money filter
+  window.__formattedPrices = {
+    {% for variant in product.variants %}
+      {{ variant.id }}: "{{ variant.price | money }}"{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  };
+  window.__formattedComparePrices = {
+    {% for variant in product.variants %}
+      {% if variant.compare_at_price %}
+        {{ variant.id }}: "{{ variant.compare_at_price | money }}"{% unless forloop.last %},{% endunless %}
+      {% endif %}
+    {% endfor %}
+  };
+</script>
 
-      init() {
-        this.changeImage(0);
-        this.handleStickyBehavior();
-      },
+<script>
+    /*
+      Dynamic variant handling for any product options.
+      - Reads window.__product (Liquid output of product | json)
+      - Builds a variants map keyed by option values
+      - Listens for option input changes and updates selected variant, price, availability, and main image
+    */
 
-      changeImage(index) {
-        const mainImage = document.getElementById('mainImage');
-        const thumbnails = document.querySelectorAll('.thumbnail');
-        const thumbnailContainer = document.querySelector('.flex.space-x-3.overflow-x-auto');
+    (function () {
+      // Helper config — expand or adjust keywords if needed
+      const COLOR_KEYWORDS = ['color','colour','handle','colourway','finish','shade'];
+      const SIZE_KEYWORDS = ['size','waist','length','inches','cm','sizing'];
 
-        if (index >= 0 && index < this.productImages.length) {
-          this.currentImageIndex = index;
-          if (mainImage) {
-            mainImage.src = this.productImages[index];
-          }
+      function isColorOption(name) {
+        if (!name) return false;
+        const n = name.toLowerCase();
+        return COLOR_KEYWORDS.some(k => n.includes(k));
+      }
+      function isSizeOption(name) {
+        if (!name) return false;
+        const n = name.toLowerCase();
+        return SIZE_KEYWORDS.some(k => n.includes(k));
+      }
 
-          // Update thumbnail borders
-          thumbnails.forEach((thumbnail, i) => {
-            if (i === index) {
-              thumbnail.classList.remove('border-gray-200');
-              thumbnail.classList.add('border-black');
-            } else {
-              thumbnail.classList.remove('border-black');
-              thumbnail.classList.add('border-gray-200');
+      // Utility to build a normalized key for a variant from its options array
+      function variantKeyFromOptionsArray(optionsArray) {
+        // keep explicit order, join by "||"
+        return optionsArray.map(v => String(v || '').trim()).join('||');
+      }
+
+      // Build variants data from window.__product
+      const product = window.__product || {};
+      console.log('Product:', product);
+      const variants = (product.variants || []).map(v => {
+        const opts = [];
+        if (v.option1 !== undefined) opts.push(v.option1);
+        if (v.option2 !== undefined) opts.push(v.option2);
+        if (v.option3 !== undefined) opts.push(v.option3);
+        return {
+          id: v.id,
+          title: v.title,
+          options: opts,
+          available: v.available,
+          price: v.price, // in cents (Shopify JSON)
+          compare_at_price: v.compare_at_price,
+          featured_image: v.featured_image ? (v.featured_image.src || v.featured_image) : null,
+          sku: v.sku || '',
+          barcode: v.barcode || '',
+        };
+      });
+
+      const variantsMap = {};
+      variants.forEach(v => {
+        const key = variantKeyFromOptionsArray(v.options);
+        variantsMap[key] = v;
+      });
+
+      // Initial selected options: read from selected_or_first_available_variant if present
+      const initialVariant = (product.selected_or_first_available_variant) ? product.selected_or_first_available_variant : (variants[0] || null);
+      const initialOptions = [];
+      if (initialVariant) {
+        if (initialVariant.option1 !== undefined) initialOptions.push(initialVariant.option1);
+        if (initialVariant.option2 !== undefined) initialOptions.push(initialVariant.option2);
+        if (initialVariant.option3 !== undefined) initialOptions.push(initialVariant.option3);
+      }
+
+      // Expose Alpine-style productPage object (keeps your existing Alpine usage)
+      window.productPage = function () {
+        return {
+          currentImageIndex: 0,
+          quantity: 1,
+          productImages: [
+            {% for media in product.media %}
+              '{{ media | img_url: "600x600" }}'{% unless forloop.last %},{% endunless %}
+            {% endfor %}
+          ],
+
+          // dynamic selected options (kept in array ordered by product.options index)
+          selectedOptions: initialOptions.slice(),
+
+          init() {
+            // initial image set
+            this.changeImage(0);
+
+            // Populate option input listeners (radio/button inputs)
+            this.bindOptionInputs();
+
+            // set initial UI state based on initialVariant
+            this.updateSelectedVariantByOptions(this.selectedOptions);
+
+            // sticky behavior
+            this.handleStickyBehavior();
+
+            // watch for page scroll/resize (you already do this; keep in component)
+          },
+
+          bindOptionInputs() {
+            // find all inputs that select options (name like options[Option Name])
+            const optionInputs = document.querySelectorAll('input[name^="options["], select[name^="options["]');
+            optionInputs.forEach(input => {
+              input.addEventListener('change', (e) => {
+                const name = input.name.replace(/^options\[(.+)\]$/, '$1');
+                // Determine which option index this corresponds to in product.options
+                const optionIndex = this.getOptionIndexByName(name); // 0-based
+                if (optionIndex === -1) return;
+
+                const value = input.value;
+                this.selectedOptions[optionIndex] = value;
+                this.updateSelectedVariantByOptions(this.selectedOptions);
+              });
+            });
+
+            // If options are represented by clickable labels without inputs, also handle clicks
+            // (some themes wrap radio in label; events bubble, so change should capture)
+          },
+
+          getOptionIndexByName(name) {
+            if (!product.options) return -1;
+            for (let i = 0; i < product.options.length; i++) {
+              if ((product.options[i] || '').toString().toLowerCase().trim() === (name || '').toLowerCase().trim()) {
+                return i;
+              }
             }
-          });
+            // fallback: try matching by substring
+            const lname = (name || '').toLowerCase();
+            for (let i = 0; i < product.options.length; i++) {
+              if ((product.options[i] || '').toString().toLowerCase().includes(lname) || lname.includes((product.options[i]||'').toLowerCase())) {
+                return i;
+              }
+            }
+            return -1;
+          },
 
-          // Auto-scroll to make the selected thumbnail visible
-          if (thumbnailContainer && thumbnails[index]) {
-            const selectedThumbnail = thumbnails[index];
-            const containerRect = thumbnailContainer.getBoundingClientRect();
-            const thumbnailRect = selectedThumbnail.getBoundingClientRect();
+          updateSelectedVariantByOptions(optionsArray) {
+            // Normalize length to product.options length
+            const optionCount = (product.options || []).length;
+            const normalized = new Array(optionCount).fill('');
+            for (let i = 0; i < optionCount; i++) normalized[i] = optionsArray[i] || (product.options_with_values && product.options_with_values[i] && product.options_with_values[i].selected_value) || '';
 
-            // Check if thumbnail is not fully visible
-            if (thumbnailRect.right > containerRect.right || thumbnailRect.left < containerRect.left) {
-              // Scroll to center the selected thumbnail
-              const scrollLeft = selectedThumbnail.offsetLeft - (thumbnailContainer.offsetWidth / 2) + (selectedThumbnail.offsetWidth / 2);
-              thumbnailContainer.scrollTo({
-                left: scrollLeft,
-                behavior: 'smooth'
+            const key = variantKeyFromOptionsArray(normalized);
+
+            let variant = variantsMap[key];
+
+            // If exact variant not found try to find a match by partial values (best effort)
+            if (!variant) {
+              // try to find first variant which matches all non-empty selected values
+              variant = variants.find(v => {
+                for (let i = 0; i < normalized.length; i++) {
+                  if (normalized[i] && ((v.options[i] || '').toString().trim() !== normalized[i].toString().trim())) {
+                    return false;
+                  }
+                }
+                return true;
               });
             }
-          }
-        }
-      },
 
-      previousImage() {
-        const newIndex = this.currentImageIndex > 0 ? this.currentImageIndex - 1 : this.productImages.length - 1;
-        this.changeImage(newIndex);
-      },
+            // final fallback
+            if (!variant) {
+              variant = variants.find(v => v.available) || variants[0] || null;
+            }
 
-      nextImage() {
-        const newIndex = this.currentImageIndex < this.productImages.length - 1 ? this.currentImageIndex + 1 : 0;
-        this.changeImage(newIndex);
-      },
+             if (variant) {
+               // update hidden input
+               const variantInput = document.getElementById('variantIdInput');
+               if (variantInput) variantInput.value = variant.id;
 
-      decreaseQuantity() {
-        if (this.quantity > 1) {
-          this.quantity--;
-        }
-      },
+               // update option button states
+               this.updateOptionButtonStates(optionsArray);
 
-      increaseQuantity() {
-        this.quantity++;
-      },
+               // update price / compare price / sale badge
+               this.updatePriceDisplay(variant);
 
-      openFullscreenGallery() {
-        console.log('Opening fullscreen gallery...');
+               // update availability
+               this.updateAvailability(variant);
 
-        // Get current slide index from main swiper
-        const mainSwiper = document.querySelector('.mainSwiper');
-        let currentSlide = 0;
-        if (mainSwiper && mainSwiper.swiper) {
-          currentSlide = mainSwiper.swiper.activeIndex;
-        }
+               // update main image if variant has featured_image
+               if (variant.featured_image) {
+                 const mainImage = document.getElementById('mainImage');
+                 if (mainImage && mainImage.src.indexOf(variant.featured_image) === -1) {
+                   mainImage.src = variant.featured_image;
+                 }
+               }
 
-        // Open fullscreen gallery
-        const fullscreenGallery = document.querySelector('[x-data*="fullscreenGallery"]');
-        if (fullscreenGallery && fullscreenGallery._x_dataStack && fullscreenGallery._x_dataStack[0]) {
-          fullscreenGallery._x_dataStack[0].currentSlide = currentSlide;
-          fullscreenGallery._x_dataStack[0].isOpen = true;
-          document.body.style.overflow = 'hidden';
-          console.log('Fullscreen gallery opened');
-        } else {
-          console.log('Fullscreen gallery element not found');
-        }
-      },
+               // update add to cart button state
+               this.updateAddToCartState(variant);
+             }
+          },
 
-      handleStickyBehavior() {
-        const productInfo = document.getElementById('productInfo');
-        const isMobile = window.innerWidth < 1024;
+          updateOptionButtonStates(selectedOptions) {
+            // Update all option inputs to reflect the selected state
+            const optionInputs = document.querySelectorAll('input[name^="options["], select[name^="options["]');
+            
+            console.log('Updating option button states:', selectedOptions);
+            
+            optionInputs.forEach(input => {
+              const name = input.name.replace(/^options\[(.+)\]$/, '$1');
+              const optionIndex = this.getOptionIndexByName(name);
+              
+              console.log(`Input: ${name}, Option Index: ${optionIndex}, Value: ${input.value}`);
+              
+              if (optionIndex !== -1 && selectedOptions[optionIndex]) {
+                const isSelected = input.value === selectedOptions[optionIndex];
+                
+                console.log(`Is selected: ${isSelected} for ${input.value}`);
+                
+                // Update radio button checked state
+                if (input.type === 'radio') {
+                  input.checked = isSelected;
+                }
+                
+                // Update visual styling for the option button/label
+                this.updateOptionButtonVisualState(input, isSelected);
+              }
+            });
+          },
 
-        if (isMobile && productInfo) {
-          // On mobile, make the entire product info sticky at bottom
-          const isSticky = window.scrollY > 400;
+          updateOptionButtonVisualState(input, isSelected) {
+            // Find the parent label or button container
+            const label = input.closest('label');
+            const button = label ? label.querySelector('div') : null;
+            
+            console.log('Updating visual state:', {
+              input: input.value,
+              isSelected: isSelected,
+              button: button,
+              buttonClasses: button ? button.className : 'none'
+            });
+            
+            if (button) {
+              if (isSelected) {
+                // Selected state - check button type by classes
+                if (button.classList.contains('min-w-[3rem]') || 
+                    button.classList.contains('px-3') || 
+                    button.closest('.size-option') ||
+                    button.textContent.trim().length < 10) { // Short text usually means size/model buttons
+                  // Size/Model button selected state - black background, white text
+                  button.classList.remove('border-gray-300', 'hover:border-black', 'bg-white', 'text-gray-900');
+                  button.classList.add('border-black', 'bg-black', 'text-white');
+                } else {
+                  // Color option selected state - black border
+                  button.classList.remove('border-gray-300', 'hover:border-black');
+                  button.classList.add('border-black');
+                  
+                  // Update text color for color options
+                  const textSpan = button.parentElement.querySelector('span');
+                  if (textSpan) {
+                    textSpan.classList.remove('text-gray-600');
+                    textSpan.classList.add('text-black');
+                  }
+                }
+              } else {
+                // Unselected state
+                if (button.classList.contains('min-w-[3rem]') || 
+                    button.classList.contains('px-3') || 
+                    button.closest('.size-option') ||
+                    button.textContent.trim().length < 10) { // Short text usually means size/model buttons
+                  // Size/Model button unselected state - white background, gray border
+                  button.classList.remove('border-black', 'bg-black', 'text-white');
+                  button.classList.add('border-gray-300', 'hover:border-black', 'bg-white', 'text-gray-900');
+                } else {
+                  // Color option unselected state - gray border
+                  button.classList.remove('border-black');
+                  button.classList.add('border-gray-300', 'hover:border-black');
+                  
+                  // Reset text color for color options
+                  const textSpan = button.parentElement.querySelector('span');
+                  if (textSpan) {
+                    textSpan.classList.remove('text-black');
+                    textSpan.classList.add('text-gray-600');
+                  }
+                }
+              }
+            }
+          },
 
-          if (isSticky && !productInfo.classList.contains('mobile-sticky')) {
-            productInfo.classList.add('mobile-sticky');
-            productInfo.style.position = 'fixed';
-            productInfo.style.bottom = '0';
-            productInfo.style.left = '0';
-            productInfo.style.right = '0';
-            productInfo.style.zIndex = '50';
-            productInfo.style.backgroundColor = 'white';
-            productInfo.style.borderTop = '1px solid #e5e7eb';
-            productInfo.style.borderRadius = '16px 16px 0 0';
-            productInfo.style.boxShadow = '0 -4px 6px -1px rgba(0, 0, 0, 0.1)';
-            productInfo.style.padding = '1rem';
-            productInfo.style.margin = '0';
-          } else if (!isSticky && productInfo.classList.contains('mobile-sticky')) {
-            productInfo.classList.remove('mobile-sticky');
-            productInfo.style.position = 'static';
-            productInfo.style.bottom = 'auto';
-            productInfo.style.left = 'auto';
-            productInfo.style.right = 'auto';
-            productInfo.style.zIndex = 'auto';
-            productInfo.style.backgroundColor = '';
-            productInfo.style.borderTop = '';
-            productInfo.style.borderRadius = '';
-            productInfo.style.boxShadow = '';
-            productInfo.style.padding = '';
-            productInfo.style.margin = '';
-          }
-        }
-      }
+          updatePriceDisplay(variant) {
+            const priceEl = document.getElementById('price');
+            const compareEl = document.getElementById('comparePrice');
+            const saleEl = document.getElementById('saleBadge');
+
+             // Use Shopify's pre-formatted prices
+             function formatMoney(cents) {
+               if (typeof cents !== 'number') return '';
+               // Find the variant with this price
+               const variant = variants.find(v => v.price === cents);
+               if (variant && window.__formattedPrices && window.__formattedPrices[variant.id]) {
+                 return window.__formattedPrices[variant.id];
+               }
+               // Fallback to basic formatting
+               return (cents / 100).toFixed(2);
+             }
+
+             function formatComparePrice(cents) {
+               if (typeof cents !== 'number') return '';
+               // Find the variant with this compare price
+               const variant = variants.find(v => v.compare_at_price === cents);
+               if (variant && window.__formattedComparePrices && window.__formattedComparePrices[variant.id]) {
+                 return window.__formattedComparePrices[variant.id];
+               }
+               // Fallback to basic formatting
+               return (cents / 100).toFixed(2);
+             }
+
+            if (priceEl) priceEl.innerText = formatMoney(variant.price);
+
+            if (compareEl) {
+              if (variant.compare_at_price && Number(variant.compare_at_price) > Number(variant.price)) {
+                compareEl.style.display = 'inline-block';
+                compareEl.innerText = formatComparePrice(variant.compare_at_price);
+                if (saleEl) saleEl.style.display = 'inline-block';
+              } else {
+                if (compareEl) compareEl.style.display = 'none';
+                if (saleEl) saleEl.style.display = 'none';
+              }
+            }
+          },
+
+          updateAvailability(variant) {
+            const availability = document.getElementById('availability');
+            if (!availability) return;
+            if (variant.available) {
+              availability.innerText = 'In stock';
+              availability.classList.remove('text-red-600');
+              availability.classList.add('text-green-600');
+            } else {
+              availability.innerText = 'Sold out';
+              availability.classList.remove('text-green-600');
+              availability.classList.add('text-red-600');
+            }
+          },
+
+          updateAddToCartState(variant) {
+            const btn = document.getElementById('addToCartBtn');
+            if (!btn) return;
+            if (!variant.available) {
+              btn.setAttribute('disabled','disabled');
+              btn.classList.add('opacity-50','cursor-not-allowed');
+              btn.innerText = 'SOLD OUT';
+            } else {
+              btn.removeAttribute('disabled');
+              btn.classList.remove('opacity-50','cursor-not-allowed');
+              btn.innerText = 'ADD TO CART';
+            }
+          },
+
+          changeImage(index) {
+            const mainImage = document.getElementById('mainImage');
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            const thumbnailContainer = document.querySelector('.flex.space-x-3.overflow-x-auto');
+
+            if (index >= 0 && index < this.productImages.length) {
+              this.currentImageIndex = index;
+              if (mainImage) {
+                mainImage.src = this.productImages[index];
+              }
+
+              // Update thumbnail borders
+              thumbnails.forEach((thumbnail, i) => {
+                if (i === index) {
+                  thumbnail.classList.remove('border-gray-200');
+                  thumbnail.classList.add('border-black');
+                } else {
+                  thumbnail.classList.remove('border-black');
+                  thumbnail.classList.add('border-gray-200');
+                }
+              });
+
+              // Auto-scroll to make the selected thumbnail visible
+              if (thumbnailContainer && thumbnails[index]) {
+                const selectedThumbnail = thumbnails[index];
+                const containerRect = thumbnailContainer.getBoundingClientRect();
+                const thumbnailRect = selectedThumbnail.getBoundingClientRect();
+
+                if (thumbnailRect.right > containerRect.right || thumbnailRect.left < containerRect.left) {
+                  const scrollLeft = selectedThumbnail.offsetLeft - (thumbnailContainer.offsetWidth / 2) + (selectedThumbnail.offsetWidth / 2);
+                  thumbnailContainer.scrollTo({
+                    left: scrollLeft,
+                    behavior: 'smooth'
+        });
     }
   }
+            }
+          },
 
+          previousImage() {
+            const newIndex = this.currentImageIndex > 0 ? this.currentImageIndex - 1 : this.productImages.length - 1;
+            this.changeImage(newIndex);
+          },
+
+          nextImage() {
+            const newIndex = this.currentImageIndex < this.productImages.length - 1 ? this.currentImageIndex + 1 : 0;
+            this.changeImage(newIndex);
+          },
+
+          decreaseQuantity() {
+            if (this.quantity > 1) {
+              this.quantity--;
+            }
+          },
+
+          increaseQuantity() {
+            this.quantity++;
+          },
+
+          openFullscreenGallery() {
+            const fullscreenGallery = document.querySelector('[x-data*="fullscreenGallery"]');
+            if (fullscreenGallery && fullscreenGallery._x_dataStack && fullscreenGallery._x_dataStack[0]) {
+              fullscreenGallery._x_dataStack[0].isOpen = true;
+              document.body.style.overflow = 'hidden';
+            }
+          },
+
+          handleStickyBehavior() {
+            const productInfo = document.getElementById('productInfo');
+            const isMobile = window.innerWidth < 1024;
+
+            if (isMobile && productInfo) {
+              const isSticky = window.scrollY > 400;
+
+              if (isSticky && !productInfo.classList.contains('mobile-sticky')) {
+                productInfo.classList.add('mobile-sticky');
+                productInfo.style.position = 'fixed';
+                productInfo.style.bottom = '0';
+                productInfo.style.left = '0';
+                productInfo.style.right = '0';
+                productInfo.style.zIndex = '50';
+                productInfo.style.backgroundColor = 'white';
+                productInfo.style.borderTop = '1px solid #e5e7eb';
+                productInfo.style.borderRadius = '16px 16px 0 0';
+                productInfo.style.boxShadow = '0 -4px 6px -1px rgba(0, 0, 0, 0.1)';
+                productInfo.style.padding = '1rem';
+                productInfo.style.margin = '0';
+              } else if (!isSticky && productInfo.classList.contains('mobile-sticky')) {
+                productInfo.classList.remove('mobile-sticky');
+                productInfo.style.position = 'static';
+                productInfo.style.bottom = 'auto';
+                productInfo.style.left = 'auto';
+                productInfo.style.right = 'auto';
+                productInfo.style.zIndex = 'auto';
+                productInfo.style.backgroundColor = '';
+                productInfo.style.borderTop = '';
+                productInfo.style.borderRadius = '';
+                productInfo.style.boxShadow = '';
+                productInfo.style.padding = '';
+                productInfo.style.margin = '';
+              }
+            }
+          }
+        };
+      };
+
+
+      // Handle window resize and scroll
+      window.addEventListener('scroll', () => {
+        const productPage = document.querySelector('[x-data*="productPage"]');
+        if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
+          productPage._x_dataStack[0].handleStickyBehavior();
+        }
+      });
+
+      window.addEventListener('resize', () => {
+        const productPage = document.querySelector('[x-data*="productPage"]');
+        if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
+          productPage._x_dataStack[0].handleStickyBehavior();
+        }
+      });
+
+      // Intercept product form submission to use cart sheet
+      document.addEventListener('DOMContentLoaded', function() {
+        const productForm = document.getElementById('product-form');
+        if (productForm) {
+          productForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const variantId = formData.get('id');
+
+            // Get quantity from Alpine.js component
+            const productPage = document.querySelector('[x-data*="productPage"]');
+            let quantity = 1;
+            if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
+              quantity = productPage._x_dataStack[0].quantity || 1;
+            }
+
+            try {
+              // Get the cart sheet component
+              const cartSheet = document.querySelector('[x-data*="cartSheet"]');
+              if (cartSheet && cartSheet._x_dataStack && cartSheet._x_dataStack[0]) {
+                await cartSheet._x_dataStack[0].addToCart(variantId, quantity);
+              } else {
+                // Fallback: direct API call
+                const response = await fetch('/cart/add.js', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    id: variantId,
+                    quantity: quantity,
+                  }),
+                });
+
+                if (response.ok) {
+                  // Dispatch event to open cart
+                  window.dispatchEvent(new CustomEvent('open-cart'));
+                } else {
+                  throw new Error('Failed to add to cart');
+                }
+              }
+    } catch (error) {
+              console.error('Error adding to cart:', error);
+              alert('Failed to add item to cart. Please try again.');
+            }
+          });
+        }
+      });
+
+      // Keyboard navigation for images
+      document.addEventListener('keydown', function(e) {
+        const productPage = document.querySelector('[x-data*="productPage"]');
+        if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
+          if (e.key === 'ArrowLeft') {
+            productPage._x_dataStack[0].previousImage();
+          } else if (e.key === 'ArrowRight') {
+            productPage._x_dataStack[0].nextImage();
+          }
+        }
+      });
+
+      // initialize Alpine style (if Alpine is present it will call x-data init, but ensure we call for non-alpine fallback)
+      document.addEventListener('alpine:init', () => {
+        // nothing needed — Alpine will call x-data init
+      });
+
+      // If Alpine isn't available or the component doesn't auto-init, try manual init (best effort)
+      document.addEventListener('DOMContentLoaded', () => {
+        const el = document.querySelector('[x-data*="productPage"]');
+        if (el && el._x_dataStack && el._x_dataStack[0]) {
+          // Alpine present; component already set up
+        } else {
+          // Not Alpine-managed or not yet init'd — we can't do much without Alpine, but we left a manual fallback in productPage()
+          if (typeof window.productPage === 'function') {
+            const p = window.productPage();
+            if (p && p.init) p.init();
+            // Make p accessible for console debugging
+            window._productPageFallback = p;
+          }
+        }
+      });
+
+    })();
+
+  // Define fullscreenGallery function globally for Alpine.js
   function fullscreenGallery() {
     return {
       isOpen: false,
@@ -686,83 +1206,6 @@
       }
     }
   }
-
-  // Handle window resize and scroll
-  window.addEventListener('scroll', () => {
-    const productPage = document.querySelector('[x-data*="productPage"]');
-    if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
-      productPage._x_dataStack[0].handleStickyBehavior();
-    }
-  });
-
-  window.addEventListener('resize', () => {
-    const productPage = document.querySelector('[x-data*="productPage"]');
-    if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
-      productPage._x_dataStack[0].handleStickyBehavior();
-    }
-  });
-
-  // Intercept product form submission to use cart sheet
-  document.addEventListener('DOMContentLoaded', function() {
-    const productForm = document.getElementById('product-form');
-    if (productForm) {
-      productForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-
-        const formData = new FormData(this);
-        const variantId = formData.get('id');
-
-        // Get quantity from Alpine.js component
-        const productPage = document.querySelector('[x-data*="productPage"]');
-        let quantity = 1;
-        if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
-          quantity = productPage._x_dataStack[0].quantity || 1;
-        }
-
-        try {
-          // Get the cart sheet component
-          const cartSheet = document.querySelector('[x-data*="cartSheet"]');
-          if (cartSheet && cartSheet._x_dataStack && cartSheet._x_dataStack[0]) {
-            await cartSheet._x_dataStack[0].addToCart(variantId, quantity);
-          } else {
-            // Fallback: direct API call
-            const response = await fetch('/cart/add.js', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                id: variantId,
-                quantity: quantity,
-              }),
-            });
-
-            if (response.ok) {
-              // Dispatch event to open cart
-              window.dispatchEvent(new CustomEvent('open-cart'));
-            } else {
-              throw new Error('Failed to add to cart');
-            }
-          }
-        } catch (error) {
-          console.error('Error adding to cart:', error);
-          alert('Failed to add item to cart. Please try again.');
-        }
-      });
-    }
-  });
-
-  // Keyboard navigation for images
-  document.addEventListener('keydown', function(e) {
-    const productPage = document.querySelector('[x-data*="productPage"]');
-    if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
-      if (e.key === 'ArrowLeft') {
-        productPage._x_dataStack[0].previousImage();
-      } else if (e.key === 'ArrowRight') {
-        productPage._x_dataStack[0].nextImage();
-      }
-    }
-  });
 </script>
 
 {% schema %}

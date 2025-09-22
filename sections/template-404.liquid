@@ -1,55 +1,230 @@
-<div class='max-w-md'>
-  <div class='text-5xl font-bold my-4'>{{ section.settings.title }}</div>
+<div class='inset-0 bg-black w-full h-full overflow-hidden relative border-b border-t border-white'>
+  <!-- Floating background elements -->
+  <div class='absolute inset-0 overflow-hidden pointer-events-none'>
+    <div
+      class='absolute -top-40 -right-40 w-80 h-80 bg-white rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-float'
+    ></div>
+    <div
+      class='absolute -bottom-40 -left-40 w-80 h-80 bg-gray-300 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-float-delay'
+    ></div>
+    <div
+      class='absolute top-40 left-1/4 w-60 h-60 bg-gray-200 rounded-full mix-blend-multiply filter blur-xl opacity-5 animate-pulse-slow'
+    ></div>
+  </div>
 
-  <div class='text-lg'>
-    <p class='text-center text-base md:text-xl leading-normal'>
-      {{ section.settings.subtext }}
-    </p>
+  <!-- Main content -->
+  <div class='relative min-h-screen flex items-center justify-center px-6 sm:px-8'>
+    <div class='text-center max-w-4xl mx-auto'>
+      <!-- 404 Number -->
+      <div class='mb-8 relative'>
+        <h1 class='text-8xl sm:text-9xl lg:text-[12rem] font-black text-white text-shadow select-none'>
+          {{ section.settings.title | default: "404" }}
+        </h1>
+        <div class='absolute inset-0 flex items-center justify-center pointer-events-none'>
+          <div class='text-6xl sm:text-7xl lg:text-8xl font-black text-white/5'>
+            {{ section.settings.title | default: "404" }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Error message -->
+      <div class='mb-12 space-y-6'>
+        <h2 class='text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4'>
+          {{ section.settings.error_title | default: "Oops! Page not found" }}
+        </h2>
+        <p class='text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed'>
+          {{
+            section.settings.subtext
+            | default: "The page you're looking for seems to have wandered off into the digital void. Don't worry though, even the best explorers sometimes take a wrong turn."
+          }}
+        </p>
+      </div>
+
+      <!-- Action buttons -->
+      <div class='flex flex-col sm:flex-row gap-4 justify-center items-center mb-16'>
+        {% if section.settings.button_url == blank %}
+          {% assign button_url = routes.root_url %}
+        {% else %}
+          {% assign button_url = section.settings.button_url %}
+        {% endif %}
+
+        <a
+          href='{{ button_url }}'
+          class='group relative px-8 py-4 bg-white text-black font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/50'
+        >
+          <span class='relative z-10 flex items-center'>
+            <svg
+              class='w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform duration-300'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'></path>
+            </svg>
+            {{ section.settings.button_text | default: "Back to Home" }}
+          </span>
+          <div
+            class='absolute inset-0 bg-gray-200 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300'
+          ></div>
+        </a>
+
+        <a
+          href='javascript:history.back()'
+          class='px-8 py-4 text-white font-semibold rounded-xl border-2 border-white/20 hover:border-white/40 hover:bg-white/10 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white/20'
+        >
+          <span class='flex items-center'>
+            <svg
+              class='w-5 h-5 mr-2'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M10 19l-7-7m0 0l7-7m-7 7h18'></path>
+            </svg>
+            {{ section.settings.back_button_text | default: "Go Back" }}
+          </span>
+        </a>
+      </div>
+
+      <!-- Additional help text -->
+      <div class='text-center'>
+        <p class='text-gray-400 text-sm'>
+          {{
+            section.settings.help_text
+            | default: "Still lost? Try searching or contact support"
+          }}
+          {% if section.settings.support_email %}
+            <a
+              href='mailto:{{ section.settings.support_email }}'
+              class='text-white hover:text-gray-300 underline underline-offset-2 transition-colors'
+            >
+              contact support
+            </a>
+          {% endif %}
+        </p>
+      </div>
+    </div>
   </div>
-  <div class='my-4'>
-    {% if section.settings.button_url == blank %}
-      {% assign button_url = routes.root_url %}
-    {% else %}
-      {% assign button_url = section.settings.button_url %}
-    {% endif %}
-    <a href='{{button_url}}' class='text-base font-medium shadow bg-green-500 rounded-md text-white p-2'>
-      {{ section.settings.button_text }}
-    </a>
-  </div>
+
+  <!-- Bottom decoration removed to avoid white gap -->
 </div>
+
+<style>
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-20px) rotate(180deg);
+    }
+  }
+
+  @keyframes float-delay {
+    0%,
+    100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-30px) rotate(-180deg);
+    }
+  }
+
+  @keyframes pulse-slow {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.15;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.25;
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-float-delay {
+    animation: float-delay 8s ease-in-out infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 4s ease-in-out infinite;
+  }
+
+  .text-shadow {
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+  }
+</style>
 
 {% schema %}
 {
   "name": "Template 404",
-  "tag": "section",
-  "class": "flex text-center py-10 items-center justify-center h-screen",
+
   "settings": [
     {
       "type": "text",
       "id": "title",
-      "label": "404 Heading Title",
+      "label": "404 Number",
       "default": "404",
-      "info": "This title will be displayed in the 404 page"
+      "info": "The large 404 number displayed on the page"
     },
     {
       "type": "text",
+      "id": "error_title",
+      "label": "Error Title",
+      "default": "Oops! Page not found",
+      "info": "The main error message title"
+    },
+    {
+      "type": "textarea",
       "id": "subtext",
-      "label": "Subtext",
-      "default": "The page you were looking for does not exist",
-      "info": "This subtext will be displayed in the 404 page"
+      "label": "Error Description",
+      "default": "The page you're looking for seems to have wandered off into the digital void. Don't worry though, even the best explorers sometimes take a wrong turn.",
+      "info": "The descriptive text explaining the error"
+    },
+    {
+      "type": "header",
+      "content": "Button Settings"
     },
     {
       "type": "text",
       "id": "button_text",
-      "label": "Button Text",
-      "default": "Return to homepage",
-      "info": "This button text will be displayed in the 404 page"
+      "label": "Home Button Text",
+      "default": "Back to Home",
+      "info": "Text for the main action button"
     },
     {
       "type": "url",
       "id": "button_url",
-      "label": "Button URL",
-      "info": "This button URL will be displayed in the 404 page"
+      "label": "Home Button URL",
+      "info": "URL for the home button (defaults to homepage if empty)"
+    },
+    {
+      "type": "text",
+      "id": "back_button_text",
+      "label": "Back Button Text",
+      "default": "Go Back",
+      "info": "Text for the back button"
+    },
+    {
+      "type": "header",
+      "content": "Support Settings"
+    },
+    {
+      "type": "text",
+      "id": "help_text",
+      "label": "Help Text",
+      "default": "Still lost? Try searching or contact support",
+      "info": "Text shown below the buttons"
+    },
+    {
+      "type": "text",
+      "id": "support_email",
+      "label": "Support Email",
+      "info": "Email address for support contact (optional)"
     }
   ]
 }

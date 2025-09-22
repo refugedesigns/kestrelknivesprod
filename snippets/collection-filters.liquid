@@ -25,18 +25,35 @@
       </button>
 
       <div x-show='filtersOpen.productType' class='space-y-2'>
+        <!-- ALL option -->
         <label class='flex items-center space-x-2 cursor-pointer'>
           <input
-            type='checkbox'
-            x-model='selectedFilters.productType'
-            value='knives'
-            @change='applyFilters()'
-            class='rounded border-gray-300 text-black focus:ring-gray-900'
+            type='radio'
+            name='productType'
+            value=''
+            x-model='selectedFilters.productTypeSelected'
+            @change='applyFilters(true)'
+            class='border-gray-300 text-black focus:ring-gray-900'
           >
-          <span class='text-sm text-gray-700'
-            >KNIVES ({{ collection.products.size }})</span
-          >
+          <span class='text-sm text-gray-700'>ALL</span>
         </label>
+
+        <template x-for='t in productTypes' :key='t.value'>
+          <label class='flex items-center space-x-2 cursor-pointer'>
+            <input
+              type='radio'
+              name='productType'
+              :value='t.value'
+              x-model='selectedFilters.productTypeSelected'
+              @change='applyFilters(true)'
+              class='border-gray-300 text-black focus:ring-gray-900'
+            >
+            <span
+              class='text-sm text-gray-700'
+              x-text='t.value.toUpperCase()'
+            ></span>
+          </label>
+        </template>
       </div>
     </div>
 
@@ -64,7 +81,7 @@
             type='checkbox'
             x-model='selectedFilters.availability'
             value='in-stock'
-            @change='applyFilters()'
+            @change='applyFilters(true)'
             class='rounded border-gray-300 text-black focus:ring-gray-900'
           >
           <span class='text-sm text-gray-700'
@@ -76,7 +93,7 @@
             type='checkbox'
             x-model='selectedFilters.availability'
             value='out-of-stock'
-            @change='applyFilters()'
+            @change='applyFilters(true)'
             class='rounded border-gray-300 text-black focus:ring-gray-900'
           >
           <span class='text-sm text-gray-700'
@@ -183,32 +200,167 @@
 </div>
 
 <script>
+  // Server-side filter metadata for counts
+  window.__filterMeta = window.__filterMeta || {}
+  window.__filterMeta.productTypes = [
+    {% assign pt = collection.filters | where: 'param_name', 'filter.p.product_type' | first %}
+    {% if pt and pt.values %}
+      {% for v in pt.values %}
+        { value: {{ v.value | json }}, count: {{ v.count | default: 0 }} }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    {% endif %}
+  ]
+  window.__filterMeta.availability = {
+    {% assign av = collection.filters | where: 'param_name', 'filter.v.availability' | first %}
+    {% if av and av.values %}
+      {% for v in av.values %}
+        {% if v.value == '1' or v.value == true %}
+          in: {{ v.count | default: 0 }},
+        {% elsif v.value == '0' or v.value == false %}
+          out: {{ v.count | default: 0 }},
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  }
+</script>
+<script>
   document.addEventListener('alpine:init', () => {
     Alpine.data('collectionFilters', () => ({
       filtersOpen: {
         productType: true,
         availability: true,
-        price: true
+        price: true,
       },
       selectedFilters: {
         productType: [],
-        availability: []
+        productTypeSelected: '',
+        availability: [],
       },
+      productTypes: [],
       priceRange: {
         min: 0,
-        max: 1000
+        max: 1000,
       },
       minPrice: 0,
       maxPrice: 1000,
+      isInitializing: true,
 
       init() {
-        // Calculate price range from products
+        // Build product types and calculate price range from products
+        this.buildProductTypes()
         this.calculatePriceRange()
+
+        // Hydrate selections from URL so checked states reflect current filters
+        this.hydrateFromUrl()
 
         // Initialize slider after a short delay to ensure DOM is ready
         setTimeout(() => {
           this.updateSlider()
+          this.isInitializing = false
         }, 100)
+      },
+
+      hydrateFromUrl() {
+        try {
+          const url = new URL(window.location.href)
+          // Product types (multiple allowed)
+          const types = url.searchParams.getAll('filter.p.product_type')
+          if (types && types.length) {
+            this.selectedFilters.productType = types
+            this.selectedFilters.productTypeSelected = types[0]
+          }
+
+          // If no explicit param, infer selection from collection URL (e.g., /collections/apparels)
+          if (!this.selectedFilters.productTypeSelected) {
+            const path = window.location.pathname || ''
+            const m = path.match(/\/collections\/([^\/]+)/)
+            const collectionHandle = m && m[1] ? decodeURIComponent(m[1]) : ''
+
+            // Skip when viewing all collections
+            if (collectionHandle && collectionHandle !== 'all') {
+              const toHandle = s =>
+                String(s || '')
+                  .toLowerCase()
+                  .trim()
+                  .replace(/[^a-z0-9]+/g, '-')
+                  .replace(/^-+|-+$/g, '')
+
+              // Find a product type whose handle matches the collection handle
+              const matchType = (this.productTypes || []).find(
+                pt => toHandle(pt.value) === collectionHandle
+              )
+              if (matchType) {
+                this.selectedFilters.productTypeSelected = matchType.value
+              }
+            }
+          }
+
+          // Availability (1=in stock, 0=out of stock). Could appear multiple times
+          const avParams = url.searchParams.getAll('filter.v.availability')
+          const av = []
+          avParams.forEach(v => {
+            if (String(v) === '1') av.push('in-stock')
+            if (String(v) === '0') av.push('out-of-stock')
+          })
+          if (av.length) this.selectedFilters.availability = av
+
+          // Price range (cents)
+          const gte = url.searchParams.get('filter.v.price.gte')
+          const lte = url.searchParams.get('filter.v.price.lte')
+          if (gte)
+            this.priceRange.min = Math.max(this.minPrice, Number(gte) / 100)
+          if (lte)
+            this.priceRange.max = Math.min(this.maxPrice, Number(lte) / 100)
+        } catch (e) {
+          // ignore
+        }
+      },
+
+      buildProductTypes() {
+        try {
+          // Prefer server-provided facet metadata when available
+          const meta = window.__filterMeta || {}
+
+          // Try to use a previously cached full list (from an unfiltered visit)
+          const cached = sessionStorage.getItem('kk_allProductTypes')
+          const cachedTypes = cached ? JSON.parse(cached) : null
+
+          if (meta.productTypes && meta.productTypes.length > 1) {
+            // When more than one option is present, assume it's a full facet and cache it
+            this.productTypes = meta.productTypes
+            sessionStorage.setItem(
+              'kk_allProductTypes',
+              JSON.stringify(this.productTypes)
+            )
+            return
+          }
+
+          if (
+            meta.productTypes &&
+            meta.productTypes.length === 1 &&
+            cachedTypes &&
+            cachedTypes.length > 0
+          ) {
+            // If facet collapsed to a single selected type, fallback to cached full list
+            this.productTypes = cachedTypes
+            return
+          }
+
+          // Fallback: derive counts from products on the current page (may be incomplete)
+          const products = window.__collectionProducts || []
+          const counts = {}
+          products.forEach(p => {
+            const t = (p.product_type || p.type || '').toString().trim()
+            if (!t) return
+            counts[t] = (counts[t] || 0) + 1
+          })
+          this.productTypes = Object.keys(counts).map(k => ({
+            value: k,
+            count: counts[k],
+          }))
+        } catch (e) {
+          this.productTypes = []
+        }
       },
 
       toggleFilter(filterName) {
@@ -218,18 +370,19 @@
       clearFilters() {
         this.selectedFilters = {
           productType: [],
-          availability: []
+          availability: [],
         }
         this.priceRange = {
           min: this.minPrice,
-          max: this.maxPrice
+          max: this.maxPrice,
         }
+        sessionStorage.removeItem('kk_allProductTypes')
         this.applyFilters()
       },
 
       calculatePriceRange() {
         // Calculate from actual collection products
-        const products = {{ collection.products | json }}
+        const products = window.__collectionProducts || []
         if (products && products.length > 0) {
           const prices = products.map(p => p.price / 100) // Convert from cents
           this.minPrice = Math.min(...prices)
@@ -245,12 +398,18 @@
       },
 
       get inStockCount() {
-        const products = {{ collection.products | json }}
+        const meta = window.__filterMeta || {}
+        if (meta.availability && typeof meta.availability.in === 'number')
+          return meta.availability.in
+        const products = window.__collectionProducts || []
         return products ? products.filter(p => p.available).length : 0
       },
 
       get outOfStockCount() {
-        const products = {{ collection.products | json }}
+        const meta = window.__filterMeta || {}
+        if (meta.availability && typeof meta.availability.out === 'number')
+          return meta.availability.out
+        const products = window.__collectionProducts || []
         return products ? products.filter(p => !p.available).length : 0
       },
 
@@ -258,7 +417,7 @@
         return new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD',
-          minimumFractionDigits: 2
+          minimumFractionDigits: 2,
         }).format(price)
       },
 
@@ -269,14 +428,21 @@
         // Update progress bar
         const progress = document.getElementById('progress')
         if (progress) {
-          const minPercent = ((this.priceRange.min - this.minPrice) / rangeMax) * 100
-          const maxPercent = ((this.priceRange.max - this.minPrice) / rangeMax) * 100
+          const minPercent =
+            ((this.priceRange.min - this.minPrice) / rangeMax) * 100
+          const maxPercent =
+            ((this.priceRange.max - this.minPrice) / rangeMax) * 100
 
           progress.style.left = minPercent + '%'
-          progress.style.right = (100 - maxPercent) + '%'
+          progress.style.right = 100 - maxPercent + '%'
         }
 
-        this.applyFilters()
+        // Client-side price filtering: broadcast current range
+        window.dispatchEvent(
+          new CustomEvent('price-filter', {
+            detail: { min: this.priceRange.min, max: this.priceRange.max },
+          })
+        )
       },
 
       updatePriceRange() {
@@ -299,17 +465,84 @@
         }
 
         this.updateSlider()
+        // Client-side price filtering only
+        window.dispatchEvent(
+          new CustomEvent('price-filter', {
+            detail: {
+              min: this.priceRange.min,
+              max: this.priceRange.max,
+            },
+          })
+        )
       },
 
-      applyFilters() {
-        // Dispatch custom event to filter products
-        window.dispatchEvent(new CustomEvent('filter-products', {
-          detail: {
-            filters: this.selectedFilters,
-            priceRange: this.priceRange
+      applyFilters(resetPrice = false) {
+        if (this.isInitializing) return
+        // Build server-side filter URL and navigate
+        const url = new URL(window.location.href)
+        const currentPath = url.pathname || ''
+        const m = currentPath.match(/\/collections\/([^\/]+)/)
+        const currentHandle = m && m[1] ? decodeURIComponent(m[1]) : ''
+        const toHandle = s =>
+          String(s || '')
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '')
+        // product type — from single-select radio
+        const selected = this.selectedFilters.productTypeSelected || ''
+        url.searchParams.delete('filter.p.product_type')
+        if (selected) {
+          url.searchParams.append('filter.p.product_type', selected)
+        }
+
+        // If the selected type does not match the current collection handle,
+        // navigate to /collections/all so the type filter can return results.
+        if (selected) {
+          const selectedHandle = toHandle(selected)
+          if (
+            currentHandle &&
+            currentHandle !== 'all' &&
+            currentHandle !== selectedHandle
+          ) {
+            url.pathname = '/collections/all'
           }
-        }))
-      }
+        } else {
+          // If user chose ALL while on a specific collection, also go to /collections/all
+          if (currentHandle && currentHandle !== 'all') {
+            url.pathname = '/collections/all'
+          }
+        }
+        // availability
+        url.searchParams.delete('filter.v.availability')
+        const hasIn = (this.selectedFilters.availability || []).includes(
+          'in-stock'
+        )
+        const hasOut = (this.selectedFilters.availability || []).includes(
+          'out-of-stock'
+        )
+        if (hasIn && !hasOut)
+          url.searchParams.append('filter.v.availability', '1')
+        if (hasOut && !hasIn)
+          url.searchParams.append('filter.v.availability', '0')
+        // price: reset to full range when switching type or when none is selected
+        url.searchParams.delete('filter.v.price.gte')
+        url.searchParams.delete('filter.v.price.lte')
+        if (selected && !resetPrice) {
+          const minCents = Math.round((this.priceRange.min || 0) * 100)
+          const maxCents = Math.round((this.priceRange.max || 0) * 100)
+          url.searchParams.set('filter.v.price.gte', String(minCents))
+          url.searchParams.set('filter.v.price.lte', String(maxCents))
+        } else {
+          // Reset UI as well
+          this.priceRange.min = this.minPrice
+          this.priceRange.max = this.maxPrice
+        }
+
+        const nextUrl = url.toString()
+        if (nextUrl === window.location.href) return
+        window.location.href = nextUrl
+      },
     }))
   })
 </script>

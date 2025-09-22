@@ -1,3 +1,7 @@
+<script>
+  window.__collectionProducts = {{ collection.products | json }};
+</script>
+
 <div class='px-4 py-8 mx-auto' x-data='collectionPage()' x-cloak>
   {% comment %}
     <a
@@ -7,7 +11,7 @@
     >
   {% endcomment %}
 
-  {% paginate collection.products by 6 %}
+  {% paginate collection.products by section.settings.number_of_products_per_page | default: 9 %}
     <h1 class='text-3xl font-bold text-center mb-8'>{{ collection.title }}</h1>
 
     <div class='max-w-7xl mx-auto'>
@@ -19,7 +23,7 @@
         <div class='flex-1'>
           <!-- Products Count -->
           <div class='mb-6'>
-            <p class='text-gray-600'>{{ collection.products.size }} products</p>
+            <p class='text-gray-600'>{{ paginate.items }} products</p>
           </div>
 
           <!-- Products Grid -->
@@ -54,14 +58,18 @@
   function collectionPage() {
     return {
       init() {
-        // Listen for filter changes
+        // Listen for legacy filter changes
         window.addEventListener('filter-products', event => {
           this.applyFilters(event.detail)
+        })
+        // Client-side price filtering (new)
+        window.addEventListener('price-filter', e => {
+          const { min, max } = e.detail || {}
+          this.applyPriceFilter(min, max)
         })
       },
 
       applyFilters(filterData) {
-
         // Get all product cards
         const productCards = document.querySelectorAll('[data-product]')
         let visibleCount = 0
@@ -85,6 +93,24 @@
             } else if (hasOutOfStockFilter && isInStock) {
               shouldShow = false
             } else if (!hasInStockFilter && !hasOutOfStockFilter) {
+              shouldShow = false
+            }
+          }
+
+          // Filter by selected product types
+          if (
+            shouldShow &&
+            filterData.filters.productType &&
+            filterData.filters.productType.length > 0
+          ) {
+            const productType = (
+              productData.product_type ||
+              productData.type ||
+              ''
+            )
+              .toString()
+              .trim()
+            if (!filterData.filters.productType.includes(productType)) {
               shouldShow = false
             }
           }
@@ -115,6 +141,26 @@
           countElement.textContent = `${visibleCount} products`
         }
       },
+
+      applyPriceFilter(min, max) {
+        const productCards = document.querySelectorAll('[data-product]')
+        let visibleCount = 0
+        productCards.forEach(card => {
+          try {
+            const productData = JSON.parse(card.dataset.product || '{}')
+            const price = (productData.price || 0) / 100
+            const inRange =
+              (!isNaN(min) ? price >= min : true) &&
+              (!isNaN(max) ? price <= max : true)
+            card.style.display = inRange ? 'block' : 'none'
+            if (inRange) visibleCount++
+          } catch (err) {
+            // ignore parsing errors
+          }
+        })
+        const countElement = document.querySelector('.text-gray-600')
+        if (countElement) countElement.textContent = `${visibleCount} products`
+      },
     }
   }
 </script>
@@ -126,7 +172,7 @@
     {
       "type": "number",
       "id": "number_of_products_per_page",
-      "default": 6,
+      "default": 9,
       "label": "Number of products per page"
     },
     {
@@ -162,6 +208,16 @@
       "id": "camo_image",
       "label": "Camo/Earth Color Image",
       "info": "Upload an image for camo or earth color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "high_vis_orange_image",
+      "label": "High Vis Orange Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "high_vis_green_image",
+      "label": "High Vis Green Image"
     }
   ]
 }

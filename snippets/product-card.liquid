@@ -12,13 +12,30 @@
   data-product='{{ product_product | json | escape }}'
   data-variants='{{ product_product.variants | json | escape }}'
   data-images='{{ product_product.images | json | escape }}'
-  x-data="productCard({{ product_product.selected_or_first_available_variant.id }}, '{{ product_product.title }}', '{{ product_product.featured_image | img_url: "400x400" }}', '{{ product_product.images[1] | img_url: "400x400" }}', '{{ product_product | json | escape }}')"
+  x-data='
+    productCard(
+      {{ product_product.selected_or_first_available_variant.id }},
+      {{ product_product.title | json }},
+      {% if product_product.featured_image %}
+        {{ product_product.featured_image | img_url: "400x400" | json }}
+      {% elsif product_product.images.size > 0 %}
+        {{ product_product.images[0] | img_url: "400x400" | json }}
+      {% else %}
+        null
+      {% endif %},
+      {% if product_product.images.size > 1 %}
+        {{ product_product.images[1] | img_url: "400x400" | json }}
+      {% else %}
+        null
+      {% endif %}
+    )
+  '
 >
   <div class='bg-white overflow-hidden w-full h-[600px] flex flex-col transition-none'>
     <!-- Product Image -->
     <div
       class='relative h-96 bg-gray-100 overflow-hidden'
-      @mouseenter='hoverImage = true'
+      @mouseenter='if (secondImage) hoverImage = true'
       @mouseleave='hoverImage = false'
     >
       <!-- SOLD OUT Badge -->
@@ -40,6 +57,7 @@
         >
         <!-- Hover Image -->
         <img
+          x-show='secondImage'
           :src='secondImage'
           :alt="'{{ product_product.title }}'"
           class='absolute inset-0 w-full h-full object-cover transition-opacity duration-300'
@@ -67,8 +85,14 @@
           </div>
         </a>
 
-        <!-- Handle Color Variants -->
-        {% unless product_product.has_only_default_variant %}
+        <!-- Handle Color Variants (hide for Apparels) -->
+        {% assign product_type_lower = product_product.type
+          | default: ""
+          | downcase
+        %}
+        {% unless product_product.has_only_default_variant
+          or product_type_lower contains "apparel"
+        %}
           <div class='mb-4'>
             <div class='flex space-x-2 justify-center'>
               {% assign unique_handle_colors = "" %}
@@ -88,84 +112,87 @@
                       {% assign color_image = "" %}
                       {% assign option_lower = variant.option1 | downcase %}
 
-                      {% comment %} Check for custom uploaded images first, then fallback to assets {% endcomment %}
-                      {% if option_lower contains "black"
-                        and option_lower contains "orange"
-                      %}
-                        {% if section.settings.black_orange_image %}
-                          {% assign color_image = section.settings.black_orange_image
-                            | img_url: "48x48"
-                          %}
-                        {% else %}
-                          {% assign color_image = "black_w_orange_liner.png" %}
-                        {% endif %}
-                      {% elsif option_lower contains "orange" %}
-                        {% if section.settings.orange_image %}
-                          {% assign color_image = section.settings.orange_image
-                            | img_url: "48x48"
-                          %}
-                        {% else %}
-                          {% assign color_image = "orange.png" %}
-                        {% endif %}
-                      {% elsif option_lower contains "black" %}
-                        {% if section.settings.black_image %}
-                          {% assign color_image = section.settings.black_image
-                            | img_url: "48x48"
-                          %}
-                        {% else %}
-                          {% assign color_image = "black_w_orange_liner.png" %}
-                        {% endif %}
-                      {% elsif option_lower contains "green" %}
-                        {% if section.settings.green_image %}
-                          {% assign color_image = section.settings.green_image
-                            | img_url: "48x48"
-                          %}
-                        {% else %}
-                          {% assign color_image = "od_green.png" %}
-                        {% endif %}
-                      {% elsif option_lower contains "camo" %}
-                        {% if section.settings.camo_image %}
-                          {% assign color_image = section.settings.camo_image
-                            | img_url: "48x48"
-                          %}
-                        {% else %}
-                          {% assign color_image = "earth_camo.png" %}
-                        {% endif %}
-                      {% elsif option_lower contains "earth" %}
-                        {% if section.settings.camo_image %}
-                          {% assign color_image = section.settings.camo_image
-                            | img_url: "48x48"
-                          %}
-                        {% else %}
-                          {% assign color_image = "earth_camo.png" %}
-                        {% endif %}
-                      {% endif %}
+                      {%- comment -%}
+                        Priority for swatch image:
+                        1) Variant featured_image
+                        2) Uploaded override in section settings (by color name)
+                        3) Fallback asset color chip or plain colored circle
+                      {%- endcomment -%}
 
-                      {% if color_image != "" %}
-                        {% if color_image contains "//" %}
-                          <img
-                            src='{{ color_image }}'
-                            alt='{{ variant.option1 }}'
-                            class='w-full h-full object-cover'
-                          >
-                        {% else %}
-                          <img
-                            src='{{ color_image | asset_url }}'
-                            alt='{{ variant.option1 }}'
-                            class='w-full h-full object-cover'
-                          >
-                        {% endif %}
-                      {% elsif variant.featured_image %}
+                      {% if variant.featured_image %}
                         <img
                           src='{{ variant.featured_image | img_url: "48x48" }}'
                           alt='{{ variant.option1 }}'
                           class='w-full h-full object-cover'
                         >
                       {% else %}
-                        <div
-                          class='w-full h-full rounded-full'
-                          style='background-color: {{ variant.option1 | downcase | replace: ' ', '' }}'
-                        ></div>
+                        {%- comment -%} Settings-based overrides {%- endcomment -%}
+                        {% if option_lower contains "black"
+                          and option_lower contains "orange"
+                        %}
+                          {% if section.settings.black_orange_image %}
+                            {% assign color_image = section.settings.black_orange_image
+                              | img_url: "48x48"
+                            %}
+                          {% else %}
+                            {% assign color_image = "black_w_orange_liner.png" %}
+                          {% endif %}
+                        {% elsif option_lower contains "orange" %}
+                          {% if section.settings.orange_image %}
+                            {% assign color_image = section.settings.orange_image
+                              | img_url: "48x48"
+                            %}
+                          {% else %}
+                            {% assign color_image = "orange.png" %}
+                          {% endif %}
+                        {% elsif option_lower contains "black" %}
+                          {% if section.settings.black_image %}
+                            {% assign color_image = section.settings.black_image
+                              | img_url: "48x48"
+                            %}
+                          {% else %}
+                            {% assign color_image = "black_w_orange_liner.png" %}
+                          {% endif %}
+                        {% elsif option_lower contains "green" %}
+                          {% if section.settings.green_image %}
+                            {% assign color_image = section.settings.green_image
+                              | img_url: "48x48"
+                            %}
+                          {% else %}
+                            {% assign color_image = "od_green.png" %}
+                          {% endif %}
+                        {% elsif option_lower contains "camo"
+                          or option_lower contains "earth"
+                        %}
+                          {% if section.settings.camo_image %}
+                            {% assign color_image = section.settings.camo_image
+                              | img_url: "48x48"
+                            %}
+                          {% else %}
+                            {% assign color_image = "earth_camo.png" %}
+                          {% endif %}
+                        {% endif %}
+
+                        {% if color_image != "" %}
+                          {% if color_image contains "//" %}
+                            <img
+                              src='{{ color_image }}'
+                              alt='{{ variant.option1 }}'
+                              class='w-full h-full object-cover'
+                            >
+                          {% else %}
+                            <img
+                              src='{{ color_image | asset_url }}'
+                              alt='{{ variant.option1 }}'
+                              class='w-full h-full object-cover'
+                            >
+                          {% endif %}
+                        {% else %}
+                          <div
+                            class='w-full h-full rounded-full'
+                            style='background-color: {{ variant.option1 | downcase | replace: ' ', '' }}'
+                          ></div>
+                        {% endif %}
                       {% endif %}
                     </button>
                   {% endunless %}
@@ -176,18 +203,24 @@
         {% endunless %}
       </div>
 
-      <!-- Add to Cart Button (only show when available) -->
-      <div x-show='isAvailable'>
-        <button
-          @click='addToCart'
-          :disabled='isAddingToCart'
-          class='w-full bg-black cursor-pointer hover:bg-gray-900 text-white font-semibold py-3 px-4 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
-        >
-          <span
-            x-text="isAddingToCart ? 'Adding...' : '+ ADD TO CART'"
-          ></span>
-        </button>
-      </div>
+      {% assign product_type_lower = product_product.type
+        | default: ""
+        | downcase
+      %}
+      {% unless product_type_lower contains "apparel" %}
+        <!-- Add to Cart Button (only show when available and not apparels) -->
+        <div x-show='isAvailable'>
+          <button
+            @click='addToCart'
+            :disabled='isAddingToCart'
+            class='w-full bg-black cursor-pointer hover:bg-gray-900 text-white font-semibold py-3 px-4 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+          >
+            <span
+              x-text="isAddingToCart ? 'Adding...' : '+ ADD TO CART'"
+            ></span>
+          </button>
+        </div>
+      {% endunless %}
     </div>
   </div>
 </div>
@@ -196,27 +229,54 @@
   document.addEventListener('alpine:init', () => {
     Alpine.data(
       'productCard',
-      (
-        selectedVariantId,
-        productTitle,
-        currentImage,
-        secondImage,
-        productData
-      ) => ({
+      (selectedVariantId, productTitle, currentImage, secondImage) => ({
         selectedVariant: selectedVariantId,
         hoverImage: false,
         currentImage: currentImage,
         secondImage: secondImage,
-        productData: productData,
+        productData: {},
         variantsData: null,
         baseTitle: productTitle,
         isAddingToCart: false,
         isAvailable: true,
 
+        // Safely decode HTML-escaped JSON from data attributes
+        decodeHtmlEntities(str) {
+          const txt = document.createElement('textarea')
+          txt.innerHTML = str
+          return txt.value
+        },
+
+        // Heuristic: treat common size labels as size-like (not for title)
+        isSizeValue(val) {
+          if (!val) return false
+          const v = String(val).toLowerCase().trim()
+          const sizeValues = [
+            'xxs',
+            'xs',
+            's',
+            'm',
+            'l',
+            'xl',
+            'xxl',
+            '2xl',
+            '3xl',
+            '4xl',
+            '5xl',
+            'small',
+            'medium',
+            'large',
+            'extra large',
+          ]
+          return sizeValues.includes(v)
+        },
+
         init() {
-          // Get product data from data attributes
-          this.productData = JSON.parse(this.$el.dataset.product)
-          this.variantsData = JSON.parse(this.$el.dataset.variants)
+          // Get product data from data attributes (HTML entities decoded first)
+          const rawProduct = this.$el.getAttribute('data-product') || '{}'
+          const rawVariants = this.$el.getAttribute('data-variants') || '[]'
+          this.productData = JSON.parse(this.decodeHtmlEntities(rawProduct))
+          this.variantsData = JSON.parse(this.decodeHtmlEntities(rawVariants))
 
           // Set initial title with first variant color
           this.updateTitle()
@@ -287,6 +347,10 @@
         },
 
         updateTitle() {
+          const typeLower = (this.productData.type || '').toLowerCase()
+          // For Apparels, never append option to title
+          const shouldAppend = !typeLower.includes('apparel')
+
           if (this.variantsData && this.variantsData.length > 0) {
             // Filter out variants with "Default Title"
             const validVariants = this.variantsData.filter(
@@ -297,14 +361,12 @@
               const selectedVariant = validVariants.find(
                 v => v.id === this.selectedVariant
               )
-              if (selectedVariant && selectedVariant.option1) {
-                // Add variant color to title
-                this.baseTitle =
-                  this.productData.title +
-                  ' - ' +
-                  selectedVariant.option1.toUpperCase()
+              const opt = selectedVariant ? selectedVariant.option1 : null
+
+              if (shouldAppend && opt && !this.isSizeValue(opt)) {
+                // Append non-size option (e.g., color) for non-apparel types
+                this.baseTitle = `${this.productData.title} - ${String(opt).toUpperCase()}`
               } else {
-                // Fallback to original title
                 this.baseTitle = this.productData.title
               }
             } else {
