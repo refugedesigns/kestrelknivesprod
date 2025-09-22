@@ -21,9 +21,11 @@
           </a>
         {% else %}
           <a href='{{ routes.root_url }}' class='flex items-center space-x-3'>
-            <h1 class='text-xl font-bold text-white truncate'>
-              {{ shop.name }}
-            </h1>
+            <img
+              src='{{ "logo_white.png" | asset_url }}'
+              class='h-14'
+              alt='{{ shop.name }} Logo'
+            >
           </a>
         {% endif %}
       </div>
