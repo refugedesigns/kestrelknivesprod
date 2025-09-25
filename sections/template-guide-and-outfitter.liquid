@@ -201,10 +201,13 @@
           Website
         </label>
         <input
+          required
           type='url'
           name='contact[website]'
           placeholder='http://'
           class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
+          oninvalid="this.setCustomValidity('Please enter a full URL by including http://')"
+          oninput="this.setCustomValidity('')"
         >
       </div>
 

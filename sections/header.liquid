@@ -1,4 +1,5 @@
 <div
+  id='siteHeader'
   class='fixed w-full z-20 top-0 start-0 bg-black'
   x-data='{ mobileMenuOpen: false, searchBarOpen: false }'
   x-cloak
@@ -15,7 +16,7 @@
           <a href='{{ routes.root_url }}' class='flex items-center space-x-3'>
             <img
               src='{{ logo_image | img_url: "master" }}'
-              class='h-14'
+              class='h-10 md:h-14'
               alt='{{ shop.name }} Logo'
             >
           </a>
@@ -23,7 +24,7 @@
           <a href='{{ routes.root_url }}' class='flex items-center space-x-3'>
             <img
               src='{{ "logo_white.png" | asset_url }}'
-              class='h-14'
+              class='h-10 md:h-14'
               alt='{{ shop.name }} Logo'
             >
           </a>

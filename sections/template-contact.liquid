@@ -12,7 +12,7 @@
       "type": "text",
       "id": "subtitle",
       "label": "Subtitle",
-      "default": "Our products are sold exclusively online. Local pick-up by appointment only. Have questions? Read the FAQ first."
+      "default": "We want to hear from you. Fill out the form below if the FAQ did not answer your question."
     },
     {
       "type": "url",
@@ -23,7 +23,32 @@
       "type": "text",
       "id": "store_address",
       "label": "Store Address",
-      "default": "3527 Sterrersnia road, Erie, PA, USA"
+      "default": "3527 Sterrettania Rd, Erie, PA 16506, USA"
+    },
+    {
+      "type": "select",
+      "id": "map_provider",
+      "label": "Map Provider",
+      "options": [
+        { "value": "embed", "label": "Google Embed (default)" },
+        { "value": "google_js", "label": "Google JS API (no info box)" }
+      ],
+      "default": "embed"
+    },
+    {
+      "type": "text",
+      "id": "maps_api_key",
+      "label": "Google Maps API Key (for JS API mode)",
+      "info": "Only required if Map Provider is Google JS API"
+    },
+    {
+      "type": "range",
+      "id": "map_zoom",
+      "label": "Map Zoom",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "default": 16
     }
   ],
   "presets": [
@@ -191,16 +216,74 @@
     </div>
   </div>
 </div>
-<div class='w-full h-96 overflow-hidden'>
-  <iframe
-    class='w-full h-full'
-    width='100%'
-    height='400'
-    style='border:0; aspect-ratio: 16/9;'
-    loading='eager'
-    allowfullscreen
-    referrerpolicy='no-referrer-when-downgrade'
-    src='https://www.google.com/maps?q={{ section.settings.store_address | url_encode }}&output=embed'
-  >
-  </iframe>
+{% assign api_mode = false %}
+{% if section.settings.map_provider == "google_js"
+  and section.settings.maps_api_key != blank
+%}
+  {% assign api_mode = true %}
+{% endif %}
+
+<div class='w-full h-96 overflow-hidden relative'>
+  {% if api_mode %}
+    <div id='contact-map' class='w-full h-full'></div>
+    <script>
+      (function() {
+        function initContactMap() {
+          try {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ address: {{ section.settings.store_address | json }} }, function(results, status) {
+              if (status === 'OK' && results && results[0]) {
+                const grayscaleStyles = [
+                  { stylers: [{ saturation: -100 }] }
+                ];
+                const map = new google.maps.Map(document.getElementById('contact-map'), {
+                  zoom: {{ section.settings.map_zoom | default: 16 }},
+                  center: results[0].geometry.location,
+                  disableDefaultUI: false,
+                  styles: grayscaleStyles,
+                });
+                new google.maps.Marker({
+                  map: map,
+                  position: results[0].geometry.location,
+                  title: {{ section.settings.store_address | json }}
+                });
+              }
+            });
+          } catch (e) {
+            console.error('Map init error', e);
+          }
+        }
+        if (!window.__contactMapLoaded) {
+          window.__contactMapLoaded = true;
+          const script = document.createElement('script');
+          script.src = 'https://maps.googleapis.com/maps/api/js?key={{ section.settings.maps_api_key | escape }}&callback=initContactMap&libraries=places';
+          script.async = true;
+          script.defer = true;
+          window.initContactMap = initContactMap;
+          document.head.appendChild(script);
+        } else {
+          initContactMap();
+        }
+      })();
+    </script>
+  {% else %}
+    <iframe
+      class='w-full h-full'
+      width='100%'
+      height='400'
+      style='border:0; aspect-ratio: 16/9; filter: grayscale(100%);'
+      loading='eager'
+      allowfullscreen
+      referrerpolicy='no-referrer-when-downgrade'
+      src='https://www.google.com/maps?q={{ section.settings.store_address | url_encode }}&output=embed&z={{ section.settings.map_zoom | default: 16 }}'
+    >
+    </iframe>
+    <!-- Overlays to hide embed UI boxes -->
+    <div
+      class='absolute top-0 left-0 w-full h-20 bg-white pointer-events-none z-18'
+    ></div>
+    <div
+      class='absolute top-0 left-0 w-64 h-16 bg-white pointer-events-none z-18'
+    ></div>
+  {% endif %}
 </div>

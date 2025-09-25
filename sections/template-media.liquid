@@ -18,6 +18,26 @@
       "default": "Hero image"
     },
     {
+      "type": "range",
+      "id": "hero_scale",
+      "label": "Hero Image Scale",
+      "min": 50,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "hero_padding_top",
+      "label": "Hero Image Top Spacing",
+      "min": 0,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "default": 80
+    },
+    {
       "type": "header",
       "content": "Social Media Links"
     },
@@ -88,6 +108,16 @@
       "id": "show_captions",
       "label": "Show image captions",
       "default": false
+    },
+    {
+      "type": "range",
+      "id": "gallery_scale",
+      "label": "Gallery Image Scale",
+      "min": 50,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
+      "default": 100
     }
   ],
   "blocks": [
@@ -137,11 +167,15 @@
 
 <!-- Hero Section -->
 {% if section.settings.hero_image %}
-  <div class='relative max-w-8xl mx-auto px-2 md:px-0 pt-20'>
+  <div
+    class='relative max-w-8xl mx-auto px-2 md:px-0'
+    style='padding-top: {{ section.settings.hero_padding_top }}px;'
+  >
     <img
       src='{{ section.settings.hero_image | image_url: width: 2000 }}'
       alt='{{ section.settings.hero_alt | escape }}'
       class='w-full h-full object-fit'
+      style='transform: scale({{ section.settings.hero_scale | divided_by: 100.0 }}); transform-origin: center;'
     >
   </div>
 {% endif %}
@@ -224,7 +258,7 @@
 </div>
 
 <!-- Media Gallery -->
-<div class='py-12 px-4'>
+<div class='pt-6 pb-12 px-4'>
   <div class='mx-auto'>
     {% if section.settings.gallery_title != blank %}
       <h2 class='text-2xl md:text-3xl font-bold text-gray-900 text-center mb-8'>
@@ -233,51 +267,59 @@
     {% endif %}
 
     {% if section.blocks.size > 0 %}
-      <div class='grid gap-3 grid-cols-{{ section.settings.columns_mobile }} sm:grid-cols-{{ section.settings.columns_tablet }} md:grid-cols-{{ section.settings.columns_desktop }}'>
-        {% for block in section.blocks %}
-          {% case block.type %}
-            {% when "media_image" %}
-              <div
-                class='group relative overflow-hidden bg-blue-400 rounded-lg aspect-square w-full h-full'
-                {{ block.shopify_attributes }}
-              >
-                {% if block.settings.link != blank %}
-                  <a
-                    href='{{ block.settings.link }}'
-                    target='_blank'
-                    class='block w-full h-full bg-green-400'
-                  >
-                {% endif %}
+      <div style='transform: scale({{ section.settings.gallery_scale | divided_by: 100.0 }}); transform-origin: center;'>
+        <div
+          class='grid gap-3'
+          style='grid-template-columns: repeat({{ section.settings.columns_mobile }}, 1fr);'
+          data-mobile-cols='{{ section.settings.columns_mobile }}'
+          data-tablet-cols='{{ section.settings.columns_tablet }}'
+          data-desktop-cols='{{ section.settings.columns_desktop }}'
+        >
+          {% for block in section.blocks %}
+            {% case block.type %}
+              {% when "media_image" %}
+                <div
+                  class='group relative overflow-hidden bg-blue-400 rounded-lg aspect-square w-full h-full'
+                  {{ block.shopify_attributes }}
+                >
+                  {% if block.settings.link != blank %}
+                    <a
+                      href='{{ block.settings.link }}'
+                      target='_blank'
+                      class='block w-full h-full bg-green-400'
+                    >
+                  {% endif %}
 
-                {% if block.settings.image %}
-                  <img
-                    src='{{ block.settings.image | image_url: width: 800 }}'
-                    alt='{{ block.settings.caption | escape }}'
-                    class='w-full h-full bg-red-400 object-cover object-center group-hover:scale-105 transition-transform duration-300'
-                    loading='lazy'
-                  >
-                {% else %}
-                  <div class='w-full h-full bg-gray-200 flex items-center justify-center aspect-square'>
-                    <span class='text-gray-500 text-sm'>No image</span>
-                  </div>
-                {% endif %}
-
-                {% if section.settings.show_captions
-                  and block.settings.caption != blank
-                %}
-                  <div class='absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-end'>
-                    <div class='p-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
-                      <p class='text-sm'>{{ block.settings.caption }}</p>
+                  {% if block.settings.image %}
+                    <img
+                      src='{{ block.settings.image | image_url: width: 800 }}'
+                      alt='{{ block.settings.caption | escape }}'
+                      class='w-full h-full bg-red-400 object-cover object-center group-hover:scale-105 transition-transform duration-300'
+                      loading='lazy'
+                    >
+                  {% else %}
+                    <div class='w-full h-full bg-gray-200 flex items-center justify-center aspect-square'>
+                      <span class='text-gray-500 text-sm'>No image</span>
                     </div>
-                  </div>
-                {% endif %}
+                  {% endif %}
 
-                {% if block.settings.link != blank %}
-                  </a>
-                {% endif %}
-              </div>
-          {% endcase %}
-        {% endfor %}
+                  {% if section.settings.show_captions
+                    and block.settings.caption != blank
+                  %}
+                    <div class='absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-end'>
+                      <div class='p-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
+                        <p class='text-sm'>{{ block.settings.caption }}</p>
+                      </div>
+                    </div>
+                  {% endif %}
+
+                  {% if block.settings.link != blank %}
+                    </a>
+                  {% endif %}
+                </div>
+            {% endcase %}
+          {% endfor %}
+        </div>
       </div>
     {% else %}
       <div class='text-center py-12'>
@@ -288,3 +330,38 @@
     {% endif %}
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const gallery = document.querySelector('[data-mobile-cols]')
+    if (!gallery) return
+
+    const mobileCols = gallery.dataset.mobileCols
+    const tabletCols = gallery.dataset.tabletCols
+    const desktopCols = gallery.dataset.desktopCols
+
+    function updateColumns() {
+      const width = window.innerWidth
+      let cols
+
+      if (width >= 1024) {
+        // lg and up
+        cols = desktopCols
+      } else if (width >= 768) {
+        // md
+        cols = tabletCols
+      } else {
+        // sm and below
+        cols = mobileCols
+      }
+
+      gallery.style.gridTemplateColumns = `repeat(${cols}, 1fr)`
+    }
+
+    // Initial setup
+    updateColumns()
+
+    // Update on resize
+    window.addEventListener('resize', updateColumns)
+  })
+</script>

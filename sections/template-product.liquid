@@ -73,511 +73,715 @@
 </style>
 
 <div class='bg-gray-50 min-h-screen' x-data='productPage()'>
-  <!-- Main Content -->
-  <main class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-    <div class='lg:grid lg:grid-cols-12 lg:gap-8'>
-      <!-- Left Column - Product Images & Description -->
+  <!-- Main Product Section -->
+  <main class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-28'>
+    <div class='lg:grid lg:grid-cols-12 lg:gap-12'>
+      <!-- Left Column - Product Images -->
       <div class='lg:col-span-7'>
-        <!-- Product Images -->
-        <div class='mb-8'>
-          <!-- Main Image -->
-          <div class='aspect-square bg-white rounded-lg overflow-hidden mb-4 relative group'>
-            <img
-              id='mainImage'
-              src='{{ product.featured_image | img_url: '600x600' }}'
-              alt='{{ product.title | escape }}'
-              class='w-full h-full object-contain transition-transform group-hover:scale-105'
-            >
+        <!-- Main Image -->
+        <div class='aspect-square bg-gray-50 rounded-lg overflow-hidden mb-6 relative group'>
+          <img
+            id='mainImage'
+            src='{{ product.featured_image | img_url: '600x600' }}'
+            alt='{{ product.title | escape }}'
+            class='w-full h-full object-contain transition-transform group-hover:scale-105'
+          >
 
-            <!-- Navigation Arrows -->
-            <button
-              @click='previousImage()'
-              class='absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity'
+          <!-- Magnifying Glass Button -->
+          <button
+            @click='openGallery()'
+            class='absolute top-4 right-4 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
+          >
+            <svg
+              class='w-5 h-5'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
             >
-              <svg
-                class='w-5 h-5'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-              </svg>
-            </button>
-            <button
-              @click='nextImage()'
-              class='absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity'
-            >
-              <svg
-                class='w-5 h-5'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-              </svg>
-            </button>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+            </svg>
+          </button>
 
-            <!-- Zoom Icon -->
-            <button
-              @click='openFullscreenGallery()'
-              class='absolute top-4 right-4 bg-white/80 hover:bg-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity'
+          <!-- Navigation Arrows -->
+          <button
+            @click='previousImage()'
+            class='absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
+          >
+            <svg
+              class='w-5 h-5'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
             >
-              <svg
-                class='w-5 h-5'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"></path>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Thumbnail Images -->
-          <div class='flex space-x-3 overflow-x-auto pb-2'>
-            {% for media in product.media %}
-              <button
-                @click='changeImage({{ forloop.index0 }})'
-                class='thumbnail flex-shrink-0 w-20 h-20 bg-white rounded-lg overflow-hidden border-2 {% if forloop.first %}border-black{% else %}border-gray-200 hover:border-black{% endif %} transition-colors'
-              >
-                {% render "product-media", media: media %}
-              </button>
-            {% endfor %}
-          </div>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </button>
+          <button
+            @click='nextImage()'
+            class='absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
+          >
+            <svg
+              class='w-5 h-5'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
         </div>
 
-        <!-- Product Description -->
-        {% if product.description != blank %}
-          <div class='bg-white rounded-lg p-6 shadow-sm h-auto'>
-            <h3 class='text-xl font-semibold mb-4'>Product Description</h3>
-            <div class='prose prose-gray max-w-none h-auto'>
-              {{ product.description | newline_to_br }}
-            </div>
-          </div>
-        {% endif %}
-
-        <!-- Specifications -->
-
-        {% comment %} Check if we have any custom metafields {% endcomment %}
-        {% assign has_specs = false %}
-        {% for metafield in product.metafields.custom %}
-          {% if metafield != blank %}
-            {% assign has_specs = true %}
-            {% break %}
-          {% endif %}
-        {% endfor %}
-
-        {% if has_specs %}
-          <div class='bg-white rounded-lg p-6 shadow-sm mt-6'>
-            <h3 class='text-xl font-semibold mb-4'>Specifications</h3>
-            <dl class='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-              {% comment %} Display individual metafields in a specific order {% endcomment %}
-              {% if product.metafields.custom.material != blank %}
-                <div>
-                  <dt class='font-medium text-gray-900'>Material</dt>
-                  <dd class='text-gray-700'>
-                    {{ product.metafields.custom.material }}
-                  </dd>
-                </div>
-              {% endif %}
-              {% if product.metafields.custom.handle_length != blank %}
-                <div>
-                  <dt class='font-medium text-gray-900'>Handle Length</dt>
-                  <dd class='text-gray-700'>
-                    {{ product.metafields.custom.handle_length }}
-                  </dd>
-                </div>
-              {% endif %}
-              {% if product.metafields.custom.thickness != blank %}
-                <div>
-                  <dt class='font-medium text-gray-900'>Thickness</dt>
-                  <dd class='text-gray-700'>
-                    {{ product.metafields.custom.thickness }}
-                  </dd>
-                </div>
-              {% endif %}
-              {% if product.metafields.custom.weight != blank %}
-                <div>
-                  <dt class='font-medium text-gray-900'>Weight</dt>
-                  <dd class='text-gray-700'>
-                    {{ product.metafields.custom.weight }}
-                  </dd>
-                </div>
-              {% endif %}
-              {% if product.metafields.custom.features != blank %}
-                <div>
-                  <dt class='font-medium text-gray-900'>Features</dt>
-                  <dd class='text-gray-700'>
-                    {{ product.metafields.custom.features }}
-                  </dd>
-                </div>
-              {% endif %}
-              {% if product.metafields.custom.overall_length != blank %}
-                <div>
-                  <dt class='font-medium text-gray-900'>Overall Length</dt>
-                  <dd class='text-gray-700'>
-                    {{ product.metafields.custom.overall_length }}
-                  </dd>
-                </div>
-              {% endif %}
-              {% if product.metafields.custom.finish != blank %}
-                <div>
-                  <dt class='font-medium text-gray-900'>Finish</dt>
-                  <dd class='text-gray-700'>
-                    {{ product.metafields.custom.finish }}
-                  </dd>
-                </div>
-              {% endif %}
-              {% if product.metafields.custom.sheath != blank %}
-                <div>
-                  <dt class='font-medium text-gray-900'>Sheath</dt>
-                  <dd class='text-gray-700'>
-                    {{ product.metafields.custom.sheath }}
-                  </dd>
-                </div>
-              {% endif %}
-              {% if product.metafields.custom.dimensions != blank %}
-                <div>
-                  <dt class='font-medium text-gray-900'>Dimensions</dt>
-                  <dd class='text-gray-700'>
-                    {{ product.metafields.custom.dimensions }}
-                  </dd>
-                </div>
-              {% endif %}
-            </dl>
-          </div>
-        {% endif %}
+        <!-- Thumbnail Images -->
+        <div id='thumbnailStrip' class='flex space-x-4 overflow-x-auto pb-2'>
+          {% for media in product.media %}
+            <button
+              @click='changeImage({{ forloop.index0 }})'
+              class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 {% if forloop.first %}border-black{% else %}border-gray-200 hover:border-black{% endif %} transition-colors'
+            >
+              {% render "product-media", media: media %}
+            </button>
+          {% endfor %}
+        </div>
       </div>
 
-      <!-- Right Column - Sticky Product Info -->
+      <!-- Right Column - Product Info -->
       <div class='lg:col-span-5 mt-8 lg:mt-0'>
-        <div id='productInfo' class='lg:sticky lg:top-8'>
-          <div class='bg-white rounded-lg p-6 shadow-sm'>
-            {% form "product",
-              product,
-              id: "product-form",
-              novalidate: "novalidate"
-            %}
-              <input
-                type='hidden'
-                name='id'
-                id='variantIdInput'
-                value='{{ selected_variant.id }}'
+        <div class='lg:sticky lg:top-24'>
+          <!-- Brand -->
+          <p class='text-sm text-gray-500 mb-2'>{{ product.vendor }}</p>
+
+          <!-- Product Title -->
+          <h1 class='text-4xl font-bold text-gray-900 mb-6'>
+            {{ product.title }}
+          </h1>
+
+          {% form "product",
+            product,
+            id: "product-form",
+            novalidate: "novalidate"
+          %}
+            <input
+              type='hidden'
+              name='id'
+              id='variantIdInput'
+              value='{{ selected_variant.id }}'
+            >
+
+            <!-- Price -->
+            <div class='mb-8'>
+              <span id='price' class='text-3xl font-bold text-gray-900'>
+                {{- selected_variant.price | money -}}
+              </span>
+              <span
+                id='comparePrice'
+                class='text-lg text-gray-500 line-through ml-2'
+                style='display: {% if selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
               >
+                {{- selected_variant.compare_at_price | money -}}
+              </span>
+              <span
+                id='saleBadge'
+                class='px-3 py-1 text-sm font-bold bg-red-500 rounded-full text-white ml-4'
+                style='display: {% if selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
+                >Sale</span
+              >
+              <div id='availability' class='mt-1 text-sm text-gray-600'></div>
+            </div>
 
-              <!-- Brand -->
-              <p class='text-sm text-gray-600 mb-2'>{{ product.vendor }}</p>
+            <!-- Insert the Shop Pay installments banner if available -->
+            <div class='mb-6'>
+              <p class='text-md text-gray-500'>
+                {{ form | payment_terms }}
+              </p>
+            </div>
 
-              <!-- Product Title -->
-              <h1 class='text-3xl font-bold text-gray-900 mb-4'>
-                {{ product.title }}
-              </h1>
+            <!--
+              Dynamic Variant Options (supports Knives, Apparel, Accessories)
+            -->
+            {% unless product.has_only_default_variant %}
+              {% for option in product.options_with_values %}
+                {% assign option_name_downcase = option.name
+                  | downcase
+                  | strip
+                %}
+                {% assign option_position = forloop.index %}
 
-              <!-- Price -->
-              <div class='mb-6'>
-                <span
-                  id='comparePrice'
-                  class='text-lg text-gray-500 line-through'
-                  style='display: {% if selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
-                >
-                  {{- selected_variant.compare_at_price | money -}}
-                </span>
-                <span id='price' class='text-3xl font-bold text-gray-900 ml-2'>
-                  {{- selected_variant.price | money -}}
-                </span>
-                <span
-                  id='saleBadge'
-                  class='px-3 py-1 text-sm font-bold bg-red-500 rounded-full text-white ml-4'
-                  style='display: {% if selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
-                  >Sale</span
-                >
-                <div id='availability' class='mt-1 text-sm text-gray-600'></div>
-              </div>
+                <div class='mb-6'>
+                  <h3 class='text-lg font-semibold mb-3'>
+                    {{ option.name }}
+                  </h3>
 
-              <!--
-                Dynamic Variant Options (supports Knives, Apparel, Accessories)
-              -->
-              {% unless product.has_only_default_variant %}
-                {% for option in product.options_with_values %}
-                  {% assign option_name_downcase = option.name
-                    | downcase
-                    | strip
+                  {% comment %}
+                    Determine renderer by option name:
+                    - color-like: color/colour/handle/colourway → swatches with images
+                    - size-like: size → text square buttons
+                    - default: text buttons
+                  {% endcomment %}
+
+                  {% if option_name_downcase contains "color"
+                    or option_name_downcase contains "colour"
+                    or option_name_downcase contains "handle"
+                    or option_name_downcase contains "colourway"
                   %}
-                  {% assign option_position = forloop.index %}
+                    <div class='grid grid-cols-4 gap-3'>
+                      {% for value in option.values %}
+                        {% assign is_selected = false %}
+                        {% if option.selected_value == value %}
+                          {% assign is_selected = true %}
+                        {% endif %}
 
-                  <div class='mb-6'>
-                    <h3 class='text-lg font-semibold mb-3'>
-                      {{ option.name }}
-                    </h3>
-
-                    {% comment %}
-                      Determine renderer by option name:
-                      - color-like: color/colour/handle/colourway → swatches with images
-                      - size-like: size → text square buttons
-                      - default: text buttons
-                    {% endcomment %}
-
-                    {% if option_name_downcase contains "color"
-                      or option_name_downcase contains "colour"
-                      or option_name_downcase contains "handle"
-                      or option_name_downcase contains "colourway"
-                    %}
-                      <div class='grid grid-cols-4 gap-3'>
-                        {% for value in option.values %}
-                          {% assign is_selected = false %}
-                          {% if option.selected_value == value %}
-                            {% assign is_selected = true %}
+                        {% assign option_image = null %}
+                        {% for variant in product.variants %}
+                          {% if option_position == 1
+                            and variant.option1 == value
+                          %}
+                            {% if variant.featured_image -%}
+                              {%- assign option_image = variant.featured_image -%}
+                            {%- endif %}
+                          {% elsif option_position == 2
+                            and variant.option2 == value
+                          %}
+                            {% if variant.featured_image -%}
+                              {%- assign option_image = variant.featured_image -%}
+                            {%- endif %}
+                          {% elsif option_position == 3
+                            and variant.option3 == value
+                          %}
+                            {% if variant.featured_image -%}
+                              {%- assign option_image = variant.featured_image -%}
+                            {%- endif %}
                           {% endif %}
+                          {% if option_image %}{% break %}{% endif %}
+                        {% endfor %}
 
-                          {% assign option_image = null %}
-                          {% for variant in product.variants %}
-                            {% if option_position == 1
-                              and variant.option1 == value
-                            %}
-                              {% if variant.featured_image -%}
-                                {%- assign option_image = variant.featured_image -%}
-                              {%- endif %}
-                            {% elsif option_position == 2
-                              and variant.option2 == value
-                            %}
-                              {% if variant.featured_image -%}
-                                {%- assign option_image = variant.featured_image -%}
-                              {%- endif %}
-                            {% elsif option_position == 3
-                              and variant.option3 == value
-                            %}
-                              {% if variant.featured_image -%}
-                                {%- assign option_image = variant.featured_image -%}
-                              {%- endif %}
+                        <label class='relative cursor-pointer color-option'>
+                          <input
+                            type='radio'
+                            name='options[{{ option.name }}]'
+                            value='{{ value | escape }}'
+                            class='sr-only'
+                            {% if is_selected %}
+                              checked
                             {% endif %}
-                            {% if option_image %}{% break %}{% endif %}
-                          {% endfor %}
+                          >
+                          <div class='w-full aspect-square border-2 {% if is_selected %}border-black{% else %}border-gray-300 hover:border-black{% endif %} rounded-lg p-2 bg-gray-50 hover:bg-gray-100 transition-colors'>
+                            {% if option_image %}
+                              <img
+                                src='{{ option_image | img_url: '96x96' }}'
+                                alt='{{ value }}'
+                                class='w-full h-full object-cover rounded-md'
+                              >
+                            {% else %}
+                              <div class='w-full h-full bg-gray-100 rounded-md flex items-center justify-center'>
+                                <span class='text-gray-600 text-xs'>
+                                  {{- value | escape -}}
+                                </span>
+                              </div>
+                            {% endif %}
+                          </div>
+                          <span class='text-xs text-center block mt-1 font-medium {% if is_selected %}text-black{% endif %}'>
+                            {{- value | upcase -}}
+                          </span>
+                        </label>
+                      {% endfor %}
+                    </div>
 
-                          <label class='relative cursor-pointer color-option'>
-                            <input
-                              type='radio'
-                              name='options[{{ option.name }}]'
-                              value='{{ value | escape }}'
-                              class='sr-only'
-                              {% if is_selected %}
-                                checked
-                              {% endif %}
-                            >
-                            <div class='w-full aspect-square border-2 {% if is_selected %}border-black{% else %}border-gray-300 hover:border-black{% endif %} rounded-lg p-2 bg-gray-50 hover:bg-gray-100 transition-colors'>
-                              {% if option_image %}
-                                <img
-                                  src='{{ option_image | img_url: '96x96' }}'
-                                  alt='{{ value }}'
-                                  class='w-full h-full object-cover rounded-md'
-                                >
-                              {% else %}
-                                <div class='w-full h-full bg-gray-100 rounded-md flex items-center justify-center'>
-                                  <span class='text-gray-600 text-xs'>
-                                    {{- value | escape -}}
-                                  </span>
-                                </div>
-                              {% endif %}
-                            </div>
-                            <span class='text-xs text-center block mt-1 font-medium {% if is_selected %}text-black{% endif %}'>
-                              {{- value | upcase -}}
-                            </span>
-                          </label>
-                        {% endfor %}
-                      </div>
+                  {% elsif option_name_downcase contains "size" %}
+                    <div class='flex flex-wrap gap-2'>
+                      {% for value in option.values %}
+                        {% assign is_selected = false %}
+                        {% if option.selected_value == value %}
+                          {% assign is_selected = true %}
+                        {% endif %}
 
-                    {% elsif option_name_downcase contains "size" %}
-                      <div class='flex flex-wrap gap-2'>
-                        {% for value in option.values %}
-                          {% assign is_selected = false %}
-                          {% if option.selected_value == value %}
-                            {% assign is_selected = true %}
-                          {% endif %}
+                        <label class='cursor-pointer'>
+                          <input
+                            type='radio'
+                            name='options[{{ option.name }}]'
+                            value='{{ value | escape }}'
+                            class='sr-only'
+                            {% if is_selected %}
+                              checked
+                            {% endif %}
+                          >
+                          <div
+                            class='
+                              min-w-[3rem] px-3 h-10 inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors
+                              {% if is_selected %} border-black bg-black text-white {% else %} border-gray-300 hover:border-black bg-white text-gray-900 {% endif %}
+                            '
+                          >
+                            {{ value | upcase }}
+                          </div>
+                        </label>
+                      {% endfor %}
+                    </div>
 
-                          <label class='cursor-pointer'>
-                            <input
-                              type='radio'
-                              name='options[{{ option.name }}]'
-                              value='{{ value | escape }}'
-                              class='sr-only'
-                              {% if is_selected %}
-                                checked
-                              {% endif %}
-                            >
-                            <div
-                              class='
-                                min-w-[3rem] px-3 h-10 inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors
-                                {% if is_selected %} border-black bg-black text-white {% else %} border-gray-300 hover:border-black bg-white text-gray-900 {% endif %}
-                              '
-                            >
-                              {{ value | upcase }}
-                            </div>
-                          </label>
-                        {% endfor %}
-                      </div>
+                  {% else %}
+                    <div class='flex flex-wrap gap-2'>
+                      {% for value in option.values %}
+                        {% assign is_selected = false %}
+                        {% if option.selected_value == value %}
+                          {% assign is_selected = true %}
+                        {% endif %}
 
-                    {% else %}
-                      <div class='flex flex-wrap gap-2'>
-                        {% for value in option.values %}
-                          {% assign is_selected = false %}
-                          {% if option.selected_value == value %}
-                            {% assign is_selected = true %}
-                          {% endif %}
-
-                          <label class='cursor-pointer'>
-                            <input
-                              type='radio'
-                              name='options[{{ option.name }}]'
-                              value='{{ value | escape }}'
-                              class='sr-only'
-                              {% if is_selected %}
-                                checked
-                              {% endif %}
-                            >
-                            <div
-                              class='
-                                px-3 h-10 inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors
-                                {% if is_selected %} border-black bg-black text-white {% else %} border-gray-300 hover:border-black bg-white text-gray-900 {% endif %}
-                              '
-                            >
-                              {{ value }}
-                            </div>
-                          </label>
-                        {% endfor %}
-                      </div>
-                    {% endif %}
-                  </div>
-                {% endfor %}
-              {% endunless %}
-
-              <!-- Quantity Selector -->
-              <div class='mb-6'>
-                <label class='block text-sm font-medium text-gray-700 mb-2'
-                  >Quantity</label
-                >
-                <div class='flex items-center space-x-3'>
-                  <button
-                    type='button'
-                    @click='decreaseQuantity()'
-                    class='w-10 h-10 rounded-md border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors'
-                  >
-                    <svg
-                      class='w-4 h-4'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                    >
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-                    </svg>
-                  </button>
-                  <input
-                    type='number'
-                    x-model='quantity'
-                    min='1'
-                    class='w-20 text-center border border-gray-300 rounded-md py-2 focus:ring-2 focus:ring-black focus:border-black'
-                  >
-                  <button
-                    type='button'
-                    @click='increaseQuantity()'
-                    class='w-10 h-10 rounded-md border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors'
-                  >
-                    <svg
-                      class='w-4 h-4'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
-                    >
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                  </button>
+                        <label class='cursor-pointer'>
+                          <input
+                            type='radio'
+                            name='options[{{ option.name }}]'
+                            value='{{ value | escape }}'
+                            class='sr-only'
+                            {% if is_selected %}
+                              checked
+                            {% endif %}
+                          >
+                          <div
+                            class='
+                              px-3 h-10 inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors
+                              {% if is_selected %} border-black bg-black text-white {% else %} border-gray-300 hover:border-black bg-white text-gray-900 {% endif %}
+                            '
+                          >
+                            {{ value }}
+                          </div>
+                        </label>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
                 </div>
-              </div>
+              {% endfor %}
+            {% endunless %}
 
-              <!-- Add to Cart Button -->
-              <button
-                id='addToCartBtn'
-                type='submit'
-                class='w-full cursor-pointer bg-black hover:bg-gray-800 text-white font-semibold py-4 px-6 transition-colors duration-200 transform hover:scale-[1.02] active:scale-[0.98] button-hover-scale {% if selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
-                {% if selected_variant.available == false %}
-                  disabled
-                {% endif %}
+            <!-- Quantity Selector -->
+            <div class='mb-6'>
+              <label class='block text-sm font-medium text-gray-700 mb-2'
+                >Quantity</label
               >
-                {% if selected_variant.available == false %}
-                  SOLD OUT
-                {% else %}
-                  ADD TO CART
-                {% endif %}
-              </button>
+              <div class='flex items-center space-x-3'>
+                <button
+                  type='button'
+                  @click='decreaseQuantity()'
+                  class='w-10 h-10 rounded-md border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors'
+                >
+                  <svg
+                    class='w-4 h-4'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                  </svg>
+                </button>
+                <input
+                  type='number'
+                  x-model='quantity'
+                  min='1'
+                  class='w-20 text-center border border-gray-300 rounded-md py-2 focus:ring-2 focus:ring-black focus:border-black'
+                >
+                <button
+                  type='button'
+                  @click='increaseQuantity()'
+                  class='w-10 h-10 rounded-md border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors'
+                >
+                  <svg
+                    class='w-4 h-4'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
 
-              <!-- Additional Info -->
-              {% comment %}
-                  <div class='mt-6 space-y-3 text-sm text-gray-600'>
-                    <div class='flex items-center'>
-                      <svg
-                        class='w-5 h-5 mr-2 text-green-600'
-                        fill='none'
-                        stroke='currentColor'
-                        viewBox='0 0 24 24'
-                      >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                      </svg>
-                      Free shipping on orders over $100
-                    </div>
-                    <div class='flex items-center'>
-                      <svg
-                        class='w-5 h-5 mr-2 text-green-600'
-                        fill='none'
-                        stroke='currentColor'
-                        viewBox='0 0 24 24'
-                      >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
-                      </svg>
-                      30-day return policy
-                    </div>
-                    <div class='flex items-center'>
-                      <svg
-                        class='w-5 h-5 mr-2 text-green-600'
-                        fill='none'
-                        stroke='currentColor'
-                        viewBox='0 0 24 24'
-                      >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                      </svg>
-                      Secure checkout
-                    </div>
-                </div>
-              {% endcomment %}
-            {% endform %}
-          </div>
+            <!-- Add to Cart Button -->
+            <button
+              id='addToCartBtn'
+              type='submit'
+              class='w-full bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mb-6'
+              {% if selected_variant.available == false %}
+                disabled
+              {% endif %}
+            >
+              {% if selected_variant.available == false %}
+                SOLD OUT
+              {% else %}
+                ADD TO CART
+              {% endif %}
+            </button>
+          {% endform %}
         </div>
       </div>
     </div>
-
-    {% comment %}
-      <!-- Reviews Section -->
-      <div class='mt-12'>
-        <div class='bg-white rounded-lg p-6 shadow-sm'>
-          <h3 class='text-2xl font-semibold mb-6'>Customer Reviews</h3>
-          <div class='flex items-center mb-6'>
-            <div class='flex items-center'>
-              <div class='flex text-yellow-400'>
-                {% for i in (1..5) %}
-                  <svg class='w-5 h-5 fill-current' viewBox='0 0 20 20'>
-                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
-                  </svg>
-                {% endfor %}
-              </div>
-              <span class='ml-2 text-sm font-medium text-gray-900'
-                >4.8 out of 5</span
-              >
-              <span class='ml-2 text-sm text-gray-600'>(124 reviews)</span>
-            </div>
-          </div>
-          <p class='text-gray-600'>Reviews and ratings coming soon...</p>
-        </div>
-      </div>
-    {% endcomment %}
   </main>
 </div>
+
+<!-- Sticky Tabs Navigation -->
+{% assign custom_fields = product.metafields.custom %}
+{% assign has_design_images = false %}
+{% if custom_fields %}
+  {% for pair in custom_fields %}
+    {% assign key = pair[0] %}
+    {% assign field = pair[1] %}
+    {% if field
+      and field.value != blank
+      and field.type == "file_reference"
+      or field.type == "list.file_reference"
+    %}
+      {% assign has_design_images = true %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+<div
+  id='tabsNavigation'
+  class='bg-white border-b border-t h-20 flex items-center border-gray-200 sticky top-16 z-18 transition-all duration-300'
+>
+  <div class='max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex items-center justify-between'>
+    <nav class='flex space-x-8'>
+      <button
+        onclick="scrollToSection('specs')"
+        class='tab-button uppercase py-4 font-bold px-2 border-b-2 border-transparent text-black hover:text-black hover:border-black transition-colors active'
+        data-tab='specs'
+      >
+        Description
+      </button>
+      {% if has_design_images %}
+        <button
+          onclick="scrollToSection('design')"
+          class='tab-button uppercase py-4 px-2 border-b-2 border-transparent text-black hover:text-black hover:border-black font-bold transition-colors'
+          data-tab='design'
+        >
+          Design
+        </button>
+      {% endif %}
+    </nav>
+
+    <!-- Price and Add to Cart -->
+    <div class='flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4'>
+      <div class='text-center md:text-right'>
+        <span id='stickyPrice' class='text-sm md:text-lg font-bold text-black'>
+          {{- selected_variant.price | money -}}
+        </span>
+      </div>
+      <button
+        onclick="document.getElementById('addToCartBtn').click()"
+        class='bg-black hover:bg-gray-800 text-white cursor-pointer font-semibold py-2 px-4 md:py-3 md:px-6 text-sm md:text-base transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]'
+      >
+        ADD TO CART
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Content Sections -->
+<div class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+  <!-- Specifications Section -->
+  <section id='specs' class='py-16'>
+    <div class='max-w-7xl mx-auto'>
+      <div class='grid grid-cols-1 lg:grid-cols-12 gap-12'>
+        <!-- Description (Left - 7 columns) -->
+        <div class='lg:col-span-7'>
+          {% if product.description != blank %}
+            <div class='prose prose-black max-w-none'>
+              {{ product.description }}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Specs (Right - 5 columns) -->
+        {% assign custom_fields = product.metafields.custom %}
+        {% assign has_specs = false %}
+        {% if custom_fields %}
+          {% for pair in custom_fields %}
+            {% assign key = pair[0] %}
+            {% assign field = pair[1] %}
+            {% if field
+              and field.value != blank
+              and field.type != "file_reference"
+              and field.type != "list.file_reference"
+            %}
+              {% assign has_specs = true %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
+        {% if has_specs %}
+          <div class='lg:col-span-5'>
+            <h2 class='sr-only'>Specs</h2>
+            <div class='bg-white border border-gray-300'>
+              <div class='px-8 py-6 border-b border-gray-200'>
+                <h3 class='text-xl font-bold text-black'>Specs</h3>
+              </div>
+              <dl class='px-8 py-6'>
+                {% for pair in custom_fields %}
+                  {% assign key = pair[0] %}
+                  {% assign field = pair[1] %}
+                  {% if field
+                    and field.value != blank
+                    and field.type != "file_reference"
+                    and field.type != "list.file_reference"
+                  %}
+                    {% assign label = key
+                      | replace: "_", " "
+                      | replace: "-", " "
+                      | strip
+                      | upcase
+                    %}
+                    <div class='grid grid-cols-2 gap-6 py-3'>
+                      <dt class='text-xs font-bold uppercase tracking-wider text-black'>
+                        {{ label }}
+                      </dt>
+                      <dd class='text-gray-900'>{{ field.value }}</dd>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </dl>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Design Section -->
+  {% if has_design_images %}
+    <section id='design' class='py-16'>
+      <div class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+        <h2 class='text-3xl font-bold text-gray-900 mb-8'>Design</h2>
+
+        <div class='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+          {% for pair in custom_fields %}
+            {% assign key = pair[0] %}
+            {% assign field = pair[1] %}
+            {% if field
+              and field.value != blank
+              and field.type == "file_reference"
+              or field.type == "list.file_reference"
+            %}
+              {% if field.type == "list.file_reference" %}
+                {% for image in field.value %}
+                  <div class='bg-white overflow-hidden'>
+                    <img
+                      src='{{ image | img_url: '600x600' }}'
+                      alt='{{ key | replace: '_', ' ' | replace: '-', ' ' | strip | capitalize }}'
+                      class='w-full object-contain'
+                      loading='lazy'
+                    >
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class='bg-white overflow-hidden'>
+                  <img
+                    src='{{ field.value | img_url: '600x600' }}'
+                    alt='{{ key | replace: '_', ' ' | replace: '-', ' ' | strip | capitalize }}'
+                    class='w-full object-contain'
+                    loading='lazy'
+                  >
+                </div>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endif %}
+</div>
+
+<!-- Anchor for inserting related products after all product content -->
+<div id='related-insert-anchor'></div>
+
+<!-- Related Products Section will be created dynamically via JavaScript -->
+
+<!-- Swiper CSS and JS -->
+<link
+  rel='stylesheet'
+  href='https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css'
+>
+<script
+  src='https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js'
+></script>
+
+<script>
+  // Fetch related products using Shopify Recommendations API
+  document.addEventListener('DOMContentLoaded', function() {
+    const productId = {{ product.id }};
+    
+    fetch(`${window.Shopify.routes.root}recommendations/products.json?product_id=${productId}&limit=6&intent=related`)
+      .then(response => response.json())
+      .then(({ products }) => {
+        if (products && products.length > 0) {
+          // Create the entire section dynamically
+          const relatedSection = document.createElement('section');
+          relatedSection.className = 'py-16 bg-gray-50';
+          relatedSection.innerHTML = `
+            <div class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+              <h2 class='text-lg font-bold text-black mb-8 uppercase'>Customers Also Viewed</h2>
+              <swiper-container
+                id='related-products-swiper'
+                class='mySwiper'
+                slides-per-view='1'
+                space-between='20'
+                pagination='true'
+                navigation='true'
+                breakpoints='{"640":{"slidesPerView":2,"spaceBetween":20},"1024":{"slidesPerView":3,"spaceBetween":30},"1280":{"slidesPerView":4,"spaceBetween":30}}'
+              >
+                <!-- Products will be loaded here -->
+              </swiper-container>
+            </div>
+          `;
+          
+          // Insert the section after all product content so sticky tabs keep sticking
+          const anchor = document.getElementById('related-insert-anchor');
+          if (anchor && anchor.parentNode) {
+            anchor.parentNode.insertBefore(relatedSection, anchor.nextSibling);
+          } else {
+            // Fallback: insert before footer or at end of body
+            const footer = document.querySelector('footer');
+            if (footer && footer.parentNode) {
+              footer.parentNode.insertBefore(relatedSection, footer);
+            } else {
+              document.body.appendChild(relatedSection);
+            }
+          }
+          
+          // Get the swiper container
+          const swiperContainer = document.getElementById('related-products-swiper');
+          
+          // Generate HTML for each product as swiper-slide
+          products.forEach(product => {
+            const productSlide = `
+              <swiper-slide style="height: 100%;">
+                <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 h-full flex flex-col">
+                  <div class="aspect-square bg-gray-50 rounded-t-lg overflow-hidden flex-shrink-0">
+                    <img
+                      src="${product.featured_image}"
+                      alt="${product.title}"
+                      class="w-full h-full object-contain"
+                      loading="lazy"
+                    >
+                  </div>
+                  <div class="p-4 flex flex-col justify-between flex-grow">
+                    <div class="flex-grow flex flex-col justify-between">
+                      <div class="h-16 flex items-center justify-center">
+                        <h3 class="text-lg font-bold text-black text-center line-clamp-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.5rem;">
+                          ${product.title.toUpperCase()}
+                        </h3>
+                      </div>
+                      <div class="text-center mb-4">
+                        <span class="text-xl font-bold text-black">
+                          ${new Intl.NumberFormat('{{ shop.locale }}', {
+                            style: 'currency',
+                            currency: '{{ shop.currency }}'
+                          }).format(product.price / 100)}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      onclick="addRelatedProductToCart('${product.handle}', '${product.url}')"
+                      class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0"
+                    >
+                      ADD TO CART
+                    </button>
+                  </div>
+                </div>
+              </swiper-slide>
+            `;
+            swiperContainer.innerHTML += productSlide;
+          });
+          
+           // Initialize Swiper after adding slides
+           const swiper = swiperContainer.swiper;
+           if (swiper) {
+             swiper.update();
+           }
+         }
+       })
+       .catch(error => {
+         console.error('Error fetching related products:', error);
+       });
+   });
+
+  // Function to add related products to cart (uses handle or derives from URL)
+  window.addRelatedProductToCart = async function(handle, url) {
+    try {
+      function extractHandle(u) {
+        try {
+          const path = new URL(u, window.location.origin).pathname;
+          const parts = path.split('/products/');
+          if (parts.length > 1) {
+            const tail = parts[1];
+            return tail.split('?')[0].split('/')[0];
+          }
+          return null;
+        } catch (e) {
+          const parts = String(u || '').split('/products/');
+          if (parts.length > 1) {
+            const tail = parts[1];
+            return tail.split('?')[0].split('/')[0];
+          }
+          return null;
+        }
+      }
+
+      const resolvedHandle = (handle && handle !== 'undefined' && handle !== 'null') ? handle : extractHandle(url);
+      if (!resolvedHandle) throw new Error('Missing product handle');
+
+      // Get product details by handle to find an addable variant
+      const response = await fetch(`/products/${resolvedHandle}.js`);
+      if (!response.ok) throw new Error('Failed to load product JSON');
+      const product = await response.json();
+
+      const variantObj = (product.variants || []).find(v => v.available) || (product.variants || [])[0];
+      if (!variantObj) throw new Error('No variants available');
+
+      // Prefer the same cart flow as the main product (cartSheet component)
+      const cartSheetEl = document.querySelector('[x-data*="cartSheet"]');
+      if (cartSheetEl && cartSheetEl._x_dataStack && cartSheetEl._x_dataStack[0] && typeof cartSheetEl._x_dataStack[0].addToCart === 'function') {
+        await cartSheetEl._x_dataStack[0].addToCart(variantObj.id, 1);
+        return;
+      }
+
+      // Fallback: direct API call then open the cart
+      const cartResponse = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: variantObj.id, quantity: 1 }),
+      });
+      if (!cartResponse.ok) throw new Error('Failed to add to cart');
+      window.dispatchEvent(new CustomEvent('open-cart'));
+    } catch (error) {
+      console.error('Error adding related product to cart:', error);
+      alert('Failed to add item to cart. Please try again.');
+    }
+  };
+</script>
+
+{% comment %}
+  <!-- Reviews Section -->
+  <div class='mt-12'>
+    <div class='bg-white rounded-lg p-6 shadow-sm'>
+      <h3 class='text-2xl font-semibold mb-6'>Customer Reviews</h3>
+      <div class='flex items-center mb-6'>
+        <div class='flex items-center'>
+          <div class='flex text-yellow-400'>
+            {% for i in (1..5) %}
+              <svg class='w-5 h-5 fill-current' viewBox='0 0 20 20'>
+                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+              </svg>
+            {% endfor %}
+          </div>
+          <span class='ml-2 text-sm font-medium text-gray-900'
+            >4.8 out of 5</span
+          >
+          <span class='ml-2 text-sm text-gray-600'>(124 reviews)</span>
+        </div>
+      </div>
+      <p class='text-gray-600'>Reviews and ratings coming soon...</p>
+    </div>
+  </div>
+{% endcomment %}
 
 <!-- Fullscreen Gallery Modal -->
 <div
@@ -731,9 +935,6 @@
 
             // set initial UI state based on initialVariant
             this.updateSelectedVariantByOptions(this.selectedOptions);
-
-            // sticky behavior
-            this.handleStickyBehavior();
 
             // watch for page scroll/resize (you already do this; keep in component)
           },
@@ -921,6 +1122,7 @@
             const priceEl = document.getElementById('price');
             const compareEl = document.getElementById('comparePrice');
             const saleEl = document.getElementById('saleBadge');
+            const stickyPriceEl = document.getElementById('stickyPrice');
 
              // Use Shopify's pre-formatted prices
              function formatMoney(cents) {
@@ -945,7 +1147,9 @@
                return (cents / 100).toFixed(2);
              }
 
-            if (priceEl) priceEl.innerText = formatMoney(variant.price);
+            const formattedPrice = formatMoney(variant.price);
+            if (priceEl) priceEl.innerText = formattedPrice;
+            if (stickyPriceEl) stickyPriceEl.innerText = formattedPrice;
 
             if (compareEl) {
               if (variant.compare_at_price && Number(variant.compare_at_price) > Number(variant.price)) {
@@ -989,14 +1193,12 @@
 
           changeImage(index) {
             const mainImage = document.getElementById('mainImage');
-            const thumbnails = document.querySelectorAll('.thumbnail');
-            const thumbnailContainer = document.querySelector('.flex.space-x-3.overflow-x-auto');
+            const thumbnails = Array.from(document.querySelectorAll('.thumbnail'));
+            const thumbnailContainer = document.getElementById('thumbnailStrip');
 
             if (index >= 0 && index < this.productImages.length) {
               this.currentImageIndex = index;
-              if (mainImage) {
-                mainImage.src = this.productImages[index];
-              }
+              if (mainImage) mainImage.src = this.productImages[index];
 
               // Update thumbnail borders
               thumbnails.forEach((thumbnail, i) => {
@@ -1009,20 +1211,29 @@
                 }
               });
 
-              // Auto-scroll to make the selected thumbnail visible
+              // Auto-scroll to make the selected thumbnail visible (robust)
               if (thumbnailContainer && thumbnails[index]) {
-                const selectedThumbnail = thumbnails[index];
+                const selected = thumbnails[index];
+                const padding = 12; // tolerance
                 const containerRect = thumbnailContainer.getBoundingClientRect();
-                const thumbnailRect = selectedThumbnail.getBoundingClientRect();
+                const thumbRect = selected.getBoundingClientRect();
 
-                if (thumbnailRect.right > containerRect.right || thumbnailRect.left < containerRect.left) {
-                  const scrollLeft = selectedThumbnail.offsetLeft - (thumbnailContainer.offsetWidth / 2) + (selectedThumbnail.offsetWidth / 2);
-                  thumbnailContainer.scrollTo({
-                    left: scrollLeft,
-                    behavior: 'smooth'
-        });
-    }
-  }
+                // If the thumbnail is left of the visible area, scroll left
+                if (thumbRect.left < containerRect.left + padding) {
+                  // Center the thumbnail in the viewport
+                  const centerOffset = (thumbnailContainer.clientWidth / 2) - (selected.clientWidth / 2);
+                  const target = Math.max(0, selected.offsetLeft - centerOffset);
+                  thumbnailContainer.scrollTo({ left: target, behavior: 'smooth' });
+
+                // If the thumbnail is right of the visible area, scroll right
+                } else if (thumbRect.right > containerRect.right - padding) {
+                  // Center the thumbnail in the viewport
+                  const centerOffset = (thumbnailContainer.clientWidth / 2) - (selected.clientWidth / 2);
+                  const maxScroll = thumbnailContainer.scrollWidth - thumbnailContainer.clientWidth;
+                  const target = Math.min(maxScroll, selected.offsetLeft - centerOffset);
+                  thumbnailContainer.scrollTo({ left: target, behavior: 'smooth' });
+                }
+              }
             }
           },
 
@@ -1034,6 +1245,15 @@
           nextImage() {
             const newIndex = this.currentImageIndex < this.productImages.length - 1 ? this.currentImageIndex + 1 : 0;
             this.changeImage(newIndex);
+          },
+
+          openGallery() {
+            const fullscreenGallery = document.querySelector('[x-data*="fullscreenGallery"]');
+            if (fullscreenGallery && fullscreenGallery._x_dataStack && fullscreenGallery._x_dataStack[0]) {
+              fullscreenGallery._x_dataStack[0].isOpen = true;
+              fullscreenGallery._x_dataStack[0].currentSlide = this.currentImageIndex;
+              document.body.style.overflow = 'hidden';
+            }
           },
 
           decreaseQuantity() {
@@ -1054,60 +1274,92 @@
             }
           },
 
-          handleStickyBehavior() {
-            const productInfo = document.getElementById('productInfo');
-            const isMobile = window.innerWidth < 1024;
-
-            if (isMobile && productInfo) {
-              const isSticky = window.scrollY > 400;
-
-              if (isSticky && !productInfo.classList.contains('mobile-sticky')) {
-                productInfo.classList.add('mobile-sticky');
-                productInfo.style.position = 'fixed';
-                productInfo.style.bottom = '0';
-                productInfo.style.left = '0';
-                productInfo.style.right = '0';
-                productInfo.style.zIndex = '50';
-                productInfo.style.backgroundColor = 'white';
-                productInfo.style.borderTop = '1px solid #e5e7eb';
-                productInfo.style.borderRadius = '16px 16px 0 0';
-                productInfo.style.boxShadow = '0 -4px 6px -1px rgba(0, 0, 0, 0.1)';
-                productInfo.style.padding = '1rem';
-                productInfo.style.margin = '0';
-              } else if (!isSticky && productInfo.classList.contains('mobile-sticky')) {
-                productInfo.classList.remove('mobile-sticky');
-                productInfo.style.position = 'static';
-                productInfo.style.bottom = 'auto';
-                productInfo.style.left = 'auto';
-                productInfo.style.right = 'auto';
-                productInfo.style.zIndex = 'auto';
-                productInfo.style.backgroundColor = '';
-                productInfo.style.borderTop = '';
-                productInfo.style.borderRadius = '';
-                productInfo.style.boxShadow = '';
-                productInfo.style.padding = '';
-                productInfo.style.margin = '';
-              }
-            }
-          }
+          handleStickyBehavior() {}
         };
       };
 
 
-      // Handle window resize and scroll
-      window.addEventListener('scroll', () => {
-        const productPage = document.querySelector('[x-data*="productPage"]');
-        if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
-          productPage._x_dataStack[0].handleStickyBehavior();
+      // Helpers to match sticky offsets to header height so tabs don't overlap it
+      function getHeaderHeight() {
+        const el = document.getElementById('siteHeader') || document.getElementById('shopify-section-header') || document.querySelector('header');
+        return el ? Math.ceil(el.getBoundingClientRect().height) : 64;
+      }
+      function getTabsHeight() {
+        const el = document.getElementById('tabsNavigation');
+        return el ? Math.ceil(el.getBoundingClientRect().height) : 56;
+      }
+      function updateTabsTopOffset() {
+        const tabs = document.getElementById('tabsNavigation');
+        if (tabs) {
+          tabs.style.top = getHeaderHeight() + 'px';
         }
-      });
+      }
 
-      window.addEventListener('resize', () => {
-        const productPage = document.querySelector('[x-data*="productPage"]');
-        if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
-          productPage._x_dataStack[0].handleStickyBehavior();
+      // Tab navigation functionality
+      window.scrollToSection = function(sectionId) {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          const offset = getHeaderHeight() + getTabsHeight();
+          const targetY = element.getBoundingClientRect().top + window.pageYOffset - offset;
+          window.scrollTo({ top: targetY, behavior: 'smooth' });
         }
-      });
+
+        // Immediately reflect active state on click
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const activeBtn = document.querySelector(`.tab-button[data-tab="${sectionId}"]`);
+        tabButtons.forEach(btn => {
+          btn.classList.remove('active', 'border-black', 'text-black');
+          btn.classList.add('border-transparent');
+        });
+        if (activeBtn) {
+          activeBtn.classList.add('active', 'border-black', 'text-black');
+          activeBtn.classList.remove('border-transparent');
+        }
+      };
+
+      // Update active tab based on scroll position
+      function updateActiveTab() {
+        const specsSection = document.getElementById('specs');
+        const designSection = document.getElementById('design');
+        const tabsNavigation = document.getElementById('tabsNavigation');
+        
+        if (!specsSection || !designSection || !tabsNavigation) return;
+        
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const offset = getHeaderHeight() + getTabsHeight() + 8;
+        
+        const specsOffset = specsSection.offsetTop - offset;
+        const designOffset = designSection.offsetTop - offset;
+        
+        const tabButtons = document.querySelectorAll('.tab-button');
+        if (scrollTop >= designOffset) {
+          tabButtons.forEach(btn => {
+            btn.classList.remove('active', 'border-black', 'text-black');
+            btn.classList.add('border-transparent');
+          });
+          const btn = document.querySelector('.tab-button[data-tab="design"]');
+          if (btn) {
+            btn.classList.add('active', 'border-black', 'text-black');
+            btn.classList.remove('border-transparent');
+          }
+        } else if (scrollTop >= specsOffset) {
+          tabButtons.forEach(btn => {
+            btn.classList.remove('active', 'border-black', 'text-black');
+            btn.classList.add('border-transparent');
+          });
+          const btn = document.querySelector('.tab-button[data-tab="specs"]');
+          if (btn) {
+            btn.classList.add('active', 'border-black', 'text-black');
+            btn.classList.remove('border-transparent');
+          }
+        }
+      }
+
+      // Add scroll listener for tab updates and initialize on load
+      window.addEventListener('scroll', updateActiveTab);
+      window.addEventListener('load', () => { updateTabsTopOffset(); updateActiveTab(); });
+      window.addEventListener('resize', updateTabsTopOffset);
+      window.addEventListener('orientationchange', updateTabsTopOffset);
 
       // Intercept product form submission to use cart sheet
       document.addEventListener('DOMContentLoaded', function() {
