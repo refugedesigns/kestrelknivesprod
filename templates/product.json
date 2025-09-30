@@ -2,6 +2,9 @@
   "sections": {
     "template-product": {
       "type": "template-product",
+      "settings": {
+        "show_reviews": true
+      },
       "blocks": {
         "vendor": {
           "type": "vendor"
@@ -20,6 +23,33 @@
         },
         "checkout_buttons": {
           "type": "checkout_buttons"
+        },
+        "review_1": {
+          "type": "review",
+          "settings": {
+            "review_text": "Being a professional guide and a son of a ranch butcher, I've skinned a lot of animals and a knife that can hold a sharp edge is a must. I've used many brands of knives and Kestrel Knives are the only one I've found that can hold a sharp edge the longest. I bought my first EDC about 3 years ago and skinned 2 elk and a 1,200 lbs buffalo with it so far and still haven't had to use my wet stone to resharpen it.",
+            "rating": 5,
+            "customer_name": "Latigo Hext",
+            "customer_title": "Verified Customer"
+          }
+        },
+        "review_2": {
+          "type": "review",
+          "settings": {
+            "review_text": "Used my Kestrel knife on my antelope buck. This is the third animal that I’ve used the knife on and it works awesome. It’s so light and thin you don’t even know it’s in your pack. The other thing I really like is that it’s so simple…no folding mechanism or blades to cut yourself on while changing them out (Havalon!) but enough mass behind the blade to really carve against bone, pry with, or whatever. Kestrel has it figured out…simple, effective, light, and cutting edge (pun intended).",
+            "rating": 5,
+            "customer_name": "David Hamilton Vortex Optics",
+            "customer_title": "Verified Customer"
+          }
+        },
+        "review_3": {
+          "type": "review",
+          "settings": {
+            "review_text": "What a great knife. These are the lightest weight knives I’ve ever seen and truly a necessity for the backcountry hunter.",
+            "rating": 5,
+            "customer_name": "Chris C.",
+            "customer_title": "Verified Customer"
+          }
         }
       },
       "block_order": [
@@ -28,7 +58,10 @@
         "price",
         "description",
         "variant_selector",
-        "checkout_buttons"
+        "checkout_buttons",
+        "review_1",
+        "review_2",
+        "review_3"
       ]
     }
   },

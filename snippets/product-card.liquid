@@ -31,10 +31,10 @@
     )
   '
 >
-  <div class='bg-white overflow-hidden w-full h-[600px] flex flex-col transition-none'>
+  <div class='bg-white overflow-hidden w-full {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[400px]{% else %}h-[600px]{% endif %} flex flex-col transition-none'>
     <!-- Product Image -->
     <div
-      class='relative h-96 bg-gray-100 overflow-hidden'
+      class='relative h-96 bg-white overflow-hidden'
       @mouseenter='if (secondImage) hoverImage = true'
       @mouseleave='hoverImage = false'
     >
@@ -51,18 +51,16 @@
         <img
           :src='currentImage'
           :alt="'{{ product_product.title }}'"
-          class='absolute inset-0 w-full h-full object-cover transition-opacity duration-300'
+          class='absolute inset-0 w-full h-full {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}object-cover{% else %}object-contain{% endif %} transition-opacity duration-300'
           :class="hoverImage ? 'opacity-0' : 'opacity-100'"
-          style='width: 100%; height: 384px;'
         >
         <!-- Hover Image -->
         <img
           x-show='secondImage'
           :src='secondImage'
           :alt="'{{ product_product.title }}'"
-          class='absolute inset-0 w-full h-full object-cover transition-opacity duration-300'
+          class='absolute inset-0 w-full h-full {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}object-cover{% else %}object-contain{% endif %} transition-opacity duration-300'
           :class="hoverImage ? 'opacity-100' : 'opacity-0'"
-          style='width: 100%; height: 384px;'
         >
       </a>
     </div>
@@ -123,7 +121,7 @@
                         <img
                           src='{{ variant.featured_image | img_url: "48x48" }}'
                           alt='{{ variant.option1 }}'
-                          class='w-full h-full object-cover'
+                          class='w-full h-full object-contain'
                         >
                       {% else %}
                         {%- comment -%} Settings-based overrides {%- endcomment -%}
