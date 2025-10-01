@@ -89,7 +89,7 @@
           | downcase
         %}
         {% unless product_product.has_only_default_variant
-          or product_type_lower contains "apparel"
+          or product_type_lower contains "apparel" or product_type_lower contains "accessories"
         %}
           <div class='mb-4'>
             <div class='flex space-x-2 justify-center'>

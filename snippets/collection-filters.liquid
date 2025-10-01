@@ -103,92 +103,6 @@
       </div>
     </div>
 
-    <!-- Price Filter -->
-    <div class='mb-6'>
-      <button
-        @click='toggleFilter("price")'
-        class='flex items-center justify-between w-full text-left font-semibold text-gray-900 mb-3'
-      >
-        <span>PRICE</span>
-        <svg
-          class='w-4 h-4 transition-transform duration-200'
-          :class="filtersOpen.price ? 'rotate-180' : ''"
-          fill='none'
-          stroke='currentColor'
-          viewBox='0 0 24 24'
-        >
-          <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/>
-        </svg>
-      </button>
-
-      <div x-show='filtersOpen.price' class='space-y-4'>
-        <!-- Price Range Slider Container -->
-        <div class='relative h-6 mb-6'>
-          <!-- Background Track -->
-          <div
-            class='absolute top-1/2 left-0 right-0 h-2 bg-gray-200 rounded-lg transform -translate-y-1/2'
-          ></div>
-
-          <!-- Active Range Track -->
-          <div
-            id='progress'
-            class='absolute top-1/2 h-2 bg-gray-400 rounded-lg transform -translate-y-1/2'
-          ></div>
-
-          <!-- Min Range Input -->
-          <input
-            id='minRange'
-            type='range'
-            x-model='priceRange.min'
-            :min='minPrice'
-            :max='maxPrice'
-            @input='updateSlider()'
-            class='absolute top-1/2 left-0 w-full h-2 bg-transparent appearance-none cursor-pointer transform -translate-y-1/2'
-            style='pointer-events: none;'
-          >
-
-          <!-- Max Range Input -->
-          <input
-            id='maxRange'
-            type='range'
-            x-model='priceRange.max'
-            :min='minPrice'
-            :max='maxPrice'
-            @input='updateSlider()'
-            class='absolute top-1/2 left-0 w-full h-2 bg-transparent appearance-none cursor-pointer transform -translate-y-1/2'
-            style='pointer-events: none;'
-          >
-        </div>
-
-        <!-- Price Input Fields -->
-        <div class='flex items-center space-x-2'>
-          <div class='flex-1'>
-            <input
-              type='number'
-              x-model='priceRange.min'
-              :min='minPrice'
-              :max='maxPrice'
-              @input='updatePriceRange()'
-              class='w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-900'
-              placeholder='$0'
-            >
-          </div>
-          <span class='text-sm text-gray-500'>to</span>
-          <div class='flex-1'>
-            <input
-              type='number'
-              x-model='priceRange.max'
-              :min='minPrice'
-              :max='maxPrice'
-              @input='updatePriceRange()'
-              class='w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-gray-900'
-              placeholder='$1000'
-            >
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Clear Filters Button -->
     <button
       @click='clearFilters'
@@ -229,7 +143,6 @@
       filtersOpen: {
         productType: true,
         availability: true,
-        price: true,
       },
       selectedFilters: {
         productType: [],
@@ -237,27 +150,17 @@
         availability: [],
       },
       productTypes: [],
-      priceRange: {
-        min: 0,
-        max: 1000,
-      },
-      minPrice: 0,
-      maxPrice: 1000,
       isInitializing: true,
 
       init() {
-        // Build product types and calculate price range from products
+        // Build product types from products
         this.buildProductTypes()
-        this.calculatePriceRange()
 
         // Hydrate selections from URL so checked states reflect current filters
         this.hydrateFromUrl()
 
-        // Initialize slider after a short delay to ensure DOM is ready
-        setTimeout(() => {
-          this.updateSlider()
-          this.isInitializing = false
-        }, 100)
+        // Mark initialization complete
+        this.isInitializing = false
       },
 
       hydrateFromUrl() {
@@ -303,14 +206,6 @@
             if (String(v) === '0') av.push('out-of-stock')
           })
           if (av.length) this.selectedFilters.availability = av
-
-          // Price range (cents)
-          const gte = url.searchParams.get('filter.v.price.gte')
-          const lte = url.searchParams.get('filter.v.price.lte')
-          if (gte)
-            this.priceRange.min = Math.max(this.minPrice, Number(gte) / 100)
-          if (lte)
-            this.priceRange.max = Math.min(this.maxPrice, Number(lte) / 100)
         } catch (e) {
           // ignore
         }
@@ -370,31 +265,11 @@
       clearFilters() {
         this.selectedFilters = {
           productType: [],
+          productTypeSelected: '',
           availability: [],
-        }
-        this.priceRange = {
-          min: this.minPrice,
-          max: this.maxPrice,
         }
         sessionStorage.removeItem('kk_allProductTypes')
         this.applyFilters()
-      },
-
-      calculatePriceRange() {
-        // Calculate from actual collection products
-        const products = window.__collectionProducts || []
-        if (products && products.length > 0) {
-          const prices = products.map(p => p.price / 100) // Convert from cents
-          this.minPrice = Math.min(...prices)
-          this.maxPrice = Math.max(...prices)
-          this.priceRange.min = this.minPrice
-          this.priceRange.max = this.maxPrice
-        } else {
-          this.minPrice = 0
-          this.maxPrice = 1000
-          this.priceRange.min = this.minPrice
-          this.priceRange.max = this.maxPrice
-        }
       },
 
       get inStockCount() {
@@ -413,73 +288,12 @@
         return products ? products.filter(p => !p.available).length : 0
       },
 
-      formatPrice(price) {
-        return new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD',
-          minimumFractionDigits: 2,
-        }).format(price)
-      },
-
-      updateSlider() {
-        const minGap = 10
-        const rangeMax = this.maxPrice - this.minPrice
-
-        // Update progress bar
-        const progress = document.getElementById('progress')
-        if (progress) {
-          const minPercent =
-            ((this.priceRange.min - this.minPrice) / rangeMax) * 100
-          const maxPercent =
-            ((this.priceRange.max - this.minPrice) / rangeMax) * 100
-
-          progress.style.left = minPercent + '%'
-          progress.style.right = 100 - maxPercent + '%'
-        }
-
-        // Client-side price filtering: broadcast current range
-        window.dispatchEvent(
-          new CustomEvent('price-filter', {
-            detail: { min: this.priceRange.min, max: this.priceRange.max },
-          })
-        )
-      },
-
-      updatePriceRange() {
-        const minGap = 10
-
-        // Ensure min doesn't exceed max with gap
-        if (this.priceRange.min > this.priceRange.max - minGap) {
-          this.priceRange.min = this.priceRange.max - minGap
-        }
-        if (this.priceRange.max < this.priceRange.min + minGap) {
-          this.priceRange.max = this.priceRange.min + minGap
-        }
-
-        // Ensure values stay within bounds
-        if (this.priceRange.min < this.minPrice) {
-          this.priceRange.min = this.minPrice
-        }
-        if (this.priceRange.max > this.maxPrice) {
-          this.priceRange.max = this.maxPrice
-        }
-
-        this.updateSlider()
-        // Client-side price filtering only
-        window.dispatchEvent(
-          new CustomEvent('price-filter', {
-            detail: {
-              min: this.priceRange.min,
-              max: this.priceRange.max,
-            },
-          })
-        )
-      },
-
-      applyFilters(resetPrice = false) {
+      applyFilters() {
         if (this.isInitializing) return
         // Build server-side filter URL and navigate
         const url = new URL(window.location.href)
+        // Always reset pagination to the first page when filters change
+        url.searchParams.delete('page')
         const currentPath = url.pathname || ''
         const m = currentPath.match(/\/collections\/([^\/]+)/)
         const currentHandle = m && m[1] ? decodeURIComponent(m[1]) : ''
@@ -525,19 +339,6 @@
           url.searchParams.append('filter.v.availability', '1')
         if (hasOut && !hasIn)
           url.searchParams.append('filter.v.availability', '0')
-        // price: reset to full range when switching type or when none is selected
-        url.searchParams.delete('filter.v.price.gte')
-        url.searchParams.delete('filter.v.price.lte')
-        if (selected && !resetPrice) {
-          const minCents = Math.round((this.priceRange.min || 0) * 100)
-          const maxCents = Math.round((this.priceRange.max || 0) * 100)
-          url.searchParams.set('filter.v.price.gte', String(minCents))
-          url.searchParams.set('filter.v.price.lte', String(maxCents))
-        } else {
-          // Reset UI as well
-          this.priceRange.min = this.minPrice
-          this.priceRange.max = this.maxPrice
-        }
 
         const nextUrl = url.toString()
         if (nextUrl === window.location.href) return
@@ -546,37 +347,3 @@
     }))
   })
 </script>
-
-<style>
-  input[type='range'] {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    background: transparent;
-    position: absolute;
-    pointer-events: none;
-  }
-
-  input[type='range']::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    height: 16px;
-    width: 16px;
-    border-radius: 50%;
-    background: #6b7280;
-    cursor: pointer;
-    pointer-events: auto;
-    position: relative;
-    z-index: 10;
-  }
-
-  input[type='range']::-moz-range-thumb {
-    height: 16px;
-    width: 16px;
-    border-radius: 50%;
-    background: #6b7280;
-    cursor: pointer;
-    pointer-events: auto;
-    position: relative;
-    z-index: 10;
-  }
-</style>

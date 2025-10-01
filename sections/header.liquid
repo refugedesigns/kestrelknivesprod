@@ -1,3 +1,12 @@
+<style>
+  /* Responsive logo sizing */
+  @media (min-width: 768px) {
+    .header-logo {
+      height: {{ section.settings.logo_height_desktop | default: 80 }}px !important;
+    }
+  }
+</style>
+
 <div
   id='siteHeader'
   class='fixed w-full z-20 top-0 start-0 bg-black'
@@ -5,7 +14,7 @@
   x-cloak
 >
   <div class='mx-auto px-4 sm:px-6 max-w-8xl'>
-    <div class='flex justify-between items-center py-6 md:justify-start md:space-x-10'>
+    <div class='flex justify-between items-center py-2 md:justify-start md:space-x-10'>
       <!-- STORE NAME / STORE LOGO -->
       <div class='flex justify-start lg:flex-1 truncate'>
         {% assign logo_image = section.settings.logo_image %}
@@ -16,7 +25,8 @@
           <a href='{{ routes.root_url }}' class='flex items-center space-x-3'>
             <img
               src='{{ logo_image | img_url: "master" }}'
-              class='h-8 md:h-14'
+              style='height: {{ section.settings.logo_height_mobile | default: 32 }}px;'
+              class='header-logo md:h-auto'
               alt='{{ shop.name }} Logo'
             >
           </a>
@@ -24,7 +34,8 @@
           <a href='{{ routes.root_url }}' class='flex items-center space-x-3'>
             <img
               src='{{ "logo_white.png" | asset_url }}'
-              class='h-8 md:h-14'
+              style='height: {{ section.settings.logo_height_mobile | default: 32 }}px;'
+              class='header-logo md:h-auto'
               alt='{{ shop.name }} Logo'
             >
           </a>
@@ -339,6 +350,26 @@
       "type": "image_picker",
       "id": "logo_image",
       "label": "Logo image"
+    },
+    {
+      "type": "range",
+      "id": "logo_height_mobile",
+      "label": "Logo Height (Mobile)",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "default": 32,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "logo_height_desktop",
+      "label": "Logo Height (Desktop)",
+      "min": 40,
+      "max": 120,
+      "step": 4,
+      "default": 80,
+      "unit": "px"
     },
     {
       "type": "link_list",
