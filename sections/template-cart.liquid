@@ -1,5 +1,5 @@
 {% if cart.item_count > 0 %}
-  <main class='max-w-7xl mx-auto lg:px-8 py-8'>
+  <main class='max-w-7xl mx-auto lg:px-8 py-8 mt-12'>
     <div class='flex flex-col lg:flex-row gap-8 lg:gap-12'>
       <!-- Cart Items -->
       <div class='flex-1 lg:w-2/3'>
@@ -54,18 +54,43 @@
                           {% if item.variant.title
                             and item.variant.title != "Default Title"
                           %}
-                            <p class='text-sm text-gray-600 mb-2'>
-                              Variant:
-                              <span class='font-medium text-gray-900'>
-                                {{- item.variant.title -}}
-                              </span>
-                            </p>
+                            {% unless item.variant.title
+                                contains "Default Title"
+                            %}
+                              <p class='text-sm text-gray-600 mb-2'>
+                                Variant:
+                                <span class='font-medium text-gray-900'>
+                                  {{- item.variant.title -}}
+                                </span>
+                              </p>
+                            {% endunless %}
                           {% endif %}
                           <div class='flex items-center space-x-4 text-sm text-gray-600'>
                             {% if item.sku -%}
                               <span>SKU: {{ item.sku }}</span>
                             {%- endif %}
                           </div>
+                          {%- assign property_size = item.properties | size -%}
+                          {% if property_size > 0 %}
+                            {% for p in item.properties %}
+                              {%- if p.first contains "_mws_" -%}
+                                {%- continue -%}
+                              {%- endif -%}
+                              {% unless p.last == blank %}
+                                <p>
+                                  {{ p.first }}:
+
+                                  {% if p.last contains "/uploads/" %}
+                                    <a href='{{ p.last }}'>
+                                      {{- p.last | split: "/" | last -}}
+                                    </a>
+                                  {% else %}
+                                    {{ p.last }}
+                                  {% endif %}
+                                </p>
+                              {% endunless %}
+                            {% endfor %}
+                          {% endif %}
                         </div>
                         <div class='text-right ml-4'>
                           <p class='text-lg font-bold text-gray-900'>

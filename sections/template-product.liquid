@@ -687,6 +687,10 @@
 <script>
   // Fetch related products using Shopify Recommendations API
   document.addEventListener('DOMContentLoaded', function() {
+  console.log(window.MWAPO);
+console.log(window.MageworxAPO)
+console.log(window.MWAPOOptions)
+
     const productId = {{ product.id }};
     
     fetch(`${window.Shopify.routes.root}recommendations/products.json?product_id=${productId}&limit=6&intent=related`)
@@ -912,6 +916,7 @@
 
 <script>
   window.__product = {{ product | json }};
+  console.log("Product:", window.__product);
   // Pre-format all variant prices using Shopify's money filter
   window.__formattedPrices = {
     {% for variant in product.variants %}

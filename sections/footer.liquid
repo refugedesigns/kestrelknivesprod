@@ -150,16 +150,22 @@
     <!-- Navigation Links -->
     <nav class='flex justify-center items-center flex-col md:flex-row gap-8'>
       <a
-        href='{{ section.settings.guide_url | default: "/pages/guide" }}'
+        href='{{ section.settings.guide_url | default: "/pages/guide-outfitter" }}'
         class='text-white hover:text-gray-300 transition-colors duration-200 font-medium uppercase tracking-wide'
       >
         Guide and Outfitter
       </a>
       <a
-        href='{{ section.settings.shipping_url | default: "/pages/shipping" }}'
+        href='{{ section.settings.shipping_url | default: "/pages/shipping-returns" }}'
         class='text-white hover:text-gray-300 transition-colors duration-200 font-medium uppercase tracking-wide'
       >
         Shipping & Returns
+      </a>
+      <a
+        href='{{ section.settings.privacy_url | default: "/pages/privacy" }}'
+        class='text-white hover:text-gray-300 transition-colors duration-200 font-medium uppercase tracking-wide'
+      >
+        Privacy Policy
       </a>
       <a
         href='{{ section.settings.faq_url | default: "/pages/faq" }}'
@@ -274,6 +280,11 @@
       "type": "url",
       "id": "guide_url",
       "label": "Guide and Outfitter URL"
+    },
+    {
+      "type": "url",
+      "id": "privacy_url",
+      "label": "Privacy Policy URL"
     },
     {
       "type": "url",
