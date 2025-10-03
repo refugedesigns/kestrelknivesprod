@@ -687,9 +687,9 @@
 <script>
   // Fetch related products using Shopify Recommendations API
   document.addEventListener('DOMContentLoaded', function() {
-  console.log(window.MWAPO);
-console.log(window.MageworxAPO)
-console.log(window.MWAPOOptions)
+    const form = document.getElementById('product-form');
+    const formData = new FormData(form);
+    console.log(formData);
 
     const productId = {{ product.id }};
     
@@ -916,7 +916,9 @@ console.log(window.MWAPOOptions)
 
 <script>
   window.__product = {{ product | json }};
-  console.log("Product:", window.__product);
+  console.log(window.MWAPO);
+console.log(window.MageworxAPO)
+console.log(window.MWAPOOptions)
   // Pre-format all variant prices using Shopify's money filter
   window.__formattedPrices = {
     {% for variant in product.variants %}

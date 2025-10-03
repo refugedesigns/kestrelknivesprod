@@ -59,7 +59,7 @@
               <p
                 class='text-sm font-medium text-gray-900'
                 x-text='item.price'
-              ></p>
+              ></p>        
             </div>
 
             <!-- Quantity Controls -->
@@ -115,6 +115,28 @@
         </template>
       </div>
     </div>
+
+     {%- assign property_size = item.properties | size -%}
+                          {% if property_size > 0 %}
+                            {% for p in item.properties %}
+                              {%- if p.first contains "_mws_" -%}
+                                {%- continue -%}
+                              {%- endif -%}
+                              {% unless p.last == blank %}
+                                <p>
+                                  {{ p.first }}:
+
+                                  {% if p.last contains "/uploads/" %}
+                                    <a href='{{ p.last }}'>
+                                      {{- p.last | split: "/" | last -}}
+                                    </a>
+                                  {% else %}
+                                    {{ p.last }}
+                                  {% endif %}
+                                </p>
+                              {% endunless %}
+                            {% endfor %}
+                          {% endif %}
 
     <!-- Cart Footer -->
     <div
@@ -200,8 +222,11 @@
             price: this.formatMoney(item.price),
             quantity: item.quantity,
             image: item.image,
+            properties: item.properties,
             line_price: item.line_price,
           }))
+
+          console.log(this.cartItems)
 
           this.updateTotals()
         } catch (error) {
@@ -213,15 +238,30 @@
         this.isLoading = true
 
         try {
+        const form = document.getElementById('product-form')
+        const formData = new FormData(form)
+
+        const payload = {
+          id: variantId,
+          quantity: quantity,
+          properties: {},
+        }
+
+        console.log(payload)
+
+        for(let [key, value] of formData.entries()) {
+          if(key.startsWith('properties[')) {
+            const propName = key.slice('properties['.length, -1)
+            payload.properties[propName] = value
+          }
+        }
+
           const response = await fetch('/cart/add.js', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-              id: variantId,
-              quantity: quantity,
-            }),
+              body: JSON.stringify(payload),
           })
 
           if (response.ok) {
