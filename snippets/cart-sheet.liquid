@@ -56,13 +56,8 @@
                 x-text='item.title'
               ></h3>
               <p class='text-sm text-gray-500' x-text='item.variant'></p>
-              <p
-                class='text-sm font-medium text-gray-900'
-                x-text='item.price'
-              ></p>        
-            </div>
-            <!-- Line item properties -->
-<div
+
+              <div
   x-show="Object.keys(item.properties || {}).length > 0"
   class="mt-2 space-y-1"
 >
@@ -83,6 +78,13 @@
     </p>
   </template>
 </div>
+              <p
+                class='text-sm font-medium text-gray-900'
+                x-text='item.price'
+              ></p>        
+            </div>
+            <!-- Line item properties -->
+
 
             
 
