@@ -61,6 +61,30 @@
                 x-text='item.price'
               ></p>        
             </div>
+            <!-- Line item properties -->
+<div
+  x-show="Object.keys(item.properties || {}).length > 0"
+  class="mt-2 space-y-1"
+>
+  <template
+    x-for="[key, value] in Object.entries(item.properties || {}).filter(([k, v]) => !k.includes('_mws_') && v !== null && v !== '')"
+    :key="key"
+  >
+    <p class="text-sm text-gray-600">
+      <span x-text="key"></span>:
+  
+      <template x-if="typeof value === 'string' && value.includes('/uploads/')">
+        <a :href="value" class="underline" x-text="value.split('/').pop()"></a>
+      </template>
+
+      <template x-if="!(typeof value === 'string' && value.includes('/uploads/'))">
+        <span x-text="value"></span>
+      </template>
+    </p>
+  </template>
+</div>
+
+            
 
             <!-- Quantity Controls -->
             <div class='flex items-center space-x-2'>
