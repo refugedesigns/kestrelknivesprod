@@ -55,7 +55,11 @@
                 class='text-sm font-medium text-gray-900 truncate'
                 x-text='item.title'
               ></h3>
-              <p class='text-sm text-gray-500' x-text='item.variant'></p>
+             <p
+  class="text-sm text-gray-500"
+  x-show="(item.variant || '').trim() !== '' && !(item.variant || '').toLowerCase().includes('default title')"
+  x-text="item.variant"
+></p>
 
               <div
   x-show="Object.keys(item.properties || {}).length > 0"
