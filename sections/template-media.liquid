@@ -195,7 +195,7 @@
     <div class='flex justify-center space-x-6'>
       {% if section.settings.youtube_url != blank %}
         <a
-          href='{{ section.settings.youtube_url }}'
+          href='{{ section.settings.youtube_url | default: "https://www.youtube.com/@kestrelknives" }}'
           target='_blank'
           rel='noopener'
           class='text-gray-600 hover:text-gray-900 transition-colors'
@@ -209,7 +209,7 @@
 
       {% if section.settings.facebook_url != blank %}
         <a
-          href='{{ section.settings.facebook_url }}'
+          href='{{ section.settings.facebook_url | default: "https://www.facebook.com/kestrelknives" }}'
           target='_blank'
           rel='noopener'
           class='text-gray-600 hover:text-gray-900 transition-colors'
@@ -223,7 +223,7 @@
 
       {% if section.settings.email_url != blank %}
         <a
-          href='{{ section.settings.email_url }}'
+          href='{{ section.settings.email_url | default: "mailto:sales@kestrelknives.com" }}'
           target='_blank'
           rel='noopener'
           class='text-gray-600 hover:text-gray-900 transition-colors'
@@ -237,7 +237,7 @@
 
       {% if section.settings.instagram_url != blank %}
         <a
-          href='{{ section.settings.instagram_url }}'
+          href='{{ section.settings.instagram_url | default: "https://www.instagram.com/kestrelknives" }}'
           target='_blank'
           rel='noopener'
           class='text-gray-600 hover:text-gray-900 transition-colors'
@@ -251,7 +251,7 @@
 
       {% if section.settings.twitter_url != blank %}
         <a
-          href='{{ section.settings.twitter_url }}'
+          href='{{ section.settings.twitter_url | default: "https://twitter.com/KestrelKnives" }}'
           target='_blank'
           rel='noopener'
           class='text-gray-600 hover:text-gray-900 transition-colors'

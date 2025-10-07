@@ -1,8 +1,8 @@
 {
-    "sections": {
-        "template-faq": {
-            "type": "template-faq"
-        }
-    },
-    "order": ["template-faq"]
+  "sections": {
+    "template-faq": {
+      "type": "template-faq"
+    }
+  },
+  "order": ["template-faq"]
 }

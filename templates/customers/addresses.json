@@ -1,7 +1,7 @@
 {
   "sections": {
     "template-customer-addresses": {
-      "type": "template-customer-addresses",
+      "type": "template-customer-addresses"
     }
   },
   "layout": "customers",

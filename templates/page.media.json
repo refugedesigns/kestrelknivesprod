@@ -1,10 +1,8 @@
 {
-    "sections": {
-        "template-media": {
-            "type": "template-media"
-        }
-    },
-    "order": [
-        "template-media"
-    ]
+  "sections": {
+    "template-media": {
+      "type": "template-media"
+    }
+  },
+  "order": ["template-media"]
 }

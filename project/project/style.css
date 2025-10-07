@@ -67,20 +67,20 @@ html {
 }
 
 /* Quantity input styling */
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-input[type="number"] {
+input[type='number'] {
   -moz-appearance: textfield;
 }
 
 /* Focus states for accessibility */
 button:focus-visible,
 input:focus-visible {
-  outline: 2px solid #FF6B35;
+  outline: 2px solid #ff6b35;
   outline-offset: 2px;
 }
 
@@ -97,7 +97,12 @@ input:focus-visible {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
   animation: loading 1.5s infinite;
 }
 
@@ -141,7 +146,7 @@ input:focus-visible {
   .lg\:sticky {
     position: sticky;
   }
-  
+
   .lg\:top-8 {
     top: 2rem;
   }
@@ -153,9 +158,11 @@ input:focus-visible {
     max-height: 60vh;
     overflow-y: auto;
   }
-  
+
   .mobile-sticky .bg-white {
-    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 -4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 -2px 4px -1px rgba(0, 0, 0, 0.06);
   }
 }
 
@@ -164,15 +171,15 @@ input:focus-visible {
   .no-print {
     display: none !important;
   }
-  
+
   body {
     background: white !important;
   }
-  
+
   .bg-gray-50 {
     background: white !important;
   }
-  
+
   .shadow-sm {
     box-shadow: none !important;
   }

@@ -11,155 +11,154 @@
   class='fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl z-50 flex flex-col'
   style='display: none;'
 >
-    <!-- Cart Header -->
-    <div class='flex items-center justify-between p-6 border-b border-gray-200'>
-      <h2 class='text-lg font-semibold text-gray-900 uppercase tracking-wide'>
-        Cart
-      </h2>
-      <button
-        @click='closeCart'
-        class='text-gray-400 hover:text-gray-600 transition-colors'
+  <!-- Cart Header -->
+  <div class='flex items-center justify-between p-6 border-b border-gray-200'>
+    <h2 class='text-lg font-semibold text-gray-900 uppercase tracking-wide'>
+      Cart
+    </h2>
+    <button
+      @click='closeCart'
+      class='text-gray-400 hover:text-gray-600 transition-colors'
+    >
+      <svg
+        class='w-6 h-6'
+        fill='none'
+        stroke='currentColor'
+        viewBox='0 0 24 24'
       >
-        <svg
-          class='w-6 h-6'
-          fill='none'
-          stroke='currentColor'
-          viewBox='0 0 24 24'
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Cart Items -->
+  <div class='flex-1 overflow-y-auto p-6'>
+    <div x-show='cartItems.length === 0' class='text-center py-8'>
+      <p class='text-gray-500'>Your cart is empty</p>
     </div>
 
-    <!-- Cart Items -->
-    <div class='flex-1 overflow-y-auto p-6'>
-      <div x-show='cartItems.length === 0' class='text-center py-8'>
-        <p class='text-gray-500'>Your cart is empty</p>
-      </div>
+    <div x-show='cartItems.length > 0' class='space-y-4'>
+      <template x-for='item in cartItems' :key='item.key'>
+        <div class='flex items-center space-x-4 p-4 border border-gray-200 rounded-lg'>
+          <!-- Product Image -->
+          <div class='flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg overflow-hidden'>
+            <img
+              :src='item.image'
+              :alt='item.title'
+              class='w-full h-full object-cover'
+            >
+          </div>
 
-      <div x-show='cartItems.length > 0' class='space-y-4'>
-        <template x-for='item in cartItems' :key='item.key'>
-          <div class='flex items-center space-x-4 p-4 border border-gray-200 rounded-lg'>
-            <!-- Product Image -->
-            <div class='flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg overflow-hidden'>
-              <img
-                :src='item.image'
-                :alt='item.title'
-                class='w-full h-full object-cover'
-              >
-            </div>
+          <!-- Product Details -->
+          <div class='flex-1 min-w-0'>
+            <h3
+              class='text-sm font-medium text-gray-900 truncate'
+              x-text='item.title'
+            ></h3>
+            <p class='text-sm text-gray-500' x-text='item.variant'></p>
+            <p
+              class='text-sm font-medium text-gray-900'
+              x-text='item.price'
+            ></p>
+          </div>
 
-            <!-- Product Details -->
-            <div class='flex-1 min-w-0'>
-              <h3
-                class='text-sm font-medium text-gray-900 truncate'
-                x-text='item.title'
-              ></h3>
-              <p class='text-sm text-gray-500' x-text='item.variant'></p>
-              <p
-                class='text-sm font-medium text-gray-900'
-                x-text='item.price'
-              ></p>        
-            </div>
-
-            <!-- Quantity Controls -->
-            <div class='flex items-center space-x-2'>
-              <button
-                @click='updateQuantity(item.key, item.quantity - 1)'
-                :disabled='item.quantity <= 1'
-                class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
-              >
-                <svg
-                  class='w-4 h-4'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                </svg>
-              </button>
-              <span
-                class='w-8 text-center text-sm font-medium'
-                x-text='item.quantity'
-              ></span>
-              <button
-                @click='updateQuantity(item.key, item.quantity + 1)'
-                class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-50'
-              >
-                <svg
-                  class='w-4 h-4'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                </svg>
-              </button>
-            </div>
-
-            <!-- Remove Button -->
+          <!-- Quantity Controls -->
+          <div class='flex items-center space-x-2'>
             <button
-              @click='removeItem(item.key)'
-              class='text-gray-400 hover:text-red-500 transition-colors'
+              @click='updateQuantity(item.key, item.quantity - 1)'
+              :disabled='item.quantity <= 1'
+              class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
             >
               <svg
-                class='w-5 h-5'
+                class='w-4 h-4'
                 fill='none'
                 stroke='currentColor'
                 viewBox='0 0 24 24'
               >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+              </svg>
+            </button>
+            <span
+              class='w-8 text-center text-sm font-medium'
+              x-text='item.quantity'
+            ></span>
+            <button
+              @click='updateQuantity(item.key, item.quantity + 1)'
+              class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-50'
+            >
+              <svg
+                class='w-4 h-4'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
               </svg>
             </button>
           </div>
-        </template>
-      </div>
+
+          <!-- Remove Button -->
+          <button
+            @click='removeItem(item.key)'
+            class='text-gray-400 hover:text-red-500 transition-colors'
+          >
+            <svg
+              class='w-5 h-5'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          </button>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  {%- assign property_size = item.properties | size -%}
+  {% if property_size > 0 %}
+    {% for p in item.properties %}
+      {%- if p.first contains "_mws_" -%}
+        {%- continue -%}
+      {%- endif -%}
+      {% unless p.last == blank %}
+        <p>
+          {{ p.first }}:
+
+          {% if p.last contains "/uploads/" %}
+            <a href='{{ p.last }}'>
+              {{- p.last | split: "/" | last -}}
+            </a>
+          {% else %}
+            {{ p.last }}
+          {% endif %}
+        </p>
+      {% endunless %}
+    {% endfor %}
+  {% endif %}
+
+  <!-- Cart Footer -->
+  <div
+    x-show='cartItems.length > 0'
+    class='border-t border-gray-200 p-6 space-y-4'
+  >
+    <!-- Subtotal -->
+    <div class='flex justify-between items-center'>
+      <span class='text-sm font-medium text-gray-900 uppercase tracking-wide'>
+        Subtotal (<span x-text='totalItems'></span>
+        <span x-text="totalItems === 1 ? 'ITEM' : 'ITEMS'"></span>)
+      </span>
+      <span class='text-lg font-bold text-gray-900' x-text='subtotal'></span>
     </div>
 
-     {%- assign property_size = item.properties | size -%}
-                          {% if property_size > 0 %}
-                            {% for p in item.properties %}
-                              {%- if p.first contains "_mws_" -%}
-                                {%- continue -%}
-                              {%- endif -%}
-                              {% unless p.last == blank %}
-                                <p>
-                                  {{ p.first }}:
-
-                                  {% if p.last contains "/uploads/" %}
-                                    <a href='{{ p.last }}'>
-                                      {{- p.last | split: "/" | last -}}
-                                    </a>
-                                  {% else %}
-                                    {{ p.last }}
-                                  {% endif %}
-                                </p>
-                              {% endunless %}
-                            {% endfor %}
-                          {% endif %}
-
-    <!-- Cart Footer -->
-    <div
-      x-show='cartItems.length > 0'
-      class='border-t border-gray-200 p-6 space-y-4'
+    <!-- Checkout Button -->
+    <button
+      @click='checkout'
+      class='w-full bg-black cursor-pointer hover:bg-gray-900 text-white font-bold py-4 px-6 transition-colors duration-200 uppercase tracking-wide'
     >
-      <!-- Subtotal -->
-      <div class='flex justify-between items-center'>
-        <span class='text-sm font-medium text-gray-900 uppercase tracking-wide'>
-          Subtotal (<span x-text='totalItems'></span>
-          <span x-text="totalItems === 1 ? 'ITEM' : 'ITEMS'"></span>)
-        </span>
-        <span class='text-lg font-bold text-gray-900' x-text='subtotal'></span>
-      </div>
-
-      <!-- Checkout Button -->
-      <button
-        @click='checkout'
-        class='w-full bg-black cursor-pointer hover:bg-gray-900 text-white font-bold py-4 px-6 transition-colors duration-200 uppercase tracking-wide'
-      >
-        Checkout →
-      </button>
-    </div>
+      Checkout →
+    </button>
   </div>
 </div>
 
@@ -169,6 +168,9 @@
       isOpen: false,
       cartItems: [],
       isLoading: false,
+      isAddingToCart: false,
+      isAddingMainButton: false,
+      isAddingStickyButton: false,
       justOpened: false,
 
       init() {
@@ -186,18 +188,80 @@
         })
 
         // Close cart when clicking outside
-        document.addEventListener('click', (event) => {
-          if (this.isOpen && !this.justOpened && !this.$el.contains(event.target)) {
+        document.addEventListener('click', event => {
+          if (
+            this.isOpen &&
+            !this.justOpened &&
+            !this.$el.contains(event.target)
+          ) {
             this.closeCart()
           }
         })
+      },
+
+      // Handlers per reference to drive button loading states
+      handleMainAddToCart() {
+        this.isAddingMainButton = true
+        const form =
+          document.getElementById('product-form') ||
+          document.querySelector('form.product-form')
+        const variantInput = form?.querySelector('input[name="id"]')
+        const variantId = variantInput?.value
+        if (!variantId) {
+          console.error('No variant ID found')
+          this.isAddingMainButton = false
+          return
+        }
+        // Quantity from Alpine productPage if present
+        let quantity = 1
+        const productPage = document.querySelector('[x-data*="productPage"]')
+        if (productPage?.__x?.$data?.quantity)
+          quantity = productPage.__x.$data.quantity
+        this.addToCart(variantId, quantity, 'main-button')
+      },
+
+      handleStickyAddToCart() {
+        this.isAddingStickyButton = true
+        const form =
+          document.getElementById('product-form') ||
+          document.querySelector('form.product-form')
+        const variantInput = form?.querySelector('input[name="id"]')
+        const variantId = variantInput?.value
+        if (!variantId) {
+          console.error('No variant ID found (sticky)')
+          this.isAddingStickyButton = false
+          return
+        }
+        // Quantity from Alpine productPage if present
+        let quantity = 1
+        const productPage = document.querySelector('[x-data*="productPage"]')
+        if (productPage?.__x?.$data?.quantity)
+          quantity = productPage.__x.$data.quantity
+
+        // Prefer APO cloned button click to inject hidden inputs
+        const apoClonedBtn = document.querySelector(
+          '.mw-apo-add-to-cart-cloned'
+        )
+        if (apoClonedBtn) {
+          try {
+            apoClonedBtn.dispatchEvent(
+              new MouseEvent('click', { bubbles: true, cancelable: true })
+            )
+            // APO will proceed its own flow; ensure loaders reset on cart-updated/open-cart
+          } catch (e) {
+            console.warn('APO cloned click failed, falling back', e)
+            this.addToCart(variantId, quantity, 'sticky-button')
+          }
+          return
+        }
+        this.addToCart(variantId, quantity, 'sticky-button')
       },
 
       openCart() {
         this.isOpen = true
         this.justOpened = true
         document.body.style.overflow = 'hidden'
-        
+
         // Reset the justOpened flag after a short delay
         setTimeout(() => {
           this.justOpened = false
@@ -226,42 +290,69 @@
             line_price: item.line_price,
           }))
 
-          console.log(this.cartItems)
-
           this.updateTotals()
         } catch (error) {
           console.error('Error loading cart:', error)
         }
       },
 
-      async addToCart(variantId, quantity = 1) {
+      async addToCart(
+        variantId,
+        quantity = 1,
+        source = 'unknown',
+        propsOverride = null
+      ) {
         this.isLoading = true
 
+        // Set specific button loading state based on source
+        if (source === 'main-button') {
+          this.isAddingMainButton = true
+        } else if (source === 'sticky-button') {
+          this.isAddingStickyButton = true
+        }
+
         try {
-        const form = document.getElementById('product-form')
-        const formData = new FormData(form)
+          const form = document.getElementById('product-form')
+          const formData = new FormData(form)
 
-        const payload = {
-          id: variantId,
-          quantity: quantity,
-          properties: {},
-        }
-
-        console.log(payload)
-
-        for(let [key, value] of formData.entries()) {
-          if(key.startsWith('properties[')) {
-            const propName = key.slice('properties['.length, -1)
-            payload.properties[propName] = value
+          const payload = {
+            id: variantId,
+            quantity: quantity,
+            properties: {},
           }
-        }
+
+          console.log('[cartSheet.addToCart] start', {
+            source,
+            variantId,
+            quantity,
+            hasForm: !!form,
+          })
+
+          const hasOverride =
+            propsOverride &&
+            typeof propsOverride === 'object' &&
+            Object.keys(propsOverride).length > 0
+          if (hasOverride) {
+            payload.properties = { ...propsOverride }
+          } else {
+            for (let [key, value] of formData.entries()) {
+              if (key.startsWith('properties[')) {
+                const propName = key.slice('properties['.length, -1)
+                payload.properties[propName] = value
+              }
+            }
+          }
+          console.log('[cartSheet.addToCart] payload', source, {
+            ...payload,
+            properties: { ...payload.properties },
+          })
 
           const response = await fetch('/cart/add.js', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-              body: JSON.stringify(payload),
+            body: JSON.stringify(payload),
           })
 
           if (response.ok) {
@@ -278,6 +369,8 @@
           alert('Failed to add item to cart. Please try again.')
         } finally {
           this.isLoading = false
+          this.isAddingMainButton = false
+          this.isAddingStickyButton = false
         }
       },
 

@@ -473,12 +473,26 @@
     <!-- Price and Add to Cart -->
     <div class='flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4'>
       <div class='text-center md:text-right'>
-        <span id='stickyPrice' class='text-sm md:text-lg font-bold text-black'>
-          {{- selected_variant.price | money -}}
-        </span>
+        {% if product.type == "custom" %}
+          <span
+            id='stickyPriceCustom'
+            class='text-sm md:text-lg font-bold text-black'
+          >
+            <span id='custom-price-display'>Loading...</span>
+          </span>
+        {% else %}
+          <span
+            id='stickyPrice'
+            class='text-sm md:text-lg font-bold text-black'
+          >
+            {{- selected_variant.price | money -}}
+          </span>
+        {% endif %}
       </div>
       <button
-        onclick="document.getElementById('addToCartBtn').click()"
+        id='stickyAddToCartBtn'
+        type='button'
+        onclick='stickyAddToCart()'
         class='bg-black hover:bg-gray-800 text-white cursor-pointer font-semibold py-2 px-4 md:py-3 md:px-6 text-sm md:text-base transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]'
       >
         ADD TO CART
@@ -687,9 +701,6 @@
 <script>
   // Fetch related products using Shopify Recommendations API
   document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('product-form');
-    const formData = new FormData(form);
-    console.log(formData);
 
     const productId = {{ product.id }};
     
@@ -916,9 +927,6 @@
 
 <script>
   window.__product = {{ product | json }};
-  console.log(window.MWAPO);
-console.log(window.MageworxAPO)
-console.log(window.MWAPOOptions)
   // Pre-format all variant prices using Shopify's money filter
   window.__formattedPrices = {
     {% for variant in product.variants %}
@@ -1450,9 +1458,19 @@ console.log(window.MWAPOOptions)
       window.addEventListener('orientationchange', updateTabsTopOffset);
 
       // Intercept product form submission to use cart sheet
-      document.addEventListener('DOMContentLoaded', function() {
-        const productForm = document.getElementById('product-form');
-        if (productForm) {
+      (function attachProductFormHandlers() {
+        if (window.__productFormHandlersAttached) return;
+
+        function setupHandlers() {
+          if (window.__productFormHandlersAttached) return;
+          window.__productFormHandlersAttached = true;
+
+          const productForm = document.getElementById('product-form');
+
+        // Removed button text/disabled toggling
+
+          if (!productForm) return;
+
           productForm.addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -1467,10 +1485,31 @@ console.log(window.MWAPOOptions)
             }
 
             try {
+              // Disable the clicked submit button (no text change)
+              const clickedBtn = (e && e.submitter) ? e.submitter : document.getElementById('addToCartBtn');
+              if (clickedBtn) {
+                clickedBtn.setAttribute('disabled','disabled');
+              }
+
+              // Restore handler to re-enable button on cart events or after timeout
+              const restore = () => {
+                if (clickedBtn) {
+                  clickedBtn.removeAttribute('disabled');
+                }
+                window.removeEventListener('cart-updated', restore);
+                window.removeEventListener('open-cart', restore);
+              };
+              window.addEventListener('cart-updated', restore);
+              window.addEventListener('open-cart', restore);
+              setTimeout(restore, 6000);
+
               // Get the cart sheet component
               const cartSheet = document.querySelector('[x-data*="cartSheet"]');
               if (cartSheet && cartSheet._x_dataStack && cartSheet._x_dataStack[0]) {
-                await cartSheet._x_dataStack[0].addToCart(variantId, quantity);
+                console.log('[submit main button] calling cartSheet.addToCart');
+                await cartSheet._x_dataStack[0].addToCart(variantId, quantity, 'main-button');
+                // Ensure button is restored on success as well
+                restore();
               } else {
                 // Fallback: direct API call
                 const response = await fetch('/cart/add.js', {
@@ -1487,6 +1526,8 @@ console.log(window.MWAPOOptions)
                 if (response.ok) {
                   // Dispatch event to open cart
                   window.dispatchEvent(new CustomEvent('open-cart'));
+                  // Ensure button is restored for fallback path
+                  restore();
                 } else {
                   throw new Error('Failed to add to cart');
                 }
@@ -1497,7 +1538,13 @@ console.log(window.MWAPOOptions)
             }
           });
         }
-      });
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', setupHandlers, { once: true });
+        } else {
+          setupHandlers();
+        }
+      })();
 
       // Keyboard navigation for images
       document.addEventListener('keydown', function(e) {
@@ -1510,6 +1557,62 @@ console.log(window.MWAPOOptions)
           }
         }
       });
+
+      // Provide a global stickyAddToCart for non-custom products (no text change)
+      if (!window.stickyAddToCart) {
+        window.stickyAddToCart = async function () {
+          try {
+            const stickyBtn = document.getElementById('stickyAddToCartBtn')
+            if (stickyBtn) stickyBtn.setAttribute('disabled', 'disabled')
+
+            const restoreSticky = () => {
+              if (stickyBtn) stickyBtn.removeAttribute('disabled')
+              window.removeEventListener('open-cart', restoreSticky)
+              window.removeEventListener('cart-updated', restoreSticky)
+            }
+            window.addEventListener('open-cart', restoreSticky)
+            window.addEventListener('cart-updated', restoreSticky)
+            setTimeout(restoreSticky, 6000)
+
+            const form = document.getElementById('product-form')
+            if (!form) {
+              console.error('Sticky add: form not found')
+              restoreSticky()
+              return
+            }
+            const variantInput = form.querySelector('input[name="id"]')
+            const variantId = variantInput ? variantInput.value : null
+            const productPage = document.querySelector('[x-data*="productPage"]')
+            let quantity = 1
+            if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
+              quantity = productPage._x_dataStack[0].quantity || 1
+            }
+
+            const cartSheet = document.querySelector('[x-data*="cartSheet"]')
+            if (
+              cartSheet &&
+              cartSheet._x_dataStack &&
+              cartSheet._x_dataStack[0] &&
+              typeof cartSheet._x_dataStack[0].addToCart === 'function' &&
+              variantId
+            ) {
+              await cartSheet._x_dataStack[0].addToCart(variantId, quantity, 'sticky-button')
+              return
+            }
+
+            // Fallback
+            const payload = { id: variantId, quantity }
+            const res = await fetch('/cart/add.js', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            })
+            if (res.ok) window.dispatchEvent(new CustomEvent('open-cart'))
+          } catch (e) {
+            console.error('Sticky add error (non-custom):', e)
+          }
+        }
+      }
 
       // initialize Alpine style (if Alpine is present it will call x-data init, but ensure we call for non-alpine fallback)
       document.addEventListener('alpine:init', () => {
@@ -1547,6 +1650,190 @@ console.log(window.MWAPOOptions)
     }
   }
 </script>
+
+{% if product.type == "custom" %}
+  <script>
+    // Monitor custom price element and update sticky price display
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log('[custom price] init')
+      console.log(document.getElementById('price'))
+      const stickyPriceDisplay = document.getElementById('custom-price-display')
+      const stickyPriceWrapper =
+        document.getElementById('stickyPriceCustom') ||
+        document.getElementById('stickyPrice')
+      if (!stickyPriceDisplay && !stickyPriceWrapper) return
+
+      function debounce(fn, wait) {
+        let t
+        return function () {
+          clearTimeout(t)
+          t = setTimeout(() => fn.apply(this, arguments), wait)
+        }
+      }
+
+      function readPriceHTML(el) {
+        if (!el) return 'Loading...'
+        const value = el.innerHTML || el.textContent || el.value || ''
+        return value && String(value).trim() !== '' ? value : 'Loading...'
+      }
+
+      function writeSticky(html) {
+        if (stickyPriceDisplay) stickyPriceDisplay.innerHTML = html
+        if (stickyPriceWrapper) stickyPriceWrapper.innerHTML = html
+      }
+
+      let observedPriceEl = null
+      let priceObserver = null
+
+      const updateFromCurrent = debounce(function () {
+        if (observedPriceEl) {
+          const html = readPriceHTML(observedPriceEl)
+          writeSticky(html)
+        }
+      }, 0)
+
+      function attachToPriceEl(el) {
+        console.log('[custom price] attaching to', el)
+        if (!el) return
+        if (priceObserver) priceObserver.disconnect()
+        observedPriceEl = el
+        // initial sync
+        writeSticky(readPriceHTML(observedPriceEl))
+        // observe content changes within the price element
+        priceObserver = new MutationObserver(updateFromCurrent)
+        priceObserver.observe(observedPriceEl, {
+          childList: true,
+          subtree: true,
+          characterData: true,
+        })
+        // also handle input-like elements
+        observedPriceEl.addEventListener('input', updateFromCurrent)
+        observedPriceEl.addEventListener('change', updateFromCurrent)
+      }
+
+      // Attach immediately if present
+      attachToPriceEl(document.getElementById('price'))
+
+      // Keep a lightweight root observer to handle price element replacements
+      const rootObserver = new MutationObserver(
+        debounce(function () {
+          const el = document.getElementById('price')
+          if (el && el !== observedPriceEl) {
+            console.log('[custom price] re-attached to replaced #price')
+            attachToPriceEl(el)
+          }
+        }, 50)
+      )
+      rootObserver.observe(document.documentElement || document.body, {
+        childList: true,
+        subtree: true,
+      })
+
+      // If the app fires a custom event when price changes, reflect that too
+      window.addEventListener('mwapo:price:changed', updateFromCurrent)
+      window.addEventListener('MWAPO:priceChanged', updateFromCurrent)
+
+      // Sticky Add to Cart — prefer clicking APO's cloned button to trigger its injection
+      // If not available, gather APO hidden inputs manually and call cartSheet.addToCart
+      window.stickyAddToCart = async function () {
+        try {
+          // Disable sticky button (no text change)
+          const stickyBtn = document.getElementById('stickyAddToCartBtn')
+          if (stickyBtn) {
+            stickyBtn.setAttribute('disabled', 'disabled')
+          }
+          const restoreSticky = () => {
+            if (stickyBtn) {
+              stickyBtn.removeAttribute('disabled')
+            }
+            window.removeEventListener('open-cart', restoreSticky)
+            window.removeEventListener('cart-updated', restoreSticky)
+          }
+          window.addEventListener('open-cart', restoreSticky)
+          window.addEventListener('cart-updated', restoreSticky)
+          setTimeout(restoreSticky, 6000)
+
+          const apoClonedBtn = document.querySelector(
+            '.mw-apo-add-to-cart-cloned'
+          )
+          if (apoClonedBtn) {
+            console.log(
+              '[sticky button] clicking APO cloned button to inject props'
+            )
+            apoClonedBtn.dispatchEvent(
+              new MouseEvent('click', { bubbles: true, cancelable: true })
+            )
+            return
+          }
+
+          const form = document.getElementById('product-form')
+          if (!form) return console.error('Sticky add: form not found')
+          console.log('[sticky button] form', form)
+          const hiddenInputs = form.querySelectorAll(
+            'input[type="hidden"][name^="properties["]'
+          )
+          console.log('[sticky button] hiddenInputs', hiddenInputs)
+          const apoProps = {}
+          hiddenInputs.forEach(input => {
+            const name = input.getAttribute('name') || ''
+            const key = name.slice('properties['.length, -1)
+            apoProps[key] = input.value
+          })
+          console.log('[sticky button] apoProps', apoProps)
+
+          const variantInput = form.querySelector('input[name="id"]')
+          const variantId = variantInput ? variantInput.value : null
+          const productPage = document.querySelector('[x-data*="productPage"]')
+          let quantity = 1
+          if (
+            productPage &&
+            productPage._x_dataStack &&
+            productPage._x_dataStack[0]
+          ) {
+            quantity = productPage._x_dataStack[0].quantity || 1
+          }
+
+          const cartSheet = document.querySelector('[x-data*="cartSheet"]')
+          if (
+            cartSheet &&
+            cartSheet._x_dataStack &&
+            cartSheet._x_dataStack[0] &&
+            typeof cartSheet._x_dataStack[0].addToCart === 'function' &&
+            variantId
+          ) {
+            console.log(
+              '[sticky button] calling cartSheet.addToCart with propsOverride',
+              apoProps
+            )
+            await cartSheet._x_dataStack[0].addToCart(
+              variantId,
+              quantity,
+              'sticky-button',
+              apoProps
+            )
+            return
+          }
+
+          // Fallback
+          const payload = {
+            id: variantId,
+            quantity: quantity,
+            properties: apoProps,
+          }
+          console.log('[sticky button] fallback payload', payload)
+          const res = await fetch('/cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          })
+          if (res.ok) window.dispatchEvent(new CustomEvent('cart-updated'))
+        } catch (e) {
+          console.error('Sticky add error:', e)
+        }
+      }
+    })
+  </script>
+{% endif %}
 
 {% schema %}
 {

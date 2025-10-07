@@ -1,8 +1,8 @@
 {
-    "sections": {
-        "template-about-us": {
-            "type": "template-about-us"
-        }
-    },
-    "order": ["template-about-us"]
+  "sections": {
+    "template-about-us": {
+      "type": "template-about-us"
+    }
+  },
+  "order": ["template-about-us"]
 }

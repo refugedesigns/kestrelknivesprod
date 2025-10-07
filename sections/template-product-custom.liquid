@@ -1448,9 +1448,16 @@ console.log(window.MWAPOOptions)
       window.addEventListener('orientationchange', updateTabsTopOffset);
 
       // Intercept product form submission to use cart sheet
-      document.addEventListener('DOMContentLoaded', function() {
-        const productForm = document.getElementById('product-form');
-        if (productForm) {
+      (function attachProductFormHandlers() {
+        if (window.__productFormHandlersAttached) return;
+
+        function setupHandlers() {
+          if (window.__productFormHandlersAttached) return;
+          window.__productFormHandlersAttached = true;
+
+          const productForm = document.getElementById('product-form');
+          if (!productForm) return;
+
           productForm.addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -1495,7 +1502,13 @@ console.log(window.MWAPOOptions)
             }
           });
         }
-      });
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', setupHandlers, { once: true });
+        } else {
+          setupHandlers();
+        }
+      })();
 
       // Keyboard navigation for images
       document.addEventListener('keydown', function(e) {

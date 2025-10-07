@@ -78,9 +78,15 @@
           </h2>
 
           <!-- Price -->
-          <div class='text-2xl font-bold text-gray-900 mb-4 text-center'>
-            {{ product_product.price | money }}
-          </div>
+          {% assign product_type_lower = product_product.type
+            | default: ""
+            | downcase
+          %}
+          {% unless product_type_lower contains "custom" %}
+            <div class='text-2xl font-bold text-gray-900 mb-4 text-center'>
+              {{ product_product.price | money }}
+            </div>
+          {% endunless %}
         </a>
 
         <!-- Handle Color Variants (hide for Apparels) -->
@@ -89,7 +95,8 @@
           | downcase
         %}
         {% unless product_product.has_only_default_variant
-          or product_type_lower contains "apparel" or product_type_lower contains "accessories"
+          or product_type_lower contains "apparel"
+          or product_type_lower contains "accessories"
         %}
           <div class='mb-4'>
             <div class='flex space-x-2 justify-center'>
@@ -205,7 +212,9 @@
         | default: ""
         | downcase
       %}
-      {% unless product_type_lower contains "apparel" %}
+      {% unless product_type_lower contains "apparel"
+        or product_type_lower contains "custom"
+      %}
         <!-- Add to Cart Button (only show when available and not apparels) -->
         <div x-show='isAvailable'>
           <button

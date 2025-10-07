@@ -2,7 +2,7 @@
 const productImages = [
   'https://images.pexels.com/photos/4226769/pexels-photo-4226769.jpeg?auto=compress&cs=tinysrgb&w=800',
   'https://images.pexels.com/photos/4226764/pexels-photo-4226764.jpeg?auto=compress&cs=tinysrgb&w=800',
-  'https://images.pexels.com/photos/4226832/pexels-photo-4226832.jpeg?auto=compress&cs=tinysrgb&w=800'
+  'https://images.pexels.com/photos/4226832/pexels-photo-4226832.jpeg?auto=compress&cs=tinysrgb&w=800',
 ];
 
 let currentImageIndex = 0;
@@ -11,11 +11,11 @@ let currentImageIndex = 0;
 function changeImage(index) {
   const mainImage = document.getElementById('mainImage');
   const thumbnails = document.querySelectorAll('.thumbnail');
-  
+
   if (index >= 0 && index < productImages.length) {
     currentImageIndex = index;
     mainImage.src = productImages[index];
-    
+
     // Update thumbnail borders
     thumbnails.forEach((thumbnail, i) => {
       if (i === index) {
@@ -31,13 +31,15 @@ function changeImage(index) {
 
 // Navigate to previous image
 function previousImage() {
-  const newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : productImages.length - 1;
+  const newIndex =
+    currentImageIndex > 0 ? currentImageIndex - 1 : productImages.length - 1;
   changeImage(newIndex);
 }
 
 // Navigate to next image
 function nextImage() {
-  const newIndex = currentImageIndex < productImages.length - 1 ? currentImageIndex + 1 : 0;
+  const newIndex =
+    currentImageIndex < productImages.length - 1 ? currentImageIndex + 1 : 0;
   changeImage(newIndex);
 }
 
@@ -57,9 +59,9 @@ function increaseQuantity() {
 }
 
 // Handle color selection
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('input[name="handleColor"]').forEach(radio => {
-    radio.addEventListener('change', function() {
+    radio.addEventListener('change', function () {
       // Update visual selection
       document.querySelectorAll('input[name="handleColor"]').forEach(r => {
         const container = r.parentElement.querySelector('div');
@@ -78,22 +80,24 @@ document.addEventListener('DOMContentLoaded', function() {
 // Add to cart functionality
 function addToCart() {
   const quantity = document.getElementById('quantity').value;
-  const selectedColor = document.querySelector('input[name="handleColor"]:checked').value;
-  
+  const selectedColor = document.querySelector(
+    'input[name="handleColor"]:checked'
+  ).value;
+
   // Animate button
   const button = event.target;
   const originalText = button.textContent;
-  
+
   button.style.transform = 'scale(0.95)';
   button.textContent = 'ADDING...';
   button.disabled = true;
-  
+
   setTimeout(() => {
     button.style.transform = 'scale(1)';
     button.textContent = 'ADDED TO CART ✓';
     button.classList.remove('bg-black', 'hover:bg-gray-800');
     button.classList.add('bg-green-600');
-    
+
     setTimeout(() => {
       button.textContent = originalText;
       button.classList.remove('bg-green-600');
@@ -101,7 +105,7 @@ function addToCart() {
       button.disabled = false;
     }, 2000);
   }, 500);
-  
+
   console.log(`Added to cart: ${quantity} x Ovis Scalpel (${selectedColor})`);
 }
 
@@ -110,10 +114,10 @@ function handleStickyTabs() {
   const tabsNav = document.getElementById('tabsNavigation');
   const header = document.querySelector('header');
   const headerHeight = header.offsetHeight;
-  
+
   const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
+    entries => {
+      entries.forEach(entry => {
         if (!entry.isIntersecting) {
           tabsNav.style.top = `${headerHeight}px`;
           tabsNav.classList.add('shadow-md');
@@ -125,7 +129,7 @@ function handleStickyTabs() {
     },
     {
       threshold: 0,
-      rootMargin: `-${headerHeight}px 0px 0px 0px`
+      rootMargin: `-${headerHeight}px 0px 0px 0px`,
     }
   );
 
@@ -142,14 +146,14 @@ function scrollToSection(sectionId) {
   const header = document.querySelector('header');
   const tabsNav = document.getElementById('tabsNavigation');
   const offset = header.offsetHeight + tabsNav.offsetHeight + 20;
-  
+
   if (section) {
     const sectionTop = section.offsetTop - offset;
     window.scrollTo({
       top: sectionTop,
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
-    
+
     // Update active tab
     updateActiveTab(sectionId);
   }
@@ -158,7 +162,7 @@ function scrollToSection(sectionId) {
 // Update active tab
 function updateActiveTab(activeTabId) {
   const tabButtons = document.querySelectorAll('.tab-button');
-  
+
   tabButtons.forEach(button => {
     const tabId = button.getAttribute('data-tab');
     if (tabId === activeTabId) {
@@ -177,28 +181,28 @@ function handleScrollBasedTabs() {
   const header = document.querySelector('header');
   const tabsNav = document.getElementById('tabsNavigation');
   const offset = header.offsetHeight + tabsNav.offsetHeight + 100;
-  
+
   let currentSection = '';
-  
+
   sections.forEach(sectionId => {
     const section = document.getElementById(sectionId);
     if (section) {
       const sectionTop = section.offsetTop - offset;
       const sectionBottom = sectionTop + section.offsetHeight;
-      
+
       if (window.scrollY >= sectionTop && window.scrollY < sectionBottom) {
         currentSection = sectionId;
       }
     }
   });
-  
+
   if (currentSection) {
     updateActiveTab(currentSection);
   }
 }
 
 // Keyboard navigation for images
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
   if (e.key === 'ArrowLeft') {
     previousImage();
   } else if (e.key === 'ArrowRight') {
@@ -207,23 +211,23 @@ document.addEventListener('keydown', function(e) {
 });
 
 // Initialize everything
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   changeImage(0);
   handleStickyTabs();
-  
+
   // Set initial active tab
   updateActiveTab('specs');
-  
+
   // Handle scroll events for tab activation
   let scrollTimeout;
-  window.addEventListener('scroll', function() {
+  window.addEventListener('scroll', function () {
     clearTimeout(scrollTimeout);
     scrollTimeout = setTimeout(handleScrollBasedTabs, 100);
   });
 });
 
 // Handle window resize
-window.addEventListener('resize', function() {
+window.addEventListener('resize', function () {
   handleStickyTabs();
 });
 

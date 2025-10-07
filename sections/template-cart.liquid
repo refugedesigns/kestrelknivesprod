@@ -110,7 +110,7 @@
                             <button
                               type='button'
                               class='p-2 hover:bg-gray-50 transition-colors'
-                              onclick="var i=document.getElementById('updates_{{ forloop.index }}'); if(i && i.value>0){ i.stepDown(); }"
+                              onclick="(function(){var i=document.getElementById('updates_{{ forloop.index }}'); if(i && i.value>0){ i.stepDown(); var q=parseInt(i.value,10)||0; updateLineQuantity('{{ item.key }}', q); }})()"
                             >
                               <svg
                                 class='w-4 h-4'
@@ -132,7 +132,7 @@
                             <button
                               type='button'
                               class='p-2 hover:bg-gray-50 transition-colors'
-                              onclick="var i=document.getElementById('updates_{{ forloop.index }}'); if(i){ i.stepUp(); }"
+                              onclick="(function(){var i=document.getElementById('updates_{{ forloop.index }}'); if(i){ i.stepUp(); var q=parseInt(i.value,10)||1; updateLineQuantity('{{ item.key }}', q); }})()"
                             >
                               <svg
                                 class='w-4 h-4'
@@ -286,6 +286,34 @@
     </div>
   </div>
 {% endif %}
+
+<script>
+  async function updateLineQuantity(itemKey, newQty) {
+    try {
+      const res = await fetch('/cart/change.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: itemKey, quantity: newQty }),
+      })
+      if (!res.ok) return
+      const cart = await fetch('/cart.js').then(r => r.json())
+      // Update prices in-place without reload
+      const items = cart.items || []
+      items.forEach((it, idx) => {
+        const priceEl = document.querySelectorAll('[data-line-price]')[idx]
+        if (priceEl)
+          priceEl.textContent = (it.final_line_price / 100).toLocaleString(
+            'en-US',
+            { style: 'currency', currency: 'USD' }
+          )
+      })
+      // Reload to ensure APO recalculations (if any) reflect
+      location.reload()
+    } catch (e) {
+      console.error('updateLineQuantity error', e)
+    }
+  }
+</script>
 
 {% schema %}
 {

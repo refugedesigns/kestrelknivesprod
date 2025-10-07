@@ -1,7 +1,7 @@
 {
   "sections": {
     "template-customer-order": {
-      "type": "template-customer-order",
+      "type": "template-customer-order"
     }
   },
   "layout": "customers",

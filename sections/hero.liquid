@@ -1,7 +1,9 @@
 <!-- Hero Carousel Section -->
-<div class='relative bg-gray-900 pt-4'>
-  <!-- Swiper Container -->
-  <swiper-container
+<div class='relative pt-4'>
+  <!-- Scaled Wrapper -->
+  <div class='hero-scale-wrap' style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %};'>
+    <!-- Swiper Container -->
+    <swiper-container
     class='hero-swiper'
     pagination='true'
     pagination-clickable='true'
@@ -29,10 +31,18 @@
       {% if section.settings.show_text_overlay %}
         <div class='absolute inset-0 flex items-center justify-center lg:justify-start z-10'>
           <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-16'>
-            <h1 class='text-4xl md:text-6xl font-bold text-white mb-4'>
+            {% assign s1_shadow = section.settings.slide_1_text_shadow_strength | default: 'soft' %}
+            {% assign s1_op = '0.35' %}
+            {% case s1_shadow %}
+              {% when 'none' %}{% assign s1_op = '0' %}
+              {% when 'soft' %}{% assign s1_op = '0.35' %}
+              {% when 'medium' %}{% assign s1_op = '0.6' %}
+              {% when 'strong' %}{% assign s1_op = '0.85' %}
+            {% endcase %}
+            <h1 class='text-4xl md:text-6xl font-bold mb-4' style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'>
               {{ section.settings.slide_1_title | default: "Premium Knives" }}
             </h1>
-            <p class='text-lg md:text-xl text-gray-300 mb-8'>
+            <p class='text-lg md:text-xl mb-8' style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'>
               {{
                 section.settings.slide_1_subtitle
                 | default: "Crafted with precision, designed for perfection"
@@ -41,7 +51,8 @@
             {% if section.settings.slide_1_button_text != blank %}
               <a
                 href='{{ section.settings.slide_1_button_url | default: "/collections/all" }}'
-                class='inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                style='background-color: {{ section.settings.slide_1_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_1_button_text_color | default: "#ffffff" }};'
               >
                 {{ section.settings.slide_1_button_text }}
               </a>
@@ -68,13 +79,21 @@
       {% if section.settings.show_text_overlay %}
         <div class='absolute inset-0 flex items-center justify-center lg:block z-10'>
           <div class='text-center lg:text-left max-w-4xl mx-auto lg:mx-0 px-4 lg:absolute lg:left-16 lg:top-1/2 lg:-translate-y-1/2'>
-            <h1 class='text-4xl md:text-6xl font-bold text-white mb-4'>
+            {% assign s2_shadow = section.settings.slide_2_text_shadow_strength | default: 'soft' %}
+            {% assign s2_op = '0.35' %}
+            {% case s2_shadow %}
+              {% when 'none' %}{% assign s2_op = '0' %}
+              {% when 'soft' %}{% assign s2_op = '0.35' %}
+              {% when 'medium' %}{% assign s2_op = '0.6' %}
+              {% when 'strong' %}{% assign s2_op = '0.85' %}
+            {% endcase %}
+            <h1 class='text-4xl md:text-6xl font-bold mb-4' style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'>
               {{
                 section.settings.slide_2_title
                 | default: "Professional Grade"
               }}
             </h1>
-            <p class='text-lg md:text-xl text-gray-300 mb-8'>
+            <p class='text-lg md:text-xl mb-8' style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'>
               {{
                 section.settings.slide_2_subtitle
                 | default: "Tools that professionals trust"
@@ -83,7 +102,8 @@
             {% if section.settings.slide_2_button_text != blank %}
               <a
                 href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
-                class='inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
               >
                 {{ section.settings.slide_2_button_text }}
               </a>
@@ -110,13 +130,21 @@
       {% if section.settings.show_text_overlay %}
         <div class='absolute inset-0 flex items-center justify-center lg:block z-10'>
           <div class='text-center lg:text-left max-w-4xl mx-auto lg:mx-0 px-4 lg:absolute lg:left-16 lg:top-1/2 lg:-translate-y-1/2'>
-            <h1 class='text-4xl md:text-6xl font-bold text-white mb-4'>
+            {% assign s3_shadow = section.settings.slide_3_text_shadow_strength | default: 'soft' %}
+            {% assign s3_op = '0.35' %}
+            {% case s3_shadow %}
+              {% when 'none' %}{% assign s3_op = '0' %}
+              {% when 'soft' %}{% assign s3_op = '0.35' %}
+              {% when 'medium' %}{% assign s3_op = '0.6' %}
+              {% when 'strong' %}{% assign s3_op = '0.85' %}
+            {% endcase %}
+            <h1 class='text-4xl md:text-6xl font-bold mb-4' style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'>
               {{
                 section.settings.slide_3_title
                 | default: "Handcrafted Excellence"
               }}
             </h1>
-            <p class='text-lg md:text-xl text-gray-300 mb-8'>
+            <p class='text-lg md:text-xl mb-8' style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'>
               {{
                 section.settings.slide_3_subtitle
                 | default: "Every piece tells a story of craftsmanship"
@@ -125,7 +153,8 @@
             {% if section.settings.slide_3_button_text != blank %}
               <a
                 href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
-                class='inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                style='background-color: {{ section.settings.slide_3_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_3_button_text_color | default: "#ffffff" }};'
               >
                 {{ section.settings.slide_3_button_text }}
               </a>
@@ -142,14 +171,56 @@
       </svg>
       <span></span>
     </div>
-  </swiper-container>
+    </swiper-container>
+  </div>
 </div>
 
 <!-- Swiper Styles -->
 <style>
   .hero-swiper {
     width: 100%;
-    height: 70vh;
+    height: {{ section.settings.height_percent | default: 70 }}vh;
+    border-radius: var(--hero-radius, 0px);
+    overflow: hidden;
+  }
+
+  .hero-scale-wrap {
+    width: 100%;
+    height: {{ section.settings.height_percent | default: 70 }}vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: var(--hero-radius, 0px);
+  }
+
+  /* Desktop: apply simple scale */
+  .hero-scale-wrap .hero-swiper {
+    transform: scale(calc(var(--hero-scale, 100) / 100));
+    transform-origin: center center;
+  }
+
+  /* Ensure slides fill container and images cover */
+  .hero-swiper swiper-slide {
+    height: 100%;
+  }
+  .hero-swiper swiper-slide img {
+    object-fit: cover;
+    object-position: center center;
+    border-radius: var(--hero-radius, 0px);
+  }
+
+  /* On mobile keep scaling and compensate dimensions to preserve cover */
+  @media (max-width: 768px) {
+    .hero-scale-wrap {
+      height: {{ section.settings.height_percent | default: 70 }}vh;
+      overflow: hidden;
+    }
+    .hero-scale-wrap .hero-swiper {
+      width: calc(100% * var(--hero-scale-inv, 1));
+      height: calc(100% * var(--hero-scale-inv, 1));
+      transform: scale(calc(var(--hero-scale, 100) / 100));
+    }
   }
 
   .hero-swiper swiper-slide {
@@ -213,8 +284,6 @@
   }
 </style>
 
-
-
 <!-- Initialize Swiper -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
@@ -246,12 +315,39 @@
     },
     {
       "type": "range",
+      "id": "height_percent",
+      "label": "Hero height (vh)",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "default": 70
+    },
+    {
+      "type": "range",
       "id": "autoplay_delay",
       "label": "Autoplay Delay (seconds)",
       "min": 2000,
       "max": 5000,
       "step": 500,
       "default": 5000
+    },
+    {
+      "type": "range",
+      "id": "scale_percent",
+      "label": "Scale (%)",
+      "min": 50,
+      "max": 120,
+      "step": 5,
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "scale_radius",
+      "label": "Scaled border radius (px)",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "default": 16
     },
     {
       "type": "checkbox",
@@ -262,6 +358,45 @@
     {
       "type": "header",
       "content": "Slide 1 Settings"
+    },
+    {
+      "type": "select",
+      "id": "slide_1_text_shadow_strength",
+      "label": "Slide 1 Text Shadow Strength",
+      "options": [
+        {"value":"none","label":"None"},
+        {"value":"soft","label":"Soft"},
+        {"value":"medium","label":"Medium"},
+        {"value":"strong","label":"Strong"}
+      ],
+      "default": "soft"
+    },
+    {
+      "type": "range",
+      "id": "slide_1_text_shadow_blur",
+      "label": "Slide 1 Text Shadow Blur (px)",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "color",
+      "id": "slide_1_text_color",
+      "label": "Slide 1 Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "slide_1_button_bg_color",
+      "label": "Slide 1 Button Background",
+      "default": "#2563eb"
+    },
+    {
+      "type": "color",
+      "id": "slide_1_button_text_color",
+      "label": "Slide 1 Button Text Color",
+      "default": "#ffffff"
     },
     {
       "type": "image_picker",
@@ -296,6 +431,45 @@
       "content": "Slide 2 Settings"
     },
     {
+      "type": "select",
+      "id": "slide_2_text_shadow_strength",
+      "label": "Slide 2 Text Shadow Strength",
+      "options": [
+        {"value":"none","label":"None"},
+        {"value":"soft","label":"Soft"},
+        {"value":"medium","label":"Medium"},
+        {"value":"strong","label":"Strong"}
+      ],
+      "default": "soft"
+    },
+    {
+      "type": "range",
+      "id": "slide_2_text_shadow_blur",
+      "label": "Slide 2 Text Shadow Blur (px)",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "color",
+      "id": "slide_2_text_color",
+      "label": "Slide 2 Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "slide_2_button_bg_color",
+      "label": "Slide 2 Button Background",
+      "default": "#2563eb"
+    },
+    {
+      "type": "color",
+      "id": "slide_2_button_text_color",
+      "label": "Slide 2 Button Text Color",
+      "default": "#ffffff"
+    },
+    {
       "type": "image_picker",
       "id": "slide_2_image",
       "label": "Slide 2 Image"
@@ -326,6 +500,45 @@
     {
       "type": "header",
       "content": "Slide 3 Settings"
+    },
+    {
+      "type": "select",
+      "id": "slide_3_text_shadow_strength",
+      "label": "Slide 3 Text Shadow Strength",
+      "options": [
+        {"value":"none","label":"None"},
+        {"value":"soft","label":"Soft"},
+        {"value":"medium","label":"Medium"},
+        {"value":"strong","label":"Strong"}
+      ],
+      "default": "soft"
+    },
+    {
+      "type": "range",
+      "id": "slide_3_text_shadow_blur",
+      "label": "Slide 3 Text Shadow Blur (px)",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "color",
+      "id": "slide_3_text_color",
+      "label": "Slide 3 Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "slide_3_button_bg_color",
+      "label": "Slide 3 Button Background",
+      "default": "#2563eb"
+    },
+    {
+      "type": "color",
+      "id": "slide_3_button_text_color",
+      "label": "Slide 3 Button Text Color",
+      "default": "#ffffff"
     },
     {
       "type": "image_picker",

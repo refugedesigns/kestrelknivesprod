@@ -1,7 +1,7 @@
 {
   "sections": {
     "template-customer-activate-account": {
-      "type": "template-customer-activate-account",
+      "type": "template-customer-activate-account"
     }
   },
   "order": ["template-customer-activate-account"]

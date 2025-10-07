@@ -427,6 +427,19 @@
       }
     </style>
 
+    <!-- Quote Collapse Styles -->
+    <style>
+      .quote-base {
+        min-height: 3.5rem;
+        display: block;
+      }
+      /* Remove overflow clipping to avoid hiding inline preview */
+      .quote-collapsed {
+        max-height: none;
+        overflow: visible;
+      }
+    </style>
+
     <!-- Initialize Swiper -->
     <script>
       // Wait for Swiper web components to be defined since it's loaded with defer
@@ -484,6 +497,66 @@
         initCarousels()
         setTimeout(initCarousels, 200)
         setTimeout(initCarousels, 500) // Extra retry
+      })
+    </script>
+
+    <!-- Truncate Quotes to N Words with Read More Toggle -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Target only the card overlays, not the modal
+        const quoteBlocks = document.querySelectorAll(
+          'blockquote.text-white.text-sm.leading-relaxed.mb-3.italic'
+        )
+        const MAX_WORDS = 40 // collapsed word limit
+
+        quoteBlocks.forEach(el => {
+          // Always ensure uniform min height across cards
+          el.classList.add('quote-base')
+          const fullTextRaw = (el.textContent || '').trim()
+          // Remove surrounding quotes if present
+          const fullText = fullTextRaw.replace(/^"+|"+$/g, '')
+
+          // Split into words for uniform collapsed length
+          const words = fullText.split(/\s+/)
+          if (!words || words.length <= MAX_WORDS) return
+
+          const truncated = words.slice(0, MAX_WORDS).join(' ').trim()
+
+          // Build structure: text span + button
+          const textSpan = document.createElement('span')
+          textSpan.className = 'js-quote-text'
+          textSpan.textContent = `"${truncated}"`
+
+          const toggleBtn = document.createElement('button')
+          toggleBtn.type = 'button'
+          toggleBtn.className = 'ml-1 underline text-blue-300 js-quote-toggle'
+          toggleBtn.textContent = 'Read more'
+          toggleBtn.setAttribute('aria-expanded', 'false')
+
+          // Prevent opening the modal when clicking the button
+          toggleBtn.addEventListener('click', function (e) {
+            e.preventDefault()
+            e.stopPropagation()
+            const expanded = toggleBtn.getAttribute('aria-expanded') === 'true'
+            if (expanded) {
+              textSpan.textContent = `"${truncated}"`
+              toggleBtn.textContent = 'Read more'
+              toggleBtn.setAttribute('aria-expanded', 'false')
+              // no overflow clipping; just revert text
+            } else {
+              textSpan.textContent = `"${fullText}"`
+              toggleBtn.textContent = 'Show less'
+              toggleBtn.setAttribute('aria-expanded', 'true')
+              // no overflow clipping; just show full text
+            }
+          })
+
+          // Replace blockquote content
+          el.innerHTML = ''
+          el.appendChild(textSpan)
+          el.appendChild(toggleBtn)
+          // Keep base height only; do not clip content
+        })
       })
     </script>
 
