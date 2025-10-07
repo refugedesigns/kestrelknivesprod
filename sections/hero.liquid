@@ -39,23 +39,34 @@
               {% when 'medium' %}{% assign s1_op = '0.6' %}
               {% when 'strong' %}{% assign s1_op = '0.85' %}
             {% endcase %}
-            <h1 class='text-4xl md:text-6xl font-bold mb-4' style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'>
-              {{ section.settings.slide_1_title | default: "Premium Knives" }}
-            </h1>
-            <p class='text-lg md:text-xl mb-8' style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'>
-              {{
-                section.settings.slide_1_subtitle
-                | default: "Crafted with precision, designed for perfection"
-              }}
-            </p>
-            {% if section.settings.slide_1_button_text != blank %}
-              <a
-                href='{{ section.settings.slide_1_button_url | default: "/collections/all" }}'
-                class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                style='background-color: {{ section.settings.slide_1_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_1_button_text_color | default: "#ffffff" }};'
-              >
-                {{ section.settings.slide_1_button_text }}
-              </a>
+            <div class='kk-text-wrap inline-block'>
+              {% if section.settings.slide_1_text_bg_enable %}
+                {% assign s1_bg_op_pct = section.settings.slide_1_text_bg_opacity | default: 50 %}
+                {% assign s1_bg_alpha = s1_bg_op_pct | divided_by: 100.0 %}
+                <div class='kk-text-bg' style='background-color: {{ section.settings.slide_1_text_bg_color | default: '#000000' | color_modify: 'alpha', s1_bg_alpha }}'></div>
+              {% endif %}
+              <div class='kk-text-content'>
+                <h1 class='text-4xl md:text-6xl font-bold mb-4' style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'>
+                  {{ section.settings.slide_1_title | default: "Premium Knives" }}
+                </h1>
+                <p class='text-lg md:text-xl mb-8' style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'>
+                  {{
+                    section.settings.slide_1_subtitle
+                    | default: "Crafted with precision, designed for perfection"
+                  }}
+                </p>
+              </div>
+            </div>
+            {% if section.settings.slide_1_button_enable and section.settings.slide_1_button_text != blank %}
+              <div class='mt-4'>
+                <a
+                  href='{{ section.settings.slide_1_button_url | default: "/collections/all" }}'
+                  class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                  style='background-color: {{ section.settings.slide_1_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_1_button_text_color | default: "#ffffff" }};'
+                >
+                  {{ section.settings.slide_1_button_text }}
+                </a>
+              </div>
             {% endif %}
           </div>
         </div>
@@ -87,26 +98,37 @@
               {% when 'medium' %}{% assign s2_op = '0.6' %}
               {% when 'strong' %}{% assign s2_op = '0.85' %}
             {% endcase %}
-            <h1 class='text-4xl md:text-6xl font-bold mb-4' style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'>
-              {{
-                section.settings.slide_2_title
-                | default: "Professional Grade"
-              }}
-            </h1>
-            <p class='text-lg md:text-xl mb-8' style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'>
-              {{
-                section.settings.slide_2_subtitle
-                | default: "Tools that professionals trust"
-              }}
-            </p>
-            {% if section.settings.slide_2_button_text != blank %}
-              <a
-                href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
-                class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
-              >
-                {{ section.settings.slide_2_button_text }}
-              </a>
+            <div class='kk-text-wrap inline-block'>
+              {% if section.settings.slide_2_text_bg_enable %}
+                {% assign s2_bg_op_pct = section.settings.slide_2_text_bg_opacity | default: 50 %}
+                {% assign s2_bg_alpha = s2_bg_op_pct | divided_by: 100.0 %}
+                <div class='kk-text-bg' style='background-color: {{ section.settings.slide_2_text_bg_color | default: '#000000' | color_modify: 'alpha', s2_bg_alpha }}'></div>
+              {% endif %}
+              <div class='kk-text-content'>
+                <h1 class='text-4xl md:text-6xl font-bold mb-4' style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'>
+                  {{
+                    section.settings.slide_2_title
+                    | default: "Professional Grade"
+                  }}
+                </h1>
+                <p class='text-lg md:text-xl mb-8' style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'>
+                  {{
+                    section.settings.slide_2_subtitle
+                    | default: "Tools that professionals trust"
+                  }}
+                </p>
+              </div>
+            </div>
+            {% if section.settings.slide_2_button_enable and section.settings.slide_2_button_text != blank %}
+              <div class='mt-4'>
+                <a
+                  href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
+                  class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                  style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
+                >
+                  {{ section.settings.slide_2_button_text }}
+                </a>
+              </div>
             {% endif %}
           </div>
         </div>
@@ -138,26 +160,37 @@
               {% when 'medium' %}{% assign s3_op = '0.6' %}
               {% when 'strong' %}{% assign s3_op = '0.85' %}
             {% endcase %}
-            <h1 class='text-4xl md:text-6xl font-bold mb-4' style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'>
-              {{
-                section.settings.slide_3_title
-                | default: "Handcrafted Excellence"
-              }}
-            </h1>
-            <p class='text-lg md:text-xl mb-8' style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'>
-              {{
-                section.settings.slide_3_subtitle
-                | default: "Every piece tells a story of craftsmanship"
-              }}
-            </p>
-            {% if section.settings.slide_3_button_text != blank %}
-              <a
-                href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
-                class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                style='background-color: {{ section.settings.slide_3_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_3_button_text_color | default: "#ffffff" }};'
-              >
-                {{ section.settings.slide_3_button_text }}
-              </a>
+            <div class='kk-text-wrap inline-block'>
+              {% if section.settings.slide_3_text_bg_enable %}
+                {% assign s3_bg_op_pct = section.settings.slide_3_text_bg_opacity | default: 50 %}
+                {% assign s3_bg_alpha = s3_bg_op_pct | divided_by: 100.0 %}
+                <div class='kk-text-bg' style='background-color: {{ section.settings.slide_3_text_bg_color | default: '#000000' | color_modify: 'alpha', s3_bg_alpha }}'></div>
+              {% endif %}
+              <div class='kk-text-content'>
+                <h1 class='text-4xl md:text-6xl font-bold mb-4' style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'>
+                  {{
+                    section.settings.slide_3_title
+                    | default: "Handcrafted Excellence"
+                  }}
+                </h1>
+                <p class='text-lg md:text-xl mb-8' style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'>
+                  {{
+                    section.settings.slide_3_subtitle
+                    | default: "Every piece tells a story of craftsmanship"
+                  }}
+                </p>
+              </div>
+            </div>
+            {% if section.settings.slide_3_button_enable and section.settings.slide_3_button_text != blank %}
+              <div class='mt-4'>
+                <a
+                  href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
+                  class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                  style='background-color: {{ section.settings.slide_3_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_3_button_text_color | default: "#ffffff" }};'
+                >
+                  {{ section.settings.slide_3_button_text }}
+                </a>
+              </div>
             {% endif %}
           </div>
         </div>
@@ -208,6 +241,21 @@
     object-fit: cover;
     object-position: center center;
     border-radius: var(--hero-radius, 0px);
+  }
+
+  /* Inline text background overlay block */
+  .kk-text-wrap {
+    position: relative;
+  }
+  .kk-text-bg {
+    position: absolute;
+    inset: -0.5rem; /* small padding around text */
+    border-radius: 0.5rem;
+    z-index: -1;
+  }
+  .kk-text-content {
+    position: relative;
+    z-index: 1;
   }
 
   /* On mobile keep scaling and compensate dimensions to preserve cover */
@@ -360,6 +408,33 @@
       "content": "Slide 1 Settings"
     },
     {
+      "type": "checkbox",
+      "id": "slide_1_button_enable",
+      "label": "Slide 1: Show button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "slide_1_text_bg_enable",
+      "label": "Slide 1: Enable text background",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "slide_1_text_bg_color",
+      "label": "Slide 1: Text background color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "slide_1_text_bg_opacity",
+      "label": "Slide 1: Text background opacity (%)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 50
+    },
+    {
       "type": "select",
       "id": "slide_1_text_shadow_strength",
       "label": "Slide 1 Text Shadow Strength",
@@ -431,6 +506,33 @@
       "content": "Slide 2 Settings"
     },
     {
+      "type": "checkbox",
+      "id": "slide_2_button_enable",
+      "label": "Slide 2: Show button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "slide_2_text_bg_enable",
+      "label": "Slide 2: Enable text background",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "slide_2_text_bg_color",
+      "label": "Slide 2: Text background color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "slide_2_text_bg_opacity",
+      "label": "Slide 2: Text background opacity (%)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 50
+    },
+    {
       "type": "select",
       "id": "slide_2_text_shadow_strength",
       "label": "Slide 2 Text Shadow Strength",
@@ -500,6 +602,33 @@
     {
       "type": "header",
       "content": "Slide 3 Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "slide_3_button_enable",
+      "label": "Slide 3: Show button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "slide_3_text_bg_enable",
+      "label": "Slide 3: Enable text background",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "slide_3_text_bg_color",
+      "label": "Slide 3: Text background color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "slide_3_text_bg_opacity",
+      "label": "Slide 3: Text background opacity (%)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 50
     },
     {
       "type": "select",
