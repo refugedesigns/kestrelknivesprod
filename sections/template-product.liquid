@@ -452,6 +452,7 @@
 >
   <div class='max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex items-center justify-between'>
     <nav class='flex space-x-8'>
+      {% if product.description != blank %}
       <button
         onclick="scrollToSection('specs')"
         class='tab-button uppercase py-4 font-bold px-2 border-b-2 border-transparent text-black hover:text-black hover:border-black transition-colors active'
@@ -459,6 +460,7 @@
       >
         Description
       </button>
+      {% endif %}
       {% if has_design_images %}
         <button
           onclick="scrollToSection('design')"

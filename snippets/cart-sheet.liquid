@@ -313,7 +313,7 @@
 
         try {
           const form = document.getElementById('product-form')
-          const formData = new FormData(form)
+          const formData = form ? new FormData(form) : new FormData()
 
           const payload = {
             id: variantId,

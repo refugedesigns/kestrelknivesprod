@@ -325,16 +325,14 @@
             ) {
               await cartSheet._x_dataStack[0].addToCart(this.selectedVariant, 1)
             } else {
-              // Fallback: direct API call
+              // Fallback: direct API call using FormData
+              const formData = new FormData()
+              formData.append('id', this.selectedVariant)
+              formData.append('quantity', '1')
+
               const response = await fetch('/cart/add.js', {
                 method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  id: this.selectedVariant,
-                  quantity: 1,
-                }),
+                body: formData,
               })
 
               if (response.ok) {
