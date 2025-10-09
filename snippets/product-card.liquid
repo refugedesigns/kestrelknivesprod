@@ -22,22 +22,13 @@
         {{ product_product.images[0] | img_url: "400x400" | json }}
       {% else %}
         null
-      {% endif %},
-      {% if product_product.images.size > 1 %}
-        {{ product_product.images[1] | img_url: "400x400" | json }}
-      {% else %}
-        null
       {% endif %}
     )
   '
 >
   <div class='bg-white overflow-hidden w-full {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[400px]{% else %}h-[600px]{% endif %} flex flex-col transition-none'>
     <!-- Product Image -->
-    <div
-      class='relative h-96 bg-white overflow-hidden'
-      @mouseenter='if (secondImage) hoverImage = true'
-      @mouseleave='hoverImage = false'
-    >
+    <div class='relative h-96 bg-white overflow-hidden'>
       <!-- SOLD OUT Badge -->
       <div
         x-show='!isAvailable'
@@ -46,21 +37,12 @@
         SOLD OUT
       </div>
 
-      <!-- Default Image -->
+      <!-- Product Image -->
       <a href='{{ product_product.url }}'>
         <img
           :src='currentImage'
           :alt="'{{ product_product.title }}'"
-          class='absolute inset-0 w-full h-full {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}object-cover{% else %}object-contain{% endif %} transition-opacity duration-300'
-          :class="hoverImage ? 'opacity-0' : 'opacity-100'"
-        >
-        <!-- Hover Image -->
-        <img
-          x-show='secondImage'
-          :src='secondImage'
-          :alt="'{{ product_product.title }}'"
-          class='absolute inset-0 w-full h-full {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}object-cover{% else %}object-contain{% endif %} transition-opacity duration-300'
-          :class="hoverImage ? 'opacity-100' : 'opacity-0'"
+          class='absolute inset-0 w-full h-full {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}object-cover{% else %}object-contain{% endif %}'
         >
       </a>
     </div>
@@ -110,8 +92,8 @@
                     %}
                     <button
                       @click='selectVariant({{ variant.id }})'
-                      :class="selectedVariant === {{ variant.id }} ? 'ring-2 ring-gray-400' : ''"
-                      class='w-10 h-10 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 overflow-hidden'
+                      :class="selectedVariant === {{ variant.id }} ? 'ring-2 ring-black' : ''"
+                      class='w-10 h-10 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-black overflow-hidden'
                       title='{{ variant.option1 }}'
                     >
                       {% assign color_image = "" %}
@@ -235,11 +217,9 @@
   document.addEventListener('alpine:init', () => {
     Alpine.data(
       'productCard',
-      (selectedVariantId, productTitle, currentImage, secondImage) => ({
+      (selectedVariantId, productTitle, currentImage) => ({
         selectedVariant: selectedVariantId,
-        hoverImage: false,
         currentImage: currentImage,
-        secondImage: secondImage,
         productData: {},
         variantsData: null,
         baseTitle: productTitle,
@@ -289,12 +269,16 @@
 
           // Check availability
           this.checkAvailability()
+
+          // Ensure initial image reflects the initially selected variant if it has a featured image
+          this.updateImage()
         },
 
         selectVariant(variantId) {
           this.selectedVariant = variantId
           this.updateTitle()
           this.checkAvailability()
+          this.updateImage()
         },
 
         checkAvailability() {
@@ -347,6 +331,25 @@
             alert('Failed to add item to cart. Please try again.')
           } finally {
             this.isAddingToCart = false
+          }
+        },
+
+        updateImage() {
+          // Update image when variant changes (for knives/non-apparels)
+          if (this.variantsData && this.variantsData.length > 0) {
+            const selectedVariant = this.variantsData.find(
+              v => v.id === this.selectedVariant
+            )
+            
+            console.log('Selected variant:', selectedVariant)
+            
+            // If variant has a featured image, use it
+            if (selectedVariant && selectedVariant.featured_image) {
+              this.currentImage = selectedVariant.featured_image.src
+              console.log('Updated image to:', this.currentImage)
+            } else {
+              console.log('No featured image for variant:', selectedVariant)
+            }
           }
         },
 

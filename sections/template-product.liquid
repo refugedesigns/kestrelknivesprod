@@ -976,7 +976,6 @@
 
       // Build variants data from window.__product
       const product = window.__product || {};
-      console.log('Product:', product);
       const variants = (product.variants || []).map(v => {
         const opts = [];
         if (v.option1 !== undefined) opts.push(v.option1);

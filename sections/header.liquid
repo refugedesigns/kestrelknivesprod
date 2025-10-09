@@ -5,13 +5,25 @@
       height: {{ section.settings.logo_height_desktop | default: 80 }}px !important;
     }
   }
+
+  /* Child menu link hover styles */
+  .child-menu-link {
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  .child-menu-link:hover {
+    background-color: {{ section.settings.child_menu_hover_bg_color | default: "#374151" }} !important;
+  }
+  .child-menu-link:hover p {
+    color: {{ section.settings.child_menu_hover_text_color | default: "#ffffff" }} !important;
+  }
 </style>
 
 <div
   id='siteHeader'
-  class='fixed w-full z-20 top-0 start-0 bg-black'
+  class='fixed w-full z-20 top-0 start-0'
   x-data='{ mobileMenuOpen: false, searchBarOpen: false }'
   x-cloak
+  style='background-color: {{ section.settings.header_bg_color | default: "#000000" }}; {% if section.settings.header_border_bottom %}border-bottom: 1px solid {{ section.settings.header_border_color | default: "#ffffff" }};{% endif %}'
 >
   <div class='mx-auto px-4 sm:px-6 max-w-8xl'>
     <div class='flex justify-between items-center py-2 md:justify-start md:space-x-10'>
@@ -68,7 +80,8 @@
               <button
                 type='button'
                 x-on:click='{{ link_handle }} = ! {{ link_handle }}'
-                class='inline-flex items-center cursor-pointer text-white hover:text-gray-100'
+                class='inline-flex items-center cursor-pointer hover:text-gray-100'
+                style='color: {{ section.settings.menu_link_color | default: "#ffffff" }};'
               >
                 {{ link.title }}
                 {% render "icon-dropdown" %}
@@ -85,15 +98,15 @@
                 @click.away='{{ link_handle }} = false'
                 class='absolute z-10 -ml-5 mt-5 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:left-1/2 lg:-translate-x-1/2'
               >
-                <div class='shadow-lg border ring-black ring-opacity-5 overflow-hidden rounded-lg'>
-                  <div class='relative grid gap-6 bg-gray-800 px-5 py-6 sm:gap-8 sm:p-8'>
+                <div class='shadow-lg border ring-opacity-5 overflow-hidden rounded-lg' style='border-color: {{ section.settings.child_menu_border_color | default: "#000000" }}; --tw-ring-color: {{ section.settings.child_menu_border_color | default: "#000000" }};'>
+                  <div class='relative grid gap-6 px-5 py-6 sm:gap-8 sm:p-8' style='background-color: {{ section.settings.child_menu_bg_color | default: "#1f2937" }};'>
                     {% for childlink in link.links %}
                       <a
                         href='{{ childlink.url }}'
-                        class='-m-3 p-3 flex items start rounded-lg hover:bg-gray-700'
+                        class='-m-3 p-3 flex items start rounded-lg child-menu-link'
                       >
                         <div class='ml-4'>
-                          <p class='text-white text-base font-medium'>
+                          <p class='text-base font-medium' style='color: {{ section.settings.child_menu_link_color | default: "#ffffff" }};'>
                             {{ childlink.title }}
                           </p>
                         </div>
@@ -106,7 +119,8 @@
           {% else %}
             <a
               href='{{ link.url }}'
-              class='text-base text-white hover:text-gray-100'
+              class='text-base hover:text-gray-100'
+              style='color: {{ section.settings.menu_link_color | default: "#ffffff" }};'
             >
               {{- link.title -}}
             </a>
@@ -118,14 +132,16 @@
         <button
           @click='window.dispatchEvent(new CustomEvent("open-search"))'
           type='button'
-          class='whitespace-nowrap text-base text-white hover:text-gray-100'
+          class='whitespace-nowrap text-base hover:text-gray-100'
+          style='color: {{ section.settings.menu_link_color | default: "#ffffff" }};'
         >
           {% render "icon-search" %}
         </button>
         <div class='relative' x-data='cartBadge()' x-init='init()'>
           <button
             @click.stop='openCart'
-            class='whitespace-nowrap text-base text-white hover:text-gray-100 relative'
+            class='whitespace-nowrap text-base hover:text-gray-100 relative'
+            style='color: {{ section.settings.menu_link_color | default: "#ffffff" }};'
           >
             {% render "icon-shopping-bag" %}
             <!-- Cart Badge -->
@@ -141,23 +157,27 @@
           {% if customer %}
             <a
               href='{{ routes.account_url }}'
-              class='text-base text-white hover:text-gray-100'
+              class='text-base hover:text-gray-100'
+              style='color: {{ section.settings.menu_link_color | default: "#ffffff" }};'
               >Account</a
             >
             <a
               href='{{ routes.account_logout_url }}'
-              class='text-base text-white hover:text-gray-100'
+              class='text-base hover:text-gray-100'
+              style='color: {{ section.settings.menu_link_color | default: "#ffffff" }};'
               >Log out</a
             >
           {% else %}
             <a
               href='{{ routes.account_login_url }}'
-              class='text-base text-white hover:text-gray-100'
+              class='text-base hover:text-gray-100'
+              style='color: {{ section.settings.menu_link_color | default: "#ffffff" }};'
               >Log in</a
             >
             <a
               href='{{ routes.account_register_url }}'
-              class='text-base text-white hover:text-gray-100'
+              class='text-base hover:text-gray-100'
+              style='color: {{ section.settings.menu_link_color | default: "#ffffff" }};'
               >Register</a
             >
           {% endif %}
@@ -376,6 +396,60 @@
       "id": "menu",
       "default": "customer-account-main-menu",
       "label": "Heading Navigation Menu"
+    },
+    {
+      "type": "color",
+      "id": "header_bg_color",
+      "label": "Header background color",
+      "default": "#000000"
+    },
+    {
+      "type": "checkbox",
+      "id": "header_border_bottom",
+      "label": "Show bottom border",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "header_border_color",
+      "label": "Header border color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "menu_link_color",
+      "label": "Menu links color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "child_menu_bg_color",
+      "label": "Child menu background color",
+      "default": "#1f2937"
+    },
+    {
+      "type": "color",
+      "id": "child_menu_link_color",
+      "label": "Child menu link color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "child_menu_border_color",
+      "label": "Child menu border color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "child_menu_hover_bg_color",
+      "label": "Child menu link hover background",
+      "default": "#374151"
+    },
+    {
+      "type": "color",
+      "id": "child_menu_hover_text_color",
+      "label": "Child menu link hover text color",
+      "default": "#ffffff"
     }
   ]
 }

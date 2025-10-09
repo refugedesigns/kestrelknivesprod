@@ -20,7 +20,8 @@
         <img
           src='{{ section.settings.slide_1_image | img_url: "1920x1080" }}'
           alt='{{ section.settings.slide_1_title | default: "Premium Knives" }}'
-          class='w-full h-full object-cover'
+          class='w-full h-full'
+          style='object-fit: {{ section.settings.slide_1_image_fit | default: "cover" }}; object-position: {{ section.settings.slide_1_image_position | default: "center" }}; transform: scale({{ section.settings.slide_1_image_zoom | default: 100 | divided_by: 100.0 }});'
         >
       {% else %}
         {{
@@ -79,7 +80,8 @@
         <img
           src='{{ section.settings.slide_2_image | img_url: "1920x1080" }}'
           alt='{{ section.settings.slide_2_title | default: "Professional Grade" }}'
-          class='w-full h-full object-cover'
+          class='w-full h-full'
+          style='object-fit: {{ section.settings.slide_2_image_fit | default: "cover" }}; object-position: {{ section.settings.slide_2_image_position | default: "center" }}; transform: scale({{ section.settings.slide_2_image_zoom | default: 100 | divided_by: 100.0 }});'
         >
       {% else %}
         {{
@@ -141,7 +143,8 @@
         <img
           src='{{ section.settings.slide_3_image | img_url: "1920x1080" }}'
           alt='{{ section.settings.slide_3_title | default: "Handcrafted Excellence" }}'
-          class='w-full h-full object-cover'
+          class='w-full h-full'
+          style='object-fit: {{ section.settings.slide_3_image_fit | default: "cover" }}; object-position: {{ section.settings.slide_3_image_position | default: "center" }}; transform: scale({{ section.settings.slide_3_image_zoom | default: 100 | divided_by: 100.0 }});'
         >
       {% else %}
         {{
@@ -236,11 +239,15 @@
   /* Ensure slides fill container and images cover */
   .hero-swiper swiper-slide {
     height: 100%;
+    overflow: hidden;
   }
   .hero-swiper swiper-slide img {
     object-fit: cover;
     object-position: center center;
     border-radius: var(--hero-radius, 0px);
+    transform-origin: center center;
+    min-width: 100%;
+    min-height: 100%;
   }
 
   /* Inline text background overlay block */
@@ -479,6 +486,40 @@
       "label": "Slide 1 Image"
     },
     {
+      "type": "select",
+      "id": "slide_1_image_fit",
+      "label": "Slide 1 Image Fit",
+      "options": [
+        {"value": "cover", "label": "Cover"},
+        {"value": "contain", "label": "Contain"},
+        {"value": "fill", "label": "Fill"},
+        {"value": "scale-down", "label": "Scale Down"},
+        {"value": "none", "label": "None"}
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "slide_1_image_position",
+      "label": "Slide 1 Image Position",
+      "options": [
+        {"value": "top", "label": "Top"},
+        {"value": "center", "label": "Center"},
+        {"value": "bottom", "label": "Bottom"}
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "slide_1_image_zoom",
+      "label": "Slide 1 Image Zoom (%)",
+      "info": "Lower values show more of the image. 100 = normal, 80 = zoomed out",
+      "min": 50,
+      "max": 150,
+      "step": 5,
+      "default": 100
+    },
+    {
       "type": "text",
       "id": "slide_1_title",
       "label": "Slide 1 Title",
@@ -577,6 +618,40 @@
       "label": "Slide 2 Image"
     },
     {
+      "type": "select",
+      "id": "slide_2_image_fit",
+      "label": "Slide 2 Image Fit",
+      "options": [
+        {"value": "cover", "label": "Cover"},
+        {"value": "contain", "label": "Contain"},
+        {"value": "fill", "label": "Fill"},
+        {"value": "scale-down", "label": "Scale Down"},
+        {"value": "none", "label": "None"}
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "slide_2_image_position",
+      "label": "Slide 2 Image Position",
+      "options": [
+        {"value": "top", "label": "Top"},
+        {"value": "center", "label": "Center"},
+        {"value": "bottom", "label": "Bottom"}
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "slide_2_image_zoom",
+      "label": "Slide 2 Image Zoom (%)",
+      "info": "Lower values show more of the image. 100 = normal, 80 = zoomed out",
+      "min": 50,
+      "max": 150,
+      "step": 5,
+      "default": 100
+    },
+    {
       "type": "text",
       "id": "slide_2_title",
       "label": "Slide 2 Title",
@@ -673,6 +748,40 @@
       "type": "image_picker",
       "id": "slide_3_image",
       "label": "Slide 3 Image"
+    },
+    {
+      "type": "select",
+      "id": "slide_3_image_fit",
+      "label": "Slide 3 Image Fit",
+      "options": [
+        {"value": "cover", "label": "Cover"},
+        {"value": "contain", "label": "Contain"},
+        {"value": "fill", "label": "Fill"},
+        {"value": "scale-down", "label": "Scale Down"},
+        {"value": "none", "label": "None"}
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "slide_3_image_position",
+      "label": "Slide 3 Image Position",
+      "options": [
+        {"value": "top", "label": "Top"},
+        {"value": "center", "label": "Center"},
+        {"value": "bottom", "label": "Bottom"}
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "slide_3_image_zoom",
+      "label": "Slide 3 Image Zoom (%)",
+      "info": "Lower values show more of the image. 100 = normal, 80 = zoomed out",
+      "min": 50,
+      "max": 150,
+      "step": 5,
+      "default": 100
     },
     {
       "type": "text",

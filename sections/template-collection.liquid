@@ -31,15 +31,43 @@
             class='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
             id='products-grid'
           >
-            {% for product in collection.products %}
-              {% render "product-card", product_product: product %}
+            {% comment %}
+              Knives special ordering: render products on this page (paginate.items)
+              in the order of tags product_1, product_2, ... product_999.
+              Any items without such tags are rendered afterwards in original order.
+            {% endcomment %}
+            {% if collection.handle contains 'knife' or collection.title contains 'Knife' or collection.title contains 'Knives' %}
+              {% assign rendered_ids = ',' %}
+              {% for i in (1..999) %}
+                {% assign wanted = 'product_' | append: i %}
+                {% assign wanted_alt = 'position_' | append: i %}
+                {% for product in collection.products %}
+                  {%- assign tags_lower = product.tags | join: '||' | downcase | split: '||' -%}
+                  {% if tags_lower contains wanted or tags_lower contains wanted_alt %}
+                    {% render "product-card", product_product: product %}
+                    {% assign rendered_ids = rendered_ids | append: product.id | append: ',' %}
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+
+              {%- comment -%} Render any remaining items without product_N tag {%- endcomment -%}
+              {% for product in collection.products %}
+                {% assign pid = product.id | append: ',' %}
+                {% unless rendered_ids contains pid %}
+                  {% render "product-card", product_product: product %}
+                {% endunless %}
+              {% endfor %}
             {% else %}
-              <div class='col-span-full text-center py-12'>
-                <p class='text-gray-500 text-lg'>
-                  There are no products in this collection
-                </p>
-              </div>
-            {% endfor %}
+              {% for product in collection.products %}
+                {% render "product-card", product_product: product %}
+              {% else %}
+                <div class='col-span-full text-center py-12'>
+                  <p class='text-gray-500 text-lg'>
+                    There are no products in this collection
+                  </p>
+                </div>
+              {% endfor %}
+            {% endif %}
           </div>
 
           <!-- Pagination -->
