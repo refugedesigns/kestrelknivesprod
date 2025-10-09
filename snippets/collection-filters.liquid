@@ -76,13 +76,26 @@
       </button>
 
       <div x-show='filtersOpen.availability' class='space-y-2'>
+        <!-- ALL option -->
         <label class='flex items-center space-x-2 cursor-pointer'>
           <input
-            type='checkbox'
-            x-model='selectedFilters.availability'
+            type='radio'
+            name='availability'
+            value=''
+            x-model='selectedFilters.availabilitySelected'
+            @change='applyFilters()'
+            class='border-gray-300 text-black focus:ring-gray-900'
+          >
+          <span class='text-sm text-gray-700'>ALL</span>
+        </label>
+        <label class='flex items-center space-x-2 cursor-pointer'>
+          <input
+            type='radio'
+            name='availability'
             value='in-stock'
-            @change='applyFilters(true)'
-            class='rounded border-gray-300 text-black focus:ring-gray-900'
+            x-model='selectedFilters.availabilitySelected'
+            @change='applyFilters()'
+            class='border-gray-300 text-black focus:ring-gray-900'
           >
           <span class='text-sm text-gray-700'
             >In stock (<span x-text='inStockCount'></span>)</span
@@ -90,11 +103,12 @@
         </label>
         <label class='flex items-center space-x-2 cursor-pointer'>
           <input
-            type='checkbox'
-            x-model='selectedFilters.availability'
+            type='radio'
+            name='availability'
             value='out-of-stock'
-            @change='applyFilters(true)'
-            class='rounded border-gray-300 text-black focus:ring-gray-900'
+            x-model='selectedFilters.availabilitySelected'
+            @change='applyFilters()'
+            class='border-gray-300 text-black focus:ring-gray-900'
           >
           <span class='text-sm text-gray-700'
             >Out of stock (<span x-text='outOfStockCount'></span>)</span
@@ -137,6 +151,18 @@
     {% endif %}
   }
 </script>
+<script type='application/json' id='kk-filter-meta'>
+  {
+    "productTypes": [
+      {% assign pt = collection.filters | where: 'param_name', 'filter.p.product_type' | first %}
+      {% if pt and pt.values %}
+        {% for v in pt.values %}
+          { "value": {{ v.value | json }}, "count": {{ v.count | default: 0 }} }{% unless forloop.last %},{% endunless %}
+        {% endfor %}
+      {% endif %}
+    ]
+  }
+</script>
 <script>
   document.addEventListener('alpine:init', () => {
     Alpine.data('collectionFilters', () => ({
@@ -147,14 +173,14 @@
       selectedFilters: {
         productType: [],
         productTypeSelected: '',
-        availability: [],
+        availabilitySelected: '',
       },
       productTypes: [],
       isInitializing: true,
 
-      init() {
-        // Build product types from products
-        this.buildProductTypes()
+      async init() {
+        // Build product types from products (await async fetch when needed)
+        await this.buildProductTypes()
 
         // Hydrate selections from URL so checked states reflect current filters
         this.hydrateFromUrl()
@@ -163,18 +189,86 @@
         this.isInitializing = false
       },
 
+      // Fetch full product type facets from /collections/all via Section Rendering API
+      async fetchAllProductTypesFromAllCollection() {
+        try {
+          const res = await fetch('/collections/all?sections=template-collection', { credentials: 'same-origin' })
+          if (!res.ok) return []
+          const data = await res.json()
+          const html = data && data['template-collection'] ? String(data['template-collection']) : ''
+          if (!html) return []
+          // Extract the JSON block embedded by id
+          const marker = 'id=\"kk-filter-meta\"'
+          const idx = html.indexOf(marker)
+          if (idx === -1) return []
+          // Find script tag boundaries
+          const startTag = html.lastIndexOf('<script', idx)
+          const endTag = html.indexOf('</scr' + 'ipt>', idx)
+          if (startTag === -1 || endTag === -1) return []
+          const scriptContent = html.substring(html.indexOf('>', startTag) + 1, endTag)
+          const parsed = JSON.parse(scriptContent)
+          const arr = (parsed && parsed.productTypes) || []
+          // Normalize structure
+          return arr
+            .map(it => ({ value: String(it.value || ''), count: Number(it.count || 0) }))
+            .filter(it => it.value && it.value.toLowerCase() !== 'custom')
+        } catch (e) {
+          return []
+        }
+      },
+
+      // Get full product types from cache or fetch them once from /collections/all
+      async getFullProductTypes() {
+        try {
+          const cached = sessionStorage.getItem('kk_allProductTypes')
+          const cachedTypes = cached ? JSON.parse(cached) : null
+          if (cachedTypes && cachedTypes.length) return cachedTypes
+          const fetched = await this.fetchAllProductTypesFromAllCollection()
+          if (fetched && fetched.length) {
+            sessionStorage.setItem('kk_allProductTypes', JSON.stringify(fetched))
+            return fetched
+          }
+          return []
+        } catch (e) {
+          return []
+        }
+      },
+
       hydrateFromUrl() {
         try {
           const url = new URL(window.location.href)
+          
           // Product types (multiple allowed)
           const types = url.searchParams.getAll('filter.p.product_type')
           if (types && types.length) {
             this.selectedFilters.productType = types
-            this.selectedFilters.productTypeSelected = types[0]
-          }
-
-          // If no explicit param, infer selection from collection URL (e.g., /collections/apparels)
-          if (!this.selectedFilters.productTypeSelected) {
+            // If URL has both Knives and Custom, select Knives (since Custom is hidden)
+            const hasKnives = types.some(t => t.toLowerCase() === 'knives')
+            const hasCustom = types.some(t => t.toLowerCase() === 'custom')
+            
+            if (hasKnives && hasCustom) {
+              // Both present, select Knives
+              this.selectedFilters.productTypeSelected = types.find(t => t.toLowerCase() === 'knives')
+            } else if (hasCustom && !hasKnives) {
+              // Only Custom (from old URL or direct access), don't select anything
+              this.selectedFilters.productTypeSelected = ''
+            } else {
+              // Normal case: use first type
+              this.selectedFilters.productTypeSelected = types[0]
+            }
+            
+            // Ensure the selected type is in productTypes array
+            if (this.selectedFilters.productTypeSelected) {
+              const selectedExists = (this.productTypes || []).some(
+                pt => pt.value === this.selectedFilters.productTypeSelected
+              )
+              if (!selectedExists) {
+                // Add it to ensure the radio button can render
+                this.productTypes.push({ value: this.selectedFilters.productTypeSelected, count: 0 })
+              }
+            }
+          } else {
+            // If no explicit param, infer selection from collection URL (e.g., /collections/apparels)
             const path = window.location.pathname || ''
             const m = path.match(/\/collections\/([^\/]+)/)
             const collectionHandle = m && m[1] ? decodeURIComponent(m[1]) : ''
@@ -188,71 +282,86 @@
                   .replace(/[^a-z0-9]+/g, '-')
                   .replace(/^-+|-+$/g, '')
 
+              // Helper to match singular/plural variations
+              const matchesHandle = (typeValue, handle) => {
+                const typeHandle = toHandle(typeValue)
+                // Direct match
+                if (typeHandle === handle) return true
+                // Plural match (handle ends with 's')
+                if (handle.endsWith('s') && typeHandle === handle.slice(0, -1)) return true
+                // Singular match (typeHandle ends with 's')
+                if (typeHandle.endsWith('s') && handle === typeHandle.slice(0, -1)) return true
+                return false
+              }
+
               // Find a product type whose handle matches the collection handle
               const matchType = (this.productTypes || []).find(
-                pt => toHandle(pt.value) === collectionHandle
+                pt => matchesHandle(pt.value, collectionHandle)
               )
               if (matchType) {
                 this.selectedFilters.productTypeSelected = matchType.value
+                
+                // Auto-redirect to include custom products when on knives collection
+                if (matchType.value.toLowerCase() === 'knives' || collectionHandle === 'knives') {
+                  // Redirect to add both Knives and custom filters
+                  const newUrl = new URL(window.location.href)
+                  newUrl.searchParams.append('filter.p.product_type', matchType.value)
+                  newUrl.searchParams.append('filter.p.product_type', 'custom')
+                  if (newUrl.toString() !== window.location.href) {
+                    window.location.href = newUrl.toString()
+                    return
+                  }
+                }
               }
             }
           }
 
-          // Availability (1=in stock, 0=out of stock). Could appear multiple times
-          const avParams = url.searchParams.getAll('filter.v.availability')
-          const av = []
-          avParams.forEach(v => {
-            if (String(v) === '1') av.push('in-stock')
-            if (String(v) === '0') av.push('out-of-stock')
-          })
-          if (av.length) this.selectedFilters.availability = av
+          // Availability (1=in stock, 0=out of stock)
+          const avParam = url.searchParams.get('filter.v.availability')
+          if (avParam !== null) {
+            if (String(avParam) === '1') {
+              this.selectedFilters.availabilitySelected = 'in-stock'
+            } else if (String(avParam) === '0') {
+              this.selectedFilters.availabilitySelected = 'out-of-stock'
+            }
+          }
         } catch (e) {
           // ignore
         }
       },
 
-      buildProductTypes() {
+      async buildProductTypes() {
         try {
           // Prefer server-provided facet metadata when available
           const meta = window.__filterMeta || {}
 
-          // Try to use a previously cached full list (from an unfiltered visit)
-          const cached = sessionStorage.getItem('kk_allProductTypes')
-          const cachedTypes = cached ? JSON.parse(cached) : null
+          // Current page facet (may be partial). Filter out 'custom'.
+          const metaTypes = (meta.productTypes || [])
+            .filter(t => String(t.value || '').toLowerCase() !== 'custom')
+            .map(t => ({ value: String(t.value || ''), count: Number(t.count || 0) }))
 
-          if (meta.productTypes && meta.productTypes.length > 1) {
-            // When more than one option is present, assume it's a full facet and cache it
-            this.productTypes = meta.productTypes
-            sessionStorage.setItem(
-              'kk_allProductTypes',
-              JSON.stringify(this.productTypes)
-            )
+          // Always attempt to use the full set from /collections/all
+          const fullTypes = await this.getFullProductTypes()
+          if (fullTypes && fullTypes.length) {
+            this.productTypes = fullTypes
             return
           }
 
-          if (
-            meta.productTypes &&
-            meta.productTypes.length === 1 &&
-            cachedTypes &&
-            cachedTypes.length > 0
-          ) {
-            // If facet collapsed to a single selected type, fallback to cached full list
-            this.productTypes = cachedTypes
+          // If we couldn't get a full set, fall back to meta types if present
+          if (metaTypes && metaTypes.length) {
+            this.productTypes = metaTypes
             return
           }
 
-          // Fallback: derive counts from products on the current page (may be incomplete)
+          // Last resort: derive counts from products on the current page (may be incomplete)
           const products = window.__collectionProducts || []
           const counts = {}
           products.forEach(p => {
             const t = (p.product_type || p.type || '').toString().trim()
-            if (!t) return
+            if (!t || t.toLowerCase() === 'custom') return
             counts[t] = (counts[t] || 0) + 1
           })
-          this.productTypes = Object.keys(counts).map(k => ({
-            value: k,
-            count: counts[k],
-          }))
+          this.productTypes = Object.keys(counts).map(k => ({ value: k, count: counts[k] }))
         } catch (e) {
           this.productTypes = []
         }
@@ -266,7 +375,7 @@
         this.selectedFilters = {
           productType: [],
           productTypeSelected: '',
-          availability: [],
+          availabilitySelected: '',
         }
         sessionStorage.removeItem('kk_allProductTypes')
         this.applyFilters()
@@ -308,6 +417,10 @@
         url.searchParams.delete('filter.p.product_type')
         if (selected) {
           url.searchParams.append('filter.p.product_type', selected)
+          // When Knives is selected, also include custom products
+          if (selected.toLowerCase() === 'knives') {
+            url.searchParams.append('filter.p.product_type', 'custom')
+          }
         }
 
         // If the selected type does not match the current collection handle,
@@ -329,16 +442,12 @@
         }
         // availability
         url.searchParams.delete('filter.v.availability')
-        const hasIn = (this.selectedFilters.availability || []).includes(
-          'in-stock'
-        )
-        const hasOut = (this.selectedFilters.availability || []).includes(
-          'out-of-stock'
-        )
-        if (hasIn && !hasOut)
+        const availabilitySelected = this.selectedFilters.availabilitySelected || ''
+        if (availabilitySelected === 'in-stock') {
           url.searchParams.append('filter.v.availability', '1')
-        if (hasOut && !hasIn)
+        } else if (availabilitySelected === 'out-of-stock') {
           url.searchParams.append('filter.v.availability', '0')
+        }
 
         const nextUrl = url.toString()
         if (nextUrl === window.location.href) return

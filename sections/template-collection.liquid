@@ -36,7 +36,31 @@
               in the order of tags product_1, product_2, ... product_999.
               Any items without such tags are rendered afterwards in original order.
             {% endcomment %}
-            {% if collection.handle contains 'knife' or collection.title contains 'Knife' or collection.title contains 'Knives' %}
+            {% assign has_knife_filter = false %}
+            {% assign url_string = request.path | append: '?' | append: request.query_string %}
+            {% if url_string contains 'filter.p.product_type=Knives' or url_string contains 'filter.p.product_type=knives' %}
+              {% assign has_knife_filter = true %}
+            {% endif %}
+
+            {%- comment -%}
+              Determine if any product on the current page has explicit position tags.
+              This allows sorting to trigger even on /collections/all when filtered to knives.
+            {%- endcomment -%}
+            {% assign has_position_tags = false %}
+            {% for product in collection.products %}
+              {%- assign tags_lower = product.tags | join: '||' | downcase | split: '||' -%}
+              {% for i in (1..999) %}
+                {% assign wanted = 'product_' | append: i %}
+                {% assign wanted_alt = 'position_' | append: i %}
+                {% if tags_lower contains wanted or tags_lower contains wanted_alt %}
+                  {% assign has_position_tags = true %}
+                  {% break %}
+                {% endif %}
+              {% endfor %}
+              {% if has_position_tags %}{% break %}{% endif %}
+            {% endfor %}
+
+            {% if collection.handle contains 'knife' or collection.title contains 'Knife' or collection.title contains 'Knives' or has_knife_filter or has_position_tags %}
               {% assign rendered_ids = ',' %}
               {% for i in (1..999) %}
                 {% assign wanted = 'product_' | append: i %}

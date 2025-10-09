@@ -715,7 +715,7 @@
           relatedSection.className = 'py-16 bg-gray-50';
           relatedSection.innerHTML = `
             <div class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-              <h2 class='text-lg font-bold text-black mb-8 uppercase'>Customers Also Viewed</h2>
+              <h2 class='text-lg font-bold text-black mb-8 uppercase'>{{ section.settings.related_heading | default: 'Members Also Bought' }}</h2>
               <swiper-container
                 id='related-products-swiper'
                 class='mySwiper'
@@ -1131,19 +1131,13 @@
           updateOptionButtonStates(selectedOptions) {
             // Update all option inputs to reflect the selected state
             const optionInputs = document.querySelectorAll('input[name^="options["], select[name^="options["]');
-            
-            console.log('Updating option button states:', selectedOptions);
-            
+
             optionInputs.forEach(input => {
               const name = input.name.replace(/^options\[(.+)\]$/, '$1');
               const optionIndex = this.getOptionIndexByName(name);
-              
-              console.log(`Input: ${name}, Option Index: ${optionIndex}, Value: ${input.value}`);
-              
+
               if (optionIndex !== -1 && selectedOptions[optionIndex]) {
                 const isSelected = input.value === selectedOptions[optionIndex];
-                
-                console.log(`Is selected: ${isSelected} for ${input.value}`);
                 
                 // Update radio button checked state
                 if (input.type === 'radio') {
@@ -1160,14 +1154,6 @@
             // Find the parent label or button container
             const label = input.closest('label');
             const button = label ? label.querySelector('div') : null;
-            
-            console.log('Updating visual state:', {
-              input: input.value,
-              isSelected: isSelected,
-              button: button,
-              buttonClasses: button ? button.className : 'none'
-            });
-            
             if (button) {
               if (isSelected) {
                 // Selected state - check button type by classes
@@ -1507,7 +1493,7 @@
               // Get the cart sheet component
               const cartSheet = document.querySelector('[x-data*="cartSheet"]');
               if (cartSheet && cartSheet._x_dataStack && cartSheet._x_dataStack[0]) {
-                console.log('[submit main button] calling cartSheet.addToCart');
+                
                 await cartSheet._x_dataStack[0].addToCart(variantId, quantity, 'main-button');
                 // Ensure button is restored on success as well
                 restore();
@@ -1656,8 +1642,7 @@
   <script>
     // Monitor custom price element and update sticky price display
     document.addEventListener('DOMContentLoaded', function () {
-      console.log('[custom price] init')
-      console.log(document.getElementById('price'))
+        
       const stickyPriceDisplay = document.getElementById('custom-price-display')
       const stickyPriceWrapper =
         document.getElementById('stickyPriceCustom') ||
@@ -1694,7 +1679,7 @@
       }, 0)
 
       function attachToPriceEl(el) {
-        console.log('[custom price] attaching to', el)
+
         if (!el) return
         if (priceObserver) priceObserver.disconnect()
         observedPriceEl = el
@@ -1720,7 +1705,7 @@
         debounce(function () {
           const el = document.getElementById('price')
           if (el && el !== observedPriceEl) {
-            console.log('[custom price] re-attached to replaced #price')
+            
             attachToPriceEl(el)
           }
         }, 50)
@@ -1758,9 +1743,7 @@
             '.mw-apo-add-to-cart-cloned'
           )
           if (apoClonedBtn) {
-            console.log(
-              '[sticky button] clicking APO cloned button to inject props'
-            )
+     
             apoClonedBtn.dispatchEvent(
               new MouseEvent('click', { bubbles: true, cancelable: true })
             )
@@ -1769,18 +1752,18 @@
 
           const form = document.getElementById('product-form')
           if (!form) return console.error('Sticky add: form not found')
-          console.log('[sticky button] form', form)
+
           const hiddenInputs = form.querySelectorAll(
             'input[type="hidden"][name^="properties["]'
           )
-          console.log('[sticky button] hiddenInputs', hiddenInputs)
+
           const apoProps = {}
           hiddenInputs.forEach(input => {
             const name = input.getAttribute('name') || ''
             const key = name.slice('properties['.length, -1)
             apoProps[key] = input.value
           })
-          console.log('[sticky button] apoProps', apoProps)
+
 
           const variantInput = form.querySelector('input[name="id"]')
           const variantId = variantInput ? variantInput.value : null
@@ -1802,10 +1785,7 @@
             typeof cartSheet._x_dataStack[0].addToCart === 'function' &&
             variantId
           ) {
-            console.log(
-              '[sticky button] calling cartSheet.addToCart with propsOverride',
-              apoProps
-            )
+
             await cartSheet._x_dataStack[0].addToCart(
               variantId,
               quantity,
@@ -1821,7 +1801,7 @@
             quantity: quantity,
             properties: apoProps,
           }
-          console.log('[sticky button] fallback payload', payload)
+
           const res = await fetch('/cart/add.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1841,6 +1821,12 @@
   "name": "Product",
   "settings": [
     {
+      "type": "text",
+      "id": "related_heading",
+      "label": "Related products heading",
+      "default": "Members Also Bought"
+    },
+    {
       "type": "checkbox",
       "id": "show_reviews",
       "label": "Show Customer Reviews",
@@ -1850,7 +1836,7 @@
       "type": "text",
       "id": "reviews_heading",
       "label": "Reviews Section Heading",
-      "default": "What our customers say"
+      "default": "What Kestrel customers are saying..."
     },
     {
       "type": "range",
