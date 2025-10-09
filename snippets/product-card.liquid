@@ -340,15 +340,13 @@
             const selectedVariant = this.variantsData.find(
               v => v.id === this.selectedVariant
             )
-            
-            console.log('Selected variant:', selectedVariant)
+          
             
             // If variant has a featured image, use it
             if (selectedVariant && selectedVariant.featured_image) {
               this.currentImage = selectedVariant.featured_image.src
-              console.log('Updated image to:', this.currentImage)
             } else {
-              console.log('No featured image for variant:', selectedVariant)
+             // No featured image, use the product's featured image
             }
           }
         },
