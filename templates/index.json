@@ -1,25 +1,121 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero-section": {
-      "type": "hero"
+      "type": "hero",
+      "settings": {
+        "height_percent": 55,
+        "autoplay_delay": 5000,
+        "scale_percent": 100,
+        "scale_radius": 16,
+        "show_text_overlay": true,
+        "slide_1_button_enable": true,
+        "slide_1_text_bg_enable": false,
+        "slide_1_text_bg_color": "#000000",
+        "slide_1_text_bg_opacity": 50,
+        "slide_1_text_shadow_strength": "soft",
+        "slide_1_text_shadow_blur": 6,
+        "slide_1_text_color": "#ffffff",
+        "slide_1_button_bg_color": "#2563eb",
+        "slide_1_button_text_color": "#ffffff",
+        "slide_1_image": "shopify://shop_images/Miller-Kestrel-Knives-1632.webp",
+        "slide_1_image_fit": "cover",
+        "slide_1_image_position": "bottom",
+        "slide_1_image_zoom": 100,
+        "slide_1_title": "Premium Knives",
+        "slide_1_subtitle": "Crafted with precision, designed for perfection",
+        "slide_1_button_text": "Shop Now",
+        "slide_1_button_url": "",
+        "slide_2_button_enable": true,
+        "slide_2_text_bg_enable": false,
+        "slide_2_text_bg_color": "#000000",
+        "slide_2_text_bg_opacity": 50,
+        "slide_2_text_shadow_strength": "soft",
+        "slide_2_text_shadow_blur": 6,
+        "slide_2_text_color": "#000000",
+        "slide_2_button_bg_color": "#2563eb",
+        "slide_2_button_text_color": "#ffffff",
+        "slide_2_image": "shopify://shop_images/Screenshot_2025-09-24_at_21.03.12.png",
+        "slide_2_image_fit": "cover",
+        "slide_2_image_position": "center",
+        "slide_2_image_zoom": 100,
+        "slide_2_title": "Professional Grade",
+        "slide_2_subtitle": "Tools that professionals trust",
+        "slide_2_button_text": "Explore Collection",
+        "slide_2_button_url": "",
+        "slide_3_button_enable": true,
+        "slide_3_text_bg_enable": false,
+        "slide_3_text_bg_color": "#000000",
+        "slide_3_text_bg_opacity": 50,
+        "slide_3_text_shadow_strength": "soft",
+        "slide_3_text_shadow_blur": 6,
+        "slide_3_text_color": "#ffffff",
+        "slide_3_button_bg_color": "#2563eb",
+        "slide_3_button_text_color": "#ffffff",
+        "slide_3_image": "shopify://shop_images/WhatsApp_Image_2025-09-08_at_10.08.32_5abe98f5_fd685018-0ef9-4de8-b234-95db4e386618.webp",
+        "slide_3_image_fit": "cover",
+        "slide_3_image_position": "center",
+        "slide_3_image_zoom": 100,
+        "slide_3_title": "Handcrafted Excellence",
+        "slide_3_subtitle": "Every piece tells a story of craftsmanship",
+        "slide_3_button_text": "Learn More",
+        "slide_3_button_url": ""
+      }
     },
     "featured-collection": {
       "type": "featured-collection",
       "settings": {
-        "featured_collection": "all"
+        "title": "Featured Collection",
+        "featured_collection": "featured",
+        "number_of_products_to_show": 3
       }
     },
     "index-section-2": {
-      "type": "index-section-2"
+      "type": "index-section-2",
+      "settings": {
+        "title": "Premium Quality",
+        "subtitle": "Crafted with precision and passion",
+        "description": "Experience the difference that quality craftsmanship makes. Our products are designed to exceed your expectations and stand the test of time.",
+        "image": "shopify://shop_images/3K9A5033.webp",
+        "button_text": "Explore Collection",
+        "button_url": ""
+      }
     },
     "big-timer": {
       "type": "big-timer",
       "settings": {
-        "show_timer": true
+        "show_timer": true,
+        "header_text": "SIGN UP TO GET NOTIFICATIONS FOR OUR",
+        "main_title": "NEXT BLADE DROP:",
+        "slogan": "Working Knives For Working People.",
+        "button_text": "NOTIFY ME",
+        "target_date": "2024-12-31T23:59:59",
+        "form_title": "Get Notified",
+        "form_subtitle": "Enter your email to be notified when we launch",
+        "success_title": "You're on the list!",
+        "success_subtitle": "We'll notify you when we launch",
+        "success_message": "Thanks for signing up!",
+        "success_button_color": "bg-black"
       }
     },
     "index-section-1": {
-      "type": "index-section-1"
+      "type": "index-section-1",
+      "settings": {
+        "title": "Welcome to Our Store",
+        "subtitle": "Discover premium quality products",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "image": "shopify://shop_images/5DM49812-EDIT.webp",
+        "button_text": "Learn More",
+        "button_url": ""
+      }
     }
   },
   "order": [
