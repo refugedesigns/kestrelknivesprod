@@ -686,6 +686,8 @@
   </section>
 {% endif %}
 
+<!-- Start of Judge.me code --><div style='clear:both'></div><div id='judgeme_product_reviews' class='jdgm-widget jdgm-review-widget' data-product-title='{{ product.title | escape }}' data-id='{{ product.id }}' data-auto-install='false'>{{ product.metafields.judgeme.widget }}</div><!-- End of Judge.me code -->
+
 <!-- Anchor for inserting related products after all product content -->
 <div id='related-insert-anchor'></div>
 
@@ -749,6 +751,11 @@
           
           // Generate HTML for each product as swiper-slide
           products.forEach(product => {
+            const isApparel = String(product.product_type || product.type || '').toLowerCase().includes('apparel');
+            const actionButton = isApparel
+              ? `<button onclick="openRelatedProductQuickView('${product.handle}')" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0">QUICK VIEW</button>`
+              : `<button onclick="addRelatedProductToCart('${product.handle}', '${product.url}')" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0">ADD TO CART</button>`;
+
             const productSlide = `
               <swiper-slide style="height: 100%;">
                 <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 h-full flex flex-col">
@@ -776,12 +783,7 @@
                         </span>
                       </div>
                     </div>
-                    <button
-                      onclick="addRelatedProductToCart('${product.handle}', '${product.url}')"
-                      class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0"
-                    >
-                      ADD TO CART
-                    </button>
+                    ${actionButton}
                   </div>
                 </div>
               </swiper-slide>
@@ -854,8 +856,232 @@
       alert('Failed to add item to cart. Please try again.');
     }
   };
+
+  // Open Quick View for related apparel by handle
+  window.openRelatedProductQuickView = async function(handle) {
+    try {
+      const root = document.querySelector('[x-data*="relatedQuickView"]');
+      if (root && root._x_dataStack && root._x_dataStack[0] && typeof root._x_dataStack[0].open === 'function') {
+        await root._x_dataStack[0].open(handle);
+      } else {
+        // Fallback: navigate to product page
+        window.location.href = `/products/${handle}`;
+      }
+    } catch (e) {
+      window.location.href = `/products/${handle}`;
+    }
+  }
 </script>
 
+<!-- Related Quick View Drawer -->
+<div x-data='relatedQuickView()' x-cloak>
+  <div x-show='openState' class='fixed inset-0 z-50' style='display:none;'
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0">
+    <div class='absolute inset-0 bg-black/50' @click='close'></div>
+    <div x-ref='rqvPanel' class='absolute right-0 top-0 h-full w-full max-w-lg bg-white shadow-xl flex flex-col transform transition-transform duration-300'
+      :class="openState ? 'translate-x-0' : 'translate-x-full'">
+      <div class='flex items-center justify-between p-5 border-b border-gray-200'>
+        <h3 class='text-lg font-semibold'>Select options</h3>
+        <button @click='close' class='text-gray-500 hover:text-gray-700 text-2xl leading-none'>×</button>
+      </div>
+      <div class='p-6 flex-1 overflow-y-auto' x-show='loaded'>
+        <div class='flex items-start space-x-6'>
+          <img :src='image' alt='' width='160' height='160' class='w-40 h-40 object-cover'>
+          <div class='min-w-0'>
+            <p class='text-gray-900 uppercase text-lg truncate' x-text='product?.title || ""'></p>
+            <p class='text-base mt-2' x-text='formattedPrice'></p>
+          </div>
+        </div>
+
+        <template x-if='(optionNames && optionNames.length) || (variants && variants.length)'>
+          <div>
+            <!-- Option 1 -->
+            <div class='mt-6' x-show='uniqueOptionValues(1).length'>
+              <p class='text-xs font-semibold text-gray-700 mb-2 uppercase' x-text='(optionNames[0] || "Option 1") + ":"'></p>
+              <div class='flex flex-wrap gap-3' x-show='isColorOption(1)'>
+                <template x-for='val in uniqueOptionValues(1)' :key='`c1-${val}`'>
+                  <button @click='sel1 = val; updateSelectedVariant()' :title='val' :class="'w-12 h-12 rounded-md border overflow-hidden ' + (sel1 === val ? 'ring-2 ring-black' : '')">
+                    <img :src='imageForOptionValue(1,val)' alt='' width='48' height='48' class='w-full h-full object-cover'>
+                  </button>
+                </template>
+              </div>
+              <div class='flex flex-wrap gap-2' x-show='!isColorOption(1)'>
+                <template x-for='val in uniqueOptionValues(1)' :key='`t1-${val}`'>
+                  <button @click='sel1 = val; updateSelectedVariant()' :class="(sel1 === val ? 'ring-2 ring-black ' : '') + 'px-4 py-3 border rounded-md text-sm'">
+                    <span x-text='val'></span>
+                  </button>
+                </template>
+              </div>
+            </div>
+
+            <!-- Option 2 (if present) -->
+            <div class='mt-6' x-show='uniqueOptionValues(2).length'>
+              <p class='text-xs font-semibold text-gray-700 mb-2 uppercase' x-text='(optionNames[1] || "Option 2") + ":"'></p>
+              <div class='flex flex-wrap gap-3' x-show='isColorOption(2)'>
+                <template x-for='val in uniqueOptionValues(2)' :key='`c2-${val}`'>
+                  <button @click='sel2 = val; updateSelectedVariant()' :disabled='!isComboAvailable(sel1, val)' :title='val' :class="'w-12 h-12 rounded-md border overflow-hidden ' + (sel2 === val ? 'ring-2 ring-black' : '') + (!isComboAvailable(sel1,val) ? ' opacity-40 cursor-not-allowed' : '')">
+                    <img :src='imageForOptionValue(2,val)' alt='' width='48' height='48' class='w-full h-full object-cover'>
+                  </button>
+                </template>
+              </div>
+              <div class='flex flex-wrap gap-2' x-show='!isColorOption(2)'>
+                <template x-for='val in uniqueOptionValues(2)' :key='`t2-${val}`'>
+                  <button @click='sel2 = val; updateSelectedVariant()' :disabled='!isComboAvailable(sel1, val)' :class="((sel2 === val ? 'ring-2 ring-black ' : '') + 'px-4 py-3 border rounded-md text-sm ') + (!isComboAvailable(sel1, val) ? 'opacity-40 cursor-not-allowed' : '')">
+                    <span x-text='val'></span>
+                  </button>
+                </template>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <div class='mt-8'>
+          <p class='text-xs font-semibold text-gray-700 mb-2 uppercase'>Quantity</p>
+          <div class='inline-flex items-center border'>
+            <button class='w-10 h-10 text-lg' @click='qty = Math.max(1, qty - 1)'>−</button>
+            <input type='number' min='1' x-model.number='qty' class='w-14 h-10 text-center outline-none border-none' />
+            <button class='w-10 h-10 text-lg' @click='qty = qty + 1'>+</button>
+          </div>
+        </div>
+
+        <div class='mt-6 space-y-3'>
+          <button @click='addToCart' class='w-full cursor-pointer bg-black text-white font-bold py-4 text-base hover:bg-gray-900'>Add to Cart</button>
+          <a :href="product ? ('/products/' + product.handle) : '#'" class='block text-center underline text-gray-700 hover:text-gray-900'>View details</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function relatedQuickView() {
+    return {
+      openState: false,
+      loaded: false,
+      product: null,
+      variants: [],
+      optionNames: [],
+      sel1: null,
+      sel2: null,
+      selectedVariantId: null,
+      qty: 1,
+      image: null,
+      get formattedPrice() {
+        const v = this.variants.find(v => v.id === this.selectedVariantId) || this.variants[0]
+        if (!v) return ''
+        try {
+          return new Intl.NumberFormat('{{ shop.locale }}', { style: 'currency', currency: '{{ shop.currency }}' }).format(v.price/100)
+        } catch(e) { return (v.price/100).toFixed(2) }
+      },
+      async open(handle) {
+        this.openState = true
+        this.loaded = false
+        this.product = null
+        this.variants = []
+        this.optionNames = []
+        this.sel1 = null
+        this.sel2 = null
+        this.selectedVariantId = null
+        this.qty = 1
+        this.image = null
+        try {
+          const res = await fetch(`/products/${handle}.js`)
+          const data = await res.json()
+          this.product = data
+          this.variants = data.variants || []
+          try {
+            const opts = Array.isArray(data.options) ? data.options : []
+            this.optionNames = opts.map(o => (typeof o === 'string' ? o : (o && o.name) || ''))
+          } catch(e) { this.optionNames = [] }
+          const first = this.variants.find(v => v.available) || this.variants[0]
+          this.selectedVariantId = first ? first.id : null
+          this.sel1 = first ? first.option1 : null
+          this.sel2 = first ? first.option2 : null
+          this.image = (first && first.featured_image && (first.featured_image.src || first.featured_image)) || data.featured_image || (data.images && data.images[0]) || null
+          this.loaded = true
+        } catch(e) {
+          console.error('Quick view load failed', e)
+        }
+      },
+      close() {
+        const panel = this.$refs && this.$refs.rqvPanel
+        if (panel) {
+          panel.classList.add('translate-x-full')
+          const done = () => { this.openState = false }
+          const onEnd = (e) => {
+            if (e && e.target !== panel) return
+            panel.removeEventListener('transitionend', onEnd)
+            done()
+          }
+          panel.addEventListener('transitionend', onEnd)
+          setTimeout(() => { try { panel.removeEventListener('transitionend', onEnd) } catch(_) {} ; done() }, 320)
+        } else {
+          this.openState = false
+        }
+      },
+      uniqueOptionValues(index) {
+        const key = index === 1 ? 'option1' : 'option2'
+        const values = new Set()
+        ;(this.variants || []).forEach(v => {
+          const val = v[key]
+          if (val) values.add(String(val))
+        })
+        return Array.from(values)
+      },
+      isColorOption(index) {
+        try {
+          const name = String((this.optionNames && this.optionNames[index-1]) || '').toLowerCase()
+          return ['color','colour','shade','finish'].some(k => name.includes(k))
+        } catch (e) { return false }
+      },
+      imageForOptionValue(index, val) {
+        const key = index === 1 ? 'option1' : 'option2'
+        const variantWithImage = (this.variants || []).find(v => String(v[key]||'') === String(val) && v.featured_image && (v.featured_image.src || v.featured_image))
+        if (variantWithImage) return variantWithImage.featured_image.src || variantWithImage.featured_image
+        return this.image
+      },
+      isComboAvailable(val1, val2) {
+        return !!(this.variants || []).find(v => {
+          const ok1 = val1 ? String(v.option1 || '') === String(val1) : true
+          const ok2 = val2 ? String(v.option2 || '') === String(val2) : true
+          return ok1 && ok2
+        })
+      },
+      updateSelectedVariant() {
+        const match = (this.variants || []).find(v => {
+          const ok1 = this.sel1 ? String(v.option1 || '') === String(this.sel1) : true
+          const ok2 = this.sel2 ? String(v.option2 || '') === String(this.sel2) : true
+          return ok1 && ok2
+        })
+        if (match) {
+          this.selectedVariantId = match.id
+          if (match.featured_image && (match.featured_image.src || match.featured_image)) {
+            this.image = match.featured_image.src || match.featured_image
+          }
+        }
+      },
+      async addToCart() {
+        try {
+          const cartSheet = document.querySelector('[x-data*="cartSheet"]')
+          if (cartSheet && cartSheet._x_dataStack && cartSheet._x_dataStack[0]) {
+            await cartSheet._x_dataStack[0].addToCart(this.selectedVariantId, this.qty)
+          } else {
+            await fetch('/cart/add.js', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: this.selectedVariantId, quantity: this.qty }) })
+          }
+          this.close()
+          window.dispatchEvent(new CustomEvent('open-cart'))
+        } catch(e) {
+          console.error('Quick view addToCart failed', e)
+        }
+      }
+    }
+  }
+</script>
 {% comment %}
   <!-- Reviews Section -->
   <div class='mt-12'>

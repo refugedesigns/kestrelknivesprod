@@ -12,7 +12,7 @@
         @click='toggleFilter("productType")'
         class='flex items-center justify-between w-full text-left font-semibold text-gray-900 mb-3'
       >
-        <span>PRODUCT TYPE</span>
+        <span>Product Type</span>
         <svg
           class='w-4 h-4 transition-transform duration-200'
           :class="filtersOpen.productType ? 'rotate-180' : ''"
@@ -25,7 +25,7 @@
       </button>
 
       <div x-show='filtersOpen.productType' class='space-y-2'>
-        <!-- ALL option -->
+        <!-- All option -->
         <label class='flex items-center space-x-2 cursor-pointer'>
           <input
             type='radio'
@@ -35,7 +35,7 @@
             @change='applyFilters(true)'
             class='border-gray-300 text-black focus:ring-gray-900'
           >
-          <span class='text-sm text-gray-700'>ALL</span>
+          <span class='text-sm text-gray-700'>All</span>
         </label>
 
         <template x-for='t in productTypes' :key='t.value'>
@@ -50,7 +50,7 @@
             >
             <span
               class='text-sm text-gray-700'
-              x-text='t.value.toUpperCase()'
+              x-text='titleCase(t.value)'
             ></span>
           </label>
         </template>
@@ -63,7 +63,7 @@
         @click='toggleFilter("availability")'
         class='flex items-center justify-between w-full text-left font-semibold text-gray-900 mb-3'
       >
-        <span>AVAILABILITY</span>
+        <span>Availability</span>
         <svg
           class='w-4 h-4 transition-transform duration-200'
           :class="filtersOpen.availability ? 'rotate-180' : ''"
@@ -76,7 +76,7 @@
       </button>
 
       <div x-show='filtersOpen.availability' class='space-y-2'>
-        <!-- ALL option -->
+        <!-- All option -->
         <label class='flex items-center space-x-2 cursor-pointer'>
           <input
             type='radio'
@@ -86,7 +86,7 @@
             @change='applyFilters()'
             class='border-gray-300 text-black focus:ring-gray-900'
           >
-          <span class='text-sm text-gray-700'>ALL</span>
+          <span class='text-sm text-gray-700'>All</span>
         </label>
         <label class='flex items-center space-x-2 cursor-pointer'>
           <input
@@ -98,7 +98,7 @@
             class='border-gray-300 text-black focus:ring-gray-900'
           >
           <span class='text-sm text-gray-700'
-            >In stock (<span x-text='inStockCount'></span>)</span
+            >In Stock (<span x-text='inStockCount'></span>)</span
           >
         </label>
         <label class='flex items-center space-x-2 cursor-pointer'>
@@ -111,7 +111,7 @@
             class='border-gray-300 text-black focus:ring-gray-900'
           >
           <span class='text-sm text-gray-700'
-            >Out of stock (<span x-text='outOfStockCount'></span>)</span
+            >Out Of Stock (<span x-text='outOfStockCount'></span>)</span
           >
         </label>
       </div>
@@ -166,6 +166,15 @@
 <script>
   document.addEventListener('alpine:init', () => {
     Alpine.data('collectionFilters', () => ({
+      titleCase(str) {
+        try {
+          return String(str || '')
+            .toLowerCase()
+            .split(/\s+/)
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ')
+        } catch (e) { return str }
+      },
       filtersOpen: {
         productType: true,
         availability: true,
@@ -189,29 +198,48 @@
         this.isInitializing = false
       },
 
-      // Fetch full product type facets from /collections/all via Section Rendering API
+      // Fetch full product type facets from /collections/all via a lightweight JSON view
       async fetchAllProductTypesFromAllCollection() {
         try {
-          const res = await fetch('/collections/all?sections=template-collection', { credentials: 'same-origin' })
+          const loc = new URL(window.location.href)
+          const preview = loc.searchParams.get('preview_theme_id')
+          const fetchUrl = preview
+            ? `/collections/all?view=filter-meta&preview_theme_id=${encodeURIComponent(preview)}`
+            : '/collections/all?view=filter-meta'
+          const res = await fetch(fetchUrl, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
           if (!res.ok) return []
-          const data = await res.json()
-          const html = data && data['template-collection'] ? String(data['template-collection']) : ''
-          if (!html) return []
-          // Extract the JSON block embedded by id
-          const marker = 'id=\"kk-filter-meta\"'
-          const idx = html.indexOf(marker)
-          if (idx === -1) return []
-          // Find script tag boundaries
-          const startTag = html.lastIndexOf('<script', idx)
-          const endTag = html.indexOf('</scr' + 'ipt>', idx)
-          if (startTag === -1 || endTag === -1) return []
-          const scriptContent = html.substring(html.indexOf('>', startTag) + 1, endTag)
-          const parsed = JSON.parse(scriptContent)
+          const text = await res.text()
+          const parsed = JSON.parse(text || '{}')
+          console.log(parsed)
           const arr = (parsed && parsed.productTypes) || []
-          // Normalize structure
-          return arr
-            .map(it => ({ value: String(it.value || ''), count: Number(it.count || 0) }))
-            .filter(it => it.value && it.value.toLowerCase() !== 'custom')
+          if (arr && arr.length) {
+            return arr
+              .map(it => ({ value: String(it.value || ''), count: Number(it.count || 0) }))
+              .filter(it => it.value)
+          }
+          // Fallback: fetch list of collections and map to product types heuristically
+          const url2 = preview
+            ? `/collections?view=filter-meta&preview_theme_id=${encodeURIComponent(preview)}`
+            : '/collections?view=filter-meta'
+          const res2 = await fetch(url2, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+          if (!res2.ok) return []
+          const text2 = await res2.text()
+          const parsed2 = JSON.parse(text2 || '{}')
+          const colls = (parsed2 && parsed2.collections) || []
+          // Convert collections to product types by title
+          const HIDE_HANDLES = ['all','frontpage','products','featured','home','home-page','homepage']
+          const HIDE_TITLES = ['featured','home page','products']
+          return colls
+            .filter(c => {
+              const h = String(c.handle || '').toLowerCase()
+              const t = String(c.title || '').toLowerCase()
+              if (!h && !t) return false
+              if (HIDE_HANDLES.includes(h)) return false
+              if (HIDE_TITLES.includes(t)) return false
+              return true
+            })
+            .map(c => ({ value: String(c.title || ''), count: 0 }))
+            .filter(it => it.value)
         } catch (e) {
           return []
         }
@@ -222,7 +250,8 @@
         try {
           const cached = sessionStorage.getItem('kk_allProductTypes')
           const cachedTypes = cached ? JSON.parse(cached) : null
-          if (cachedTypes && cachedTypes.length) return cachedTypes
+          // If cache exists but is suspiciously small (e.g., 0 or 1), refetch to ensure full list
+          if (cachedTypes && cachedTypes.length >= 2) return cachedTypes
           const fetched = await this.fetchAllProductTypesFromAllCollection()
           if (fetched && fetched.length) {
             sessionStorage.setItem('kk_allProductTypes', JSON.stringify(fetched))
@@ -244,7 +273,7 @@
             this.selectedFilters.productType = types
             // If URL has both Knives and Custom, select Knives (since Custom is hidden)
             const hasKnives = types.some(t => t.toLowerCase() === 'knives')
-            const hasCustom = types.some(t => t.toLowerCase() === 'custom')
+            const hasCustom = types.some(t => t.toLowerCase() === 'Custom')
             
             if (hasKnives && hasCustom) {
               // Both present, select Knives
@@ -282,15 +311,17 @@
                   .replace(/[^a-z0-9]+/g, '-')
                   .replace(/^-+|-+$/g, '')
 
-              // Helper to match singular/plural variations
+              // Helper to match collection handle to product type value
               const matchesHandle = (typeValue, handle) => {
                 const typeHandle = toHandle(typeValue)
                 // Direct match
                 if (typeHandle === handle) return true
-                // Plural match (handle ends with 's')
-                if (handle.endsWith('s') && typeHandle === handle.slice(0, -1)) return true
-                // Singular match (typeHandle ends with 's')
+                // Plural/singular swap
+                if (handle.endsWith('s') && typeHandle === handle.slice(0, 1) + handle.slice(1, -1)) return true
                 if (typeHandle.endsWith('s') && handle === typeHandle.slice(0, -1)) return true
+                // Suffix match: allow collection handle being a suffix of the type handle
+                // e.g., handle "knives" should match "ultralight-knives"
+                if (typeHandle.endsWith('-' + handle)) return true
                 return false
               }
 
@@ -306,7 +337,7 @@
                   // Redirect to add both Knives and custom filters
                   const newUrl = new URL(window.location.href)
                   newUrl.searchParams.append('filter.p.product_type', matchType.value)
-                  newUrl.searchParams.append('filter.p.product_type', 'custom')
+                  newUrl.searchParams.append('filter.p.product_type', 'Custom')
                   if (newUrl.toString() !== window.location.href) {
                     window.location.href = newUrl.toString()
                     return
@@ -419,7 +450,7 @@
           url.searchParams.append('filter.p.product_type', selected)
           // When Knives is selected, also include custom products
           if (selected.toLowerCase() === 'knives') {
-            url.searchParams.append('filter.p.product_type', 'custom')
+            url.searchParams.append('filter.p.product_type', 'Custom')
           }
         }
 

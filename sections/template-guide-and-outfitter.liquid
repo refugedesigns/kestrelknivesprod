@@ -1,7 +1,7 @@
 <div class='max-w-4xl mx-auto py-12 md:py-16'>
   <!-- Page Header -->
   <div class='text-center mb-12 border-b border-gray-200 pb-8'>
-    <h1 class='text-3xl md:text-4xl font-bold text-gray-900 mb-4'>
+    <h1 id='guide-outfitter-header' class='text-3xl md:text-4xl font-bold text-gray-900 mb-4'>
       Guide and Outfitter Application
     </h1>
     <p class='text-gray-700 text-lg'>
@@ -31,7 +31,7 @@
           </ul>
         </div>
       {% elsif form.posted_successfully? %}
-        <div class='border border-green-300 bg-green-50 p-4 mb-6 rounded'>
+        <div id='guide-success' class='border border-green-300 bg-green-50 p-4 mb-6 rounded'>
           <div class='flex items-center'>
             <div class='text-green-500 mr-2'>
               <svg class='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
@@ -44,6 +44,16 @@
             </div>
           </div>
         </div>
+        <script>
+          window.addEventListener('load', function () {
+            var header = document.getElementById('guide-outfitter-header')
+            if (header && typeof header.scrollIntoView === 'function') {
+              header.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            } else {
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            }
+          })
+        </script>
       {% endif %}
 
       <!-- Hidden field for email subject -->

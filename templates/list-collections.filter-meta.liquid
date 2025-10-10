@@ -1,0 +1,12 @@
+{% layout none %}
+{"collections":[
+{% paginate collections by 250 %}
+  {% for c in collections %}
+    {% unless c.handle == 'all' %}
+      {"handle":{{ c.handle | json }},"title":{{ c.title | json }}}{% if forloop.last and paginate.current_page == paginate.pages %}{% else %},{% endif %}
+    {% endunless %}
+  {% endfor %}
+{% endpaginate %}
+]}
+
+

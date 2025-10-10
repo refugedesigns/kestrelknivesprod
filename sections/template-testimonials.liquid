@@ -20,6 +20,26 @@
       "id": "carousel_title",
       "label": "Carousel Title",
       "default": "Product Reviews"
+    },
+    {
+      "type": "range",
+      "id": "mobile_columns",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "Mobile columns",
+      "default": 1,
+      "info": "Number of testimonials per row on mobile"
+    },
+    {
+      "type": "range",
+      "id": "desktop_columns",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Desktop columns",
+      "default": 3,
+      "info": "Number of testimonials per row on desktop"
     }
   ],
   "blocks": [
@@ -41,6 +61,30 @@
           "type": "image_picker",
           "id": "author_image",
           "label": "Author photo"
+        },
+        {
+          "type": "select",
+          "id": "object_fit",
+          "label": "Image object-fit",
+          "default": "cover",
+          "options": [
+            { "value": "cover", "label": "Cover" },
+            { "value": "contain", "label": "Contain" },
+            { "value": "fill", "label": "Fill (stretch)" },
+            { "value": "none", "label": "None" },
+            { "value": "scale-down", "label": "Scale down" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "object_position",
+          "label": "Image position",
+          "default": "center",
+          "options": [
+            { "value": "top", "label": "Top" },
+            { "value": "center", "label": "Center" },
+            { "value": "bottom", "label": "Bottom" }
+          ]
         }
       ]
     }
@@ -64,23 +108,47 @@
 
     <!-- First 6 Testimonials -->
     {% assign first_six = section.blocks | slice: 0, 6 %}
-    <div
-      class='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-    >
+    {% assign mobile_cols = section.settings.mobile_columns | default: 1 %}
+    {% assign desktop_cols = section.settings.desktop_columns | default: 3 %}
+    <style>
+      .testimonials-grid-first {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: repeat({{ mobile_cols }}, minmax(0, 1fr));
+      }
+      @media (min-width: 768px) {
+        .testimonials-grid-first {
+          grid-template-columns: repeat({{ desktop_cols }}, minmax(0, 1fr));
+        }
+      }
+    </style>
+    <div class='testimonials-grid-first'>
       {% for block in first_six %}
         <div
           class='relative h-[40rem] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer'
           data-quote='{{ block.settings.quote | strip_newlines | escape }}'
           data-author='{{ block.settings.author | escape }}'
           data-image='{% if block.settings.author_image %}{{ block.settings.author_image | image_url: width: 2000 | escape }}{% endif %}'
-          onclick='(function(el){window.dispatchEvent(new CustomEvent("open-testimonial",{detail:{quote:el.getAttribute("data-quote"),author:el.getAttribute("data-author"),author_image:el.getAttribute("data-image")||null}}))})(this)'
+          data-fit='{{ block.settings.object_fit | default: "cover" }}'
+          data-pos='{{ block.settings.object_position | default: "center" }}'
+          onclick='(function(el){window.dispatchEvent(new CustomEvent("open-testimonial",{detail:{quote:el.getAttribute("data-quote"),author:el.getAttribute("data-author"),author_image:el.getAttribute("data-image")||null,object_fit:el.getAttribute("data-fit")||"cover",object_position:el.getAttribute("data-pos")||"center"}}))})(this)'
         >
           <!-- Background Image -->
           {% if block.settings.author_image %}
+            {% assign fit = block.settings.object_fit | default: 'cover' %}
+            {% assign pos = block.settings.object_position | default: 'center' %}
+            {% assign pos_map = 'top:50%_0%,center:50%_50%,bottom:50%_100%' | split: ',' %}
+            {% assign pos_css = '50%_50%' %}
+            {% for pair in pos_map %}
+              {% assign kv = pair | split: ':' %}
+              {% if kv[0] == pos %}{% assign pos_css = kv[1] %}{% endif %}
+            {% endfor %}
             <img
               src='{{ block.settings.author_image | image_url: width: 400 }}'
               alt='Photo of {{ block.settings.author }}'
-              class='w-full h-full object-cover object-[50%_50%]'
+              width='400'
+              height='400'
+              style='width:100%;height:100%;object-fit:{{ fit }};object-position:{{ pos_css | replace: "_", " " }};'
             >
           {% else %}
             <div class='w-full h-full bg-gray-300 flex items-center justify-center'>
@@ -138,8 +206,10 @@
                       <div class='w-full md:w-1/2 relative h-48 md:h-full'>
                         {% if product.featured_image %}
                           <img
-                            src='{{ product.featured_image | img_url: "400x400" }}'
+                            src='{{ product.featured_image | image_url: width: 400 }}'
                             alt='{{ product.title }}'
+                            width='400'
+                            height='400'
                             class='w-full h-full object-cover'
                           >
                         {% else %}
@@ -566,7 +636,19 @@
         | slice: 6, section.blocks.size
       %}
       <div class='mt-8'>
-        <div class='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+        <style>
+          .testimonials-grid-remaining {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat({{ mobile_cols }}, minmax(0, 1fr));
+          }
+          @media (min-width: 768px) {
+            .testimonials-grid-remaining {
+              grid-template-columns: repeat({{ desktop_cols }}, minmax(0, 1fr));
+            }
+          }
+        </style>
+        <div class='testimonials-grid-remaining'>
           {% for block in remaining_blocks %}
             <div
               class='relative h-[40rem] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer'
@@ -577,10 +659,20 @@
             >
               <!-- Background Image -->
               {% if block.settings.author_image %}
+                {% assign fit = block.settings.object_fit | default: 'cover' %}
+                {% assign pos = block.settings.object_position | default: 'center' %}
+                {% assign pos_map = 'top:50%_0%,center:50%_50%,bottom:50%_100%' | split: ',' %}
+                {% assign pos_css = '50%_50%' %}
+                {% for pair in pos_map %}
+                  {% assign kv = pair | split: ':' %}
+                  {% if kv[0] == pos %}{% assign pos_css = kv[1] %}{% endif %}
+                {% endfor %}
                 <img
                   src='{{ block.settings.author_image | image_url: width: 400 }}'
                   alt='Photo of {{ block.settings.author }}'
-                  class='w-full h-full object-cover object-[50%_50%]'
+                  width='400'
+                  height='400'
+                  style='width:100%;height:100%;object-fit:{{ fit }};object-position:{{ pos_css | replace: "_", " " }};'
                 >
               {% else %}
                 <div class='w-full h-full bg-gray-300 flex items-center justify-center'>
@@ -638,8 +730,10 @@
                       <div class='w-full md:w-1/2 relative h-48 md:h-full'>
                         {% if product.featured_image %}
                           <img
-                            src='{{ product.featured_image | img_url: "400x400" }}'
+                            src='{{ product.featured_image | image_url: width: 400 }}'
                             alt='{{ product.title }}'
+                            width='400'
+                            height='400'
                             class='w-full h-full object-cover'
                           >
                         {% else %}
@@ -938,7 +1032,9 @@
           <img
             :src='selectedTestimonial.author_image'
             :alt='`Photo of ${selectedTestimonial.author}`'
-            class='w-full h-full object-cover object-top'
+            width='1200'
+            height='800'
+            :style='`width:100%;height:100%;object-fit:${selectedTestimonial.object_fit||"cover"};object-position:${(selectedTestimonial.object_position||"center")==="top"?"50% 0%":(selectedTestimonial.object_position||"center")==="bottom"?"50% 100%":"50% 50%"};`'
           >
         </template>
         <template x-if='!selectedTestimonial || !selectedTestimonial.author_image'>

@@ -12,7 +12,7 @@
   {% endcomment %}
 
   {% paginate collection.products by section.settings.number_of_products_per_page | default: 9 %}
-    <h1 class='text-3xl font-bold text-center mb-8'>{{ collection.title }}</h1>
+    <h1 class='text-3xl font-bold text-center mb-8' x-text='getPageTitle()'>{{ collection.title }}</h1>
 
     <div class='max-w-7xl mx-auto'>
       <div class='flex flex-col md:flex-row gap-8'>
@@ -119,6 +119,56 @@
           const { min, max } = e.detail || {}
           this.applyPriceFilter(min, max)
         })
+      },
+
+      toTitleCase(str) {
+        try {
+          return String(str || '')
+            .toLowerCase()
+            .split(/\s+/)
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ')
+        } catch (e) { return str }
+      },
+
+      getPageTitle() {
+        try {
+          const url = new URL(window.location.href)
+          const types = url.searchParams.getAll('filter.p.product_type').filter(Boolean)
+          if (types && types.length) {
+            const hasKnives = types.some(t => String(t).toLowerCase() === 'knives')
+            const selected = hasKnives ? types.find(t => String(t).toLowerCase() === 'knives') : types[0]
+            return this.toTitleCase(selected)
+          }
+
+          // No explicit filter param; attempt to infer from collection handle
+          const path = window.location.pathname || ''
+          const m = path.match(/\/collections\/([^\/]+)/)
+          const handle = m && m[1] ? decodeURIComponent(m[1]) : ''
+          if (handle && handle !== 'all') {
+            const toHandle = s => String(s||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')
+            const matchesHandle = (typeValue, h) => {
+              const th = toHandle(typeValue)
+              if (th === h) return true
+              if (h.endsWith('s') && th === h.slice(0, -1)) return true
+              if (th.endsWith('s') && h === th.slice(0, -1)) return true
+              if (th.endsWith('-' + h)) return true
+              return false
+            }
+            const filterComponent = document.querySelector('[x-data*="collectionFilters"]')
+            const typesArr = (filterComponent && filterComponent._x_dataStack && filterComponent._x_dataStack[0] && filterComponent._x_dataStack[0].productTypes) || []
+            const match = typesArr.find(t => matchesHandle(t.value, handle))
+            if (match && match.value) return this.toTitleCase(match.value)
+          }
+        } catch (e) { /* ignore */ }
+        // Fallbacks: show "All Products" on /collections/all, otherwise collection title
+        try {
+          const path = window.location.pathname || ''
+          const m = path.match(/\/collections\/([^\/]+)/)
+          const handle = m && m[1] ? decodeURIComponent(m[1]) : ''
+          if (!handle || handle === 'all') return 'All Products'
+        } catch (e) { /* ignore */ }
+        return '{{ collection.title }}'
       },
 
       applyFilters(filterData) {
