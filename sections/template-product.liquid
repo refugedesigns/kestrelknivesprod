@@ -1,4 +1,6 @@
 {% assign selected_variant = product.selected_or_first_available_variant %}
+{% assign kk_status_raw = product.metafields.custom.product_status %}
+{% assign product_status_text = kk_status_raw.value | default: kk_status_raw %}
 
 <style>
   /* Custom styles for enhanced functionality */
@@ -410,12 +412,12 @@
             <button
               id='addToCartBtn'
               type='submit'
-              class='w-full bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mb-6'
-              {% if selected_variant.available == false %}
-                disabled
-              {% endif %}
+              class='w-full uppercase bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mb-6 {% if product_status_text != blank or selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
+              {% if product_status_text != blank or selected_variant.available == false %}disabled{% endif %}
             >
-              {% if selected_variant.available == false %}
+              {% if product_status_text != blank %}
+                {{ product_status_text }}
+              {% elsif selected_variant.available == false %}
                 SOLD OUT
               {% else %}
                 ADD TO CART
@@ -495,9 +497,16 @@
         id='stickyAddToCartBtn'
         type='button'
         onclick='stickyAddToCart()'
-        class='bg-black hover:bg-gray-800 text-white cursor-pointer font-semibold py-2 px-4 md:py-3 md:px-6 text-sm md:text-base transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]'
+        class='bg-black uppercase hover:bg-gray-800 text-white cursor-pointer font-semibold py-2 px-4 md:py-3 md:px-6 text-sm md:text-base transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] {% if product_status_text != blank or selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
+        {% if product_status_text != blank or selected_variant.available == false %}disabled{% endif %}
       >
-        ADD TO CART
+        {% if product_status_text != blank %}
+          {{ product_status_text }}
+        {% elsif selected_variant.available == false %}
+          SOLD OUT
+        {% else %}
+          ADD TO CART
+        {% endif %}
       </button>
     </div>
   </div>
@@ -1488,15 +1497,43 @@
 
           updateAddToCartState(variant) {
             const btn = document.getElementById('addToCartBtn');
-            if (!btn) return;
-            if (!variant.available) {
-              btn.setAttribute('disabled','disabled');
-              btn.classList.add('opacity-50','cursor-not-allowed');
-              btn.innerText = 'SOLD OUT';
+            const sticky = document.getElementById('stickyAddToCartBtn');
+            if (!btn && !sticky) return;
+            const statusText = '{{ product_status_text | escape }}';
+            const hasStatus = statusText && statusText.trim().length > 0;
+            if (hasStatus) {
+              if (btn) {
+                btn.setAttribute('disabled','disabled');
+                btn.classList.add('opacity-50','cursor-not-allowed');
+                btn.innerText = statusText;
+              }
+              if (sticky) {
+                sticky.setAttribute('disabled','disabled');
+                sticky.classList.add('opacity-50','cursor-not-allowed');
+                sticky.textContent = statusText;
+              }
+            } else if (!variant.available) {
+              if (btn) {
+                btn.setAttribute('disabled','disabled');
+                btn.classList.add('opacity-50','cursor-not-allowed');
+                btn.innerText = 'SOLD OUT';
+              }
+              if (sticky) {
+                sticky.setAttribute('disabled','disabled');
+                sticky.classList.add('opacity-50','cursor-not-allowed');
+                sticky.textContent = 'SOLD OUT';
+              }
             } else {
-              btn.removeAttribute('disabled');
-              btn.classList.remove('opacity-50','cursor-not-allowed');
-              btn.innerText = 'ADD TO CART';
+              if (btn) {
+                btn.removeAttribute('disabled');
+                btn.classList.remove('opacity-50','cursor-not-allowed');
+                btn.innerText = 'ADD TO CART';
+              }
+              if (sticky) {
+                sticky.removeAttribute('disabled');
+                sticky.classList.remove('opacity-50','cursor-not-allowed');
+                sticky.textContent = 'ADD TO CART';
+              }
             }
           },
 
