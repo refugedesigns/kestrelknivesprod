@@ -251,7 +251,7 @@
                 <div class='flex flex-wrap gap-3' x-show='isColorOption(1)'>
                   <template x-for='val in uniqueOptionValues(1)' :key='`c1-${val}`'>
                     <button @click='qvOption1 = val; updateQVSelectedVariant()' :title='val' :class="'w-12 h-12 rounded-md border overflow-hidden ' + (qvOption1 === val ? 'ring-2 ring-black' : '')">
-                      <img :src='imageForOptionValue(1,val)' alt='' width='48' height='48' class='w-full h-full object-cover'>
+                      <img :src='imageForOptionValue(1,val)' alt='' width='48' height='48' class='w-full h-full object-contain'>
                     </button>
                   </template>
                 </div>
@@ -270,7 +270,7 @@
                 <div class='flex flex-wrap gap-3' x-show='isColorOption(2)'>
                   <template x-for='val in uniqueOptionValues(2)' :key='`c2-${val}`'>
                     <button @click='qvOption2 = val; updateQVSelectedVariant()' :disabled='!isComboAvailable(qvOption1, val)' :title='val' :class="'w-12 h-12 rounded-md border overflow-hidden ' + (qvOption2 === val ? 'ring-2 ring-black' : '') + (!isComboAvailable(qvOption1,val) ? ' opacity-40 cursor-not-allowed' : '')">
-                      <img :src='imageForOptionValue(2,val)' alt='' width='48' height='48' class='w-full h-full object-cover'>
+                      <img :src='imageForOptionValue(2,val)' alt='' width='48' height='48' class='w-full h-full object-contain'>
                     </button>
                   </template>
                 </div>
