@@ -22,6 +22,21 @@
       "default": "Product Reviews"
     },
     {
+      "type": "checkbox",
+      "id": "show_carousel_title",
+      "label": "Show carousel title",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "carousel_max_width",
+      "label": "Carousel max width (px)",
+      "min": 900,
+      "max": 1600,
+      "step": 50,
+      "default": 1200
+    },
+    {
       "type": "range",
       "id": "mobile_columns",
       "min": 1,
@@ -87,6 +102,17 @@
           ]
         }
       ]
+    },
+    {
+      "type": "carousel_review",
+      "name": "Carousel Review Slide",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Product/Image" },
+        { "type": "range", "id": "rating", "label": "Rating", "min": 1, "max": 5, "step": 1, "default": 5 },
+        { "type": "textarea", "id": "review_text", "label": "Review Text" },
+        { "type": "text", "id": "author", "label": "Author" },
+        { "type": "text", "id": "product_title", "label": "Product Title" }
+      ]
     }
   ],
   "presets": [
@@ -106,10 +132,10 @@
       </h2>
     </div>
 
-    <!-- First 6 Testimonials -->
-    {% assign first_six = section.blocks | slice: 0, 6 %}
+    <!-- First 6 Testimonials (only testimonial blocks) -->
     {% assign mobile_cols = section.settings.mobile_columns | default: 1 %}
     {% assign desktop_cols = section.settings.desktop_columns | default: 3 %}
+    {% assign break_count = desktop_cols | times: 2 %}
     <style>
       .testimonials-grid-first {
         display: grid;
@@ -123,7 +149,9 @@
       }
     </style>
     <div class='testimonials-grid-first'>
-      {% for block in first_six %}
+      {% assign rendered = 0 %}
+      {% for block in section.blocks %}
+        {% if block.type == 'testimonial' and rendered < break_count %}
         <div
           class='relative h-[40rem] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer'
           data-quote='{{ block.settings.quote | strip_newlines | escape }}'
@@ -169,15 +197,167 @@
             </cite>
           </div>
         </div>
+        {% assign rendered = rendered | plus: 1 %}
+        {% endif %}
       {% endfor %}
     </div>
 
-    <!-- Product Reviews Carousel (if enabled and more than 6 testimonials) -->
-    {% if section.settings.enable_carousel and section.blocks.size > 6 %}
-      <div class='mt-16'>
-        <h3 class='text-2xl font-bold text-gray-900 text-center mb-8'>
-          {{ section.settings.carousel_title }}
-        </h3>
+    {% if section.settings.enable_carousel %}
+      <div class='my-8' style='max-width: {{ section.settings.carousel_max_width | default: 1200 }}px; margin-left: auto; margin-right: auto;'>
+        {% if section.settings.show_carousel_title %}
+          <h3 class='text-2xl font-bold text-gray-900 text-center mb-4'>
+            {{ section.settings.carousel_title }}
+          </h3>
+        {% endif %}
+
+        <swiper-container
+          class='testimonials-carousel'
+          pagination='true'
+          pagination-clickable='true'
+          navigation='false'
+          space-between='20'
+          slides-per-view='1'
+          centered-slides='true'
+          autoplay='true'
+          autoplay-delay='5000'
+          autoplay-disable-on-interaction='false'
+          loop='false'
+        >
+          {% assign has_reviews = false %}
+          {% for product in collections.all.products %}
+            {% if product.reviews.size > 0 %}
+              {% assign has_reviews = true %}
+              {% for review in product.reviews %}
+                <swiper-slide>
+                  <div class='bg-white rounded-lg shadow-lg overflow-hidden' style='max-width: {{ section.settings.carousel_max_width | default: 1200 }}px; margin-left: auto; margin-right: auto;'>
+                    <div class='flex flex-col md:flex-row h-auto md:h-80'>
+                      <div class='w-full md:w-1/2 relative h-48 md:h-full'>
+                        {% if product.featured_image %}
+                          <img src='{{ product.featured_image | image_url: width: 400 }}' alt='{{ product.title }}' width='400' height='400' class='w-full h-full object-cover'>
+                        {% else %}
+                          <div class='w-full h-full bg-gray-200 flex items-center justify-center'><span class='text-gray-500'>No image</span></div>
+                        {% endif %}
+                      </div>
+                      <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
+                        <div class='flex items-center mb-3 md:mb-4'>
+                          <div class='flex text-yellow-400 mr-3'>
+                            {% for i in (1..5) %}
+                              {% if i <= review.rating %}
+                                <svg class='w-4 h-4 md:w-5 md:h-5 fill-current' viewBox='0 0 20 20'><path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/></svg>
+                              {% else %}
+                                <svg class='w-4 h-4 md:w-5 md:h-5 text-gray-300' viewBox='0 0 20 20'><path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/></svg>
+                              {% endif %}
+                            {% endfor %}
+                          </div>
+                          <span class='text-xs md:text-sm text-gray-600 font-medium'>{{- review.rating }}/5</span>
+                        </div>
+                        <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>"{{ review.content }}"</blockquote>
+                        <div class='flex items-center'>
+                          <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
+                            <span class='text-gray-600 font-semibold text-xs md:text-sm'>{{- review.author | slice: 0, 1 | upcase -}}</span>
+                          </div>
+                          <div>
+                            <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'>{{- review.author -}}</cite>
+                            <p class='text-xs md:text-sm text-gray-500'>{{ product.title }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </swiper-slide>
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+
+          {% unless has_reviews %}
+            {% assign manual_count = 0 %}
+            {% for block in section.blocks %}
+              {% if block.type == 'carousel_review' %}
+                {% assign manual_count = manual_count | plus: 1 %}
+                <swiper-slide>
+                  <div class='bg-white rounded-lg shadow-lg overflow-hidden' style='max-width: {{ section.settings.carousel_max_width | default: 1200 }}px; margin-left: auto; margin-right: auto;'>
+                    <div class='flex flex-col md:flex-row h-auto md:h-80'>
+                      <div class='w-full md:w-1/2 relative h-48 md:h-full'>
+                        {% if block.settings.image %}
+                          <img src='{{ block.settings.image | image_url: width: 400 }}' alt='{{ block.settings.product_title | default: block.settings.author }}' width='400' height='400' class='w-full h-full object-cover'>
+                        {% else %}
+                          <div class='w-full h-full bg-gray-200 flex items-center justify-center'><span class='text-gray-500'>No image</span></div>
+                        {% endif %}
+                      </div>
+                      <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
+                        <div class='flex items-center mb-3 md:mb-4'>
+                          <div class='flex text-yellow-400 mr-3'>
+                            {% for i in (1..5) %}
+                              {% if i <= block.settings.rating %}
+                                <svg class='w-4 h-4 md:w-5 md:h-5 fill-current' viewBox='0 0 20 20'><path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/></svg>
+                              {% else %}
+                                <svg class='w-4 h-4 md:w-5 md:h-5 text-gray-300' viewBox='0 0 20 20'><path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/></svg>
+                              {% endif %}
+                            {% endfor %}
+                          </div>
+                          <span class='text-xs md:text-sm text-gray-600 font-medium'>{{- block.settings.rating }}/5</span>
+                        </div>
+                        <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>"{{ block.settings.review_text }}"</blockquote>
+                        <div class='flex items-center'>
+                          <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
+                            <span class='text-gray-600 font-semibold text-xs md:text-sm'>{{- block.settings.author | slice: 0, 1 | upcase -}}</span>
+                          </div>
+                          <div>
+                            <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'>{{- block.settings.author -}}</cite>
+                            <p class='text-xs md:text-sm text-gray-500'>{{ block.settings.product_title }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </swiper-slide>
+              {% endif %}
+            {% endfor %}
+            {% if manual_count == 0 %}
+              <!-- Placeholder Review (no product reviews, no manual slides) -->
+              <swiper-slide>
+                <div class='bg-white rounded-lg shadow-lg overflow-hidden mx-auto max-w-5xl'>
+                  <div class='flex flex-col md:flex-row h-auto md:h-80'>
+                    <div class='w-full md:w-1/2 relative h-48 md:h-full'>
+                      {{ 'product-1' | placeholder_svg_tag: 'w-full h-full bg-gray-200 object-cover' }}
+                    </div>
+                    <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
+                      <div class='flex items-center mb-3 md:mb-4'>
+                        <div class='flex text-yellow-400 mr-3'>
+                          {% for i in (1..5) %}
+                            <svg class='w-4 h-4 md:w-5 md:h-5 fill-current' viewBox='0 0 20 20'><path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/></svg>
+                          {% endfor %}
+                        </div>
+                        <span class='text-xs md:text-sm text-gray-600 font-medium'>5/5</span>
+                      </div>
+                      <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>"Add your first review in the theme editor."</blockquote>
+                      <div class='flex items-center'>
+                        <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
+                          <span class='text-gray-600 font-semibold text-xs md:text-sm'>A</span>
+                        </div>
+                        <div>
+                          <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'>Anonymous</cite>
+                          <p class='text-xs md:text-sm text-gray-500'>Product Name</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </swiper-slide>
+            {% endif %}
+          {% endunless %}
+        </swiper-container>
+      </div>
+    {% endif %}
+
+    <!-- Product Reviews Carousel (disabled here; moved below grid to avoid gaps) -->
+    {% if false and section.settings.enable_carousel and section.blocks.size > 8 %}
+      <div class='mt-16' style='max-width: {{ section.settings.carousel_max_width | default: 1200 }}px; margin-left: auto; margin-right: auto;'>
+        {% if section.settings.show_carousel_title %}
+          <h3 class='text-2xl font-bold text-gray-900 text-center mb-8'>
+            {{ section.settings.carousel_title }}
+          </h3>
+        {% endif %}
 
         <!-- Swiper Carousel -->
         <swiper-container
@@ -199,68 +379,36 @@
               {% assign has_reviews = true %}
               {% for review in product.reviews %}
                 <swiper-slide>
-                  <div class='bg-white rounded-lg shadow-lg overflow-hidden mx-2'>
-                    <!-- Mobile: Stack vertically, Desktop: Side by side -->
+                  <div class='bg-white rounded-lg shadow-lg overflow-hidden' style='max-width: {{ section.settings.carousel_max_width | default: 1200 }}px; margin-left: auto; margin-right: auto;'>
                     <div class='flex flex-col md:flex-row h-auto md:h-80'>
-                      <!-- Product Image -->
                       <div class='w-full md:w-1/2 relative h-48 md:h-full'>
                         {% if product.featured_image %}
-                          <img
-                            src='{{ product.featured_image | image_url: width: 400 }}'
-                            alt='{{ product.title }}'
-                            width='400'
-                            height='400'
-                            class='w-full h-full object-cover'
-                          >
+                          <img src='{{ product.featured_image | image_url: width: 400 }}' alt='{{ product.title }}' width='400' height='400' class='w-full h-full object-cover'>
                         {% else %}
-                          <div class='w-full h-full bg-gray-200 flex items-center justify-center'>
-                            <span class='text-gray-500'>No image</span>
-                          </div>
+                          <div class='w-full h-full bg-gray-200 flex items-center justify-center'><span class='text-gray-500'>No image</span></div>
                         {% endif %}
                       </div>
-
-                      <!-- Review Content -->
                       <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
                         <div class='flex items-center mb-3 md:mb-4'>
                           <div class='flex text-yellow-400 mr-3'>
                             {% for i in (1..5) %}
                               {% if i <= review.rating %}
-                                <svg
-                                  class='w-4 h-4 md:w-5 md:h-5 fill-current'
-                                  viewBox='0 0 20 20'
-                                >
-                                  <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
-                                </svg>
+                                <svg class='w-4 h-4 md:w-5 md:h-5 fill-current' viewBox='0 0 20 20'><path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/></svg>
                               {% else %}
-                                <svg
-                                  class='w-4 h-4 md:w-5 md:h-5 text-gray-300'
-                                  viewBox='0 0 20 20'
-                                >
-                                  <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
-                                </svg>
+                                <svg class='w-4 h-4 md:w-5 md:h-5 text-gray-300' viewBox='0 0 20 20'><path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/></svg>
                               {% endif %}
                             {% endfor %}
                           </div>
-                          <span class='text-xs md:text-sm text-gray-600 font-medium'>
-                            {{- review.rating }}/5</span
-                          >
+                          <span class='text-xs md:text-sm text-gray-600 font-medium'>{{- review.rating }}/5</span>
                         </div>
-                        <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>
-                          "{{ review.content }}"
-                        </blockquote>
+                        <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>"{{ review.content }}"</blockquote>
                         <div class='flex items-center'>
                           <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
-                            <span class='text-gray-600 font-semibold text-xs md:text-sm'>
-                              {{- review.author | slice: 0, 1 | upcase -}}
-                            </span>
+                            <span class='text-gray-600 font-semibold text-xs md:text-sm'>{{- review.author | slice: 0, 1 | upcase -}}</span>
                           </div>
                           <div>
-                            <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'>
-                              {{- review.author -}}
-                            </cite>
-                            <p class='text-xs md:text-sm text-gray-500'>
-                              {{ product.title }}
-                            </p>
+                            <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'>{{- review.author -}}</cite>
+                            <p class='text-xs md:text-sm text-gray-500'>{{ product.title }}</p>
                           </div>
                         </div>
                       </div>
@@ -272,177 +420,83 @@
           {% endfor %}
 
           {% unless has_reviews %}
-            <swiper-slide>
-              <div class='bg-white rounded-lg shadow-lg overflow-hidden mx-2'>
-                <!-- Mobile: Stack vertically, Desktop: Side by side -->
-                <div class='flex flex-col md:flex-row h-auto md:h-80'>
-                  <!-- Product Image -->
-                  <div class='w-full md:w-1/2 relative h-48 md:h-full'>
-                    {{
-                      "product-1"
-                      | placeholder_svg_tag: "w-full h-full bg-gray-200 object-cover"
-                    }}
-                  </div>
-
-                  <!-- Review Content -->
-                  <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
-                    <div class='flex items-center mb-3 md:mb-4'>
-                      <div class='flex text-yellow-400 mr-3'>
-                        {% for i in (1..5) %}
-                          <svg
-                            class='w-4 h-4 md:w-5 md:h-5 fill-current'
-                            viewBox='0 0 20 20'
-                          >
-                            <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
-                          </svg>
-                        {% endfor %}
+            {% assign manual_count = 0 %}
+            {% for block in section.blocks %}
+              {% if block.type == 'carousel_review' %}
+                {% assign manual_count = manual_count | plus: 1 %}
+                <swiper-slide>
+                  <div class='bg-white rounded-lg shadow-lg overflow-hidden' style='max-width: {{ section.settings.carousel_max_width | default: 1200 }}px; margin-left: auto; margin-right: auto;'>
+                    <div class='flex flex-col md:flex-row h-auto md:h-80'>
+                      <div class='w-full md:w-1/2 relative h-48 md:h-full'>
+                        {% if block.settings.image %}
+                          <img src='{{ block.settings.image | image_url: width: 400 }}' alt='{{ block.settings.product_title | default: block.settings.author }}' width='400' height='400' class='w-full h-full object-cover'>
+                        {% else %}
+                          <div class='w-full h-full bg-gray-200 flex items-center justify-center'><span class='text-gray-500'>No image</span></div>
+                        {% endif %}
                       </div>
-                      <span class='text-xs md:text-sm text-gray-600 font-medium'
-                        >5/5</span
-                      >
-                    </div>
-                    <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>
-                      "Being a professional guide and a son of a ranch butcher,
-                      I've skinned a lot of animals and a knife that can hold a
-                      sharp edge is a must. I've used many brands of knives and
-                      Kestrel Knives are the only one I've found that can hold a
-                      sharp edge the longest."
-                    </blockquote>
-                    <div class='flex items-center'>
-                      <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
-                        <span class='text-gray-600 font-semibold text-xs md:text-sm'
-                          >L</span
-                        >
-                      </div>
-                      <div>
-                        <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'
-                          >Latigo Hext</cite
-                        >
-                        <p class='text-xs md:text-sm text-gray-500'>
-                          Ovis Scalpel
-                        </p>
+                      <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
+                        <div class='flex items-center mb-3 md:mb-4'>
+                          <div class='flex text-yellow-400 mr-3'>
+                            {% for i in (1..5) %}
+                              {% if i <= block.settings.rating %}
+                                <svg class='w-4 h-4 md:w-5 md:h-5 fill-current' viewBox='0 0 20 20'><path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/></svg>
+                              {% else %}
+                                <svg class='w-4 h-4 md:w-5 md:h-5 text-gray-300' viewBox='0 0 20 20'><path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/></svg>
+                              {% endif %}
+                            {% endfor %}
+                          </div>
+                          <span class='text-xs md:text-sm text-gray-600 font-medium'>{{- block.settings.rating }}/5</span>
+                        </div>
+                        <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>"{{ block.settings.review_text }}"</blockquote>
+                        <div class='flex items-center'>
+                          <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
+                            <span class='text-gray-600 font-semibold text-xs md:text-sm'>{{- block.settings.author | slice: 0, 1 | upcase -}}</span>
+                          </div>
+                          <div>
+                            <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'>{{- block.settings.author -}}</cite>
+                            <p class='text-xs md:text-sm text-gray-500'>{{ block.settings.product_title }}</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </swiper-slide>
-
-            <swiper-slide>
-              <div class='bg-white rounded-lg shadow-lg overflow-hidden mx-2'>
-                <!-- Mobile: Stack vertically, Desktop: Side by side -->
-                <div class='flex flex-col md:flex-row h-auto md:h-80'>
-                  <!-- Product Image -->
-                  <div class='w-full md:w-1/2 relative h-48 md:h-full'>
-                    {{
-                      "product-2"
-                      | placeholder_svg_tag: "w-full h-full bg-gray-200 object-cover"
-                    }}
-                  </div>
-
-                  <!-- Review Content -->
-                  <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
-                    <div class='flex items-center mb-3 md:mb-4'>
-                      <div class='flex text-yellow-400 mr-3'>
-                        {% for i in (1..4) %}
-                          <svg
-                            class='w-4 h-4 md:w-5 md:h-5 fill-current'
-                            viewBox='0 0 20 20'
-                          >
-                            <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
-                          </svg>
-                        {% endfor %}
-                        <svg
-                          class='w-4 h-4 md:w-5 md:h-5 text-gray-300'
-                          viewBox='0 0 20 20'
-                        >
-                          <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
-                        </svg>
-                      </div>
-                      <span class='text-xs md:text-sm text-gray-600 font-medium'
-                        >4/5</span
-                      >
+                </swiper-slide>
+              {% endif %}
+            {% endfor %}
+            {% if manual_count == 0 %}
+              <!-- Placeholder slide shown when no manual slides are added -->
+              <swiper-slide>
+                <div class='bg-white rounded-lg shadow-lg overflow-hidden' style='max-width: {{ section.settings.carousel_max_width | default: 1200 }}px; margin-left: auto; margin-right: auto;'>
+                  <div class='flex flex-col md:flex-row h-auto md:h-80'>
+                    <div class='w-full md:w-1/2 relative h-48 md:h-full'>
+                      {{ 'product-1' | placeholder_svg_tag: 'w-full h-full bg-gray-200 object-cover' }}
                     </div>
-                    <blockquote class='text-gray-800 text-lg leading-relaxed mb-6 italic'>
-                      "Excellent craftsmanship and attention to detail. The
-                      blade stays sharp through heavy use and the handle
-                      provides a comfortable grip. Highly recommend for any
-                      outdoor enthusiast."
-                    </blockquote>
-                    <div class='flex items-center'>
-                      <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
-                        <span class='text-gray-600 font-semibold text-xs md:text-sm'
-                          >M</span
-                        >
+                    <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
+                      <div class='flex items-center mb-3 md:mb-4'>
+                        <div class='flex text-yellow-400 mr-3'>
+                          {% for i in (1..5) %}
+                            <svg class='w-4 h-4 md:w-5 md:h-5 fill-current' viewBox='0 0 20 20'><path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/></svg>
+                          {% endfor %}
+                        </div>
+                        <span class='text-xs md:text-sm text-gray-600 font-medium'>5/5</span>
                       </div>
-                      <div>
-                        <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'
-                          >Mike Johnson</cite
-                        >
-                        <p class='text-xs md:text-sm text-gray-500'>
-                          Ovis Hunter
-                        </p>
+                      <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>
+                        "Add your first review in the theme editor."
+                      </blockquote>
+                      <div class='flex items-center'>
+                        <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
+                          <span class='text-gray-600 font-semibold text-xs md:text-sm'>A</span>
+                        </div>
+                        <div>
+                          <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'>Anonymous</cite>
+                          <p class='text-xs md:text-sm text-gray-500'>Product Name</p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </swiper-slide>
-
-            <swiper-slide>
-              <div class='bg-white rounded-lg shadow-lg overflow-hidden mx-2'>
-                <!-- Mobile: Stack vertically, Desktop: Side by side -->
-                <div class='flex flex-col md:flex-row h-auto md:h-80'>
-                  <!-- Product Image -->
-                  <div class='w-full md:w-1/2 relative h-48 md:h-full'>
-                    {{
-                      "product-3"
-                      | placeholder_svg_tag: "w-full h-full bg-gray-200 object-cover"
-                    }}
-                  </div>
-
-                  <!-- Review Content -->
-                  <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
-                    <div class='flex items-center mb-3 md:mb-4'>
-                      <div class='flex text-yellow-400 mr-3'>
-                        {% for i in (1..5) %}
-                          <svg
-                            class='w-4 h-4 md:w-5 md:h-5 fill-current'
-                            viewBox='0 0 20 20'
-                          >
-                            <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
-                          </svg>
-                        {% endfor %}
-                      </div>
-                      <span class='text-xs md:text-sm text-gray-600 font-medium'
-                        >5/5</span
-                      >
-                    </div>
-                    <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>
-                      "This knife exceeded my expectations. The titanium
-                      construction makes it incredibly lightweight while
-                      maintaining strength. Perfect for backpacking and hunting
-                      trips."
-                    </blockquote>
-                    <div class='flex items-center'>
-                      <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
-                        <span class='text-gray-600 font-semibold text-xs md:text-sm'
-                          >S</span
-                        >
-                      </div>
-                      <div>
-                        <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'
-                          >Sarah Williams</cite
-                        >
-                        <p class='text-xs md:text-sm text-gray-500'>
-                          Titanium EDC
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </swiper-slide>
+              </swiper-slide>
+            {% endif %}
           {% endunless %}
         </swiper-container>
       </div>
@@ -630,11 +684,14 @@
       })
     </script>
 
-    <!-- Remaining Testimonials (if more than 6) -->
-    {% if section.blocks.size > 6 %}
-      {% assign remaining_blocks = section.blocks
-        | slice: 6, section.blocks.size
-      %}
+    <!-- Remaining Testimonials (after first 2 desktop rows) -->
+    {% assign testimonial_total = 0 %}
+    {% for block in section.blocks %}
+      {% if block.type == 'testimonial' %}
+        {% assign testimonial_total = testimonial_total | plus: 1 %}
+      {% endif %}
+    {% endfor %}
+    {% if testimonial_total > break_count %}
       <div class='mt-8'>
         <style>
           .testimonials-grid-remaining {
@@ -649,7 +706,11 @@
           }
         </style>
         <div class='testimonials-grid-remaining'>
-          {% for block in remaining_blocks %}
+          {% assign testimonial_index = 0 %}
+          {% for block in section.blocks %}
+            {% if block.type == 'testimonial' %}
+              {% assign testimonial_index = testimonial_index | plus: 1 %}
+              {% if testimonial_index > break_count %}
             <div
               class='relative h-[40rem] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer'
               data-quote='{{ block.settings.quote | strip_newlines | escape }}'
@@ -693,17 +754,23 @@
                 </cite>
               </div>
             </div>
+              {% endif %}
+            {% endif %}
           {% endfor %}
         </div>
       </div>
     {% endif %}
 
-    {% if section.settings.enable_carousel and section.blocks.size <= 6 %}
-      <div class='mt-16'>
-        <h3 class='text-2xl font-bold text-gray-900 text-center mb-8'>
-          {{ section.settings.carousel_title }}
-        </h3>
+    <!-- Product Reviews Carousel (moved below grids so cards fill rows first) -->
+    {% if false and section.settings.enable_carousel and section.blocks.size > 8 %}
+      <div class='mt-16' style='max-width: {{ section.settings.carousel_max_width | default: 1200 }}px; margin-left: auto; margin-right: auto;'>
+        {% if section.settings.show_carousel_title %}
+          <h3 class='text-2xl font-bold text-gray-900 text-center mb-8'>
+            {{ section.settings.carousel_title }}
+          </h3>
+        {% endif %}
 
+        <!-- Swiper Carousel -->
         <swiper-container
           class='testimonials-carousel'
           pagination='true'
@@ -723,68 +790,36 @@
               {% assign has_reviews = true %}
               {% for review in product.reviews %}
                 <swiper-slide>
-                  <div class='bg-white rounded-lg shadow-lg overflow-hidden mx-2'>
-                    <!-- Mobile: Stack vertically, Desktop: Side by side -->
+                  <div class='bg-white rounded-lg shadow-lg overflow-hidden' style='max-width: {{ section.settings.carousel_max_width | default: 1200 }}px; margin-left: auto; margin-right: auto;'>
                     <div class='flex flex-col md:flex-row h-auto md:h-80'>
-                      <!-- Product Image -->
                       <div class='w-full md:w-1/2 relative h-48 md:h-full'>
                         {% if product.featured_image %}
-                          <img
-                            src='{{ product.featured_image | image_url: width: 400 }}'
-                            alt='{{ product.title }}'
-                            width='400'
-                            height='400'
-                            class='w-full h-full object-cover'
-                          >
+                          <img src='{{ product.featured_image | image_url: width: 400 }}' alt='{{ product.title }}' width='400' height='400' class='w-full h-full object-cover'>
                         {% else %}
-                          <div class='w-full h-full bg-gray-200 flex items-center justify-center'>
-                            <span class='text-gray-500'>No image</span>
-                          </div>
+                          <div class='w-full h-full bg-gray-200 flex items-center justify-center'><span class='text-gray-500'>No image</span></div>
                         {% endif %}
                       </div>
-
-                      <!-- Review Content -->
                       <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
                         <div class='flex items-center mb-3 md:mb-4'>
                           <div class='flex text-yellow-400 mr-3'>
                             {% for i in (1..5) %}
                               {% if i <= review.rating %}
-                                <svg
-                                  class='w-4 h-4 md:w-5 md:h-5 fill-current'
-                                  viewBox='0 0 20 20'
-                                >
-                                  <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
-                                </svg>
+                                <svg class='w-4 h-4 md:w-5 md:h-5 fill-current' viewBox='0 0 20 20'><path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/></svg>
                               {% else %}
-                                <svg
-                                  class='w-4 h-4 md:w-5 md:h-5 text-gray-300'
-                                  viewBox='0 0 20 20'
-                                >
-                                  <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
-                                </svg>
+                                <svg class='w-4 h-4 md:w-5 md:h-5 text-gray-300' viewBox='0 0 20 20'><path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/></svg>
                               {% endif %}
                             {% endfor %}
                           </div>
-                          <span class='text-xs md:text-sm text-gray-600 font-medium'>
-                            {{- review.rating }}/5</span
-                          >
+                          <span class='text-xs md:text-sm text-gray-600 font-medium'>{{- review.rating }}/5</span>
                         </div>
-                        <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>
-                          "{{ review.content }}"
-                        </blockquote>
+                        <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>"{{ review.content }}"</blockquote>
                         <div class='flex items-center'>
                           <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
-                            <span class='text-gray-600 font-semibold text-xs md:text-sm'>
-                              {{- review.author | slice: 0, 1 | upcase -}}
-                            </span>
+                            <span class='text-gray-600 font-semibold text-xs md:text-sm'>{{- review.author | slice: 0, 1 | upcase -}}</span>
                           </div>
                           <div>
-                            <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'>
-                              {{- review.author -}}
-                            </cite>
-                            <p class='text-xs md:text-sm text-gray-500'>
-                              {{ product.title }}
-                            </p>
+                            <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'>{{- review.author -}}</cite>
+                            <p class='text-xs md:text-sm text-gray-500'>{{ product.title }}</p>
                           </div>
                         </div>
                       </div>
@@ -796,184 +831,86 @@
           {% endfor %}
 
           {% unless has_reviews %}
-            <!-- Placeholder Review 1 -->
-            <swiper-slide>
-              <div class='bg-white rounded-lg shadow-lg overflow-hidden mx-2'>
-                <!-- Mobile: Stack vertically, Desktop: Side by side -->
-                <div class='flex flex-col md:flex-row h-auto md:h-80'>
-                  <!-- Product Image -->
-                  <div class='w-full md:w-1/2 relative h-48 md:h-full'>
-                    {{
-                      "product-1"
-                      | placeholder_svg_tag: "w-full h-full bg-gray-200 object-cover"
-                    }}
-                  </div>
-
-                  <!-- Review Content -->
-                  <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
-                    <div class='flex items-center mb-3 md:mb-4'>
-                      <div class='flex text-yellow-400 mr-3'>
-                        {% for i in (1..5) %}
-                          <svg
-                            class='w-4 h-4 md:w-5 md:h-5 fill-current'
-                            viewBox='0 0 20 20'
-                          >
-                            <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
-                          </svg>
-                        {% endfor %}
+            {% assign manual_count = 0 %}
+            {% for block in section.blocks %}
+              {% if block.type == 'carousel_review' %}
+                {% assign manual_count = manual_count | plus: 1 %}
+                <swiper-slide>
+                  <div class='bg-white rounded-lg shadow-lg overflow-hidden' style='max-width: {{ section.settings.carousel_max_width | default: 1200 }}px; margin-left: auto; margin-right: auto;'>
+                    <div class='flex flex-col md:flex-row h-auto md:h-80'>
+                      <div class='w-full md:w-1/2 relative h-48 md:h-full'>
+                        {% if block.settings.image %}
+                          <img src='{{ block.settings.image | image_url: width: 400 }}' alt='{{ block.settings.product_title | default: block.settings.author }}' width='400' height='400' class='w-full h-full object-cover'>
+                        {% else %}
+                          <div class='w-full h-full bg-gray-200 flex items-center justify-center'><span class='text-gray-500'>No image</span></div>
+                        {% endif %}
                       </div>
-                      <span class='text-xs md:text-sm text-gray-600 font-medium'
-                        >5/5</span
-                      >
-                    </div>
-                    <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>
-                      "Being a professional guide and a son of a ranch butcher,
-                      I've skinned a lot of animals and a knife that can hold a
-                      sharp edge is a must. I've used many brands of knives and
-                      Kestrel Knives are the only one I've found that can hold a
-                      sharp edge the longest."
-                    </blockquote>
-                    <div class='flex items-center'>
-                      <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
-                        <span class='text-gray-600 font-semibold text-xs md:text-sm'
-                          >L</span
-                        >
-                      </div>
-                      <div>
-                        <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'
-                          >Latigo Hext</cite
-                        >
-                        <p class='text-xs md:text-sm text-gray-500'>
-                          Ovis Scalpel
-                        </p>
+                      <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
+                        <div class='flex items-center mb-3 md:mb-4'>
+                          <div class='flex text-yellow-400 mr-3'>
+                            {% for i in (1..5) %}
+                              {% if i <= block.settings.rating %}
+                                <svg class='w-4 h-4 md:w-5 md:h-5 fill-current' viewBox='0 0 20 20'><path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/></svg>
+                              {% else %}
+                                <svg class='w-4 h-4 md:w-5 md:h-5 text-gray-300' viewBox='0 0 20 20'><path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/></svg>
+                              {% endif %}
+                            {% endfor %}
+                          </div>
+                          <span class='text-xs md:text-sm text-gray-600 font-medium'>{{- block.settings.rating }}/5</span>
+                        </div>
+                        <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>"{{ block.settings.review_text }}"</blockquote>
+                        <div class='flex items-center'>
+                          <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
+                            <span class='text-gray-600 font-semibold text-xs md:text-sm'>{{- block.settings.author | slice: 0, 1 | upcase -}}</span>
+                          </div>
+                          <div>
+                            <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'>{{- block.settings.author -}}</cite>
+                            <p class='text-xs md:text-sm text-gray-500'>{{ block.settings.product_title }}</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </swiper-slide>
-
-            <!-- Placeholder Review 2 -->
-            <swiper-slide>
-              <div class='bg-white rounded-lg shadow-lg overflow-hidden mx-2'>
-                <!-- Mobile: Stack vertically, Desktop: Side by side -->
-                <div class='flex flex-col md:flex-row h-auto md:h-80'>
-                  <!-- Product Image -->
-                  <div class='w-full md:w-1/2 relative h-48 md:h-full'>
-                    {{
-                      "product-2"
-                      | placeholder_svg_tag: "w-full h-full bg-gray-200 object-cover"
-                    }}
-                  </div>
-
-                  <!-- Review Content -->
-                  <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
-                    <div class='flex items-center mb-3 md:mb-4'>
-                      <div class='flex text-yellow-400 mr-3'>
-                        {% for i in (1..4) %}
-                          <svg
-                            class='w-4 h-4 md:w-5 md:h-5 fill-current'
-                            viewBox='0 0 20 20'
-                          >
-                            <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
-                          </svg>
-                        {% endfor %}
-                        <svg
-                          class='w-4 h-4 md:w-5 md:h-5 text-gray-300'
-                          viewBox='0 0 20 20'
-                        >
-                          <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
-                        </svg>
-                      </div>
-                      <span class='text-xs md:text-sm text-gray-600 font-medium'
-                        >4/5</span
-                      >
+                </swiper-slide>
+              {% endif %}
+            {% endfor %}
+            {% if manual_count == 0 %}
+              <!-- Placeholder Review (no product reviews, no manual slides) -->
+              <swiper-slide>
+                <div class='bg-white rounded-lg shadow-lg overflow-hidden mx-auto max-w-5xl'>
+                  <div class='flex flex-col md:flex-row h-auto md:h-80'>
+                    <div class='w-full md:w-1/2 relative h-48 md:h-full'>
+                      {{ 'product-1' | placeholder_svg_tag: 'w-full h-full bg-gray-200 object-cover' }}
                     </div>
-                    <blockquote class='text-gray-800 text-lg leading-relaxed mb-6 italic'>
-                      "Excellent craftsmanship and attention to detail. The
-                      blade stays sharp through heavy use and the handle
-                      provides a comfortable grip. Highly recommend for any
-                      outdoor enthusiast."
-                    </blockquote>
-                    <div class='flex items-center'>
-                      <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
-                        <span class='text-gray-600 font-semibold text-xs md:text-sm'
-                          >M</span
-                        >
+                    <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
+                      <div class='flex items-center mb-3 md:mb-4'>
+                        <div class='flex text-yellow-400 mr-3'>
+                          {% for i in (1..5) %}
+                            <svg class='w-4 h-4 md:w-5 md:h-5 fill-current' viewBox='0 0 20 20'><path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/></svg>
+                          {% endfor %}
+                        </div>
+                        <span class='text-xs md:text-sm text-gray-600 font-medium'>5/5</span>
                       </div>
-                      <div>
-                        <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'
-                          >Mike Johnson</cite
-                        >
-                        <p class='text-xs md:text-sm text-gray-500'>
-                          Ovis Hunter
-                        </p>
+                      <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>"Add your first review in the theme editor."</blockquote>
+                      <div class='flex items-center'>
+                        <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
+                          <span class='text-gray-600 font-semibold text-xs md:text-sm'>A</span>
+                        </div>
+                        <div>
+                          <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'>Anonymous</cite>
+                          <p class='text-xs md:text-sm text-gray-500'>Product Name</p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </swiper-slide>
-
-            <!-- Placeholder Review 3 -->
-            <swiper-slide>
-              <div class='bg-white rounded-lg shadow-lg overflow-hidden mx-2'>
-                <!-- Mobile: Stack vertically, Desktop: Side by side -->
-                <div class='flex flex-col md:flex-row h-auto md:h-80'>
-                  <!-- Product Image -->
-                  <div class='w-full md:w-1/2 relative h-48 md:h-full'>
-                    {{
-                      "product-3"
-                      | placeholder_svg_tag: "w-full h-full bg-gray-200 object-cover"
-                    }}
-                  </div>
-
-                  <!-- Review Content -->
-                  <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
-                    <div class='flex items-center mb-3 md:mb-4'>
-                      <div class='flex text-yellow-400 mr-3'>
-                        {% for i in (1..5) %}
-                          <svg
-                            class='w-4 h-4 md:w-5 md:h-5 fill-current'
-                            viewBox='0 0 20 20'
-                          >
-                            <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
-                          </svg>
-                        {% endfor %}
-                      </div>
-                      <span class='text-xs md:text-sm text-gray-600 font-medium'
-                        >5/5</span
-                      >
-                    </div>
-                    <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>
-                      "This knife exceeded my expectations. The titanium
-                      construction makes it incredibly lightweight while
-                      maintaining strength. Perfect for backpacking and hunting
-                      trips."
-                    </blockquote>
-                    <div class='flex items-center'>
-                      <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
-                        <span class='text-gray-600 font-semibold text-xs md:text-sm'
-                          >S</span
-                        >
-                      </div>
-                      <div>
-                        <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'
-                          >Sarah Williams</cite
-                        >
-                        <p class='text-xs md:text-sm text-gray-500'>
-                          Titanium EDC
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </swiper-slide>
+              </swiper-slide>
+            {% endif %}
           {% endunless %}
         </swiper-container>
       </div>
     {% endif %}
+
 
     <!-- Empty State -->
     {% if section.blocks.size == 0 %}
