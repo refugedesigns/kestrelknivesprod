@@ -193,7 +193,7 @@
         | default: ""
         | downcase
       %}
-      {% unless product_type_lower contains "apparel" or product_type_lower contains "custom" %}
+      {% unless product_type_lower contains "apparel" or product_type_lower contains "custom" or product_type_lower contains "accessories" %}
         <!-- Add to Cart Button (only show when available and not apparels) -->
         <div x-show='isAvailable'>
           <button
@@ -208,7 +208,7 @@
         </div>
       {% endunless %}
 
-      {% if product_type_lower contains "apparel" %}
+      {% if product_type_lower contains "apparel" or product_type_lower contains "accessories" %}
         <!-- Quick View for Apparels -->
         <div class='mt-3'>
           <button
@@ -571,8 +571,8 @@
 
         updateTitle() {
           const typeLower = (this.productData.type || '').toLowerCase()
-          // For Apparels, never append option to title
-          const shouldAppend = !typeLower.includes('apparel')
+          // For Apparels and Accessories, never append option to title
+          const shouldAppend = !(typeLower.includes('apparel') || typeLower.includes('accessories'))
 
           if (this.variantsData && this.variantsData.length > 0) {
             // Filter out variants with "Default Title"
