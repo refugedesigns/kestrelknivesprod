@@ -555,6 +555,11 @@
         },
 
         updateImage() {
+          // For apparel, keep using the product's featured_image (do not swap per variant)
+          const typeLower = (this.productData.type || '').toLowerCase()
+          if (typeLower.includes('apparel')) {
+            return
+          }
           // Update image when variant changes (for knives/non-apparels)
           if (this.variantsData && this.variantsData.length > 0) {
             const selectedVariant = this.variantsData.find(
