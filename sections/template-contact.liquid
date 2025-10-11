@@ -114,6 +114,16 @@
               </div>
             </div>
           </div>
+          <script>
+            (function() {
+              try {
+                var cleanUrl = window.location.pathname + (window.location.hash || '')
+                if (window.history && window.history.replaceState) {
+                  window.history.replaceState({}, document.title, cleanUrl)
+                }
+              } catch (e) {}
+            })()
+          </script>
         {% endif %}
 
         {% if form.errors or form.posted_successfully? %}
