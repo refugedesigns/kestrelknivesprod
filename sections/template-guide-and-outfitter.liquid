@@ -30,6 +30,17 @@
             {% endfor %}
           </ul>
         </div>
+        <script>
+          window.addEventListener('load', function () {
+            try {
+              var headerEl = document.getElementById('siteHeader')
+              var headerH = headerEl ? headerEl.offsetHeight : 0
+              var target = document.getElementById('guide-outfitter-header')
+              var y = (target ? target.getBoundingClientRect().top + window.pageYOffset : 0) - headerH - 12
+              window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
+            } catch (e) {}
+          })
+        </script>
       {% elsif form.posted_successfully? %}
         <div id='guide-success' class='border border-green-300 bg-green-50 p-4 mb-6 rounded'>
           <div class='flex items-center'>
@@ -46,12 +57,18 @@
         </div>
         <script>
           window.addEventListener('load', function () {
-            var header = document.getElementById('guide-outfitter-header')
-            if (header && typeof header.scrollIntoView === 'function') {
-              header.scrollIntoView({ behavior: 'smooth', block: 'start' })
-            } else {
-              window.scrollTo({ top: 0, behavior: 'smooth' })
-            }
+            try {
+              var siteHeader = document.getElementById('siteHeader')
+              var headerHeight = siteHeader ? siteHeader.offsetHeight : 0
+              var target = document.getElementById('guide-outfitter-header')
+              var y = (target ? target.getBoundingClientRect().top + window.pageYOffset : 0) - headerHeight - 12
+              window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
+
+              var cleanUrl = window.location.pathname + (window.location.hash || '')
+              if (window.history && window.history.replaceState) {
+                window.history.replaceState({}, document.title, cleanUrl)
+              }
+            } catch (e) {}
           })
         </script>
       {% endif %}
