@@ -119,13 +119,23 @@
         {% if form.errors or form.posted_successfully? %}
           <script>
             (function() {
-              try {
-                var target = document.getElementById('contact-scroll-target')
-                if (!target) return
-                var y = target.getBoundingClientRect().top + window.pageYOffset - 100
-                window.scrollTo({ top: y, behavior: 'smooth' })
-              } catch (e) {
-                // no-op
+              function runScroll() {
+                try {
+                  var header = document.getElementById('siteHeader')
+                  var headerHeight = header ? header.offsetHeight : 0
+                  var target = document.getElementById('contact-scroll-target')
+                  if (!target) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
+                    return
+                  }
+                  var y = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 12
+                  window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
+                } catch (e) {}
+              }
+              if (document.readyState === 'complete') {
+                setTimeout(runScroll, 0)
+              } else {
+                window.addEventListener('load', function() { setTimeout(runScroll, 0) })
               }
             })()
           </script>
