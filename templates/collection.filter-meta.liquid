@@ -1,11 +1,13 @@
 {% layout none %}
 {"productTypes":[
-{% assign pt = collection.filters | where: 'param_name', 'filter.p.product_type' | first %}
+{% assign pt = collection.filters
+  | where: "param_name", "filter.p.product_type"
+  | first
+%}
 {% if pt and pt.values %}
   {% for v in pt.values %}
-    {"value":{{ v.value | json }},"count":{{ v.count | default: 0 }}}{% unless forloop.last %},{% endunless %}
+    {"value":{{ v.value | json }},"count":{{ v.count | default: 0 }}}
+    {%- unless forloop.last %},{% endunless %}
   {% endfor %}
 {% endif %}
 ]}
-
-

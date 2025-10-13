@@ -45,7 +45,7 @@
             <img
               :src='item.image'
               :alt='item.title'
-              class='w-full h-full object-cover'
+              class='w-full h-full object-contain'
             >
           </div>
 
@@ -143,7 +143,7 @@
     x-show='cartItems.length > 0'
     class='border-t border-gray-200 p-6 space-y-4'
   >
-  <i data-govx-id="s"></i>
+    <i data-govx-id='s'></i>
     <!-- Subtotal -->
     <div class='flex justify-between items-center'>
       <span class='text-sm font-medium text-gray-900 uppercase tracking-wide'>
@@ -152,8 +152,6 @@
       </span>
       <span class='text-lg font-bold text-gray-900' x-text='subtotal'></span>
     </div>
-
-    
 
     <!-- Checkout Button -->
     <button

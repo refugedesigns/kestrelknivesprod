@@ -12,7 +12,9 @@
   {% endcomment %}
 
   {% paginate collection.products by section.settings.number_of_products_per_page | default: 9 %}
-    <h1 class='text-3xl font-bold text-center mb-8' x-text='getPageTitle()'>{{ collection.title }}</h1>
+    <h1 class='text-3xl font-bold text-center mb-8' x-text='getPageTitle()'>
+      {{ collection.title }}
+    </h1>
 
     <div class='max-w-7xl mx-auto'>
       <div class='flex flex-col md:flex-row gap-8'>
@@ -37,8 +39,13 @@
               Any items without such tags are rendered afterwards in original order.
             {% endcomment %}
             {% assign has_knife_filter = false %}
-            {% assign url_string = request.path | append: '?' | append: request.query_string %}
-            {% if url_string contains 'filter.p.product_type=Knives' or url_string contains 'filter.p.product_type=knives' %}
+            {% assign url_string = request.path
+              | append: "?"
+              | append: request.query_string
+            %}
+            {% if url_string contains "filter.p.product_type=Knives"
+              or url_string contains "filter.p.product_type=knives"
+            %}
               {% assign has_knife_filter = true %}
             {% endif %}
 
@@ -48,11 +55,17 @@
             {%- endcomment -%}
             {% assign has_position_tags = false %}
             {% for product in collection.products %}
-              {%- assign tags_lower = product.tags | join: '||' | downcase | split: '||' -%}
+              {%- assign tags_lower = product.tags
+                | join: "||"
+                | downcase
+                | split: "||"
+              -%}
               {% for i in (1..999) %}
-                {% assign wanted = 'product_' | append: i %}
-                {% assign wanted_alt = 'position_' | append: i %}
-                {% if tags_lower contains wanted or tags_lower contains wanted_alt %}
+                {% assign wanted = "product_" | append: i %}
+                {% assign wanted_alt = "position_" | append: i %}
+                {% if tags_lower contains wanted
+                  or tags_lower contains wanted_alt
+                %}
                   {% assign has_position_tags = true %}
                   {% break %}
                 {% endif %}
@@ -60,23 +73,37 @@
               {% if has_position_tags %}{% break %}{% endif %}
             {% endfor %}
 
-            {% if collection.handle contains 'knife' or collection.title contains 'Knife' or collection.title contains 'Knives' or has_knife_filter or has_position_tags %}
-              {% assign rendered_ids = ',' %}
+            {% if collection.handle contains "knife"
+              or collection.title contains "Knife"
+              or collection.title contains "Knives"
+              or has_knife_filter
+              or has_position_tags
+            %}
+              {% assign rendered_ids = "," %}
               {% for i in (1..999) %}
-                {% assign wanted = 'product_' | append: i %}
-                {% assign wanted_alt = 'position_' | append: i %}
+                {% assign wanted = "product_" | append: i %}
+                {% assign wanted_alt = "position_" | append: i %}
                 {% for product in collection.products %}
-                  {%- assign tags_lower = product.tags | join: '||' | downcase | split: '||' -%}
-                  {% if tags_lower contains wanted or tags_lower contains wanted_alt %}
+                  {%- assign tags_lower = product.tags
+                    | join: "||"
+                    | downcase
+                    | split: "||"
+                  -%}
+                  {% if tags_lower contains wanted
+                    or tags_lower contains wanted_alt
+                  %}
                     {% render "product-card", product_product: product %}
-                    {% assign rendered_ids = rendered_ids | append: product.id | append: ',' %}
+                    {% assign rendered_ids = rendered_ids
+                      | append: product.id
+                      | append: ","
+                    %}
                   {% endif %}
                 {% endfor %}
               {% endfor %}
 
               {%- comment -%} Render any remaining items without product_N tag {%- endcomment -%}
               {% for product in collection.products %}
-                {% assign pid = product.id | append: ',' %}
+                {% assign pid = product.id | append: "," %}
                 {% unless rendered_ids contains pid %}
                   {% render "product-card", product_product: product %}
                 {% endunless %}
@@ -128,16 +155,24 @@
             .split(/\s+/)
             .map(w => w.charAt(0).toUpperCase() + w.slice(1))
             .join(' ')
-        } catch (e) { return str }
+        } catch (e) {
+          return str
+        }
       },
 
       getPageTitle() {
         try {
           const url = new URL(window.location.href)
-          const types = url.searchParams.getAll('filter.p.product_type').filter(Boolean)
+          const types = url.searchParams
+            .getAll('filter.p.product_type')
+            .filter(Boolean)
           if (types && types.length) {
-            const hasKnives = types.some(t => String(t).toLowerCase() === 'knives')
-            const selected = hasKnives ? types.find(t => String(t).toLowerCase() === 'knives') : types[0]
+            const hasKnives = types.some(
+              t => String(t).toLowerCase() === 'knives'
+            )
+            const selected = hasKnives
+              ? types.find(t => String(t).toLowerCase() === 'knives')
+              : types[0]
             return this.toTitleCase(selected)
           }
 
@@ -146,7 +181,12 @@
           const m = path.match(/\/collections\/([^\/]+)/)
           const handle = m && m[1] ? decodeURIComponent(m[1]) : ''
           if (handle && handle !== 'all') {
-            const toHandle = s => String(s||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')
+            const toHandle = s =>
+              String(s || '')
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '')
             const matchesHandle = (typeValue, h) => {
               const th = toHandle(typeValue)
               if (th === h) return true
@@ -155,19 +195,30 @@
               if (th.endsWith('-' + h)) return true
               return false
             }
-            const filterComponent = document.querySelector('[x-data*="collectionFilters"]')
-            const typesArr = (filterComponent && filterComponent._x_dataStack && filterComponent._x_dataStack[0] && filterComponent._x_dataStack[0].productTypes) || []
+            const filterComponent = document.querySelector(
+              '[x-data*="collectionFilters"]'
+            )
+            const typesArr =
+              (filterComponent &&
+                filterComponent._x_dataStack &&
+                filterComponent._x_dataStack[0] &&
+                filterComponent._x_dataStack[0].productTypes) ||
+              []
             const match = typesArr.find(t => matchesHandle(t.value, handle))
             if (match && match.value) return this.toTitleCase(match.value)
           }
-        } catch (e) { /* ignore */ }
+        } catch (e) {
+          /* ignore */
+        }
         // Fallbacks: show "All Products" on /collections/all, otherwise collection title
         try {
           const path = window.location.pathname || ''
           const m = path.match(/\/collections\/([^\/]+)/)
           const handle = m && m[1] ? decodeURIComponent(m[1]) : ''
           if (!handle || handle === 'all') return 'All Products'
-        } catch (e) { /* ignore */ }
+        } catch (e) {
+          /* ignore */
+        }
         return '{{ collection.title }}'
       },
 

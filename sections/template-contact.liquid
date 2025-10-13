@@ -48,7 +48,7 @@
       "min": 10,
       "max": 20,
       "step": 1,
-      "default": 16
+      "default": 10
     }
   ],
   "presets": [
@@ -59,10 +59,13 @@
 }
 {% endschema %}
 
-<div class='max-w-8xl mx-auto py-12 px-4 md:px-0 md:py-16'>
+<div class='max-w-8xl mx-auto py-12 px-4 md:px-0 md:pt-16'>
   <!-- Page Header -->
   <div class='text-center mb-20 border-b border-gray-200 pb-12'>
-    <h1 class='text-3xl md:text-4xl font-bold text-gray-900 mb-4'>
+    <h1
+      id='contact-scroll-target'
+      class='text-3xl md:text-4xl font-bold text-gray-900 mb-4'
+    >
       {{ section.settings.page_title }}
     </h1>
     <p class='text-gray-700 text-lg'>
@@ -79,7 +82,7 @@
   </div>
 
   <!-- Main Content -->
-  <div class='grid grid-cols-1 lg:grid-cols-4 gap-12'>
+  <div class='grid grid-cols-1 lg:grid-cols-4 gap-12 px-4 lg:px-0 max-w-7xl mx-4 md:mx-8 lg:mx-auto border border-gray-200 py-12 rounded-lg shadow-sm'>
     <!-- Contact Form (Left Side) -->
     <div class='lg:col-span-2'>
       {% form "contact" %}
@@ -114,6 +117,48 @@
               </div>
             </div>
           </div>
+          <script>
+            ;(function () {
+              try {
+                var cleanUrl =
+                  window.location.pathname + (window.location.hash || '')
+                if (window.history && window.history.replaceState) {
+                  window.history.replaceState({}, document.title, cleanUrl)
+                }
+              } catch (e) {}
+            })()
+          </script>
+        {% endif %}
+
+        {% if form.errors or form.posted_successfully? %}
+          <script>
+            ;(function () {
+              function runScroll() {
+                try {
+                  var header = document.getElementById('siteHeader')
+                  var headerHeight = header ? header.offsetHeight : 0
+                  var target = document.getElementById('contact-scroll-target')
+                  if (!target) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
+                    return
+                  }
+                  var y =
+                    target.getBoundingClientRect().top +
+                    window.pageYOffset -
+                    headerHeight -
+                    12
+                  window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
+                } catch (e) {}
+              }
+              if (document.readyState === 'complete') {
+                setTimeout(runScroll, 0)
+              } else {
+                window.addEventListener('load', function () {
+                  setTimeout(runScroll, 0)
+                })
+              }
+            })()
+          </script>
         {% endif %}
 
         <!-- Name Field -->
@@ -147,12 +192,21 @@
           <label class='block text-sm font-medium text-gray-700 mb-2'>
             Subject
           </label>
-          <input
-            type='text'
+          <select
             name='contact[subject]'
-            class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500'
+            class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white'
             required
           >
+            <option value=''>Select a subject</option>
+            <option value='Knife Sharpening'>Knife Sharpening</option>
+            <option value='Product Issue/Warranty'>
+              Product Issue/Warranty
+            </option>
+            <option value='Order Status'>Order Status</option>
+            <option value='Feedback'>Feedback</option>
+            <option value='Product Question'>Product Question</option>
+            <option value='Other'>Other</option>
+          </select>
         </div>
 
         <!-- Message Field -->

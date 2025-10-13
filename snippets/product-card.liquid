@@ -30,9 +30,10 @@
     <!-- Product Image -->
     <div class='relative h-96 bg-white overflow-hidden'>
       <!-- Status / SOLD OUT Badge -->
-      {% assign kk_status = product_product.metafields.custom.product_status 
-        | default: product_product.metafields.custom_fields.product_status 
-        | default: product_product.metafields.global.product_status %}
+      {% assign kk_status = product_product.metafields.custom.product_status
+        | default: product_product.metafields.custom_fields.product_status
+        | default: product_product.metafields.global.product_status
+      %}
       {% if kk_status != blank %}
         <div class='absolute top-4 left-4 bg-black text-white font-bold px-3 py-1 text-sm uppercase z-10'>
           {{ kk_status }}
@@ -48,10 +49,12 @@
 
       <!-- Product Image -->
       <a href='{{ product_product.url }}'>
-        <img width='400' height='400'
+        <img
+          width='400'
+          height='400'
           :src='currentImage'
           :alt="'{{ product_product.title }}'"
-          class='absolute inset-0 w-full h-full {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}object-cover{% else %}object-contain{% endif %}'
+          class='absolute inset-0 w-full h-full object-contain'
         >
       </a>
     </div>
@@ -116,7 +119,9 @@
                       {%- endcomment -%}
 
                       {% if variant.featured_image %}
-                        <img width='48' height='48'
+                        <img
+                          width='48'
+                          height='48'
                           src='{{ variant.featured_image | image_url: width: 48 }}'
                           alt='{{ variant.option1 }}'
                           class='w-full h-full object-contain'
@@ -127,25 +132,33 @@
                           and option_lower contains "orange"
                         %}
                           {% if section.settings.black_orange_image %}
-                            {% assign color_image = section.settings.black_orange_image | image_url: width: 48 %}
+                            {% assign color_image = section.settings.black_orange_image
+                              | image_url: width: 48
+                            %}
                           {% else %}
                             {% assign color_image = "black_w_orange_liner.png" %}
                           {% endif %}
                         {% elsif option_lower contains "orange" %}
                           {% if section.settings.orange_image %}
-                            {% assign color_image = section.settings.orange_image | image_url: width: 48 %}
+                            {% assign color_image = section.settings.orange_image
+                              | image_url: width: 48
+                            %}
                           {% else %}
                             {% assign color_image = "orange.png" %}
                           {% endif %}
                         {% elsif option_lower contains "black" %}
                           {% if section.settings.black_image %}
-                            {% assign color_image = section.settings.black_image | image_url: width: 48 %}
+                            {% assign color_image = section.settings.black_image
+                              | image_url: width: 48
+                            %}
                           {% else %}
                             {% assign color_image = "black_w_orange_liner.png" %}
                           {% endif %}
                         {% elsif option_lower contains "green" %}
                           {% if section.settings.green_image %}
-                            {% assign color_image = section.settings.green_image | image_url: width: 48 %}
+                            {% assign color_image = section.settings.green_image
+                              | image_url: width: 48
+                            %}
                           {% else %}
                             {% assign color_image = "od_green.png" %}
                           {% endif %}
@@ -153,7 +166,9 @@
                           or option_lower contains "earth"
                         %}
                           {% if section.settings.camo_image %}
-                            {% assign color_image = section.settings.camo_image | image_url: width: 48 %}
+                            {% assign color_image = section.settings.camo_image
+                              | image_url: width: 48
+                            %}
                           {% else %}
                             {% assign color_image = "earth_camo.png" %}
                           {% endif %}
@@ -161,13 +176,17 @@
 
                         {% if color_image != "" %}
                           {% if color_image contains "//" %}
-                            <img width='48' height='48'
+                            <img
+                              width='48'
+                              height='48'
                               src='{{ color_image }}'
                               alt='{{ variant.option1 }}'
                               class='w-full h-full object-cover'
                             >
                           {% else %}
-                            <img width='48' height='48'
+                            <img
+                              width='48'
+                              height='48'
                               src='{{ color_image | asset_url }}'
                               alt='{{ variant.option1 }}'
                               class='w-full h-full object-cover'
@@ -193,7 +212,10 @@
         | default: ""
         | downcase
       %}
-      {% unless product_type_lower contains "apparel" or product_type_lower contains "custom" or product_type_lower contains "accessories" %}
+      {% unless product_type_lower contains "apparel"
+        or product_type_lower contains "custom"
+        or product_type_lower contains "accessories"
+      %}
         <!-- Add to Cart Button (only show when available and not apparels) -->
         <div x-show='isAvailable'>
           <button
@@ -208,7 +230,9 @@
         </div>
       {% endunless %}
 
-      {% if product_type_lower contains "apparel" or product_type_lower contains "accessories" %}
+      {% if product_type_lower contains "apparel"
+        or product_type_lower contains "accessories"
+      %}
         <!-- Quick View for Apparels -->
         <div class='mt-3'>
           <button
@@ -222,84 +246,183 @@
       {% endif %}
     </div>
   </div>
-  
+
   <!-- Quick View Drawer (Apparels, teleported to body) -->
-  <template x-if="isQuickViewOpen">
+  <template x-if='isQuickViewOpen'>
     <div class='fixed inset-0 z-50' x-cloak>
       <div class='absolute inset-0 bg-black/50' @click='closeQuickView()'></div>
-      <div x-ref='qvPanel' class='absolute right-0 top-0 h-full w-full max-w-lg bg-white shadow-xl flex flex-col transform transition-transform duration-300 translate-x-full' x-init='requestAnimationFrame(() => $el.classList.remove("translate-x-full"))'>
+      <div
+        x-ref='qvPanel'
+        class='absolute right-0 top-0 h-full w-full max-w-lg bg-white shadow-xl flex flex-col transform transition-transform duration-300 translate-x-full'
+        x-init='requestAnimationFrame(() => $el.classList.remove("translate-x-full"))'
+      >
         <div class='flex items-center justify-between p-5 border-b border-gray-200'>
           {% comment %} <h3 class='text-xl font-semibold' x-text='baseTitle'></h3> {% endcomment %}
-          <h3 class="text-lg font-semibold">Select options</h3>
-          <button @click='closeQuickView()' class='text-gray-500 hover:text-gray-700 text-2xl leading-none'>×</button>
+          <h3 class='text-lg font-semibold'>Select options</h3>
+          <button
+            @click='closeQuickView()'
+            class='text-gray-500 hover:text-gray-700 text-2xl leading-none'
+          >
+            ×
+          </button>
         </div>
         <div class='p-6 flex-1 overflow-y-auto'>
           <div class='flex items-start space-x-6'>
-            <img :src='qvImage || currentImage' alt='' width='160' height='160' class='w-40 h-40 object-cover' />
+            <img
+              :src='qvImage || currentImage'
+              alt=''
+              width='160'
+              height='160'
+              class='w-40 h-40 object-cover'
+            >
             <div class='min-w-0'>
-              <p class='text-gray-900 uppercase text-lg truncate' x-text='baseTitle'></p>
+              <p
+                class='text-gray-900 uppercase text-lg truncate'
+                x-text='baseTitle'
+              ></p>
               <p class='text-base mt-2'>{{ product_product.price | money }}</p>
             </div>
           </div>
 
           {% unless product_product.has_only_default_variant %}
-          <template x-if='(optionNames && optionNames.length) || (variantsData && variantsData.length)'>
-            <div>
-              <!-- Option 1 -->
-              <div class='mt-6' x-show='uniqueOptionValues(1).length'>
-                <p class='text-xs font-semibold text-gray-700 mb-2 uppercase' x-text='(optionNames[0] || "Option 1") + ":"'></p>
-                <div class='flex flex-wrap gap-3' x-show='isColorOption(1)'>
-                  <template x-for='val in uniqueOptionValues(1)' :key='`c1-${val}`'>
-                    <button @click='qvOption1 = val; updateQVSelectedVariant()' :title='val' :class="'w-12 h-12 rounded-md border overflow-hidden ' + (qvOption1 === val ? 'ring-2 ring-black' : '')">
-                      <img :src='imageForOptionValue(1,val)' alt='' width='48' height='48' class='w-full h-full object-contain'>
-                    </button>
-                  </template>
+            <template x-if='(optionNames && optionNames.length) || (variantsData && variantsData.length)'>
+              <div>
+                <!-- Option 1 -->
+                <div class='mt-6' x-show='uniqueOptionValues(1).length'>
+                  <p
+                    class='text-xs font-semibold text-gray-700 mb-2 uppercase'
+                    x-text='(optionNames[0] || "Option 1") + ":"'
+                  ></p>
+                  <div class='flex flex-wrap gap-3' x-show='isColorOption(1)'>
+                    <template
+                      x-for='val in uniqueOptionValues(1)'
+                      :key='`c1-${val}`'
+                    >
+                      <button
+                        @click='qvOption1 = val; updateQVSelectedVariant()'
+                        :title='val'
+                        :class="'w-12 h-12 rounded-md border overflow-hidden ' + (qvOption1 === val ? 'ring-2 ring-black' : '')"
+                      >
+                        <img
+                          :src='imageForOptionValue(1,val)'
+                          alt=''
+                          width='48'
+                          height='48'
+                          class='w-full h-full object-contain'
+                        >
+                      </button>
+                    </template>
+                  </div>
+                  <div class='flex flex-wrap gap-2' x-show='!isColorOption(1)'>
+                    <template
+                      x-for='val in uniqueOptionValues(1)'
+                      :key='`t1-${val}`'
+                    >
+                      <button
+                        @click='qvOption1 = val; updateQVSelectedVariant()'
+                        :class="(qvOption1 === val ? 'ring-2 ring-black ' : '') + 'px-4 py-3 border rounded-md text-sm'"
+                      >
+                        <span x-text='val'></span>
+                      </button>
+                    </template>
+                  </div>
                 </div>
-                <div class='flex flex-wrap gap-2' x-show='!isColorOption(1)'>
-                  <template x-for='val in uniqueOptionValues(1)' :key='`t1-${val}`'>
-                    <button @click='qvOption1 = val; updateQVSelectedVariant()' :class="(qvOption1 === val ? 'ring-2 ring-black ' : '') + 'px-4 py-3 border rounded-md text-sm'">
-                      <span x-text='val'></span>
-                    </button>
-                  </template>
-                </div>
-              </div>
 
-              <!-- Option 2 (if present) -->
-              <div class='mt-6' x-show='uniqueOptionValues(2).length'>
-                <p class='text-xs font-semibold text-gray-700 mb-2 uppercase' x-text='(optionNames[1] || "Option 2") + ":"'></p>
-                <div class='flex flex-wrap gap-3' x-show='isColorOption(2)'>
-                  <template x-for='val in uniqueOptionValues(2)' :key='`c2-${val}`'>
-                    <button @click='qvOption2 = val; updateQVSelectedVariant()' :disabled='!isComboAvailable(qvOption1, val)' :title='val' :class="'w-12 h-12 rounded-md border overflow-hidden ' + (qvOption2 === val ? 'ring-2 ring-black' : '') + (!isComboAvailable(qvOption1,val) ? ' opacity-40 cursor-not-allowed' : '')">
-                      <img :src='imageForOptionValue(2,val)' alt='' width='48' height='48' class='w-full h-full object-contain'>
-                    </button>
-                  </template>
-                </div>
-                <div class='flex flex-wrap gap-2' x-show='!isColorOption(2)'>
-                  <template x-for='val in uniqueOptionValues(2)' :key='`t2-${val}`'>
-                    <button @click='qvOption2 = val; updateQVSelectedVariant()' :disabled='!isComboAvailable(qvOption1, val)' :class="((qvOption2 === val ? 'ring-2 ring-black ' : '') + 'px-4 py-3 border rounded-md text-sm ') + (!isComboAvailable(qvOption1, val) ? 'opacity-40 cursor-not-allowed' : '')">
-                      <span x-text='val'></span>
-                    </button>
-                  </template>
+                <!-- Option 2 (if present) -->
+                <div class='mt-6' x-show='uniqueOptionValues(2).length'>
+                  <p
+                    class='text-xs font-semibold text-gray-700 mb-2 uppercase'
+                    x-text='(optionNames[1] || "Option 2") + ":"'
+                  ></p>
+                  <div class='flex flex-wrap gap-3' x-show='isColorOption(2)'>
+                    <template
+                      x-for='val in uniqueOptionValues(2)'
+                      :key='`c2-${val}`'
+                    >
+                      <button
+                        @click='qvOption2 = val; updateQVSelectedVariant()'
+                        :disabled='!isComboAvailable(qvOption1, val)'
+                        :title='val'
+                        :class="'w-12 h-12 rounded-md border overflow-hidden ' + (qvOption2 === val ? 'ring-2 ring-black' : '') + (!isComboAvailable(qvOption1,val) ? ' opacity-40 cursor-not-allowed' : '')"
+                      >
+                        <img
+                          :src='imageForOptionValue(2,val)'
+                          alt=''
+                          width='48'
+                          height='48'
+                          class='w-full h-full object-contain'
+                        >
+                      </button>
+                    </template>
+                  </div>
+                  <div class='flex flex-wrap gap-2' x-show='!isColorOption(2)'>
+                    <template
+                      x-for='val in uniqueOptionValues(2)'
+                      :key='`t2-${val}`'
+                    >
+                      <button
+                        @click='qvOption2 = val; updateQVSelectedVariant()'
+                        :disabled='!isComboAvailable(qvOption1, val)'
+                        :class="((qvOption2 === val ? 'ring-2 ring-black ' : '') + 'px-4 py-3 border rounded-md text-sm ') + (!isComboAvailable(qvOption1, val) ? 'opacity-40 cursor-not-allowed' : '')"
+                      >
+                        <span x-text='val'></span>
+                      </button>
+                    </template>
+                  </div>
                 </div>
               </div>
-            </div>
-          </template>
+            </template>
           {% endunless %}
 
           <div class='mt-8'>
-            <p class='text-xs font-semibold text-gray-700 mb-2 uppercase'>Quantity</p>
+            <p class='text-xs font-semibold text-gray-700 mb-2 uppercase'>
+              Quantity
+            </p>
             <div class='inline-flex items-center border'>
-              <button class='w-10 h-10 text-lg' @click='qvQuantity = Math.max(1, (qvQuantity||1) - 1)'>−</button>
-              <input type='number' min='1' x-model.number='qvQuantity' class='w-14 h-10 text-center outline-none border-none' />
-              <button class='w-10 h-10 text-lg' @click='qvQuantity = (qvQuantity||1) + 1'>+</button>
+              <button
+                class='w-10 h-10 text-lg'
+                @click='qvQuantity = Math.max(1, (qvQuantity||1) - 1)'
+              >
+                −
+              </button>
+              <input
+                type='number'
+                min='1'
+                x-model.number='qvQuantity'
+                class='w-14 h-10 text-center outline-none border-none'
+              >
+              <button
+                class='w-10 h-10 text-lg'
+                @click='qvQuantity = (qvQuantity||1) + 1'
+              >
+                +
+              </button>
             </div>
           </div>
 
           <!-- Primary action placed near options/quantity -->
           <div class='mt-6 space-y-3'>
-            <button @click='qvAddToCart()' class='w-full cursor-pointer bg-black text-white font-bold py-4 text-base hover:bg-gray-900'>Add to Cart</button>
-           <a href='{{ product_product.url }}' class='block text-center underline text-gray-700 hover:text-gray-900'>View details</a>
-            </div>
+            {% if kk_status != blank %}
+              <button
+                disabled
+                class='w-full uppercase bg-gray-400 text-white font-bold py-4 text-base cursor-not-allowed'
+              >
+                {{ kk_status }}
+              </button>
+            {% else %}
+              <button
+                @click='qvAddToCart()'
+                class='w-full cursor-pointer bg-black text-white font-bold py-4 text-base hover:bg-gray-900'
+              >
+                Add to Cart
+              </button>
+            {% endif %}
+            <a
+              href='{{ product_product.url }}'
+              class='block text-center underline text-gray-700 hover:text-gray-900'
+              >View details</a
+            >
+          </div>
         </div>
       </div>
     </div>
@@ -379,13 +502,19 @@
           this.qvQuantity = 1
           // Capture option names from product
           try {
-            const opts = Array.isArray(this.productData.options) ? this.productData.options : []
-            this.optionNames = opts.map(o => (typeof o === 'string' ? o : (o && o.name) || '')).filter(Boolean)
+            const opts = Array.isArray(this.productData.options)
+              ? this.productData.options
+              : []
+            this.optionNames = opts
+              .map(o => (typeof o === 'string' ? o : (o && o.name) || ''))
+              .filter(Boolean)
           } catch (e) {
             this.optionNames = []
           }
           // Seed option selections from current variant if available
-          const current = (this.variantsData || []).find(v => v.id === (this.selectedVariant || this.qvSelectedVariantId))
+          const current = (this.variantsData || []).find(
+            v => v.id === (this.selectedVariant || this.qvSelectedVariantId)
+          )
           if (current) {
             this.qvOption1 = current.option1 || null
             this.qvOption2 = current.option2 || null
@@ -406,14 +535,16 @@
               document.body.style.overflow = ''
             }
             // Prefer transitionend, fallback to timeout
-            const onEnd = (e) => {
+            const onEnd = e => {
               if (e && e.target !== panel) return
               panel.removeEventListener('transitionend', onEnd)
               done()
             }
             panel.addEventListener('transitionend', onEnd)
             setTimeout(() => {
-              try { panel.removeEventListener('transitionend', onEnd) } catch(_) {}
+              try {
+                panel.removeEventListener('transitionend', onEnd)
+              } catch (_) {}
               done()
             }, 320)
           } else {
@@ -486,11 +617,21 @@
           try {
             // Prefer cart sheet addToCart if available
             const cartSheet = document.querySelector('[x-data*="cartSheet"]')
-            if (cartSheet && cartSheet._x_dataStack && cartSheet._x_dataStack[0]) {
-              await cartSheet._x_dataStack[0].addToCart(this.qvSelectedVariantId || this.selectedVariant, this.qvQuantity)
+            if (
+              cartSheet &&
+              cartSheet._x_dataStack &&
+              cartSheet._x_dataStack[0]
+            ) {
+              await cartSheet._x_dataStack[0].addToCart(
+                this.qvSelectedVariantId || this.selectedVariant,
+                this.qvQuantity
+              )
             } else {
               const formData = new FormData()
-              formData.append('id', this.qvSelectedVariantId || this.selectedVariant)
+              formData.append(
+                'id',
+                this.qvSelectedVariantId || this.selectedVariant
+              )
               formData.append('quantity', String(this.qvQuantity || 1))
               await fetch('/cart/add.js', { method: 'POST', body: formData })
             }
@@ -514,14 +655,25 @@
         },
         isColorOption(index) {
           try {
-            const name = String((this.optionNames && this.optionNames[index-1]) || '').toLowerCase()
-            return ['color','colour','shade','finish'].some(k => name.includes(k))
-          } catch (e) { return false }
+            const name = String(
+              (this.optionNames && this.optionNames[index - 1]) || ''
+            ).toLowerCase()
+            return ['color', 'colour', 'shade', 'finish'].some(k =>
+              name.includes(k)
+            )
+          } catch (e) {
+            return false
+          }
         },
         imageForOptionValue(index, val) {
           // Try to find a variant whose option matches and has an image
           const key = index === 1 ? 'option1' : 'option2'
-          const variantWithImage = (this.variantsData || []).find(v => String(v[key]||'') === String(val) && v.featured_image && v.featured_image.src)
+          const variantWithImage = (this.variantsData || []).find(
+            v =>
+              String(v[key] || '') === String(val) &&
+              v.featured_image &&
+              v.featured_image.src
+          )
           if (variantWithImage) return variantWithImage.featured_image.src
           // Fallback to current product image
           return this.qvImage || this.currentImage
@@ -538,8 +690,12 @@
           let chosen = null
           if (this.qvOption1 || this.qvOption2) {
             chosen = (this.variantsData || []).find(v => {
-              const ok1 = this.qvOption1 ? String(v.option1 || '') === String(this.qvOption1) : true
-              const ok2 = this.qvOption2 ? String(v.option2 || '') === String(this.qvOption2) : true
+              const ok1 = this.qvOption1
+                ? String(v.option1 || '') === String(this.qvOption1)
+                : true
+              const ok2 = this.qvOption2
+                ? String(v.option2 || '') === String(this.qvOption2)
+                : true
               return ok1 && ok2
             })
           }
@@ -565,13 +721,12 @@
             const selectedVariant = this.variantsData.find(
               v => v.id === this.selectedVariant
             )
-          
-            
+
             // If variant has a featured image, use it
             if (selectedVariant && selectedVariant.featured_image) {
-            this.currentImage = selectedVariant.featured_image.src
+              this.currentImage = selectedVariant.featured_image.src
             } else {
-             // No featured image, use the product's featured image
+              // No featured image, use the product's featured image
             }
           }
         },
@@ -579,7 +734,9 @@
         updateTitle() {
           const typeLower = (this.productData.type || '').toLowerCase()
           // For Apparels and Accessories, never append option to title
-          const shouldAppend = !(typeLower.includes('apparel') || typeLower.includes('accessories'))
+          const shouldAppend = !(
+            typeLower.includes('apparel') || typeLower.includes('accessories')
+          )
 
           if (this.variantsData && this.variantsData.length > 0) {
             // Filter out variants with "Default Title"
@@ -613,4 +770,6 @@
   })
 </script>
 
-<!-- Removed duplicate Quick View template (handled above within component scope) -->
+<!--
+  Removed duplicate Quick View template (handled above within component scope)
+-->

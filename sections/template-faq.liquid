@@ -1,38 +1,34 @@
 <div
-  class='bg-gray-50 min-h-screen'
+  class='bg-gray-50'
   x-data='faqPage()'
 >
   <!-- Header Section -->
-  <header class='bg-black text-white py-16 relative overflow-hidden'>
-    <div class='absolute inset-0 bg-black opacity-10'></div>
-    <div class='container mx-auto px-4 relative z-10'>
+  <header
+    class='text-white relative overflow-hidden flex items-center justify-center'
+    style='background-color: {{ section.settings.header_bg_color | default: "#000000" }}; min-height: {{ section.settings.header_height | default: "200" }}px; padding-top: {{ section.settings.header_padding_top | default: "4" }}rem; padding-bottom: {{ section.settings.header_padding_bottom | default: "4" }}rem; {% if section.settings.header_border_bottom %}border-bottom: 2px solid {{ section.settings.header_border_color | default: "#ffffff" }};{% endif %}'
+  >
+    <div class='container mx-auto px-4 relative z-10 flex flex-col items-center justify-center'>
       <div class='text-center'>
-        <div class='mb-6'>
-          <svg
-            class='w-16 h-16 mx-auto opacity-90'
-            fill='currentColor'
-            viewBox='0 0 20 20'
-          >
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
-          </svg>
-        </div>
-        <h1 class='text-5xl font-bold mb-4'>
+        <h1
+          class='text-5xl font-bold mb-4'
+          style='color: {{ section.settings.title_color | default: "#ffffff" }};'
+        >
           {{
             section.settings.page_title
             | default: "Frequently Asked Questions"
           }}
         </h1>
-        <p class='text-xl opacity-90 max-w-2xl mx-auto leading-relaxed'>
+        <p
+          class='text-xl opacity-90 max-w-2xl mx-auto leading-relaxed'
+          style='color: {{ section.settings.subtitle_color | default: "#ffffff" }};'
+        >
           {{
             section.settings.page_subtitle
-            | default: "Find answers to common questions about our services, billing, and support. Can't find what you're looking for? Contact our support team."
+            | default: "Find answers to common questions about our services, billing, and support."
           }}
         </p>
       </div>
     </div>
-    <div
-      class='absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-r from-transparent via-white to-transparent opacity-20'
-    ></div>
   </header>
 
   <!-- Search and Filter Section -->
@@ -148,12 +144,6 @@
             | default: "Still have questions?"
           }}
         </h2>
-        <p class='text-xl text-gray-600 mb-8 leading-relaxed'>
-          {{
-            section.settings.contact_subtitle
-            | default: "Can't find the answer you're looking for? Our friendly support team is here to help."
-          }}
-        </p>
         <div class='flex flex-col sm:flex-row justify-center items-center gap-8 max-w-2xl mx-auto'>
           {% if section.settings.live_chat_text %}
             <div class='flex flex-col items-center text-center'>
@@ -278,19 +268,13 @@
       "type": "textarea",
       "id": "page_subtitle",
       "label": "Page Subtitle",
-      "default": "Find answers to common questions about our services, billing, and support. Can't find what you're looking for? Contact our support team."
+      "default": "Find answers to common questions about our services, billing, and support."
     },
     {
       "type": "text",
       "id": "contact_title",
       "label": "Contact Section Title",
       "default": "Still have questions?"
-    },
-    {
-      "type": "textarea",
-      "id": "contact_subtitle",
-      "label": "Contact Section Subtitle",
-      "default": "Can't find the answer you're looking for? Our friendly support team is here to help."
     },
     {
       "type": "text",
@@ -310,6 +294,70 @@
       "label": "FAQ Categories (comma-separated)",
       "default": "General, Billing, Technical, Support",
       "info": "Enter categories separated by commas (e.g., General, Billing, Technical, Support)"
+    },
+    {
+      "type": "header",
+      "content": "Header Settings"
+    },
+    {
+      "type": "color",
+      "id": "header_bg_color",
+      "label": "Header background color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "header_height",
+      "label": "Header height",
+      "min": 200,
+      "max": 600,
+      "step": 16,
+      "default": 200,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Subtitle color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "header_border_bottom",
+      "label": "Show bottom border",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "header_border_color",
+      "label": "Bottom border color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "header_padding_top",
+      "label": "Header padding top",
+      "min": 2,
+      "max": 8,
+      "step": 0.5,
+      "default": 4,
+      "unit": "rem"
+    },
+    {
+      "type": "range",
+      "id": "header_padding_bottom",
+      "label": "Header padding bottom",
+      "min": 2,
+      "max": 8,
+      "step": 0.5,
+      "default": 4,
+      "unit": "rem"
     }
   ],
   "blocks": [

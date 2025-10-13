@@ -1,5 +1,8 @@
 <!-- Index Section 2 - Full Width Image with Text Overlay -->
-<div class='relative w-full h-[70vh] min-h-[500px] overflow-hidden'>
+<div
+  class='relative w-full overflow-hidden'
+  style='height: {{ section.settings.section_height_vh | default: 70 }}vh; min-height: {{ section.settings.min_height | default: "500" }}px;'
+>
   <!-- Background Image -->
   {% if section.settings.image != blank %}
     <img
@@ -86,6 +89,30 @@
       "type": "image_picker",
       "id": "image",
       "label": "Background Image"
+    },
+    {
+      "type": "header",
+      "content": "Section Height Settings"
+    },
+    {
+      "type": "range",
+      "id": "section_height_vh",
+      "label": "Section Height (% of viewport)",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "default": 70,
+      "unit": "%"
+    },
+    {
+      "type": "range",
+      "id": "min_height",
+      "label": "Minimum Height (Mobile)",
+      "min": 300,
+      "max": 800,
+      "step": 50,
+      "default": 500,
+      "unit": "px"
     },
     {
       "type": "header",

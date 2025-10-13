@@ -58,7 +58,8 @@
         <button
           x-on:click='mobileMenuOpen = true'
           type='button'
-          class='text-white p-2 inline-flex items-center justify-center focus:outline-none'
+          class='p-2 inline-flex items-center justify-center focus:outline-none'
+          style='color: {{ section.settings.mobile_menu_button_color | default: "#ffffff" }};'
         >
           {% render "icon-menu" %}
         </button>
@@ -98,15 +99,24 @@
                 @click.away='{{ link_handle }} = false'
                 class='absolute z-10 -ml-5 mt-5 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:left-1/2 lg:-translate-x-1/2'
               >
-                <div class='shadow-lg border ring-opacity-5 overflow-hidden rounded-lg' style='border-color: {{ section.settings.child_menu_border_color | default: "#000000" }}; --tw-ring-color: {{ section.settings.child_menu_border_color | default: "#000000" }};'>
-                  <div class='relative grid gap-6 px-5 py-6 sm:gap-8 sm:p-8' style='background-color: {{ section.settings.child_menu_bg_color | default: "#1f2937" }};'>
+                <div
+                  class='shadow-lg border ring-opacity-5 overflow-hidden rounded-lg'
+                  style='border-color: {{ section.settings.child_menu_border_color | default: "#000000" }}; --tw-ring-color: {{ section.settings.child_menu_border_color | default: "#000000" }};'
+                >
+                  <div
+                    class='relative grid gap-6 px-5 py-6 sm:gap-8 sm:p-8'
+                    style='background-color: {{ section.settings.child_menu_bg_color | default: "#1f2937" }};'
+                  >
                     {% for childlink in link.links %}
                       <a
                         href='{{ childlink.url }}'
                         class='-m-3 p-3 flex items start rounded-lg child-menu-link'
                       >
                         <div class='ml-4'>
-                          <p class='text-base font-medium' style='color: {{ section.settings.child_menu_link_color | default: "#ffffff" }};'>
+                          <p
+                            class='text-base font-medium'
+                            style='color: {{ section.settings.child_menu_link_color | default: "#ffffff" }};'
+                          >
                             {{ childlink.title }}
                           </p>
                         </div>
@@ -148,7 +158,8 @@
             <span
               x-show='itemCount > 0'
               x-text='itemCount'
-              class='absolute -top-2 -right-2 bg-white text-black text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold'
+              class='absolute -top-2 -right-2 text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold'
+              style='background-color: {{ section.settings.cart_badge_bg_color | default: "#ffffff" }}; color: {{ section.settings.cart_badge_text_color | default: "#000000" }};'
             ></span>
           </button>
         </div>
@@ -190,13 +201,22 @@
         @click.away='mobileMenuOpen = false'
         class='absolute z-10 top-0 inset-x-0 p-2 transform origin-top-left md:hidden'
       >
-        <div class='shadow-lg rounded-lg ring-1 ring-black ring-opacity-5 bg-gray-800 w-full'>
-          <div class='p-5 divide-y-2 divide-gray-700'>
+        <div
+          class='shadow-lg rounded-lg ring-1 ring-black ring-opacity-5 w-full'
+          style='background-color: {{ section.settings.mobile_menu_bg_color | default: "#1f2937" }};'
+        >
+          <div
+            class='p-5 divide-y-2'
+            style='border-color: {{ section.settings.mobile_menu_border_color | default: "#374151" }};'
+          >
             <!-- MOBILE MENU HEADER TITLE PLUS CLOSE BUTTON -->
 
             <div class='flex items-center justify-between pb-3'>
               <div>
-                <h1 class='text-lg text-white'>
+                <h1
+                  class='text-lg'
+                  style='color: {{ section.settings.mobile_menu_title_color | default: "#ffffff" }};'
+                >
                   {{ section.settings.mobile_menu_title }}
                 </h1>
               </div>
@@ -204,7 +224,8 @@
                 <button
                   x-on:click='mobileMenuOpen = false'
                   type='button'
-                  class='bg-gray-800 rounded-md p-2 text-white'
+                  class='rounded-md p-2'
+                  style='background-color: {{ section.settings.mobile_menu_close_button_bg_color | default: "#1f2937" }}; color: {{ section.settings.mobile_menu_close_button_color | default: "#ffffff" }};'
                 >
                   {% render "icon-close" %}
                 </button>
@@ -231,7 +252,8 @@
                       <button
                         x-on:click='{{ mobile_link_handle }} = ! {{ mobile_link_handle }}'
                         type='button'
-                        class='text-base text-white hover:text-gray-100 flex items-center justify-between w-full'
+                        class='text-base flex items-center justify-between w-full'
+                        style='color: {{ section.settings.mobile_menu_link_color | default: "#ffffff" }};'
                       >
                         <div>{{ link.title }}</div>
                         {% render "icon-dropdown" %}
@@ -244,9 +266,12 @@
                         {% for childlink in link.links %}
                           <a
                             href='{{ childlink.url }}'
-                            class='-m-3 p-3 mt-2 flex items-center rounded-md text-white hover:text-gray-100 hover:bg-gray-700'
+                            class='-m-3 p-3 mt-2 flex items-center rounded-md'
+                            style='color: {{ section.settings.mobile_menu_link_color | default: "#ffffff" }}; transition: background-color 0.2s ease, color 0.2s ease;'
+                            onmouseover='this.style.backgroundColor="{{ section.settings.mobile_menu_link_hover_bg_color | default: "#374151" }}"; this.style.color="{{ section.settings.mobile_menu_link_hover_text_color | default: "#ffffff" }}"'
+                            onmouseout='this.style.backgroundColor="transparent"; this.style.color="{{ section.settings.mobile_menu_link_color | default: "#ffffff" }}"'
                           >
-                            <span class='ml-3 text-base font-medium text-white'>
+                            <span class='ml-3 text-base font-medium'>
                               {{- childlink.title -}}
                             </span>
                           </a>
@@ -256,7 +281,10 @@
                   {% else %}
                     <a
                       href='{{ link.url }}'
-                      class='-m-3 p-3 flex items-center rounded-md text-white hover:text-gray-100 hover:bg-gray-700'
+                      class='-m-3 p-3 flex items-center rounded-md'
+                      style='color: {{ section.settings.mobile_menu_link_color | default: "#ffffff" }}; transition: background-color 0.2s ease, color 0.2s ease;'
+                      onmouseover='this.style.backgroundColor="{{ section.settings.mobile_menu_link_hover_bg_color | default: "#374151" }}"; this.style.color="{{ section.settings.mobile_menu_link_hover_text_color | default: "#ffffff" }}"'
+                      onmouseout='this.style.backgroundColor="transparent"; this.style.color="{{ section.settings.mobile_menu_link_color | default: "#ffffff" }}"'
                     >
                       {{ link.title }}
                     </a>
@@ -264,11 +292,17 @@
                 {% endfor %}
 
                 <!-- Mobile Menu Actions -->
-                <div class='border-t border-gray-700 pt-4'>
+                <div
+                  class='border-t pt-4'
+                  style='border-color: {{ section.settings.mobile_menu_border_color | default: "#374151" }};'
+                >
                   <!-- Search -->
                   <button
                     @click='window.dispatchEvent(new CustomEvent("open-search")); mobileMenuOpen = false'
-                    class='-m-3 p-3 flex items-center rounded-md text-white hover:text-gray-100 hover:bg-gray-700 w-full text-left'
+                    class='-m-3 p-3 flex items-center rounded-md w-full text-left'
+                    style='color: {{ section.settings.mobile_menu_link_color | default: "#ffffff" }}; transition: background-color 0.2s ease, color 0.2s ease;'
+                    onmouseover='this.style.backgroundColor="{{ section.settings.mobile_menu_link_hover_bg_color | default: "#374151" }}"; this.style.color="{{ section.settings.mobile_menu_link_hover_text_color | default: "#ffffff" }}"'
+                    onmouseout='this.style.backgroundColor="transparent"; this.style.color="{{ section.settings.mobile_menu_link_color | default: "#ffffff" }}"'
                   >
                     Search
                   </button>
@@ -276,7 +310,10 @@
                   <!-- Cart -->
                   <button
                     @click='window.dispatchEvent(new CustomEvent("open-cart")); mobileMenuOpen = false'
-                    class='-m-3 p-3 flex items-center rounded-md text-white hover:text-gray-100 hover:bg-gray-700 w-full text-left'
+                    class='-m-3 p-3 flex items-center rounded-md w-full text-left'
+                    style='color: {{ section.settings.mobile_menu_link_color | default: "#ffffff" }}; transition: background-color 0.2s ease, color 0.2s ease;'
+                    onmouseover='this.style.backgroundColor="{{ section.settings.mobile_menu_link_hover_bg_color | default: "#374151" }}"; this.style.color="{{ section.settings.mobile_menu_link_hover_text_color | default: "#ffffff" }}"'
+                    onmouseout='this.style.backgroundColor="transparent"; this.style.color="{{ section.settings.mobile_menu_link_color | default: "#ffffff" }}"'
                   >
                     Cart
                   </button>
@@ -286,26 +323,38 @@
                     {% if customer %}
                       <a
                         href='{{ routes.account_url }}'
-                        class='-m-3 p-3 flex items-center rounded-md text-white hover:text-gray-100 hover:bg-gray-700'
+                        class='-m-3 p-3 flex items-center rounded-md'
+                        style='color: {{ section.settings.mobile_menu_link_color | default: "#ffffff" }}; transition: background-color 0.2s ease, color 0.2s ease;'
+                        onmouseover='this.style.backgroundColor="{{ section.settings.mobile_menu_link_hover_bg_color | default: "#374151" }}"; this.style.color="{{ section.settings.mobile_menu_link_hover_text_color | default: "#ffffff" }}"'
+                        onmouseout='this.style.backgroundColor="transparent"; this.style.color="{{ section.settings.mobile_menu_link_color | default: "#ffffff" }}"'
                       >
                         Account
                       </a>
                       <a
                         href='{{ routes.account_logout_url }}'
-                        class='-m-3 p-3 flex items-center rounded-md text-white hover:text-gray-100 hover:bg-gray-700'
+                        class='-m-3 p-3 flex items-center rounded-md'
+                        style='color: {{ section.settings.mobile_menu_link_color | default: "#ffffff" }}; transition: background-color 0.2s ease, color 0.2s ease;'
+                        onmouseover='this.style.backgroundColor="{{ section.settings.mobile_menu_link_hover_bg_color | default: "#374151" }}"; this.style.color="{{ section.settings.mobile_menu_link_hover_text_color | default: "#ffffff" }}"'
+                        onmouseout='this.style.backgroundColor="transparent"; this.style.color="{{ section.settings.mobile_menu_link_color | default: "#ffffff" }}"'
                       >
                         Log out
                       </a>
                     {% else %}
                       <a
                         href='{{ routes.account_login_url }}'
-                        class='-m-3 p-3 flex items-center rounded-md text-white hover:text-gray-100 hover:bg-gray-700'
+                        class='-m-3 p-3 flex items-center rounded-md'
+                        style='color: {{ section.settings.mobile_menu_link_color | default: "#ffffff" }}; transition: background-color 0.2s ease, color 0.2s ease;'
+                        onmouseover='this.style.backgroundColor="{{ section.settings.mobile_menu_link_hover_bg_color | default: "#374151" }}"; this.style.color="{{ section.settings.mobile_menu_link_hover_text_color | default: "#ffffff" }}"'
+                        onmouseout='this.style.backgroundColor="transparent"; this.style.color="{{ section.settings.mobile_menu_link_color | default: "#ffffff" }}"'
                       >
                         Log in
                       </a>
                       <a
                         href='{{ routes.account_register_url }}'
-                        class='-m-3 p-3 flex items-center rounded-md text-white hover:text-gray-100 hover:bg-gray-700'
+                        class='-m-3 p-3 flex items-center rounded-md'
+                        style='color: {{ section.settings.mobile_menu_link_color | default: "#ffffff" }}; transition: background-color 0.2s ease, color 0.2s ease;'
+                        onmouseover='this.style.backgroundColor="{{ section.settings.mobile_menu_link_hover_bg_color | default: "#374151" }}"; this.style.color="{{ section.settings.mobile_menu_link_hover_text_color | default: "#ffffff" }}"'
+                        onmouseout='this.style.backgroundColor="transparent"; this.style.color="{{ section.settings.mobile_menu_link_color | default: "#ffffff" }}"'
                       >
                         Register
                       </a>
@@ -450,6 +499,80 @@
       "id": "child_menu_hover_text_color",
       "label": "Child menu link hover text color",
       "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Mobile Menu Settings"
+    },
+    {
+      "type": "color",
+      "id": "mobile_menu_button_color",
+      "label": "Mobile menu button color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "mobile_menu_bg_color",
+      "label": "Mobile menu background color",
+      "default": "#1f2937"
+    },
+    {
+      "type": "color",
+      "id": "mobile_menu_title_color",
+      "label": "Mobile menu title color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "mobile_menu_link_color",
+      "label": "Mobile menu link color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "mobile_menu_link_hover_bg_color",
+      "label": "Mobile menu link hover background",
+      "default": "#374151"
+    },
+    {
+      "type": "color",
+      "id": "mobile_menu_link_hover_text_color",
+      "label": "Mobile menu link hover text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "mobile_menu_border_color",
+      "label": "Mobile menu border color",
+      "default": "#374151"
+    },
+    {
+      "type": "color",
+      "id": "mobile_menu_close_button_bg_color",
+      "label": "Mobile menu close button background",
+      "default": "#1f2937"
+    },
+    {
+      "type": "color",
+      "id": "mobile_menu_close_button_color",
+      "label": "Mobile menu close button icon color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Cart Badge Settings"
+    },
+    {
+      "type": "color",
+      "id": "cart_badge_bg_color",
+      "label": "Cart badge background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "cart_badge_text_color",
+      "label": "Cart badge text color",
+      "default": "#000000"
     }
   ]
 }

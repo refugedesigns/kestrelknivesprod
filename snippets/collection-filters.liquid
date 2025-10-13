@@ -173,7 +173,9 @@
             .split(/\s+/)
             .map(w => w.charAt(0).toUpperCase() + w.slice(1))
             .join(' ')
-        } catch (e) { return str }
+        } catch (e) {
+          return str
+        }
       },
       filtersOpen: {
         productType: true,
@@ -206,7 +208,10 @@
           const fetchUrl = preview
             ? `/collections/all?view=filter-meta&preview_theme_id=${encodeURIComponent(preview)}`
             : '/collections/all?view=filter-meta'
-          const res = await fetch(fetchUrl, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+          const res = await fetch(fetchUrl, {
+            credentials: 'same-origin',
+            headers: { Accept: 'application/json' },
+          })
           if (!res.ok) return []
           const text = await res.text()
           const parsed = JSON.parse(text || '{}')
@@ -214,21 +219,35 @@
           const arr = (parsed && parsed.productTypes) || []
           if (arr && arr.length) {
             return arr
-              .map(it => ({ value: String(it.value || ''), count: Number(it.count || 0) }))
+              .map(it => ({
+                value: String(it.value || ''),
+                count: Number(it.count || 0),
+              }))
               .filter(it => it.value)
           }
           // Fallback: fetch list of collections and map to product types heuristically
           const url2 = preview
             ? `/collections?view=filter-meta&preview_theme_id=${encodeURIComponent(preview)}`
             : '/collections?view=filter-meta'
-          const res2 = await fetch(url2, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+          const res2 = await fetch(url2, {
+            credentials: 'same-origin',
+            headers: { Accept: 'application/json' },
+          })
           if (!res2.ok) return []
           const text2 = await res2.text()
           const parsed2 = JSON.parse(text2 || '{}')
           const colls = (parsed2 && parsed2.collections) || []
           // Convert collections to product types by title
-          const HIDE_HANDLES = ['all','frontpage','products','featured','home','home-page','homepage']
-          const HIDE_TITLES = ['featured','home page','products']
+          const HIDE_HANDLES = [
+            'all',
+            'frontpage',
+            'products',
+            'featured',
+            'home',
+            'home-page',
+            'homepage',
+          ]
+          const HIDE_TITLES = ['featured', 'home page', 'products']
           return colls
             .filter(c => {
               const h = String(c.handle || '').toLowerCase()
@@ -254,7 +273,10 @@
           if (cachedTypes && cachedTypes.length >= 2) return cachedTypes
           const fetched = await this.fetchAllProductTypesFromAllCollection()
           if (fetched && fetched.length) {
-            sessionStorage.setItem('kk_allProductTypes', JSON.stringify(fetched))
+            sessionStorage.setItem(
+              'kk_allProductTypes',
+              JSON.stringify(fetched)
+            )
             return fetched
           }
           return []
@@ -266,7 +288,7 @@
       hydrateFromUrl() {
         try {
           const url = new URL(window.location.href)
-          
+
           // Product types (multiple allowed)
           const types = url.searchParams.getAll('filter.p.product_type')
           if (types && types.length) {
@@ -274,10 +296,12 @@
             // If URL has both Knives and Custom, select Knives (since Custom is hidden)
             const hasKnives = types.some(t => t.toLowerCase() === 'knives')
             const hasCustom = types.some(t => t.toLowerCase() === 'Custom')
-            
+
             if (hasKnives && hasCustom) {
               // Both present, select Knives
-              this.selectedFilters.productTypeSelected = types.find(t => t.toLowerCase() === 'knives')
+              this.selectedFilters.productTypeSelected = types.find(
+                t => t.toLowerCase() === 'knives'
+              )
             } else if (hasCustom && !hasKnives) {
               // Only Custom (from old URL or direct access), don't select anything
               this.selectedFilters.productTypeSelected = ''
@@ -285,7 +309,7 @@
               // Normal case: use first type
               this.selectedFilters.productTypeSelected = types[0]
             }
-            
+
             // Ensure the selected type is in productTypes array
             if (this.selectedFilters.productTypeSelected) {
               const selectedExists = (this.productTypes || []).some(
@@ -293,7 +317,10 @@
               )
               if (!selectedExists) {
                 // Add it to ensure the radio button can render
-                this.productTypes.push({ value: this.selectedFilters.productTypeSelected, count: 0 })
+                this.productTypes.push({
+                  value: this.selectedFilters.productTypeSelected,
+                  count: 0,
+                })
               }
             }
           } else {
@@ -317,8 +344,16 @@
                 // Direct match
                 if (typeHandle === handle) return true
                 // Plural/singular swap
-                if (handle.endsWith('s') && typeHandle === handle.slice(0, 1) + handle.slice(1, -1)) return true
-                if (typeHandle.endsWith('s') && handle === typeHandle.slice(0, -1)) return true
+                if (
+                  handle.endsWith('s') &&
+                  typeHandle === handle.slice(0, 1) + handle.slice(1, -1)
+                )
+                  return true
+                if (
+                  typeHandle.endsWith('s') &&
+                  handle === typeHandle.slice(0, -1)
+                )
+                  return true
                 // Suffix match: allow collection handle being a suffix of the type handle
                 // e.g., handle "knives" should match "ultralight-knives"
                 if (typeHandle.endsWith('-' + handle)) return true
@@ -326,17 +361,23 @@
               }
 
               // Find a product type whose handle matches the collection handle
-              const matchType = (this.productTypes || []).find(
-                pt => matchesHandle(pt.value, collectionHandle)
+              const matchType = (this.productTypes || []).find(pt =>
+                matchesHandle(pt.value, collectionHandle)
               )
               if (matchType) {
                 this.selectedFilters.productTypeSelected = matchType.value
-                
+
                 // Auto-redirect to include custom products when on knives collection
-                if (matchType.value.toLowerCase() === 'knives' || collectionHandle === 'knives') {
+                if (
+                  matchType.value.toLowerCase() === 'knives' ||
+                  collectionHandle === 'knives'
+                ) {
                   // Redirect to add both Knives and custom filters
                   const newUrl = new URL(window.location.href)
-                  newUrl.searchParams.append('filter.p.product_type', matchType.value)
+                  newUrl.searchParams.append(
+                    'filter.p.product_type',
+                    matchType.value
+                  )
                   newUrl.searchParams.append('filter.p.product_type', 'Custom')
                   if (newUrl.toString() !== window.location.href) {
                     window.location.href = newUrl.toString()
@@ -369,7 +410,10 @@
           // Current page facet (may be partial). Filter out 'custom'.
           const metaTypes = (meta.productTypes || [])
             .filter(t => String(t.value || '').toLowerCase() !== 'custom')
-            .map(t => ({ value: String(t.value || ''), count: Number(t.count || 0) }))
+            .map(t => ({
+              value: String(t.value || ''),
+              count: Number(t.count || 0),
+            }))
 
           // Always attempt to use the full set from /collections/all
           const fullTypes = await this.getFullProductTypes()
@@ -392,7 +436,10 @@
             if (!t || t.toLowerCase() === 'custom') return
             counts[t] = (counts[t] || 0) + 1
           })
-          this.productTypes = Object.keys(counts).map(k => ({ value: k, count: counts[k] }))
+          this.productTypes = Object.keys(counts).map(k => ({
+            value: k,
+            count: counts[k],
+          }))
         } catch (e) {
           this.productTypes = []
         }
@@ -473,7 +520,8 @@
         }
         // availability
         url.searchParams.delete('filter.v.availability')
-        const availabilitySelected = this.selectedFilters.availabilitySelected || ''
+        const availabilitySelected =
+          this.selectedFilters.availabilitySelected || ''
         if (availabilitySelected === 'in-stock') {
           url.searchParams.append('filter.v.availability', '1')
         } else if (availabilitySelected === 'out-of-stock') {

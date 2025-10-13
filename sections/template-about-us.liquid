@@ -56,6 +56,64 @@
         }
       ],
       "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Default Header Settings"
+    },
+    {
+      "type": "color",
+      "id": "header_bg_color",
+      "label": "Header background color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "header_height_custom",
+      "label": "Header height",
+      "min": 200,
+      "max": 600,
+      "step": 16,
+      "default": 200,
+      "unit": "px"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "header_border_bottom",
+      "label": "Show bottom border",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "header_border_color",
+      "label": "Bottom border color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "header_padding_top",
+      "label": "Header padding top",
+      "min": 2,
+      "max": 8,
+      "step": 0.5,
+      "default": 4,
+      "unit": "rem"
+    },
+    {
+      "type": "range",
+      "id": "header_padding_bottom",
+      "label": "Header padding bottom",
+      "min": 2,
+      "max": 8,
+      "step": 0.5,
+      "default": 4,
+      "unit": "rem"
     }
   ],
   "presets": [
@@ -106,12 +164,19 @@
   </div>
 {% else %}
   <!-- Default Header Section (like template-page.liquid) -->
-  <div class='bg-gray-50 min-h-screen'>
-    <header class='bg-black text-white py-8 relative overflow-hidden md:h-96'>
-      <div class='absolute inset-0 bg-black opacity-10'></div>
-      <div class='container mx-auto px-4 relative z-10 h-full flex flex-col items-center justify-center'>
+  <div class='bg-gray-50'>
+    <header
+      class='text-white relative overflow-hidden flex items-center justify-center'
+      style='background-color: {{ section.settings.header_bg_color | default: "#000000" }}; min-height: {{ section.settings.header_height_custom | default: "200" }}px; padding-top: {{ section.settings.header_padding_top | default: "4" }}rem; padding-bottom: {{ section.settings.header_padding_bottom | default: "4" }}rem; {% if section.settings.header_border_bottom %}border-bottom: 2px solid {{ section.settings.header_border_color | default: "#ffffff" }};{% endif %}'
+    >
+      <div class='container mx-auto px-4 relative z-10 flex flex-col items-center justify-center'>
         <div class='text-center'>
-          <h1 class='text-5xl font-bold mb-4 text-white'>{{ page.title }}</h1>
+          <h1
+            class='text-5xl font-bold mb-4'
+            style='color: {{ section.settings.title_color | default: "#ffffff" }};'
+          >
+            {{ page.title }}
+          </h1>
           {% if page.excerpt != blank %}
             <p class='text-xl opacity-90 max-w-2xl mx-auto leading-relaxed'>
               {{ page.excerpt }}
@@ -119,9 +184,6 @@
           {% endif %}
         </div>
       </div>
-      <div
-        class='absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-r from-transparent via-white to-transparent opacity-20'
-      ></div>
     </header>
 {% endif %}
 

@@ -34,11 +34,24 @@
       [x-cloak] {
         display: none;
       }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        display: flex;
+        min-height: 100vh;
+        flex-direction: column;
+      }
+      main[role='main'] {
+        flex: 1 0 auto;
+      }
     </style>
   </head>
-  <body>
+  <body class='min-h-screen flex flex-col'>
     {% section "header" %}
-    <main role='main' class='pt-16'>
+    <main role='main' class='pt-16 flex-1'>
       {{ content_for_layout }}
     </main>
 
@@ -55,6 +68,7 @@
     <!-- Flowbite CDN -->
     <script
       src='https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js'
+      defer
     ></script>
   </body>
 </html>

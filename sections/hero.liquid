@@ -1,212 +1,275 @@
 <!-- Hero Carousel Section -->
 <div class='relative pt-4'>
   <!-- Scaled Wrapper -->
-  <div class='hero-scale-wrap' style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %};'>
+  <div
+    class='hero-scale-wrap'
+    style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %};'
+  >
     <!-- Swiper Container -->
     <swiper-container
-    class='hero-swiper'
-    pagination='true'
-    pagination-clickable='true'
-    navigation='false'
-    space-between='0'
-    centered-slides='true'
-    autoplay-delay='{{ section.settings.autoplay_delay | default: 5000 }}'
-    autoplay-disable-on-interaction='false'
-    loop='true'
-  >
-    <!-- Slide 1 -->
-    <swiper-slide class='relative'>
-      {% if section.settings.slide_1_image != blank %}
-        <img
-          src='{{ section.settings.slide_1_image | img_url: "1920x1080" }}'
-          alt='{{ section.settings.slide_1_title | default: "Premium Knives" }}'
-          class='w-full h-full'
-          style='object-fit: {{ section.settings.slide_1_image_fit | default: "cover" }}; object-position: {{ section.settings.slide_1_image_position | default: "center" }}; transform: scale({{ section.settings.slide_1_image_zoom | default: 100 | divided_by: 100.0 }});'
-        >
-      {% else %}
-        {{
-          "lifestyle-1"
-          | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
-        }}
-      {% endif %}
-      {% if section.settings.show_text_overlay %}
-        <div class='absolute inset-0 flex items-center justify-center lg:justify-start z-10'>
-          <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-16'>
-            {% assign s1_shadow = section.settings.slide_1_text_shadow_strength | default: 'soft' %}
-            {% assign s1_op = '0.35' %}
-            {% case s1_shadow %}
-              {% when 'none' %}{% assign s1_op = '0' %}
-              {% when 'soft' %}{% assign s1_op = '0.35' %}
-              {% when 'medium' %}{% assign s1_op = '0.6' %}
-              {% when 'strong' %}{% assign s1_op = '0.85' %}
-            {% endcase %}
-            <div class='kk-text-wrap inline-block'>
-              {% if section.settings.slide_1_text_bg_enable %}
-                {% assign s1_bg_op_pct = section.settings.slide_1_text_bg_opacity | default: 50 %}
-                {% assign s1_bg_alpha = s1_bg_op_pct | divided_by: 100.0 %}
-                <div class='kk-text-bg' style='background-color: {{ section.settings.slide_1_text_bg_color | default: '#000000' | color_modify: 'alpha', s1_bg_alpha }}'></div>
+      class='hero-swiper'
+      pagination='true'
+      pagination-clickable='true'
+      navigation='false'
+      space-between='0'
+      centered-slides='true'
+      autoplay-delay='{{ section.settings.autoplay_delay | default: 5000 }}'
+      autoplay-disable-on-interaction='false'
+      loop='true'
+    >
+      <!-- Slide 1 -->
+      <swiper-slide class='relative'>
+        {% if section.settings.slide_1_image != blank %}
+          <img
+            src='{{ section.settings.slide_1_image | img_url: "1920x1080" }}'
+            alt='{{ section.settings.slide_1_title | default: "Premium Knives" }}'
+            class='w-full h-full'
+            style='object-fit: {{ section.settings.slide_1_image_fit | default: "cover" }}; object-position: {{ section.settings.slide_1_image_position | default: "center" }}; transform: scale({{ section.settings.slide_1_image_zoom | default: 100 | divided_by: 100.0 }});'
+          >
+        {% else %}
+          {{
+            "lifestyle-1"
+            | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
+          }}
+        {% endif %}
+        {% if section.settings.show_text_overlay %}
+          <div class='absolute inset-0 flex items-center justify-center lg:justify-start z-10'>
+            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-16'>
+              {% assign s1_shadow = section.settings.slide_1_text_shadow_strength
+                | default: "soft"
+              %}
+              {% assign s1_op = "0.35" %}
+              {% case s1_shadow %}
+                {% when "none" -%}
+                  {%- assign s1_op = "0" %}
+                {% when "soft" -%}
+                  {%- assign s1_op = "0.35" %}
+                {% when "medium" -%}
+                  {%- assign s1_op = "0.6" %}
+                {% when "strong" -%}
+                  {%- assign s1_op = "0.85" %}
+              {% endcase %}
+              <div class='kk-text-wrap inline-block'>
+                {% if section.settings.slide_1_text_bg_enable %}
+                  {% assign s1_bg_op_pct = section.settings.slide_1_text_bg_opacity
+                    | default: 50
+                  %}
+                  {% assign s1_bg_alpha = s1_bg_op_pct | divided_by: 100.0 %}
+                  <div
+                    class='kk-text-bg'
+                    style='background-color: {{ section.settings.slide_1_text_bg_color | default: '#000000' | color_modify: 'alpha', s1_bg_alpha }}'
+                  ></div>
+                {% endif %}
+                <div class='kk-text-content'>
+                  <h1
+                    class='text-4xl md:text-6xl font-bold mb-4'
+                    style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'
+                  >
+                    {{
+                      section.settings.slide_1_title
+                      | default: "Premium Knives"
+                    }}
+                  </h1>
+                  <p
+                    class='text-lg md:text-xl mb-8'
+                    style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'
+                  >
+                    {{
+                      section.settings.slide_1_subtitle
+                      | default: "Crafted with precision, designed for perfection"
+                    }}
+                  </p>
+                </div>
+              </div>
+              {% if section.settings.slide_1_button_enable
+                and section.settings.slide_1_button_text != blank
+              %}
+                <div class='mt-4'>
+                  <a
+                    href='{{ section.settings.slide_1_button_url | default: "/collections/all" }}'
+                    class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                    style='background-color: {{ section.settings.slide_1_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_1_button_text_color | default: "#ffffff" }};'
+                  >
+                    {{ section.settings.slide_1_button_text }}
+                  </a>
+                </div>
               {% endif %}
-              <div class='kk-text-content'>
-                <h1 class='text-4xl md:text-6xl font-bold mb-4' style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'>
-                  {{ section.settings.slide_1_title | default: "Premium Knives" }}
-                </h1>
-                <p class='text-lg md:text-xl mb-8' style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'>
-                  {{
-                    section.settings.slide_1_subtitle
-                    | default: "Crafted with precision, designed for perfection"
-                  }}
-                </p>
-              </div>
             </div>
-            {% if section.settings.slide_1_button_enable and section.settings.slide_1_button_text != blank %}
-              <div class='mt-4'>
-                <a
-                  href='{{ section.settings.slide_1_button_url | default: "/collections/all" }}'
-                  class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                  style='background-color: {{ section.settings.slide_1_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_1_button_text_color | default: "#ffffff" }};'
-                >
-                  {{ section.settings.slide_1_button_text }}
-                </a>
-              </div>
-            {% endif %}
           </div>
-        </div>
-      {% endif %}
-    </swiper-slide>
+        {% endif %}
+      </swiper-slide>
 
-    <!-- Slide 2 -->
-    <swiper-slide class='relative'>
-      {% if section.settings.slide_2_image != blank %}
-        <img
-          src='{{ section.settings.slide_2_image | img_url: "1920x1080" }}'
-          alt='{{ section.settings.slide_2_title | default: "Professional Grade" }}'
-          class='w-full h-full'
-          style='object-fit: {{ section.settings.slide_2_image_fit | default: "cover" }}; object-position: {{ section.settings.slide_2_image_position | default: "center" }}; transform: scale({{ section.settings.slide_2_image_zoom | default: 100 | divided_by: 100.0 }});'
-        >
-      {% else %}
-        {{
-          "lifestyle-1"
-          | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
-        }}
-      {% endif %}
-      {% if section.settings.show_text_overlay %}
-        <div class='absolute inset-0 flex items-center justify-center lg:block z-10'>
-          <div class='text-center lg:text-left max-w-4xl mx-auto lg:mx-0 px-4 lg:absolute lg:left-16 lg:top-1/2 lg:-translate-y-1/2'>
-            {% assign s2_shadow = section.settings.slide_2_text_shadow_strength | default: 'soft' %}
-            {% assign s2_op = '0.35' %}
-            {% case s2_shadow %}
-              {% when 'none' %}{% assign s2_op = '0' %}
-              {% when 'soft' %}{% assign s2_op = '0.35' %}
-              {% when 'medium' %}{% assign s2_op = '0.6' %}
-              {% when 'strong' %}{% assign s2_op = '0.85' %}
-            {% endcase %}
-            <div class='kk-text-wrap inline-block'>
-              {% if section.settings.slide_2_text_bg_enable %}
-                {% assign s2_bg_op_pct = section.settings.slide_2_text_bg_opacity | default: 50 %}
-                {% assign s2_bg_alpha = s2_bg_op_pct | divided_by: 100.0 %}
-                <div class='kk-text-bg' style='background-color: {{ section.settings.slide_2_text_bg_color | default: '#000000' | color_modify: 'alpha', s2_bg_alpha }}'></div>
+      <!-- Slide 2 -->
+      <swiper-slide class='relative'>
+        {% if section.settings.slide_2_image != blank %}
+          <img
+            src='{{ section.settings.slide_2_image | img_url: "1920x1080" }}'
+            alt='{{ section.settings.slide_2_title | default: "Professional Grade" }}'
+            class='w-full h-full'
+            style='object-fit: {{ section.settings.slide_2_image_fit | default: "cover" }}; object-position: {{ section.settings.slide_2_image_position | default: "center" }}; transform: scale({{ section.settings.slide_2_image_zoom | default: 100 | divided_by: 100.0 }});'
+          >
+        {% else %}
+          {{
+            "lifestyle-1"
+            | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
+          }}
+        {% endif %}
+        {% if section.settings.show_text_overlay %}
+          <div class='absolute inset-0 flex items-center justify-center lg:block z-10'>
+            <div class='text-center lg:text-left max-w-4xl mx-auto lg:mx-0 px-4 lg:absolute lg:left-16 lg:top-1/2 lg:-translate-y-1/2'>
+              {% assign s2_shadow = section.settings.slide_2_text_shadow_strength
+                | default: "soft"
+              %}
+              {% assign s2_op = "0.35" %}
+              {% case s2_shadow %}
+                {% when "none" -%}
+                  {%- assign s2_op = "0" %}
+                {% when "soft" -%}
+                  {%- assign s2_op = "0.35" %}
+                {% when "medium" -%}
+                  {%- assign s2_op = "0.6" %}
+                {% when "strong" -%}
+                  {%- assign s2_op = "0.85" %}
+              {% endcase %}
+              <div class='kk-text-wrap inline-block'>
+                {% if section.settings.slide_2_text_bg_enable %}
+                  {% assign s2_bg_op_pct = section.settings.slide_2_text_bg_opacity
+                    | default: 50
+                  %}
+                  {% assign s2_bg_alpha = s2_bg_op_pct | divided_by: 100.0 %}
+                  <div
+                    class='kk-text-bg'
+                    style='background-color: {{ section.settings.slide_2_text_bg_color | default: '#000000' | color_modify: 'alpha', s2_bg_alpha }}'
+                  ></div>
+                {% endif %}
+                <div class='kk-text-content'>
+                  <h1
+                    class='text-4xl md:text-6xl font-bold mb-4'
+                    style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
+                  >
+                    {{
+                      section.settings.slide_2_title
+                      | default: "Professional Grade"
+                    }}
+                  </h1>
+                  <p
+                    class='text-lg md:text-xl mb-8'
+                    style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
+                  >
+                    {{
+                      section.settings.slide_2_subtitle
+                      | default: "Tools that professionals trust"
+                    }}
+                  </p>
+                </div>
+              </div>
+              {% if section.settings.slide_2_button_enable
+                and section.settings.slide_2_button_text != blank
+              %}
+                <div class='mt-4'>
+                  <a
+                    href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
+                    class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                    style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
+                  >
+                    {{ section.settings.slide_2_button_text }}
+                  </a>
+                </div>
               {% endif %}
-              <div class='kk-text-content'>
-                <h1 class='text-4xl md:text-6xl font-bold mb-4' style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'>
-                  {{
-                    section.settings.slide_2_title
-                    | default: "Professional Grade"
-                  }}
-                </h1>
-                <p class='text-lg md:text-xl mb-8' style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'>
-                  {{
-                    section.settings.slide_2_subtitle
-                    | default: "Tools that professionals trust"
-                  }}
-                </p>
-              </div>
             </div>
-            {% if section.settings.slide_2_button_enable and section.settings.slide_2_button_text != blank %}
-              <div class='mt-4'>
-                <a
-                  href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
-                  class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                  style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
-                >
-                  {{ section.settings.slide_2_button_text }}
-                </a>
-              </div>
-            {% endif %}
           </div>
-        </div>
-      {% endif %}
-    </swiper-slide>
+        {% endif %}
+      </swiper-slide>
 
-    <!-- Slide 3 -->
-    <swiper-slide class='relative'>
-      {% if section.settings.slide_3_image != blank %}
-        <img
-          src='{{ section.settings.slide_3_image | img_url: "1920x1080" }}'
-          alt='{{ section.settings.slide_3_title | default: "Handcrafted Excellence" }}'
-          class='w-full h-full'
-          style='object-fit: {{ section.settings.slide_3_image_fit | default: "cover" }}; object-position: {{ section.settings.slide_3_image_position | default: "center" }}; transform: scale({{ section.settings.slide_3_image_zoom | default: 100 | divided_by: 100.0 }});'
-        >
-      {% else %}
-        {{
-          "lifestyle-1"
-          | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
-        }}
-      {% endif %}
-      {% if section.settings.show_text_overlay %}
-        <div class='absolute inset-0 flex items-center justify-center lg:block z-10'>
-          <div class='text-center lg:text-left max-w-4xl mx-auto lg:mx-0 px-4 lg:absolute lg:left-16 lg:top-1/2 lg:-translate-y-1/2'>
-            {% assign s3_shadow = section.settings.slide_3_text_shadow_strength | default: 'soft' %}
-            {% assign s3_op = '0.35' %}
-            {% case s3_shadow %}
-              {% when 'none' %}{% assign s3_op = '0' %}
-              {% when 'soft' %}{% assign s3_op = '0.35' %}
-              {% when 'medium' %}{% assign s3_op = '0.6' %}
-              {% when 'strong' %}{% assign s3_op = '0.85' %}
-            {% endcase %}
-            <div class='kk-text-wrap inline-block'>
-              {% if section.settings.slide_3_text_bg_enable %}
-                {% assign s3_bg_op_pct = section.settings.slide_3_text_bg_opacity | default: 50 %}
-                {% assign s3_bg_alpha = s3_bg_op_pct | divided_by: 100.0 %}
-                <div class='kk-text-bg' style='background-color: {{ section.settings.slide_3_text_bg_color | default: '#000000' | color_modify: 'alpha', s3_bg_alpha }}'></div>
+      <!-- Slide 3 -->
+      <swiper-slide class='relative'>
+        {% if section.settings.slide_3_image != blank %}
+          <img
+            src='{{ section.settings.slide_3_image | img_url: "1920x1080" }}'
+            alt='{{ section.settings.slide_3_title | default: "Handcrafted Excellence" }}'
+            class='w-full h-full'
+            style='object-fit: {{ section.settings.slide_3_image_fit | default: "cover" }}; object-position: {{ section.settings.slide_3_image_position | default: "center" }}; transform: scale({{ section.settings.slide_3_image_zoom | default: 100 | divided_by: 100.0 }});'
+          >
+        {% else %}
+          {{
+            "lifestyle-1"
+            | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
+          }}
+        {% endif %}
+        {% if section.settings.show_text_overlay %}
+          <div class='absolute inset-0 flex items-center justify-center lg:block z-10'>
+            <div class='text-center lg:text-left max-w-4xl mx-auto lg:mx-0 px-4 lg:absolute lg:left-16 lg:top-1/2 lg:-translate-y-1/2'>
+              {% assign s3_shadow = section.settings.slide_3_text_shadow_strength
+                | default: "soft"
+              %}
+              {% assign s3_op = "0.35" %}
+              {% case s3_shadow %}
+                {% when "none" -%}
+                  {%- assign s3_op = "0" %}
+                {% when "soft" -%}
+                  {%- assign s3_op = "0.35" %}
+                {% when "medium" -%}
+                  {%- assign s3_op = "0.6" %}
+                {% when "strong" -%}
+                  {%- assign s3_op = "0.85" %}
+              {% endcase %}
+              <div class='kk-text-wrap inline-block'>
+                {% if section.settings.slide_3_text_bg_enable %}
+                  {% assign s3_bg_op_pct = section.settings.slide_3_text_bg_opacity
+                    | default: 50
+                  %}
+                  {% assign s3_bg_alpha = s3_bg_op_pct | divided_by: 100.0 %}
+                  <div
+                    class='kk-text-bg'
+                    style='background-color: {{ section.settings.slide_3_text_bg_color | default: '#000000' | color_modify: 'alpha', s3_bg_alpha }}'
+                  ></div>
+                {% endif %}
+                <div class='kk-text-content'>
+                  <h1
+                    class='text-4xl md:text-6xl font-bold mb-4'
+                    style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'
+                  >
+                    {{
+                      section.settings.slide_3_title
+                      | default: "Handcrafted Excellence"
+                    }}
+                  </h1>
+                  <p
+                    class='text-lg md:text-xl mb-8'
+                    style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'
+                  >
+                    {{
+                      section.settings.slide_3_subtitle
+                      | default: "Every piece tells a story of craftsmanship"
+                    }}
+                  </p>
+                </div>
+              </div>
+              {% if section.settings.slide_3_button_enable
+                and section.settings.slide_3_button_text != blank
+              %}
+                <div class='mt-4'>
+                  <a
+                    href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
+                    class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                    style='background-color: {{ section.settings.slide_3_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_3_button_text_color | default: "#ffffff" }};'
+                  >
+                    {{ section.settings.slide_3_button_text }}
+                  </a>
+                </div>
               {% endif %}
-              <div class='kk-text-content'>
-                <h1 class='text-4xl md:text-6xl font-bold mb-4' style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'>
-                  {{
-                    section.settings.slide_3_title
-                    | default: "Handcrafted Excellence"
-                  }}
-                </h1>
-                <p class='text-lg md:text-xl mb-8' style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'>
-                  {{
-                    section.settings.slide_3_subtitle
-                    | default: "Every piece tells a story of craftsmanship"
-                  }}
-                </p>
-              </div>
             </div>
-            {% if section.settings.slide_3_button_enable and section.settings.slide_3_button_text != blank %}
-              <div class='mt-4'>
-                <a
-                  href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
-                  class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                  style='background-color: {{ section.settings.slide_3_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_3_button_text_color | default: "#ffffff" }};'
-                >
-                  {{ section.settings.slide_3_button_text }}
-                </a>
-              </div>
-            {% endif %}
           </div>
-        </div>
-      {% endif %}
-    </swiper-slide>
+        {% endif %}
+      </swiper-slide>
 
-    <!-- Autoplay Progress Indicator -->
-    <div class='autoplay-progress' slot='container-end'>
-      <svg viewBox='0 0 48 48'>
-        <circle cx="24" cy="24" r="20"></circle>
-      </svg>
-      <span></span>
-    </div>
+      <!-- Autoplay Progress Indicator -->
+      <div class='autoplay-progress' slot='container-end'>
+        <svg viewBox='0 0 48 48'>
+          <circle cx="24" cy="24" r="20"></circle>
+        </svg>
+        <span></span>
+      </div>
     </swiper-container>
   </div>
 </div>
@@ -446,10 +509,10 @@
       "id": "slide_1_text_shadow_strength",
       "label": "Slide 1 Text Shadow Strength",
       "options": [
-        {"value":"none","label":"None"},
-        {"value":"soft","label":"Soft"},
-        {"value":"medium","label":"Medium"},
-        {"value":"strong","label":"Strong"}
+        { "value": "none", "label": "None" },
+        { "value": "soft", "label": "Soft" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "strong", "label": "Strong" }
       ],
       "default": "soft"
     },
@@ -490,11 +553,11 @@
       "id": "slide_1_image_fit",
       "label": "Slide 1 Image Fit",
       "options": [
-        {"value": "cover", "label": "Cover"},
-        {"value": "contain", "label": "Contain"},
-        {"value": "fill", "label": "Fill"},
-        {"value": "scale-down", "label": "Scale Down"},
-        {"value": "none", "label": "None"}
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
       ],
       "default": "cover"
     },
@@ -503,9 +566,9 @@
       "id": "slide_1_image_position",
       "label": "Slide 1 Image Position",
       "options": [
-        {"value": "top", "label": "Top"},
-        {"value": "center", "label": "Center"},
-        {"value": "bottom", "label": "Bottom"}
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
       ],
       "default": "center"
     },
@@ -578,10 +641,10 @@
       "id": "slide_2_text_shadow_strength",
       "label": "Slide 2 Text Shadow Strength",
       "options": [
-        {"value":"none","label":"None"},
-        {"value":"soft","label":"Soft"},
-        {"value":"medium","label":"Medium"},
-        {"value":"strong","label":"Strong"}
+        { "value": "none", "label": "None" },
+        { "value": "soft", "label": "Soft" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "strong", "label": "Strong" }
       ],
       "default": "soft"
     },
@@ -622,11 +685,11 @@
       "id": "slide_2_image_fit",
       "label": "Slide 2 Image Fit",
       "options": [
-        {"value": "cover", "label": "Cover"},
-        {"value": "contain", "label": "Contain"},
-        {"value": "fill", "label": "Fill"},
-        {"value": "scale-down", "label": "Scale Down"},
-        {"value": "none", "label": "None"}
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
       ],
       "default": "cover"
     },
@@ -635,9 +698,9 @@
       "id": "slide_2_image_position",
       "label": "Slide 2 Image Position",
       "options": [
-        {"value": "top", "label": "Top"},
-        {"value": "center", "label": "Center"},
-        {"value": "bottom", "label": "Bottom"}
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
       ],
       "default": "center"
     },
@@ -710,10 +773,10 @@
       "id": "slide_3_text_shadow_strength",
       "label": "Slide 3 Text Shadow Strength",
       "options": [
-        {"value":"none","label":"None"},
-        {"value":"soft","label":"Soft"},
-        {"value":"medium","label":"Medium"},
-        {"value":"strong","label":"Strong"}
+        { "value": "none", "label": "None" },
+        { "value": "soft", "label": "Soft" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "strong", "label": "Strong" }
       ],
       "default": "soft"
     },
@@ -754,11 +817,11 @@
       "id": "slide_3_image_fit",
       "label": "Slide 3 Image Fit",
       "options": [
-        {"value": "cover", "label": "Cover"},
-        {"value": "contain", "label": "Contain"},
-        {"value": "fill", "label": "Fill"},
-        {"value": "scale-down", "label": "Scale Down"},
-        {"value": "none", "label": "None"}
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
       ],
       "default": "cover"
     },
@@ -767,9 +830,9 @@
       "id": "slide_3_image_position",
       "label": "Slide 3 Image Position",
       "options": [
-        {"value": "top", "label": "Top"},
-        {"value": "center", "label": "Center"},
-        {"value": "bottom", "label": "Bottom"}
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
       ],
       "default": "center"
     },
