@@ -46,9 +46,16 @@
               {% for item in search.results %}
                 {% case item.object_type %}
                   {% when "product" %}
-                    <div data-product='{{ item | json | escape }}'>
-                      {% render "product-card", product_product: item %}
-                    </div>
+                    {%- assign tags_lower = item.tags
+                      | join: "||"
+                      | downcase
+                      | split: "||"
+                    -%}
+                    {% unless tags_lower contains "hidden_offer" %}
+                      <div data-product='{{ item | json | escape }}'>
+                        {% render "product-card", product_product: item %}
+                      </div>
+                    {% endunless %}
                   {% else %}
 
                 {% endcase %}

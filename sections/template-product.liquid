@@ -779,6 +779,16 @@
           
           // Generate HTML for each product as swiper-slide
           products.forEach(product => {
+            // Filter out products with hidden_offer tag
+            const tags = product.tags || [];
+            const hasHiddenOfferTag = tags.some(tag => 
+              String(tag).toLowerCase().includes('hidden_offer')
+            );
+            
+            if (hasHiddenOfferTag) {
+              return; // Skip this product
+            }
+
             const isApparel = String(product.product_type || product.type || '').toLowerCase().includes('apparel');
             const actionButton = isApparel
               ? `<button onclick="openRelatedProductQuickView('${product.handle}')" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0">QUICK VIEW</button>`

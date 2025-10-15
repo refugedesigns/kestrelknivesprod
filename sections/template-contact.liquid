@@ -9,12 +9,6 @@
       "default": "GET IN TOUCH"
     },
     {
-      "type": "text",
-      "id": "subtitle",
-      "label": "Subtitle",
-      "default": "We want to hear from you. Fill out the form below if the FAQ did not answer your question."
-    },
-    {
       "type": "url",
       "id": "faq_link",
       "label": "FAQ Link"
@@ -68,17 +62,6 @@
     >
       {{ section.settings.page_title }}
     </h1>
-    <p class='text-gray-700 text-lg'>
-      {{ section.settings.subtitle }}
-      {% if section.settings.faq_link %}
-        <a
-          href='{{ section.settings.faq_link }}'
-          class='text-black hover:text-gray-900 underline'
-        >
-          FAQ
-        </a>
-      {% endif %}
-    </p>
   </div>
 
   <!-- Main Content -->
