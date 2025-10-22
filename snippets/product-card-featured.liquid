@@ -55,7 +55,10 @@
     <div class='p-4 md:p-6 flex flex-col justify-between'>
       <div>
         <a href='{{ product_obj.url }}'>
-          <h2 class='text-sm md:text-lg uppercase font-semibold text-gray-900 mb-2 text-center'>
+          <h2
+            class='text-sm md:text-lg uppercase font-semibold text-gray-900 mb-2 text-center'
+            x-text='baseTitle'
+          >
             {{ product_obj.title }}
           </h2>
           {% assign product_type_lower = product_obj.type
@@ -101,8 +104,10 @@
                       <button
                         type='button'
                         class='w-10 h-10 rounded-full border-2 border-gray-300 overflow-hidden focus:outline-none'
-                        @click='swapImage({{ v.featured_image.src | json }})'
+                        @click='selectByHandle({{ v.option1 | json }})'
+                        :class="$el.dataset.handleLc && selectedOption1Lc === $el.dataset.handleLc ? 'ring-2 ring-black' : ''"
                         title='{{ v.title }}'
+                        data-handle-lc='{{ v.option1 | strip | downcase }}'
                       >
                         <img
                           src='{{ v.featured_image.src | image_url: width: 48 }}'
@@ -340,6 +345,7 @@
     function fcCard() {
       return {
         currentImage: '',
+        baseTitle: '',
         productData: {},
         variantsData: [],
         selectedVariant: null,
@@ -376,6 +382,10 @@
             const any = (this.variantsData || [])[0]
             this.selectedVariant = avail ? avail.id : any && any.id
           }
+
+          // Set initial title
+          this.updateTitle()
+
           this.checkAvailability()
         },
 
@@ -414,8 +424,112 @@
           }
         },
 
-        swapImage(src) {
-          if (src) this.currentImage = src
+        // Computed: currently selected handle color (option1)
+        get selectedOption1() {
+          const v = (this.variantsData || []).find(
+            v => v.id === this.selectedVariant
+          )
+          return v && v.option1 ? String(v.option1) : null
+        },
+        get selectedOption1Lc() {
+          return String(this.selectedOption1 || '')
+            .trim()
+            .toLowerCase()
+        },
+
+        // Select by handle color (option1). Prefer an available variant; fallback to first match.
+        selectByHandle(handleValue) {
+          const hv = String(handleValue || '').trim()
+          const matches = (this.variantsData || []).filter(
+            v => String(v.option1 || '') === hv
+          )
+          if (!matches.length) return
+          const available = matches.find(v => !!v.available)
+          const chosen = available || matches[0]
+          this.selectedVariant = chosen.id
+          this.updateTitle()
+          this.checkAvailability()
+          this.updateImage()
+        },
+
+        updateTitle() {
+          const typeLower = (this.productData.type || '').toLowerCase()
+          // For Apparels and Accessories, never append option to title
+          const shouldAppend = !(
+            typeLower.includes('apparel') || typeLower.includes('accessories')
+          )
+
+          if (this.variantsData && this.variantsData.length > 0) {
+            // Filter out variants with "Default Title"
+            const validVariants = this.variantsData.filter(
+              variant => variant.title !== 'Default Title'
+            )
+
+            if (validVariants.length > 0) {
+              const selectedVariant = validVariants.find(
+                v => v.id === this.selectedVariant
+              )
+              const opt = selectedVariant ? selectedVariant.option1 : null
+
+              if (shouldAppend && opt && !this.isSizeValue(opt)) {
+                // Append non-size option (e.g., color) for non-apparel types
+                this.baseTitle = `${this.productData.title} - ${String(opt).toUpperCase()}`
+              } else {
+                this.baseTitle = this.productData.title
+              }
+            } else {
+              // No valid variants (all were "Default Title"), use original title
+              this.baseTitle = this.productData.title
+            }
+          } else {
+            // No variants, use original title
+            this.baseTitle = this.productData.title
+          }
+        },
+
+        // Heuristic: treat common size labels as size-like (not for title)
+        isSizeValue(val) {
+          if (!val) return false
+          const v = String(val).toLowerCase().trim()
+          const sizeValues = [
+            'xxs',
+            'xs',
+            's',
+            'm',
+            'l',
+            'xl',
+            'xxl',
+            '2xl',
+            '3xl',
+            '4xl',
+            '5xl',
+            'small',
+            'medium',
+            'large',
+            'extra large',
+          ]
+          return sizeValues.includes(v)
+        },
+
+        updateImage() {
+          // For apparel, keep using the product's featured_image (do not swap per variant)
+          const typeLower = (this.productData.type || '').toLowerCase()
+          if (typeLower.includes('apparel')) {
+            return
+          }
+          // Update image when variant changes (for knives/non-apparels)
+          if (this.variantsData && this.variantsData.length > 0) {
+            const selectedVariant = this.variantsData.find(
+              v => v.id === this.selectedVariant
+            )
+
+            // If variant has a featured image, use it
+            if (selectedVariant && selectedVariant.featured_image) {
+              this.currentImage = selectedVariant.featured_image.src
+            } else {
+              // No featured image, use the product's featured image
+            }
+          }
         },
 
         async addToCart() {
