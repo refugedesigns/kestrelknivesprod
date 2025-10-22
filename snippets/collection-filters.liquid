@@ -228,7 +228,7 @@
               }))
               .filter(it => {
                 const val = String(it.value || '').toLowerCase()
-                return it.value && val !== 'custom' && !val.includes('hidden')
+                return it.value && !val.includes('hidden')
               })
           }
           // Fallback: fetch list of collections and map to product types heuristically
@@ -284,18 +284,18 @@
           const cachedTypes = cached ? JSON.parse(cached) : null
           // If cache exists but is suspiciously small (e.g., 0 or 1), refetch to ensure full list
           if (cachedTypes && cachedTypes.length >= 2) {
-            // Filter out custom and hidden offer from cached types
+            // Filter out hidden offer from cached types
             return cachedTypes.filter(t => {
               const val = String(t.value || '').toLowerCase()
-              return val !== 'custom' && !val.includes('hidden')
+              return !val.includes('hidden')
             })
           }
           const fetched = await this.fetchAllProductTypesFromAllCollection()
           if (fetched && fetched.length) {
-            // Filter out custom and hidden offer from fetched types
+            // Filter out hidden offer from fetched types
             const filtered = fetched.filter(t => {
               const val = String(t.value || '').toLowerCase()
-              return val !== 'custom' && !val.includes('hidden')
+              return !val.includes('hidden')
             })
             sessionStorage.setItem(
               'kk_allProductTypes',
@@ -461,7 +461,7 @@
           products.forEach(p => {
             const t = (p.product_type || p.type || '').toString().trim()
             const tLower = t.toLowerCase()
-            if (!t || tLower === 'custom' || tLower.includes('hidden')) return
+            if (!t || tLower.includes('hidden')) return
             counts[t] = (counts[t] || 0) + 1
           })
           this.productTypes = Object.keys(counts).map(k => ({
