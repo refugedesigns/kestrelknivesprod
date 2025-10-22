@@ -510,7 +510,7 @@
       {% endif %}
     </nav>
 
-    <!-- Price and Add to Cart -->
+    <!-- Price, Size Selector (for apparel), and Add to Cart -->
     <div class='flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4'>
       <div class='text-center md:text-right'>
         {% if product.type == "Custom" %}
@@ -529,6 +529,38 @@
           </span>
         {% endif %}
       </div>
+
+      {% comment %} Size Selector for Apparel Products {% endcomment %}
+      {% assign product_type_lower = product.type | default: "" | downcase %}
+      {% if product_type_lower contains "apparel"
+        and product.has_only_default_variant == false
+      %}
+        {% for option in product.options_with_values %}
+          {% assign option_name_downcase = option.name | downcase | strip %}
+          {% if option_name_downcase contains "size" %}
+            <div class='flex flex-col items-center'>
+              <select
+                id='stickySizeSelector'
+                class='border border-gray-300 rounded-md px-3 py-2 text-sm font-medium bg-white focus:ring-2 focus:ring-black focus:border-black'
+                onchange='updateStickyVariant()'
+              >
+                {% for value in option.values %}
+                  <option
+                    value='{{ value | escape }}'
+                    {% if option.selected_value == value %}
+                      selected
+                    {% endif %}
+                  >
+                    {{ value | upcase }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            {% break %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+
       <button
         id='stickyAddToCartBtn'
         type='button'
@@ -818,7 +850,6 @@
             const hasHiddenOfferTag = tags.some(tag => 
               String(tag).toLowerCase().includes('hidden_offer')
             );
-
             
             if (hasHiddenOfferTag) {
               return; // Skip this product
@@ -1495,6 +1526,13 @@
             // set initial UI state based on initialVariant
             this.updateSelectedVariantByOptions(this.selectedOptions);
 
+            // sync sticky size selector on initialization
+            setTimeout(() => {
+              if (typeof window.syncStickySizeSelector === 'function') {
+                window.syncStickySizeSelector();
+              }
+            }, 100);
+
             // watch for page scroll/resize (you already do this; keep in component)
           },
 
@@ -1587,6 +1625,11 @@
 
                // update add to cart button state
                this.updateAddToCartState(variant);
+               
+               // sync sticky size selector if it exists
+               if (typeof window.syncStickySizeSelector === 'function') {
+                 window.syncStickySizeSelector();
+               }
              }
           },
 
@@ -2045,6 +2088,70 @@
           }
         }
       });
+
+      // Function to update variant when sticky size selector changes
+      window.updateStickyVariant = function() {
+        const sizeSelector = document.getElementById('stickySizeSelector');
+        if (!sizeSelector) return;
+        
+        const selectedSize = sizeSelector.value;
+        const productPage = document.querySelector('[x-data*="productPage"]');
+        
+        if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
+          // Find the variant that matches the selected size
+          const variants = window.__product?.variants || [];
+          const matchingVariant = variants.find(variant => {
+            // Check if this variant's size option matches the selected size
+            const option1 = variant.option1;
+            const option2 = variant.option2;
+            const option3 = variant.option3;
+            
+            return option1 === selectedSize || option2 === selectedSize || option3 === selectedSize;
+          });
+          
+          if (matchingVariant) {
+            // Update the hidden variant input
+            const variantInput = document.getElementById('variantIdInput');
+            if (variantInput) {
+              variantInput.value = matchingVariant.id;
+            }
+            
+            // Update the sticky price display
+            const stickyPrice = document.getElementById('stickyPrice');
+            if (stickyPrice) {
+              const formattedPrice = new Intl.NumberFormat('{{ shop.locale }}', {
+                style: 'currency',
+                currency: '{{ shop.currency }}'
+              }).format(matchingVariant.price / 100);
+              stickyPrice.textContent = formattedPrice;
+            }
+            
+            // Update the main product page variant selection
+            productPage._x_dataStack[0].updateSelectedVariantByOptions([selectedSize]);
+          }
+        }
+      };
+
+      // Function to sync sticky size selector with main product page selection
+      window.syncStickySizeSelector = function() {
+        const stickySizeSelector = document.getElementById('stickySizeSelector');
+        if (!stickySizeSelector) return;
+        
+        // Find the currently selected size from the main product page
+        const sizeInputs = document.querySelectorAll('input[name^="options["]');
+        let selectedSize = '';
+        
+        sizeInputs.forEach(input => {
+          const name = input.name.replace(/^options\[(.+)\]$/, '$1');
+          if (name.toLowerCase().includes('size') && input.checked) {
+            selectedSize = input.value;
+          }
+        });
+        
+        if (selectedSize && stickySizeSelector.value !== selectedSize) {
+          stickySizeSelector.value = selectedSize;
+        }
+      };
 
       // Provide a global stickyAddToCart for non-custom products (no text change)
       if (!window.stickyAddToCart) {
