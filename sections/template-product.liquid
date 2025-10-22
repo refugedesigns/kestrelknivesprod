@@ -544,24 +544,6 @@
 
     <!-- Price, Size Selector (for apparel), and Add to Cart -->
     <div class='flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4'>
-      <div class='text-center md:text-right'>
-        {% if product.type == "Custom" %}
-          <span
-            id='stickyPriceCustom'
-            class='text-sm md:text-lg font-bold text-black'
-          >
-            <span id='custom-price-display'>Loading...</span>
-          </span>
-        {% else %}
-          <span
-            id='stickyPrice'
-            class='text-sm md:text-lg font-bold text-black'
-          >
-            {{- selected_variant.price | money -}}
-          </span>
-        {% endif %}
-      </div>
-
       {% comment %} Size Selector for Apparel Products {% endcomment %}
       {% assign product_type_lower = product.type | default: "" | downcase %}
       {% if product_type_lower contains "apparel"
@@ -608,6 +590,24 @@
           {% endif %}
         {% endfor %}
       {% endif %}
+
+      <div class='text-center md:text-right'>
+        {% if product.type == "Custom" %}
+          <span
+            id='stickyPriceCustom'
+            class='text-sm md:text-lg font-bold text-black'
+          >
+            <span id='custom-price-display'>Loading...</span>
+          </span>
+        {% else %}
+          <span
+            id='stickyPrice'
+            class='text-sm md:text-lg font-bold text-black'
+          >
+            {{- selected_variant.price | money -}}
+          </span>
+        {% endif %}
+      </div>
 
       <button
         id='stickyAddToCartBtn'
