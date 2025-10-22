@@ -190,6 +190,9 @@
       isInitializing: true,
 
       async init() {
+        // Clear any cached data that might contain hidden offer
+        sessionStorage.removeItem('kk_allProductTypes')
+
         // Build product types from products (await async fetch when needed)
         await this.buildProductTypes()
 
@@ -280,14 +283,25 @@
           const cached = sessionStorage.getItem('kk_allProductTypes')
           const cachedTypes = cached ? JSON.parse(cached) : null
           // If cache exists but is suspiciously small (e.g., 0 or 1), refetch to ensure full list
-          if (cachedTypes && cachedTypes.length >= 2) return cachedTypes
+          if (cachedTypes && cachedTypes.length >= 2) {
+            // Filter out custom and hidden offer from cached types
+            return cachedTypes.filter(t => {
+              const val = String(t.value || '').toLowerCase()
+              return val !== 'custom' && !val.includes('hidden')
+            })
+          }
           const fetched = await this.fetchAllProductTypesFromAllCollection()
           if (fetched && fetched.length) {
+            // Filter out custom and hidden offer from fetched types
+            const filtered = fetched.filter(t => {
+              const val = String(t.value || '').toLowerCase()
+              return val !== 'custom' && !val.includes('hidden')
+            })
             sessionStorage.setItem(
               'kk_allProductTypes',
-              JSON.stringify(fetched)
+              JSON.stringify(filtered)
             )
-            return fetched
+            return filtered
           }
           return []
         } catch (e) {
@@ -469,6 +483,7 @@
           productTypeSelected: '',
           availabilitySelected: '',
         }
+        // Clear cache to force refresh and remove any cached hidden offer data
         sessionStorage.removeItem('kk_allProductTypes')
         this.applyFilters()
       },
