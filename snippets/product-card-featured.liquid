@@ -40,13 +40,25 @@
       <a
         href='{{ product_obj.url }}'
         class='relative h-full w-[280px] md:w-[320px] mx-auto block'
+        @mouseenter='handleImageHover(true)'
+        @mouseleave='handleImageHover(false)'
       >
+        <!-- Base image -->
         <img
           width='400'
           height='400'
           :src='currentImage'
           alt='{{ product_obj.title | escape }}'
-          class='absolute inset-0 w-full h-full object-contain'
+          :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
+        >
+        <!-- Hover image (crossfades in) -->
+        <img
+          width='400'
+          height='400'
+          x-show='secondImageSrc'
+          :src='secondImageSrc'
+          alt='{{ product_obj.title | escape }}'
+          :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 pointer-events-none ' + ((isHovering && hoverImageLoaded) ? 'opacity-100' : 'opacity-0')"
         >
       </a>
     </div>
@@ -343,9 +355,12 @@
         baseTitle: '',
         productData: {},
         variantsData: [],
+        imagesData: null,
         selectedVariant: null,
         isAvailable: true,
         isAddingToCart: false,
+        isHovering: false,
+        hoverImageLoaded: false,
 
         // Quick View state
         isQuickViewOpen: false,
@@ -364,10 +379,12 @@
             const rawImages = el.getAttribute('data-images') || '[]'
             this.productData = JSON.parse(fcDecode(rawProduct))
             this.variantsData = JSON.parse(fcDecode(rawVariants))
-            const imgs = JSON.parse(fcDecode(rawImages))
-            if (imgs && imgs.length) {
+            this.imagesData = JSON.parse(fcDecode(rawImages))
+            if (this.imagesData && this.imagesData.length) {
               this.currentImage =
-                typeof imgs[0] === 'string' ? imgs[0] : imgs[0] && imgs[0].src
+                typeof this.imagesData[0] === 'string'
+                  ? this.imagesData[0]
+                  : this.imagesData[0] && this.imagesData[0].src
             }
           } catch (e) {}
 
@@ -396,6 +413,15 @@
           return this.productData.price
             ? this.formatMoney(this.productData.price)
             : ''
+        },
+
+        // URL of second product image, if available
+        get secondImageSrc() {
+          if (!this.imagesData || this.imagesData.length < 2) return null
+          const img = this.imagesData[1]
+          if (!img) return null
+          if (typeof img === 'string') return img
+          return img.src || null
         },
 
         formatMoney(cents) {
@@ -525,6 +551,24 @@
               // No featured image, use the product's featured image
             }
           }
+        },
+
+        handleImageHover(isEntering) {
+          if (this.imagesData && this.imagesData.length > 1) {
+            if (isEntering) this.preloadSecondImage()
+            this.isHovering = isEntering
+          }
+        },
+
+        preloadSecondImage() {
+          if (this.hoverImageLoaded) return
+          const src = this.secondImageSrc
+          if (!src) return
+          const img = new Image()
+          img.onload = () => {
+            this.hoverImageLoaded = true
+          }
+          img.src = src
         },
 
         async addToCart() {
