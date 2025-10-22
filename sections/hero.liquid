@@ -1,13 +1,14 @@
 <!-- Hero Carousel Section -->
-<div class='relative pt-4'>
+<div class='relative pt-4 hero-root'>
   <!-- Scaled Wrapper -->
   <div
     class='hero-scale-wrap'
-    style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %};'
+    style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %}; --hero-height-px: {{ section.settings.hero_height_px | default: 600 }}px; --hero-height-mobile-px: {{ section.settings.hero_height_mobile_px | default: 420 }}px;'
   >
     <!-- Swiper Container -->
     <swiper-container
       class='hero-swiper'
+      style='--swiper-theme-color: #ffffff;'
       pagination='true'
       pagination-clickable='true'
       navigation='false'
@@ -18,23 +19,30 @@
       loop='true'
     >
       <!-- Slide 1 -->
-      <swiper-slide class='relative'>
-        {% if section.settings.slide_1_image != blank %}
-          <img
-            src='{{ section.settings.slide_1_image | img_url: "1920x1080" }}'
-            alt='{{ section.settings.slide_1_title | default: "Premium Knives" }}'
-            class='w-full h-full'
-            style='object-fit: {{ section.settings.slide_1_image_fit | default: "cover" }}; object-position: {{ section.settings.slide_1_image_position | default: "center" }}; transform: scale({{ section.settings.slide_1_image_zoom | default: 100 | divided_by: 100.0 }});'
-          >
-        {% else %}
-          {{
-            "lifestyle-1"
-            | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
-          }}
-        {% endif %}
+      <swiper-slide class='relative slide-1'>
+        <a
+          href='{{ section.settings.slide_1_button_url | default: "/collections/all" }}'
+          class='block w-full h-full'
+        >
+          {% if section.settings.slide_1_image != blank %}
+            <img
+              src='{{ section.settings.slide_1_image | image_url: width: 1920 }}'
+              alt='{{ section.settings.slide_1_title | default: "Premium Knives" }}'
+              class='w-full h-full'
+              width='{{ section.settings.slide_1_image.width }}'
+              height='{{ section.settings.slide_1_image.height }}'
+              style='transform: scale({{ section.settings.slide_1_image_zoom | default: 100 | divided_by: 100.0 }});'
+            >
+          {% else %}
+            {{
+              "lifestyle-1"
+              | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
+            }}
+          {% endif %}
+        </a>
         {% if section.settings.show_text_overlay %}
-          <div class='absolute inset-0 flex items-center justify-center lg:justify-start z-10'>
-            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-16'>
+          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none'>
+            <div class='text-center lg:text-left max-w-2xl px-4 lg:ml-16 lg:mb-16'>
               {% assign s1_shadow = section.settings.slide_1_text_shadow_strength
                 | default: "soft"
               %}
@@ -70,21 +78,27 @@
                       | default: "Premium Knives"
                     }}
                   </h1>
-                  <p
-                    class='text-lg md:text-xl mb-8'
-                    style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'
-                  >
-                    {{
-                      section.settings.slide_1_subtitle
-                      | default: "Crafted with precision, designed for perfection"
-                    }}
-                  </p>
+                  {% assign s1_subtitle = section.settings.slide_1_subtitle
+                    | default: "Crafted with precision, designed for perfection"
+                  %}
+                  {% assign s1_sentences = s1_subtitle | split: "." %}
+                  {% for sentence in s1_sentences %}
+                    {% assign trimmed_sentence = sentence | strip %}
+                    {% if trimmed_sentence != blank %}
+                      <p
+                        class='text-lg md:text-xl mb-8'
+                        style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'
+                      >
+                        {{ trimmed_sentence }}.
+                      </p>
+                    {% endif %}
+                  {% endfor %}
                 </div>
               </div>
               {% if section.settings.slide_1_button_enable
                 and section.settings.slide_1_button_text != blank
               %}
-                <div class='mt-4'>
+                <div class='mt-4 mb-8 pointer-events-auto'>
                   <a
                     href='{{ section.settings.slide_1_button_url | default: "/collections/all" }}'
                     class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
@@ -100,23 +114,30 @@
       </swiper-slide>
 
       <!-- Slide 2 -->
-      <swiper-slide class='relative'>
-        {% if section.settings.slide_2_image != blank %}
-          <img
-            src='{{ section.settings.slide_2_image | img_url: "1920x1080" }}'
-            alt='{{ section.settings.slide_2_title | default: "Professional Grade" }}'
-            class='w-full h-full'
-            style='object-fit: {{ section.settings.slide_2_image_fit | default: "cover" }}; object-position: {{ section.settings.slide_2_image_position | default: "center" }}; transform: scale({{ section.settings.slide_2_image_zoom | default: 100 | divided_by: 100.0 }});'
-          >
-        {% else %}
-          {{
-            "lifestyle-1"
-            | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
-          }}
-        {% endif %}
+      <swiper-slide class='relative slide-2'>
+        <a
+          href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
+          class='block w-full h-full'
+        >
+          {% if section.settings.slide_2_image != blank %}
+            <img
+              src='{{ section.settings.slide_2_image | image_url: width: 1920 }}'
+              alt='{{ section.settings.slide_2_title | default: "Professional Grade" }}'
+              class='w-full h-full'
+              width='{{ section.settings.slide_2_image.width }}'
+              height='{{ section.settings.slide_2_image.height }}'
+              style='transform: scale({{ section.settings.slide_2_image_zoom | default: 100 | divided_by: 100.0 }});'
+            >
+          {% else %}
+            {{
+              "lifestyle-1"
+              | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
+            }}
+          {% endif %}
+        </a>
         {% if section.settings.show_text_overlay %}
-          <div class='absolute inset-0 flex items-center justify-center lg:block z-10'>
-            <div class='text-center lg:text-left max-w-4xl mx-auto lg:mx-0 px-4 lg:absolute lg:left-16 lg:top-1/2 lg:-translate-y-1/2'>
+          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none'>
+            <div class='text-center lg:text-left max-w-2xl px-4 lg:ml-16 lg:mb-16'>
               {% assign s2_shadow = section.settings.slide_2_text_shadow_strength
                 | default: "soft"
               %}
@@ -152,21 +173,27 @@
                       | default: "Professional Grade"
                     }}
                   </h1>
-                  <p
-                    class='text-lg md:text-xl mb-8'
-                    style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
-                  >
-                    {{
-                      section.settings.slide_2_subtitle
-                      | default: "Tools that professionals trust"
-                    }}
-                  </p>
+                  {% assign s2_subtitle = section.settings.slide_2_subtitle
+                    | default: "Tools that professionals trust"
+                  %}
+                  {% assign s2_sentences = s2_subtitle | split: "." %}
+                  {% for sentence in s2_sentences %}
+                    {% assign trimmed_sentence = sentence | strip %}
+                    {% if trimmed_sentence != blank %}
+                      <p
+                        class='text-lg md:text-xl mb-8'
+                        style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
+                      >
+                        {{ trimmed_sentence }}.
+                      </p>
+                    {% endif %}
+                  {% endfor %}
                 </div>
               </div>
               {% if section.settings.slide_2_button_enable
                 and section.settings.slide_2_button_text != blank
               %}
-                <div class='mt-4'>
+                <div class='mt-4 pointer-events-auto'>
                   <a
                     href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
                     class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
@@ -182,23 +209,30 @@
       </swiper-slide>
 
       <!-- Slide 3 -->
-      <swiper-slide class='relative'>
-        {% if section.settings.slide_3_image != blank %}
-          <img
-            src='{{ section.settings.slide_3_image | img_url: "1920x1080" }}'
-            alt='{{ section.settings.slide_3_title | default: "Handcrafted Excellence" }}'
-            class='w-full h-full'
-            style='object-fit: {{ section.settings.slide_3_image_fit | default: "cover" }}; object-position: {{ section.settings.slide_3_image_position | default: "center" }}; transform: scale({{ section.settings.slide_3_image_zoom | default: 100 | divided_by: 100.0 }});'
-          >
-        {% else %}
-          {{
-            "lifestyle-1"
-            | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
-          }}
-        {% endif %}
+      <swiper-slide class='relative slide-3'>
+        <a
+          href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
+          class='block w-full h-full'
+        >
+          {% if section.settings.slide_3_image != blank %}
+            <img
+              src='{{ section.settings.slide_3_image | image_url: width: 1920 }}'
+              alt='{{ section.settings.slide_3_title | default: "Handcrafted Excellence" }}'
+              class='w-full h-full'
+              width='{{ section.settings.slide_3_image.width }}'
+              height='{{ section.settings.slide_3_image.height }}'
+              style='transform: scale({{ section.settings.slide_3_image_zoom | default: 100 | divided_by: 100.0 }});'
+            >
+          {% else %}
+            {{
+              "lifestyle-1"
+              | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
+            }}
+          {% endif %}
+        </a>
         {% if section.settings.show_text_overlay %}
-          <div class='absolute inset-0 flex items-center justify-center lg:block z-10'>
-            <div class='text-center lg:text-left max-w-4xl mx-auto lg:mx-0 px-4 lg:absolute lg:left-16 lg:top-1/2 lg:-translate-y-1/2'>
+          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none'>
+            <div class='text-center lg:text-left max-w-2xl px-4 lg:ml-16 lg:mb-16'>
               {% assign s3_shadow = section.settings.slide_3_text_shadow_strength
                 | default: "soft"
               %}
@@ -234,21 +268,27 @@
                       | default: "Handcrafted Excellence"
                     }}
                   </h1>
-                  <p
-                    class='text-lg md:text-xl mb-8'
-                    style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'
-                  >
-                    {{
-                      section.settings.slide_3_subtitle
-                      | default: "Every piece tells a story of craftsmanship"
-                    }}
-                  </p>
+                  {% assign s3_subtitle = section.settings.slide_3_subtitle
+                    | default: "Every piece tells a story of craftsmanship"
+                  %}
+                  {% assign s3_sentences = s3_subtitle | split: "." %}
+                  {% for sentence in s3_sentences %}
+                    {% assign trimmed_sentence = sentence | strip %}
+                    {% if trimmed_sentence != blank %}
+                      <p
+                        class='text-lg md:text-xl mb-8'
+                        style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'
+                      >
+                        {{ trimmed_sentence }}.
+                      </p>
+                    {% endif %}
+                  {% endfor %}
                 </div>
               </div>
               {% if section.settings.slide_3_button_enable
                 and section.settings.slide_3_button_text != blank
               %}
-                <div class='mt-4'>
+                <div class='mt-4 pointer-events-auto'>
                   <a
                     href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
                     class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
@@ -264,12 +304,14 @@
       </swiper-slide>
 
       <!-- Autoplay Progress Indicator -->
-      <div class='autoplay-progress' slot='container-end'>
-        <svg viewBox='0 0 48 48'>
-          <circle cx="24" cy="24" r="20"></circle>
-        </svg>
-        <span></span>
-      </div>
+      {% comment %}
+        <div class='autoplay-progress' slot='container-end'>
+          <svg viewBox='0 0 48 48'>
+            <circle cx="24" cy="24" r="20" stroke="white" style="stroke: white !important;"></circle>
+          </svg>
+          <span></span>
+        </div>
+      {% endcomment %}
     </swiper-container>
   </div>
 </div>
@@ -278,14 +320,14 @@
 <style>
   .hero-swiper {
     width: 100%;
-    height: {{ section.settings.height_percent | default: 70 }}vh;
+    height: var(--hero-height-px, 600px);
     border-radius: var(--hero-radius, 0px);
     overflow: hidden;
   }
 
   .hero-scale-wrap {
     width: 100%;
-    height: {{ section.settings.height_percent | default: 70 }}vh;
+    height: var(--hero-height-px, 600px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -305,12 +347,8 @@
     overflow: hidden;
   }
   .hero-swiper swiper-slide img {
-    object-fit: cover;
-    object-position: center center;
     border-radius: var(--hero-radius, 0px);
     transform-origin: center center;
-    min-width: 100%;
-    min-height: 100%;
   }
 
   /* Inline text background overlay block */
@@ -328,11 +366,11 @@
     z-index: 1;
   }
 
-  /* On mobile keep scaling and compensate dimensions to preserve cover */
+  /* On mobile keep scaling and compensate dimensions */
   @media (max-width: 768px) {
+    .hero-swiper,
     .hero-scale-wrap {
-      height: {{ section.settings.height_percent | default: 70 }}vh;
-      overflow: hidden;
+      height: var(--hero-height-mobile-px, var(--hero-height-px, 600px));
     }
     .hero-scale-wrap .hero-swiper {
       width: calc(100% * var(--hero-scale-inv, 1));
@@ -353,7 +391,53 @@
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+  }
+
+  /* Per-slide responsive object-fit and object-position */
+  /* Desktop/base */
+  .hero-root .slide-1 img {
+    object-fit: {{ section.settings.slide_1_image_fit_desktop | default: section.settings.slide_1_image_fit | default: "cover" }};
+    object-position: {{ section.settings.slide_1_image_position_desktop | default: section.settings.slide_1_image_position | default: "center" }};
+  }
+  .hero-root .slide-2 img {
+    object-fit: {{ section.settings.slide_2_image_fit_desktop | default: section.settings.slide_2_image_fit | default: "cover" }};
+    object-position: {{ section.settings.slide_2_image_position_desktop | default: section.settings.slide_2_image_position | default: "center" }};
+  }
+  .hero-root .slide-3 img {
+    object-fit: {{ section.settings.slide_3_image_fit_desktop | default: section.settings.slide_3_image_fit | default: "cover" }};
+    object-position: {{ section.settings.slide_3_image_position_desktop | default: section.settings.slide_3_image_position | default: "center" }};
+  }
+
+  /* Tablet overrides */
+  @media (max-width: 1024px) {
+    .hero-root .slide-1 img {
+      object-fit: {{ section.settings.slide_1_image_fit_tablet | default: section.settings.slide_1_image_fit | default: "cover" }};
+      object-position: {{ section.settings.slide_1_image_position_tablet | default: section.settings.slide_1_image_position | default: "center" }};
+    }
+    .hero-root .slide-2 img {
+      object-fit: {{ section.settings.slide_2_image_fit_tablet | default: section.settings.slide_2_image_fit | default: "cover" }};
+      object-position: {{ section.settings.slide_2_image_position_tablet | default: section.settings.slide_2_image_position | default: "center" }};
+    }
+    .hero-root .slide-3 img {
+      object-fit: {{ section.settings.slide_3_image_fit_tablet | default: section.settings.slide_3_image_fit | default: "cover" }};
+      object-position: {{ section.settings.slide_3_image_position_tablet | default: section.settings.slide_3_image_position | default: "center" }};
+    }
+  }
+
+  /* Mobile overrides */
+  @media (max-width: 768px) {
+    .hero-root .slide-1 img {
+      object-fit: {{ section.settings.slide_1_image_fit_mobile | default: section.settings.slide_1_image_fit | default: "cover" }};
+      object-position: {{ section.settings.slide_1_image_position_mobile | default: section.settings.slide_1_image_position | default: "center" }};
+    }
+    .hero-root .slide-2 img {
+      object-fit: {{ section.settings.slide_2_image_fit_mobile | default: section.settings.slide_2_image_fit | default: "cover" }};
+      object-position: {{ section.settings.slide_2_image_position_mobile | default: section.settings.slide_2_image_position | default: "center" }};
+    }
+    .hero-root .slide-3 img {
+      object-fit: {{ section.settings.slide_3_image_fit_mobile | default: section.settings.slide_3_image_fit | default: "cover" }};
+      object-position: {{ section.settings.slide_3_image_position_mobile | default: section.settings.slide_3_image_position | default: "center" }};
+    }
   }
 
   .autoplay-progress {
@@ -367,7 +451,7 @@
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    color: #3b82f6;
+    color: white !important;
   }
 
   .autoplay-progress svg {
@@ -379,11 +463,16 @@
     width: 100%;
     height: 100%;
     stroke-width: 4px;
-    stroke: #3b82f6;
+    stroke: white !important;
     fill: none;
     stroke-dashoffset: calc(125.6px * (1 - var(--progress)));
     stroke-dasharray: 125.6;
     transform: rotate(-90deg);
+  }
+
+  /* Ensure ring stroke is white regardless of defaults */
+  .autoplay-progress svg circle {
+    stroke: white !important;
   }
 
   .autoplay-progress span {
@@ -393,12 +482,12 @@
 
   /* Custom Pagination Styles */
   .hero-swiper .swiper-pagination-bullet {
-    background: rgba(255, 255, 255, 0.5);
+    background: white !important;
     opacity: 1;
   }
 
   .hero-swiper .swiper-pagination-bullet-active {
-    background: #3b82f6;
+    background: white !important;
   }
 </style>
 
@@ -429,16 +518,29 @@
   "settings": [
     {
       "type": "header",
-      "content": "Carousel Settings"
+      "content": "Unified Height"
     },
     {
       "type": "range",
-      "id": "height_percent",
-      "label": "Hero height (vh)",
-      "min": 40,
-      "max": 100,
-      "step": 5,
-      "default": 70
+      "id": "hero_height_px",
+      "label": "Hero height (px)",
+      "min": 200,
+      "max": 1200,
+      "step": 20,
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "hero_height_mobile_px",
+      "label": "Hero height - Mobile (px)",
+      "min": 160,
+      "max": 900,
+      "step": 20,
+      "default": 420
+    },
+    {
+      "type": "header",
+      "content": "Carousel Settings"
     },
     {
       "type": "range",
@@ -548,10 +650,11 @@
       "id": "slide_1_image",
       "label": "Slide 1 Image"
     },
+    { "type": "header", "content": "Slide 1 Responsive Image" },
     {
       "type": "select",
       "id": "slide_1_image_fit",
-      "label": "Slide 1 Image Fit",
+      "label": "Slide 1 Image Fit [fallback]",
       "options": [
         { "value": "cover", "label": "Cover" },
         { "value": "contain", "label": "Contain" },
@@ -563,14 +666,80 @@
     },
     {
       "type": "select",
+      "id": "slide_1_image_fit_mobile",
+      "label": "Slide 1 Image Fit - Mobile",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "slide_1_image_fit_tablet",
+      "label": "Slide 1 Image Fit - Tablet",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "slide_1_image_fit_desktop",
+      "label": "Slide 1 Image Fit - Desktop",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
       "id": "slide_1_image_position",
-      "label": "Slide 1 Image Position",
+      "label": "Slide 1 Image Position [fallback]",
       "options": [
         { "value": "top", "label": "Top" },
         { "value": "center", "label": "Center" },
         { "value": "bottom", "label": "Bottom" }
       ],
       "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "slide_1_image_position_mobile",
+      "label": "Slide 1 Image Position - Mobile",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "slide_1_image_position_tablet",
+      "label": "Slide 1 Image Position - Tablet",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "slide_1_image_position_desktop",
+      "label": "Slide 1 Image Position - Desktop",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
     },
     {
       "type": "range",
@@ -680,10 +849,11 @@
       "id": "slide_2_image",
       "label": "Slide 2 Image"
     },
+    { "type": "header", "content": "Slide 2 Responsive Image" },
     {
       "type": "select",
       "id": "slide_2_image_fit",
-      "label": "Slide 2 Image Fit",
+      "label": "Slide 2 Image Fit [fallback]",
       "options": [
         { "value": "cover", "label": "Cover" },
         { "value": "contain", "label": "Contain" },
@@ -695,14 +865,80 @@
     },
     {
       "type": "select",
+      "id": "slide_2_image_fit_mobile",
+      "label": "Slide 2 Image Fit - Mobile",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "slide_2_image_fit_tablet",
+      "label": "Slide 2 Image Fit - Tablet",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "slide_2_image_fit_desktop",
+      "label": "Slide 2 Image Fit - Desktop",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
       "id": "slide_2_image_position",
-      "label": "Slide 2 Image Position",
+      "label": "Slide 2 Image Position [fallback]",
       "options": [
         { "value": "top", "label": "Top" },
         { "value": "center", "label": "Center" },
         { "value": "bottom", "label": "Bottom" }
       ],
       "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "slide_2_image_position_mobile",
+      "label": "Slide 2 Image Position - Mobile",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "slide_2_image_position_tablet",
+      "label": "Slide 2 Image Position - Tablet",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "slide_2_image_position_desktop",
+      "label": "Slide 2 Image Position - Desktop",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
     },
     {
       "type": "range",
@@ -812,10 +1048,11 @@
       "id": "slide_3_image",
       "label": "Slide 3 Image"
     },
+    { "type": "header", "content": "Slide 3 Responsive Image" },
     {
       "type": "select",
       "id": "slide_3_image_fit",
-      "label": "Slide 3 Image Fit",
+      "label": "Slide 3 Image Fit [fallback]",
       "options": [
         { "value": "cover", "label": "Cover" },
         { "value": "contain", "label": "Contain" },
@@ -827,14 +1064,80 @@
     },
     {
       "type": "select",
+      "id": "slide_3_image_fit_mobile",
+      "label": "Slide 3 Image Fit - Mobile",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "slide_3_image_fit_tablet",
+      "label": "Slide 3 Image Fit - Tablet",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "slide_3_image_fit_desktop",
+      "label": "Slide 3 Image Fit - Desktop",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
       "id": "slide_3_image_position",
-      "label": "Slide 3 Image Position",
+      "label": "Slide 3 Image Position [fallback]",
       "options": [
         { "value": "top", "label": "Top" },
         { "value": "center", "label": "Center" },
         { "value": "bottom", "label": "Bottom" }
       ],
       "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "slide_3_image_position_mobile",
+      "label": "Slide 3 Image Position - Mobile",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "slide_3_image_position_tablet",
+      "label": "Slide 3 Image Position - Tablet",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "slide_3_image_position_desktop",
+      "label": "Slide 3 Image Position - Desktop",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
     },
     {
       "type": "range",

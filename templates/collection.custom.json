@@ -1,0 +1,9 @@
+{
+  "name": "Collection",
+  "sections": {
+    "collection-list": {
+      "type": "template-custom-collection"
+    }
+  },
+  "order": ["collection-list"]
+}

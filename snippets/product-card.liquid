@@ -26,9 +26,9 @@
     )
   '
 >
-  <div class='bg-white overflow-hidden w-full {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[440px]{% else %}h-[600px]{% endif %} flex flex-col transition-none'>
+  <div class='bg-white overflow-hidden w-full {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[600px]{% else %}h-[600px]{% endif %} flex flex-col transition-none'>
     <!-- Product Image -->
-    <div class='relative h-96 bg-white overflow-hidden'>
+    <div class='relative {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[420px]{% else %}h-96{% endif %} bg-white overflow-hidden'>
       <!-- Status / SOLD OUT Badge -->
       {% assign kk_status = product_product.metafields.custom.product_status
         | default: product_product.metafields.custom_fields.product_status
@@ -60,12 +60,12 @@
     </div>
 
     <!-- Product Info -->
-    <div class='p-6 flex flex-col flex-grow justify-between'>
+    <div class='p-4 md:p-6 flex flex-col {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}justify-center{% else %}justify-between{% endif %}'>
       <div>
         <!-- Product Name -->
         <a href='{{ product_product.url }}'>
           <h2
-            class='text-lg uppercase font-semibold text-gray-900 mb-2 text-center'
+            class='text-sm md:text-lg uppercase font-semibold text-gray-900 mb-2 text-center'
             x-text='baseTitle'
           >
             {{ product_product.title }}
@@ -77,7 +77,10 @@
             | downcase
           %}
           {% unless product_type_lower contains "custom" %}
-            <div class='text-2xl font-bold text-gray-900 mb-4 text-center'>
+            <div
+              class='text-lg md:text-2xl font-bold text-gray-900 mb-4 text-center'
+              x-text='formattedPrice'
+            >
               {{ product_product.price | money }}
             </div>
           {% endunless %}
@@ -93,20 +96,25 @@
           or product_type_lower contains "accessories"
         %}
           <div class='mb-4'>
-            <div class='flex space-x-2 justify-center'>
+            <div class='flex flex-wrap gap-1 md:gap-2 justify-center'>
               {% assign unique_handle_colors = "" %}
               {% for variant in product_product.variants %}
                 {% if variant.option1 and variant.title != "Default Title" %}
-                  {% unless unique_handle_colors contains variant.option1 %}
+                  {% assign color_token = "|"
+                    | append: variant.option1
+                    | downcase
+                    | append: "|"
+                  %}
+                  {% unless unique_handle_colors contains color_token %}
                     {% assign unique_handle_colors = unique_handle_colors
-                      | append: variant.option1
-                      | append: ","
+                      | append: color_token
                     %}
                     <button
-                      @click='selectVariant({{ variant.id }})'
-                      :class="selectedVariant === {{ variant.id }} ? 'ring-2 ring-black' : ''"
-                      class='w-10 h-10 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-black overflow-hidden'
+                      @click='selectByHandle({{ variant.option1 | json }})'
+                      :class="$el.dataset.handleLc && selectedOption1Lc === $el.dataset.handleLc ? 'ring-2 ring-black' : ''"
+                      class='w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-black overflow-hidden'
                       title='{{ variant.option1 }}'
+                      data-handle-lc='{{ variant.option1 | strip | downcase }}'
                     >
                       {% assign color_image = "" %}
                       {% assign option_lower = variant.option1 | downcase %}
@@ -221,7 +229,7 @@
           <button
             @click='addToCart'
             :disabled='isAddingToCart'
-            class='w-full bg-black cursor-pointer hover:bg-gray-900 text-white font-semibold py-3 px-4 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+            class='w-full bg-black cursor-pointer hover:bg-gray-900 text-white font-semibold py-2 md:py-3 px-3 md:px-4 text-xs md:text-base transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
           >
             <span
               x-text="isAddingToCart ? 'Adding...' : '+ ADD TO CART'"
@@ -238,7 +246,7 @@
           <button
             type='button'
             @click='openQuickView()'
-            class='w-full bg-black  text-white  uppercase font-semibold py-3 px-4 cursor-pointer hover:bg-gray-900 transition-colors duration-200'
+            class='w-full bg-black text-white uppercase font-semibold py-2 md:py-3 px-3 md:px-4 text-xs md:text-base cursor-pointer hover:bg-gray-900 transition-colors duration-200'
           >
             Quick View
           </button>
@@ -280,7 +288,7 @@
                 class='text-gray-900 uppercase text-lg truncate'
                 x-text='baseTitle'
               ></p>
-              <p class='text-base mt-2'>{{ product_product.price | money }}</p>
+              <p class='text-base mt-2' x-text='qvFormattedPrice'></p>
             </div>
           </div>
 
@@ -440,6 +448,59 @@
         baseTitle: productTitle,
         isAddingToCart: false,
         isAvailable: true,
+
+        // Computed property for formatted price
+        get formattedPrice() {
+          if (!this.variantsData || this.variantsData.length === 0) {
+            return this.productData.price
+              ? this.formatMoney(this.productData.price)
+              : ''
+          }
+
+          const selectedVariant = this.variantsData.find(
+            v => v.id === this.selectedVariant
+          )
+          if (selectedVariant && selectedVariant.price) {
+            return this.formatMoney(selectedVariant.price)
+          }
+
+          return this.productData.price
+            ? this.formatMoney(this.productData.price)
+            : ''
+        },
+
+        // Computed: currently selected handle color (option1)
+        get selectedOption1() {
+          const v = (this.variantsData || []).find(
+            v => v.id === this.selectedVariant
+          )
+          return v && v.option1 ? String(v.option1) : null
+        },
+        get selectedOption1Lc() {
+          return String(this.selectedOption1 || '')
+            .trim()
+            .toLowerCase()
+        },
+
+        // Computed property for Quick View formatted price
+        get qvFormattedPrice() {
+          if (!this.variantsData || this.variantsData.length === 0) {
+            return this.productData.price
+              ? this.formatMoney(this.productData.price)
+              : ''
+          }
+
+          const qvSelectedVariant = this.variantsData.find(
+            v => v.id === this.qvSelectedVariantId
+          )
+          if (qvSelectedVariant && qvSelectedVariant.price) {
+            return this.formatMoney(qvSelectedVariant.price)
+          }
+
+          return this.productData.price
+            ? this.formatMoney(this.productData.price)
+            : ''
+        },
         // Quick View state
         isQuickViewOpen: false,
         qvSelectedVariantId: null,
@@ -454,6 +515,20 @@
           const txt = document.createElement('textarea')
           txt.innerHTML = str
           return txt.value
+        },
+
+        // Format price from cents to currency
+        formatMoney(cents) {
+          if (!cents || typeof cents !== 'number') return ''
+          try {
+            return new Intl.NumberFormat('{{ shop.locale }}', {
+              style: 'currency',
+              currency: '{{ shop.currency }}',
+            }).format(cents / 100)
+          } catch (e) {
+            // Fallback to basic formatting
+            return '$' + (cents / 100).toFixed(2)
+          }
         },
 
         // Heuristic: treat common size labels as size-like (not for title)
@@ -555,6 +630,22 @@
 
         selectVariant(variantId) {
           this.selectedVariant = variantId
+          this.updateTitle()
+          this.checkAvailability()
+          this.updateImage()
+          // Price will update automatically via the formattedPrice computed property
+        },
+
+        // Select by handle color (option1). Prefer an available variant; fallback to first match.
+        selectByHandle(handleValue) {
+          const hv = String(handleValue || '').trim()
+          const matches = (this.variantsData || []).filter(
+            v => String(v.option1 || '') === hv
+          )
+          if (!matches.length) return
+          const available = matches.find(v => !!v.available)
+          const chosen = available || matches[0]
+          this.selectedVariant = chosen.id
           this.updateTitle()
           this.checkAvailability()
           this.updateImage()

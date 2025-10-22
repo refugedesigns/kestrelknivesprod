@@ -65,10 +65,11 @@
   </div>
 
   <!-- Main Content -->
-  <div class='grid grid-cols-1 lg:grid-cols-4 gap-12 px-4 lg:px-0 max-w-7xl mx-4 md:mx-8 lg:mx-auto border border-gray-200 py-12 rounded-lg shadow-sm'>
+  <div class='grid grid-cols-1 lg:grid-cols-4 gap-12 px-4 lg:px-0 max-w-7xl mx-4 md:mx-8 xl:mx-auto border border-gray-200 py-12 rounded-lg shadow-sm'>
     <!-- Contact Form (Left Side) -->
-    <div class='lg:col-span-2'>
-      {% form "contact" %}
+    <div class='lg:col-span-2 px-4'>
+      <div class="contact-kaktus"></div>
+      {% comment %} {% form "contact" %}
         {% if form.errors %}
           <div class='border border-red-300 bg-red-50 p-4 mb-6 rounded'>
             <div class='flex items-center mb-2'>
@@ -224,17 +225,47 @@
         >
           Submit
         </button>
-      {% endform %}
+      {% endform %} {% endcomment %}
     </div>
 
     <!-- Information Section (Right Side) -->
     <div class='lg:col-span-2'>
-      <div class='prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-headings:uppercase prose-headings:tracking-wide prose-headings:text-lg prose-headings:mb-3 prose-p:text-gray-700 prose-p:mb-6 prose-a:text-black prose-a:hover:text-gray-900 prose-a:underline'>
+      <div class='prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-headings:uppercase prose-headings:tracking-wide prose-headings:text-lg prose-headings:mb-3 prose-p:text-gray-700 prose-p:mb-6 prose-a:text-black prose-a:hover:text-gray-900 prose-a:underline contact-content'>
         {{ page.content }}
       </div>
     </div>
   </div>
 </div>
+<style>
+  /* Force icons within Shopify page content to render black */
+  .contact-content svg,
+  .contact-content svg * {
+    color: #000 !important;
+  }
+  .contact-content svg * {
+    fill: currentColor !important;
+    stroke: currentColor !important;
+  }
+  /* Prevent clipping and ensure consistent rendering */
+  .contact-content svg {
+    display: inline-block;
+    overflow: visible; /* avoid cutting strokes at edges */
+    vertical-align: middle;
+  }
+  .contact-content a svg {
+    width: 24px;
+    height: 24px;
+  }
+  /* Hover color override to gray */
+  .contact-content a:hover svg,
+  .contact-content a:hover svg * {
+    color: #6b7280 !important; /* gray-500 */
+  }
+  /* In case incoming content uses text-white on wrappers */
+  .contact-content .text-white {
+    color: #000 !important;
+  }
+</style>
 {% assign api_mode = false %}
 {% if section.settings.map_provider == "google_js"
   and section.settings.maps_api_key != blank

@@ -111,6 +111,14 @@
 
             <div class='space-y-4'>
               <input
+                type='text'
+                x-model='name'
+                name='contact[name]'
+                placeholder='Full Name'
+                class='w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500'
+                required
+              >
+              <input
                 type='email'
                 x-model='email'
                 name='contact[email]'
@@ -303,6 +311,7 @@
     return {
       showForm: false,
       showSuccess: false,
+      name: '',
       email: '',
       submitting: false,
       errorMessage: '',
@@ -310,6 +319,7 @@
       openForm() {
         this.showForm = true
         this.errorMessage = ''
+        this.name = ''
         this.email = ''
       },
 
@@ -326,6 +336,29 @@
         this.submitting = true
 
         var form = event.target
+
+        // Validate name field
+        if (!this.name || !this.name.trim()) {
+          this.errorMessage = 'Please enter your full name.'
+          this.submitting = false
+          return
+        }
+
+        // Validate email field
+        if (!this.email || !this.email.trim()) {
+          this.errorMessage = 'Please enter your email address.'
+          this.submitting = false
+          return
+        }
+
+        // Additional email format validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(this.email)) {
+          this.errorMessage = 'Please enter a valid email address.'
+          this.submitting = false
+          return
+        }
+
         var formData = new FormData(form)
 
         try {
@@ -342,6 +375,8 @@
             // Optionally inspect response.text() or response.url for query params
             this.showForm = false
             this.showSuccess = true
+            this.name = ''
+            this.email = ''
           } else {
             // For error statuses, attempt to parse the response to get message
             var text = await response.text()

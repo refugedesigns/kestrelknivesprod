@@ -89,349 +89,372 @@
 
 <div class='bg-gray-50 mb-8' x-data='productPage()'>
   <!-- Main Product Section -->
-  <main class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-28'>
-    <div class='lg:grid lg:grid-cols-12 lg:gap-12'>
-      <!-- Left Column - Product Images -->
-      <div class='lg:col-span-7'>
-        <!-- Main Image -->
-        <div class='aspect-square bg-white rounded-lg overflow-hidden mb-6 relative group'>
-          <img
-            id='mainImage'
-            src='{{ product.featured_image | img_url: '600x600' }}'
-            alt='{{ product.title | escape }}'
-            class='w-full h-full object-contain transition-transform group-hover:scale-105'
-          >
-
-          <!-- Magnifying Glass Button -->
-          <button
-            @click='openGallery()'
-            class='absolute top-4 right-4 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
-          >
-            <svg
-              class='w-5 h-5'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
-            </svg>
-          </button>
-
-          <!-- Navigation Arrows -->
-          <button
-            @click='previousImage()'
-            class='absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
-          >
-            <svg
-              class='w-5 h-5'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-            </svg>
-          </button>
-          <button
-            @click='nextImage()'
-            class='absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
-          >
-            <svg
-              class='w-5 h-5'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Thumbnail Images -->
-        <div id='thumbnailStrip' class='flex space-x-4 overflow-x-auto pb-2'>
-          {% for media in product.media %}
-            <button
-              @click='changeImage({{ forloop.index0 }})'
-              class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 {% if forloop.first %}border-black{% else %}border-gray-200 hover:border-black{% endif %} transition-colors'
-            >
-              {% render "product-media", media: media %}
-            </button>
-          {% endfor %}
-        </div>
+  <div class=''>
+    {%- assign tags_lower = product.tags
+      | join: "||"
+      | downcase
+      | split: "||"
+    -%}
+    {% if tags_lower contains "hidden_offer" %}
+      <div
+        class='text-center mb-8 px-6 py-4 rounded-lg my-8 h-40 flex items-center justify-center'
+        style='background-color: {{ section.settings.hidden_offer_title_bg_color | default: "#ffffff" }};'
+      >
+        <h1
+          class='text-3xl md:text-4xl font-bold text-gray-900 mb-4'
+          style='color: {{ section.settings.hidden_offer_title_color | default: "#000000" }};'
+        >
+          {{
+            section.settings.hidden_offer_title
+            | default: "This Product is Currently Unavailable"
+          }}
+        </h1>
       </div>
-
-      <!-- Right Column - Product Info -->
-      <div class='lg:col-span-5 mt-8 lg:mt-0'>
-        <div class='lg:sticky lg:top-24'>
-          <!-- Brand -->
-          <p class='text-sm text-gray-500 mb-2'>{{ product.vendor }}</p>
-
-          <!-- Product Title -->
-          <h1 class='text-4xl font-bold text-gray-900 mb-6'>
-            {{ product.title }}
-          </h1>
-
-          {% form "product",
-            product,
-            id: "product-form",
-            novalidate: "novalidate"
-          %}
-            <input
-              type='hidden'
-              name='id'
-              id='variantIdInput'
-              value='{{ selected_variant.id }}'
+    {% endif %}
+    <main class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 {% unless tags_lower contains 'hidden_offer' %}pt-24{% endunless %}'>
+      <div class='lg:grid lg:grid-cols-12 lg:gap-12'>
+        <!-- Left Column - Product Images -->
+        <div class='lg:col-span-7'>
+          <!-- Main Image -->
+          <div class='aspect-square bg-white rounded-lg overflow-hidden mb-6 relative group'>
+            <img
+              id='mainImage'
+              src='{{ product.featured_image | img_url: '600x600' }}'
+              alt='{{ product.title | escape }}'
+              class='w-full h-full object-contain transition-transform group-hover:scale-105'
             >
 
-            <!-- Price -->
-            <div class='mb-8'>
-              <span id='price' class='text-3xl font-bold text-gray-900'>
-                {{- selected_variant.price | money -}}
-              </span>
-              <span
-                id='comparePrice'
-                class='text-lg text-gray-500 line-through ml-2'
-                style='display: {% if selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
+            <!-- Magnifying Glass Button -->
+            <button
+              @click='openGallery()'
+              class='absolute top-4 right-4 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
+            >
+              <svg
+                class='w-5 h-5'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
               >
-                {{- selected_variant.compare_at_price | money -}}
-              </span>
-              <span
-                id='saleBadge'
-                class='px-3 py-1 text-sm font-bold bg-red-500 rounded-full text-white ml-4'
-                style='display: {% if selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
-                >Sale</span
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+              </svg>
+            </button>
+
+            <!-- Navigation Arrows -->
+            <button
+              @click='previousImage()'
+              class='absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
+            >
+              <svg
+                class='w-5 h-5'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
               >
-              <div id='availability' class='mt-1 text-sm text-gray-600'></div>
-            </div>
-
-            <!-- Insert the Shop Pay installments banner if available -->
-            <div class='mb-6'>
-              <p class='text-md text-gray-500'>
-                {{ form | payment_terms }}
-              </p>
-            </div>
-
-            <!--
-              Dynamic Variant Options (supports Knives, Apparel, Accessories)
-            -->
-            {% unless product.has_only_default_variant %}
-              {% for option in product.options_with_values %}
-                {% assign option_name_downcase = option.name
-                  | downcase
-                  | strip
-                %}
-                {% assign option_position = forloop.index %}
-
-                <div class='mb-6'>
-                  <h3 class='text-lg font-semibold mb-3'>
-                    {{ option.name }}
-                  </h3>
-
-                  {% comment %}
-                    Determine renderer by option name:
-                    - color-like: color/colour/handle/colourway → swatches with images
-                    - size-like: size → text square buttons
-                    - default: text buttons
-                  {% endcomment %}
-
-                  {% if option_name_downcase contains "color"
-                    or option_name_downcase contains "colour"
-                    or option_name_downcase contains "handle"
-                    or option_name_downcase contains "colourway"
-                  %}
-                    <div class='grid grid-cols-5 gap-3'>
-                      {% for value in option.values %}
-                        {% assign is_selected = false %}
-                        {% if option.selected_value == value %}
-                          {% assign is_selected = true %}
-                        {% endif %}
-
-                        {% assign option_image = null %}
-                        {% for variant in product.variants %}
-                          {% if option_position == 1
-                            and variant.option1 == value
-                          %}
-                            {% if variant.featured_image -%}
-                              {%- assign option_image = variant.featured_image -%}
-                            {%- endif %}
-                          {% elsif option_position == 2
-                            and variant.option2 == value
-                          %}
-                            {% if variant.featured_image -%}
-                              {%- assign option_image = variant.featured_image -%}
-                            {%- endif %}
-                          {% elsif option_position == 3
-                            and variant.option3 == value
-                          %}
-                            {% if variant.featured_image -%}
-                              {%- assign option_image = variant.featured_image -%}
-                            {%- endif %}
-                          {% endif %}
-                          {% if option_image %}{% break %}{% endif %}
-                        {% endfor %}
-
-                        <label class='relative cursor-pointer color-option'>
-                          <input
-                            type='radio'
-                            name='options[{{ option.name }}]'
-                            value='{{ value | escape }}'
-                            class='sr-only'
-                            {% if is_selected %}
-                              checked
-                            {% endif %}
-                          >
-                          <div class='w-full aspect-square border-2 {% if is_selected %}border-black{% else %}border-gray-300 hover:border-black{% endif %} rounded-lg p-2 bg-white hover:bg-gray-100 transition-colors'>
-                            {% if option_image %}
-                              <img
-                                src='{{ option_image | img_url: '64x64' }}'
-                                alt='{{ value }}'
-                                class='w-full h-full object-contain rounded-md'
-                              >
-                            {% else %}
-                              <div class='w-full h-full bg-white rounded-md flex items-center justify-center'>
-                                <span class='text-gray-600 text-xs'>
-                                  {{- value | escape -}}
-                                </span>
-                              </div>
-                            {% endif %}
-                          </div>
-                          <span class='text-xs text-center block mt-1 font-medium {% if is_selected %}text-black{% endif %}'>
-                            {{- value | upcase -}}
-                          </span>
-                        </label>
-                      {% endfor %}
-                    </div>
-
-                  {% elsif option_name_downcase contains "size" %}
-                    <div class='flex flex-wrap gap-2'>
-                      {% for value in option.values %}
-                        {% assign is_selected = false %}
-                        {% if option.selected_value == value %}
-                          {% assign is_selected = true %}
-                        {% endif %}
-
-                        <label class='cursor-pointer'>
-                          <input
-                            type='radio'
-                            name='options[{{ option.name }}]'
-                            value='{{ value | escape }}'
-                            class='sr-only'
-                            {% if is_selected %}
-                              checked
-                            {% endif %}
-                          >
-                          <div
-                            class='
-                              min-w-[3rem] px-3 h-10 inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors
-                              {% if is_selected %} border-black bg-black text-white {% else %} border-gray-300 hover:border-black bg-white text-gray-900 {% endif %}
-                            '
-                          >
-                            {{ value | upcase }}
-                          </div>
-                        </label>
-                      {% endfor %}
-                    </div>
-
-                  {% else %}
-                    <div class='flex flex-wrap gap-2'>
-                      {% for value in option.values %}
-                        {% assign is_selected = false %}
-                        {% if option.selected_value == value %}
-                          {% assign is_selected = true %}
-                        {% endif %}
-
-                        <label class='cursor-pointer'>
-                          <input
-                            type='radio'
-                            name='options[{{ option.name }}]'
-                            value='{{ value | escape }}'
-                            class='sr-only'
-                            {% if is_selected %}
-                              checked
-                            {% endif %}
-                          >
-                          <div
-                            class='
-                              px-3 h-10 inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors
-                              {% if is_selected %} border-black bg-black text-white {% else %} border-gray-300 hover:border-black bg-white text-gray-900 {% endif %}
-                            '
-                          >
-                            {{ value }}
-                          </div>
-                        </label>
-                      {% endfor %}
-                    </div>
-                  {% endif %}
-                </div>
-              {% endfor %}
-            {% endunless %}
-
-            <!-- Quantity Selector -->
-            <div class='mb-6'>
-              <label class='block text-sm font-medium text-gray-700 mb-2'
-                >Quantity</label
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+            <button
+              @click='nextImage()'
+              class='absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
+            >
+              <svg
+                class='w-5 h-5'
+                fill='none'
+                stroke='currentColor'
+                viewBox='0 0 24 24'
               >
-              <div class='flex items-center space-x-3'>
-                <button
-                  type='button'
-                  @click='decreaseQuantity()'
-                  class='w-10 h-10 rounded-md border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors'
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Thumbnail Images -->
+          <div id='thumbnailStrip' class='flex space-x-4 overflow-x-auto pb-2'>
+            {% for media in product.media %}
+              <button
+                @click='changeImage({{ forloop.index0 }})'
+                class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 {% if forloop.first %}border-black{% else %}border-gray-200 hover:border-black{% endif %} transition-colors'
+              >
+                {% render "product-media", media: media %}
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Right Column - Product Info -->
+        <div class='lg:col-span-5 mt-8 lg:mt-0'>
+          <div class='lg:sticky lg:top-24'>
+            <!-- Brand -->
+            <p class='text-sm text-gray-500 mb-2'>{{ product.vendor }}</p>
+
+            <!-- Product Title -->
+            <h1 class='text-4xl font-bold text-gray-900 mb-6'>
+              {{ product.title }}
+            </h1>
+
+            {% form "product",
+              product,
+              id: "product-form",
+              novalidate: "novalidate"
+            %}
+              <input
+                type='hidden'
+                name='id'
+                id='variantIdInput'
+                value='{{ selected_variant.id }}'
+              >
+
+              <!-- Price -->
+              <div class='mb-8'>
+                <span id='price' class='text-3xl font-bold text-gray-900'>
+                  {{- selected_variant.price | money -}}
+                </span>
+                <span
+                  id='comparePrice'
+                  class='text-lg text-gray-500 line-through ml-2'
+                  style='display: {% if selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
                 >
-                  <svg
-                    class='w-4 h-4'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-                  </svg>
-                </button>
-                <input
-                  type='number'
-                  x-model='quantity'
-                  min='1'
-                  class='w-20 text-center border border-gray-300 rounded-md py-2 focus:ring-2 focus:ring-black focus:border-black'
+                  {{- selected_variant.compare_at_price | money -}}
+                </span>
+                <span
+                  id='saleBadge'
+                  class='px-3 py-1 text-sm font-bold bg-red-500 rounded-full text-white ml-4'
+                  style='display: {% if selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
+                  >Sale</span
                 >
-                <button
-                  type='button'
-                  @click='increaseQuantity()'
-                  class='w-10 h-10 rounded-md border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors'
-                >
-                  <svg
-                    class='w-4 h-4'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                  </svg>
-                </button>
+                <div id='availability' class='mt-1 text-sm text-gray-600'></div>
               </div>
-            </div>
 
-            <!-- Add to Cart Button -->
-            <button
-              id='addToCartBtn'
-              type='submit'
-              class='w-full uppercase bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mb-6 {% if product_status_text != blank or selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
-              {% if product_status_text != blank
-                or selected_variant.available == false
-              %}
-                disabled
-              {% endif %}
-            >
-              {% if product_status_text != blank %}
-                {{ product_status_text }}
-              {% elsif selected_variant.available == false %}
-                SOLD OUT
-              {% else %}
-                ADD TO CART
-              {% endif %}
-            </button>
-          {% endform %}
+              <!-- Insert the Shop Pay installments banner if available -->
+              <div class='mb-6'>
+                <p class='text-md text-gray-500'>
+                  {{ form | payment_terms }}
+                </p>
+              </div>
+
+              <!--
+                Dynamic Variant Options (supports Knives, Apparel, Accessories)
+              -->
+              {% unless product.has_only_default_variant %}
+                {% for option in product.options_with_values %}
+                  {% assign option_name_downcase = option.name
+                    | downcase
+                    | strip
+                  %}
+                  {% assign option_position = forloop.index %}
+
+                  <div class='mb-6'>
+                    <h3 class='text-lg font-semibold mb-3'>
+                      {{ option.name }}
+                    </h3>
+
+                    {% comment %}
+                      Determine renderer by option name:
+                      - color-like: color/colour/handle/colourway → swatches with images
+                      - size-like: size → text square buttons
+                      - default: text buttons
+                    {% endcomment %}
+
+                    {% if option_name_downcase contains "color"
+                      or option_name_downcase contains "colour"
+                      or option_name_downcase contains "handle"
+                      or option_name_downcase contains "colourway"
+                    %}
+                      <div class='grid grid-cols-5 gap-3'>
+                        {% for value in option.values %}
+                          {% assign is_selected = false %}
+                          {% if option.selected_value == value %}
+                            {% assign is_selected = true %}
+                          {% endif %}
+
+                          {% assign option_image = null %}
+                          {% for variant in product.variants %}
+                            {% if option_position == 1
+                              and variant.option1 == value
+                            %}
+                              {% if variant.featured_image -%}
+                                {%- assign option_image = variant.featured_image -%}
+                              {%- endif %}
+                            {% elsif option_position == 2
+                              and variant.option2 == value
+                            %}
+                              {% if variant.featured_image -%}
+                                {%- assign option_image = variant.featured_image -%}
+                              {%- endif %}
+                            {% elsif option_position == 3
+                              and variant.option3 == value
+                            %}
+                              {% if variant.featured_image -%}
+                                {%- assign option_image = variant.featured_image -%}
+                              {%- endif %}
+                            {% endif %}
+                            {% if option_image %}{% break %}{% endif %}
+                          {% endfor %}
+
+                          <label class='relative cursor-pointer color-option'>
+                            <input
+                              type='radio'
+                              name='options[{{ option.name }}]'
+                              value='{{ value | escape }}'
+                              class='sr-only'
+                              {% if is_selected %}
+                                checked
+                              {% endif %}
+                            >
+                            <div class='w-full aspect-square border-2 {% if is_selected %}border-black{% else %}border-gray-300 hover:border-black{% endif %} rounded-lg p-2 bg-white hover:bg-gray-100 transition-colors'>
+                              {% if option_image %}
+                                <img
+                                  src='{{ option_image | img_url: '64x64' }}'
+                                  alt='{{ value }}'
+                                  class='w-full h-full object-contain rounded-md'
+                                >
+                              {% else %}
+                                <div class='w-full h-full bg-white rounded-md flex items-center justify-center'>
+                                  <span class='text-gray-600 text-xs'>
+                                    {{- value | escape -}}
+                                  </span>
+                                </div>
+                              {% endif %}
+                            </div>
+                            <span class='text-xs text-center block mt-1 font-medium {% if is_selected %}text-black{% endif %}'>
+                              {{- value | upcase -}}
+                            </span>
+                          </label>
+                        {% endfor %}
+                      </div>
+
+                    {% elsif option_name_downcase contains "size" %}
+                      <div class='flex flex-wrap gap-2'>
+                        {% for value in option.values %}
+                          {% assign is_selected = false %}
+                          {% if option.selected_value == value %}
+                            {% assign is_selected = true %}
+                          {% endif %}
+
+                          <label class='cursor-pointer'>
+                            <input
+                              type='radio'
+                              name='options[{{ option.name }}]'
+                              value='{{ value | escape }}'
+                              class='sr-only'
+                              {% if is_selected %}
+                                checked
+                              {% endif %}
+                            >
+                            <div
+                              class='
+                                min-w-[3rem] px-3 h-10 inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors
+                                {% if is_selected %} border-black bg-black text-white {% else %} border-gray-300 hover:border-black bg-white text-gray-900 {% endif %}
+                              '
+                            >
+                              {{ value | upcase }}
+                            </div>
+                          </label>
+                        {% endfor %}
+                      </div>
+
+                    {% else %}
+                      <div class='flex flex-wrap gap-2'>
+                        {% for value in option.values %}
+                          {% assign is_selected = false %}
+                          {% if option.selected_value == value %}
+                            {% assign is_selected = true %}
+                          {% endif %}
+
+                          <label class='cursor-pointer'>
+                            <input
+                              type='radio'
+                              name='options[{{ option.name }}]'
+                              value='{{ value | escape }}'
+                              class='sr-only'
+                              {% if is_selected %}
+                                checked
+                              {% endif %}
+                            >
+                            <div
+                              class='
+                                px-3 h-10 inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors
+                                {% if is_selected %} border-black bg-black text-white {% else %} border-gray-300 hover:border-black bg-white text-gray-900 {% endif %}
+                              '
+                            >
+                              {{ value }}
+                            </div>
+                          </label>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              {% endunless %}
+
+              <!-- Quantity Selector -->
+              <div class='mb-6'>
+                <label class='block text-sm font-medium text-gray-700 mb-2'
+                  >Quantity</label
+                >
+                <div class='flex items-center space-x-3'>
+                  <button
+                    type='button'
+                    @click='decreaseQuantity()'
+                    class='w-10 h-10 rounded-md border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors'
+                  >
+                    <svg
+                      class='w-4 h-4'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                    </svg>
+                  </button>
+                  <input
+                    type='number'
+                    x-model='quantity'
+                    min='1'
+                    class='w-20 text-center border border-gray-300 rounded-md py-2 focus:ring-2 focus:ring-black focus:border-black'
+                  >
+                  <button
+                    type='button'
+                    @click='increaseQuantity()'
+                    class='w-10 h-10 rounded-md border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors'
+                  >
+                    <svg
+                      class='w-4 h-4'
+                      fill='none'
+                      stroke='currentColor'
+                      viewBox='0 0 24 24'
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Add to Cart Button -->
+              <button
+                id='addToCartBtn'
+                type='submit'
+                class='w-full uppercase bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mb-6 {% if product_status_text != blank or selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
+                {% if product_status_text != blank
+                  or selected_variant.available == false
+                %}
+                  disabled
+                {% endif %}
+              >
+                {% if product_status_text != blank %}
+                  {{ product_status_text }}
+                {% elsif selected_variant.available == false %}
+                  SOLD OUT
+                {% else %}
+                  ADD TO CART
+                {% endif %}
+              </button>
+            {% endform %}
+          </div>
         </div>
       </div>
-    </div>
-  </main>
+    </main>
+  </div>
 </div>
 
 <!-- Sticky Tabs Navigation -->
@@ -474,6 +497,15 @@
           data-tab='design'
         >
           Design
+        </button>
+      {% endif %}
+      {% if section.settings.show_reviews and section.blocks.size > 0 %}
+        <button
+          onclick="scrollToSection('reviews')"
+          class='tab-button uppercase py-4 px-2 border-b-2 border-transparent text-black hover:text-black hover:border-black font-bold transition-colors'
+          data-tab='reviews'
+        >
+          Reviews
         </button>
       {% endif %}
     </nav>
@@ -637,7 +669,7 @@
 
 <!-- Product Reviews Section -->
 {% if section.settings.show_reviews and section.blocks.size > 0 %}
-  <section class='py-8 bg-white'>
+  <section id='reviews' class='py-8 bg-white'>
     <div class='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8'>
       <h2 class='text-3xl font-bold text-gray-900 mb-8 text-center'>
         {{ section.settings.reviews_heading }}
@@ -703,17 +735,19 @@
   </section>
 {% endif %}
 
-<!-- Start of Judge.me code -->
-<div style='clear:both'></div>
-<div
-  id='judgeme_product_reviews'
-  class='jdgm-widget jdgm-review-widget'
-  data-product-title='{{ product.title | escape }}'
-  data-id='{{ product.id }}'
-  data-auto-install='false'
->
-  {{ product.metafields.judgeme.widget }}
-</div>
+{% comment %}
+  <!-- Start of Judge.me code -->
+  <div style='clear:both'></div>
+  <div
+    id='judgeme_product_reviews'
+    class='jdgm-widget jdgm-review-widget'
+    data-product-title='{{ product.title | escape }}'
+    data-id='{{ product.id }}'
+    data-auto-install='false'
+  >
+    {{ product.metafields.judgeme.widget }}
+  </div>
+{% endcomment %}
 <!-- End of Judge.me code -->
 
 <!-- Anchor for inserting related products after all product content -->
@@ -1853,38 +1887,49 @@
       function updateActiveTab() {
         const specsSection = document.getElementById('specs');
         const designSection = document.getElementById('design');
+        const reviewsSection = document.getElementById('reviews');
         const tabsNavigation = document.getElementById('tabsNavigation');
         
-        if (!specsSection || !designSection || !tabsNavigation) return;
+        if (!tabsNavigation) return;
         
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         const offset = getHeaderHeight() + getTabsHeight() + 8;
-        
-        const specsOffset = specsSection.offsetTop - offset;
-        const designOffset = designSection.offsetTop - offset;
+        const viewportHeight = window.innerHeight;
         
         const tabButtons = document.querySelectorAll('.tab-button');
-        if (scrollTop >= designOffset) {
-          tabButtons.forEach(btn => {
-            btn.classList.remove('active', 'border-black', 'text-black');
-            btn.classList.add('border-transparent');
-          });
-          const btn = document.querySelector('.tab-button[data-tab="design"]');
-          if (btn) {
-            btn.classList.add('active', 'border-black', 'text-black');
-            btn.classList.remove('border-transparent');
-          }
-        } else if (scrollTop >= specsOffset) {
-          tabButtons.forEach(btn => {
-            btn.classList.remove('active', 'border-black', 'text-black');
-            btn.classList.add('border-transparent');
-          });
-          const btn = document.querySelector('.tab-button[data-tab="specs"]');
-          if (btn) {
-            btn.classList.add('active', 'border-black', 'text-black');
-            btn.classList.remove('border-transparent');
+        let activeSection = null;
+        
+        // Check each section to see if we're within its bounds
+        const sections = [
+          { id: 'specs', element: specsSection },
+          { id: 'design', element: designSection },
+          { id: 'reviews', element: reviewsSection }
+        ];
+        
+        for (const section of sections) {
+          if (section.element) {
+            const sectionTop = section.element.offsetTop - offset;
+            const sectionBottom = sectionTop + section.element.offsetHeight;
+            
+            // Check if current scroll position is within this section
+            if (scrollTop >= sectionTop && scrollTop < sectionBottom) {
+              activeSection = section.id;
+              break;
+            }
           }
         }
+        
+        // Update all tab buttons
+        tabButtons.forEach(btn => {
+          const isActive = activeSection && btn.getAttribute('data-tab') === activeSection;
+          if (isActive) {
+            btn.classList.add('active', 'border-black', 'text-black');
+            btn.classList.remove('border-transparent');
+          } else {
+            btn.classList.remove('active', 'border-black', 'text-black');
+            btn.classList.add('border-transparent');
+          }
+        });
       }
 
       // Add scroll listener for tab updates and initialize on load
@@ -2319,6 +2364,32 @@
 {
   "name": "Product",
   "settings": [
+    {
+      "type": "header",
+      "content": "Hidden Offer Settings"
+    },
+    {
+      "type": "text",
+      "id": "hidden_offer_title",
+      "label": "Hidden Offer Title",
+      "default": "Guide & Outfitter Early Access"
+    },
+    {
+      "type": "color",
+      "id": "hidden_offer_title_color",
+      "label": "Hidden Offer Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "hidden_offer_title_bg_color",
+      "label": "Hidden Offer Title Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Product Settings"
+    },
     {
       "type": "text",
       "id": "related_heading",

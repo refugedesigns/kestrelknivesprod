@@ -2,23 +2,66 @@
   <h1 class='text-center text-3xl'>{{ section.settings.title }}</h1>
 
   <div class='max-w-6xl mx-auto flex flex-col items-center w-full'>
-    <div class='grid grid-cols-1 md:grid-cols-3 gap-4'>
-      {% for product in section.settings.featured_collection.products
-        limit: section.settings.number_of_products_to_show
-      %}
-        {%- assign tags_lower = product.tags
-          | join: "||"
-          | downcase
-          | split: "||"
-        -%}
-        {% unless tags_lower contains "hidden_offer" %}
-          {% render "product-card", product_product: product %}
-        {% endunless %}
-      {% else %}
-        {% for item in (1..4) %}
-          {% render "product-card-placeholder" %}
-        {% endfor %}
-      {% endfor %}
+    <!-- Mobile Collection -->
+    <div class='block md:hidden'>
+      <div
+        class='grid gap-4 w-full'
+        style='grid-template-columns: repeat({{ section.settings.mobile_columns | default: 2 }}, 1fr);'
+      >
+        {% if section.settings.mobile_collection %}
+          {% for product in section.settings.mobile_collection.products
+            limit: section.settings.mobile_products_to_show
+          %}
+            {%- assign tags_lower = product.tags
+              | join: "||"
+              | downcase
+              | split: "||"
+            -%}
+            {% unless tags_lower contains "hidden_offer" %}
+              {% render "product-card", product_product: product %}
+            {% endunless %}
+          {% else %}
+            {% for item in (1..4) %}
+              {% render "product-card-placeholder" %}
+            {% endfor %}
+          {% endfor %}
+        {% else %}
+          {% for item in (1..4) %}
+            {% render "product-card-placeholder" %}
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Desktop Collection -->
+    <div class='hidden md:block'>
+      <div
+        class='grid gap-4 w-full'
+        style='grid-template-columns: repeat({{ section.settings.desktop_columns | default: 3 }}, 1fr);'
+      >
+        {% if section.settings.featured_collection %}
+          {% for product in section.settings.featured_collection.products
+            limit: section.settings.number_of_products_to_show
+          %}
+            {%- assign tags_lower = product.tags
+              | join: "||"
+              | downcase
+              | split: "||"
+            -%}
+            {% unless tags_lower contains "hidden_offer" %}
+              {% render "product-card", product_product: product %}
+            {% endunless %}
+          {% else %}
+            {% for item in (1..4) %}
+              {% render "product-card-placeholder" %}
+            {% endfor %}
+          {% endfor %}
+        {% else %}
+          {% for item in (1..4) %}
+            {% render "product-card-placeholder" %}
+          {% endfor %}
+        {% endif %}
+      </div>
     </div>
   </div>
 </div>
@@ -36,7 +79,7 @@
     {
       "type": "collection",
       "id": "featured_collection",
-      "label": "Collection"
+      "label": "Desktop Collection"
     },
     {
       "type": "range",
@@ -44,7 +87,44 @@
       "min": 3,
       "max": 12,
       "default": 3,
-      "label": "Number of products to show"
+      "label": "Desktop: Number of products to show"
+    },
+    {
+      "type": "header",
+      "content": "Mobile Settings"
+    },
+    {
+      "type": "collection",
+      "id": "mobile_collection",
+      "label": "Mobile Collection",
+      "info": "Optional: Use a different collection for mobile. If not set, will use the desktop collection."
+    },
+    {
+      "type": "range",
+      "id": "mobile_products_to_show",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4,
+      "label": "Mobile: Number of products to show"
+    },
+    {
+      "type": "range",
+      "id": "mobile_columns",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2,
+      "label": "Mobile: Number of columns"
+    },
+    {
+      "type": "range",
+      "id": "desktop_columns",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3,
+      "label": "Desktop: Number of columns"
     },
     {
       "type": "header",

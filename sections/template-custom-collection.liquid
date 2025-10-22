@@ -1,0 +1,249 @@
+<style>
+  #products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 400px));
+    gap: 1.5rem;
+    justify-content: center;
+    place-items: start;
+  }
+
+  @media (max-width: 640px) {
+    #products-grid {
+      grid-template-columns: 1fr;
+      place-items: center;
+    }
+  }
+</style>
+
+<script>
+  window.__collectionProducts = {{ collection.products | json }};
+</script>
+
+<div class='px-4 py-16 mx-auto' x-data='customCollectionPage()' x-cloak>
+  {% paginate collection.products by section.settings.number_of_products_per_page | default: 9 %}
+    <div
+      class='text-center mb-8 px-6 py-4 rounded-lg my-8 h-40 flex items-center justify-center'
+      style='background-color: {{ section.settings.page_title_bg_color | default: "#ffffff" }};'
+    >
+      <h1
+        class='text-3xl md:text-4xl font-bold text-gray-900 mb-4'
+        style='color: {{ section.settings.page_title_color | default: "#000000" }};'
+      >
+        {{ section.settings.page_title | default: "Hidden Offer" }}
+      </h1>
+    </div>
+
+    <div class='max-w-7xl mx-auto'>
+      {%- comment -%} Product count removed {%- endcomment -%}
+
+      <!-- Products Grid -->
+      <div id='products-grid'>
+        {% assign hidden_offer_count = 0 %}
+
+        {% comment %}
+          Only render products with hidden_offer tag.
+          Apply same knife sorting logic if applicable.
+        {% endcomment %}
+
+        {% assign has_knife_filter = false %}
+        {% assign url_string = request.path
+          | append: "?"
+          | append: request.query_string
+        %}
+        {% if url_string contains "filter.p.product_type=Knives"
+          or url_string contains "filter.p.product_type=knives"
+        %}
+          {% assign has_knife_filter = true %}
+        {% endif %}
+
+        {%- comment -%}
+          Determine if any product on the current page has explicit position tags.
+        {%- endcomment -%}
+        {% assign has_position_tags = false %}
+        {% for product in collection.products %}
+          {%- assign tags_lower = product.tags
+            | join: "||"
+            | downcase
+            | split: "||"
+          -%}
+          {% if tags_lower contains "hidden_offer" %}
+            {% for i in (1..999) %}
+              {% assign wanted = "product_" | append: i %}
+              {% assign wanted_alt = "position_" | append: i %}
+              {% if tags_lower contains wanted
+                or tags_lower contains wanted_alt
+              %}
+                {% assign has_position_tags = true %}
+                {% break %}
+              {% endif %}
+            {% endfor %}
+            {% if has_position_tags %}{% break %}{% endif %}
+          {% endif %}
+        {% endfor %}
+
+        {% if collection.handle contains "knife"
+          or collection.title contains "Knife"
+          or collection.title contains "Knives"
+          or has_knife_filter
+          or has_position_tags
+        %}
+          {% assign rendered_ids = "," %}
+          {% for i in (1..999) %}
+            {% assign wanted = "product_" | append: i %}
+            {% assign wanted_alt = "position_" | append: i %}
+            {% for product in collection.products %}
+              {%- assign tags_lower = product.tags
+                | join: "||"
+                | downcase
+                | split: "||"
+              -%}
+              {% if tags_lower contains "hidden_offer" %}
+                {% if tags_lower contains wanted
+                  or tags_lower contains wanted_alt
+                %}
+                  {% render "product-card", product_product: product %}
+                  {% assign rendered_ids = rendered_ids
+                    | append: product.id
+                    | append: ","
+                  %}
+                  {% assign hidden_offer_count = hidden_offer_count | plus: 1 %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+
+          {%- comment -%} Render any remaining hidden_offer items without product_N tag {%- endcomment -%}
+          {% for product in collection.products %}
+            {% assign pid = product.id | append: "," %}
+            {% unless rendered_ids contains pid %}
+              {%- assign tags_lower = product.tags
+                | join: "||"
+                | downcase
+                | split: "||"
+              -%}
+              {% if tags_lower contains "hidden_offer" %}
+                {% render "product-card", product_product: product %}
+                {% assign hidden_offer_count = hidden_offer_count | plus: 1 %}
+              {% endif %}
+            {% endunless %}
+          {% endfor %}
+        {% else %}
+          {% for product in collection.products %}
+            {%- assign tags_lower = product.tags
+              | join: "||"
+              | downcase
+              | split: "||"
+            -%}
+            {% if tags_lower contains "hidden_offer" %}
+              {% render "product-card", product_product: product %}
+              {% assign hidden_offer_count = hidden_offer_count | plus: 1 %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
+        {% if hidden_offer_count == 0 %}
+          <div class='col-span-full text-center py-12'>
+            <p class='text-gray-500 text-lg'>
+              There are no products in this collection
+            </p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Pagination -->
+      {% if paginate.pages > 1 %}
+        <div class='mt-12'>
+          {% render "pagination", pagination: paginate %}
+        </div>
+      {% endif %}
+    </div>
+  {% endpaginate %}
+</div>
+
+<script>
+  function customCollectionPage() {
+    return {
+      init() {},
+    }
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Custom Collection",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Page Title"
+    },
+    {
+      "type": "text",
+      "id": "page_title",
+      "label": "Page Title",
+      "default": "Guide & Outfitter Early Access"
+    },
+    {
+      "type": "color",
+      "id": "page_title_color",
+      "label": "Page Title Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "page_title_bg_color",
+      "label": "Page Title Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "number",
+      "id": "number_of_products_per_page",
+      "default": 9,
+      "label": "Number of products per page"
+    },
+    {
+      "type": "header",
+      "content": "Color Variant Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "orange_image",
+      "label": "Orange Color Image",
+      "info": "Upload an image for orange color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "black_orange_image",
+      "label": "Black w/Orange Liner Image",
+      "info": "Upload an image for black with orange liner variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "black_image",
+      "label": "Black Color Image",
+      "info": "Upload an image for black color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "green_image",
+      "label": "Green Color Image",
+      "info": "Upload an image for green color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "camo_image",
+      "label": "Camo/Earth Color Image",
+      "info": "Upload an image for camo or earth color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "high_vis_orange_image",
+      "label": "High Vis Orange Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "high_vis_green_image",
+      "label": "High Vis Green Image"
+    }
+  ]
+}
+{% endschema %}

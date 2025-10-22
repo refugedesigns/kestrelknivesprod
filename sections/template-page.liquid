@@ -28,45 +28,152 @@
   }
 </style>
 
-<div class='bg-gray-50'>
-  <!-- Header Section -->
-  <header
-    class='text-white relative overflow-hidden flex items-center justify-center'
-    style='background-color: {{ section.settings.header_bg_color | default: "#000000" }}; min-height: {{ section.settings.header_height | default: "200" }}px; padding-top: {{ section.settings.header_padding_top | default: "4" }}rem; padding-bottom: {{ section.settings.header_padding_bottom | default: "4" }}rem; {% if section.settings.header_border_bottom %}border-bottom: 2px solid {{ section.settings.header_border_color | default: "#ffffff" }};{% endif %}'
-  >
-    <div class='container mx-auto px-4 relative z-10  flex flex-col items-center justify-center'>
-      <div class='text-center'>
-        <h1
-          class='text-5xl font-bold mb-4'
-          style='color: {{ section.settings.title_color | default: "#ffffff" }};'
-        >
-          {{ page.title }}
-        </h1>
-        {% if page.excerpt != blank %}
-          <p class='text-xl opacity-90 max-w-2xl mx-auto leading-relaxed'>
-            {{ page.excerpt }}
-          </p>
-        {% endif %}
-      </div>
-    </div>
-  </header>
+<!-- Header Section -->
+{% if section.settings.header_image
+  and section.settings.header_image != blank
+%}
+  <!-- Custom Header Image -->
+  <div class='relative w-full overflow-hidden'>
+    {% assign position_class = section.settings.header_position %}
+    {% case position_class %}
+      {% when "center" %}
+        {% assign object_position = "object-center" %}
+      {% when "top" %}
+        {% assign object_position = "object-top" %}
+      {% when "bottom" %}
+        {% assign object_position = "object-bottom" %}
+    {% endcase %}
 
-  <!-- Content Section -->
-  <div class='container mx-auto px-4 py-16'>
-    <div class='max-w-4xl mx-auto'>
-      <div class='bg-white p-8 md:p-12'>
-        <div class='prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-headings:mb-6 prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6 prose-h1:text-3xl prose-h1:mb-8 prose-h2:text-2xl prose-h2:mb-6 prose-h2:mt-8 prose-h3:text-xl prose-h3:mb-4 prose-h3:mt-6 prose-ul:text-gray-700 prose-ol:text-gray-700 prose-li:text-gray-700 prose-a:text-black prose-a:font-medium prose-a:underline prose-a:decoration-2 prose-a:underline-offset-2 prose-strong:text-gray-900 prose-strong:font-semibold prose-blockquote:text-gray-600 prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-6 prose-blockquote:italic prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-pre:bg-gray-100 prose-pre:border prose-pre:border-gray-200 prose-pre:rounded-lg prose-pre:p-4 prose-table:text-sm prose-th:bg-gray-50 prose-th:font-semibold prose-th:text-gray-900 prose-td:border prose-td:border-gray-200 prose-td:px-4 prose-td:py-2 remove-list-indent'>
-          {{ page.content }}
+    <div
+      class='w-full'
+      style='height: {{ section.settings.header_image_height_mobile | default: 300 }}px;'
+    >
+      <img
+        src='{{ section.settings.header_image | image_url: width: 1920 }}'
+        alt='{{ section.settings.header_alt | escape }}'
+        class='w-full h-full object-cover {{ object_position }}'
+        loading='eager'
+      >
+    </div>
+
+    <style>
+      @media (min-width: 768px) {
+        .relative.w-full.overflow-hidden > div:first-child {
+          height: {{ section.settings.header_image_height | default: 400 }}px !important;
+        }
+      }
+    </style>
+
+    <!-- Optional overlay for text if needed -->
+    <div class='absolute inset-0 bg-black/20'></div>
+  </div>
+
+  <!-- Content Section with custom header -->
+  <div class='max-w-4xl mx-auto px-4 py-6 md:py-8'>
+    <div class='prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6 prose-h1:text-3xl prose-h1:mb-8 prose-h2:text-2xl prose-h2:mb-6 prose-h2:mt-8 prose-h3:text-xl prose-h3:mb-4 prose-h3:mt-6 remove-list-indent'>
+      {{ page.content }}
+    </div>
+  </div>
+{% else %}
+  <!-- Default Header Section -->
+  <div class='bg-gray-50'>
+    <header
+      class='text-white relative overflow-hidden flex items-center justify-center'
+      style='background-color: {{ section.settings.header_bg_color | default: "#000000" }}; min-height: {{ section.settings.header_height | default: "200" }}px; padding-top: {{ section.settings.header_padding_top | default: "4" }}rem; padding-bottom: {{ section.settings.header_padding_bottom | default: "4" }}rem; {% if section.settings.header_border_bottom %}border-bottom: 2px solid {{ section.settings.header_border_color | default: "#ffffff" }};{% endif %}'
+    >
+      <div class='container mx-auto px-4 relative z-10  flex flex-col items-center justify-center'>
+        <div class='text-center'>
+          <h1
+            class='text-5xl font-bold mb-4'
+            style='color: {{ section.settings.title_color | default: "#ffffff" }};'
+          >
+            {{ page.title }}
+          </h1>
+          {% if page.excerpt != blank %}
+            <p class='text-xl opacity-90 max-w-2xl mx-auto leading-relaxed'>
+              {{ page.excerpt }}
+            </p>
+          {% endif %}
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Section with default header -->
+    <div class='container mx-auto px-4 py-16'>
+      <div class='max-w-4xl mx-auto'>
+        <div class='bg-white p-8 md:p-12'>
+          <div class='prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-headings:mb-6 prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6 prose-h1:text-3xl prose-h1:mb-8 prose-h2:text-2xl prose-h2:mb-6 prose-h2:mt-8 prose-h3:text-xl prose-h3:mb-4 prose-h3:mt-6 prose-ul:text-gray-700 prose-ol:text-gray-700 prose-li:text-gray-700 prose-a:text-black prose-a:font-medium prose-a:underline prose-a:decoration-2 prose-a:underline-offset-2 prose-strong:text-gray-900 prose-strong:font-semibold prose-blockquote:text-gray-600 prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-6 prose-blockquote:italic prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-pre:bg-gray-100 prose-pre:border prose-pre:border-gray-200 prose-pre:rounded-lg prose-pre:p-4 prose-table:text-sm prose-th:bg-gray-50 prose-th:font-semibold prose-th:text-gray-900 prose-td:border prose-td:border-gray-200 prose-td:px-4 prose-td:py-2 remove-list-indent'>
+            {{ page.content }}
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+{% endif %}
 
 {% schema %}
 {
   "name": "Page Template",
   "settings": [
+    {
+      "type": "image_picker",
+      "id": "header_image",
+      "label": "Header Image"
+    },
+    {
+      "type": "text",
+      "id": "header_alt",
+      "label": "Header Image Alt Text",
+      "default": "Page Header"
+    },
+    {
+      "type": "header",
+      "content": "Header Image Settings"
+    },
+    {
+      "type": "range",
+      "id": "header_image_height",
+      "label": "Header Image Height",
+      "min": 200,
+      "max": 800,
+      "step": 50,
+      "default": 400,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "header_image_height_mobile",
+      "label": "Header Image Height - Mobile",
+      "min": 150,
+      "max": 600,
+      "step": 50,
+      "default": 300,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "header_position",
+      "label": "Image Position",
+      "options": [
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Default Header Settings"
+    },
     {
       "type": "color",
       "id": "header_bg_color",

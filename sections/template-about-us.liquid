@@ -18,24 +18,24 @@
       "content": "Header Image Settings"
     },
     {
-      "type": "select",
+      "type": "range",
       "id": "header_height",
       "label": "Header Image Height",
-      "options": [
-        {
-          "value": "small",
-          "label": "Small (200px)"
-        },
-        {
-          "value": "medium",
-          "label": "Medium (400px)"
-        },
-        {
-          "value": "large",
-          "label": "Large (600px)"
-        }
-      ],
-      "default": "medium"
+      "min": 200,
+      "max": 800,
+      "step": 50,
+      "default": 400,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "header_height_mobile",
+      "label": "Header Image Height - Mobile",
+      "min": 150,
+      "max": 600,
+      "step": 50,
+      "default": 300,
+      "unit": "px"
     },
     {
       "type": "select",
@@ -130,16 +130,6 @@
 %}
   <!-- Custom Header Image -->
   <div class='relative w-full overflow-hidden'>
-    {% assign header_height = section.settings.header_height %}
-    {% case header_height %}
-      {% when "small" %}
-        {% assign height_class = "h-48 md:h-64" %}
-      {% when "medium" %}
-        {% assign height_class = "h-64 md:h-" %}
-      {% when "large" %}
-        {% assign height_class = "h-128 md:h-[600px]" %}
-    {% endcase %}
-
     {% assign position_class = section.settings.header_position %}
     {% case position_class %}
       {% when "center" %}
@@ -150,7 +140,10 @@
         {% assign object_position = "object-bottom" %}
     {% endcase %}
 
-    <div class='{{ height_class }} w-full'>
+    <div
+      class='w-full'
+      style='height: {{ section.settings.header_height_mobile | default: 300 }}px;'
+    >
       <img
         src='{{ section.settings.header_image | image_url: width: 1920 }}'
         alt='{{ section.settings.header_alt | escape }}'
@@ -158,6 +151,14 @@
         loading='eager'
       >
     </div>
+
+    <style>
+      @media (min-width: 768px) {
+        .relative.w-full.overflow-hidden > div:first-child {
+          height: {{ section.settings.header_height | default: 400 }}px !important;
+        }
+      }
+    </style>
 
     <!-- Optional overlay for text if needed -->
     <div class='absolute inset-0 bg-black/20'></div>

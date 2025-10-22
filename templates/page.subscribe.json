@@ -1,0 +1,8 @@
+{
+    "sections": {
+        "template-newsletter": {
+            "type": "template-newsletter"
+        }
+    },
+    "order": ["template-newsletter"]
+}
