@@ -86,7 +86,7 @@
                     {% assign trimmed_sentence = sentence | strip %}
                     {% if trimmed_sentence != blank %}
                       <p
-                        class='text-lg md:text-xl mb-8'
+                        class='text-lg md:text-xl mb-1'
                         style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'
                       >
                         {{ trimmed_sentence }}.
@@ -181,7 +181,7 @@
                     {% assign trimmed_sentence = sentence | strip %}
                     {% if trimmed_sentence != blank %}
                       <p
-                        class='text-lg md:text-xl mb-8'
+                        class='text-lg md:text-xl mb-1'
                         style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
                       >
                         {{ trimmed_sentence }}.
@@ -276,7 +276,7 @@
                     {% assign trimmed_sentence = sentence | strip %}
                     {% if trimmed_sentence != blank %}
                       <p
-                        class='text-lg md:text-xl mb-8'
+                        class='text-lg md:text-xl mb-1'
                         style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'
                       >
                         {{ trimmed_sentence }}.
