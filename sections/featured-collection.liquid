@@ -49,7 +49,7 @@
               | split: "||"
             -%}
             {% unless tags_lower contains "hidden_offer" %}
-              {% render "product-card", product_product: product %}
+              {% render "product-card-featured", product_product: product %}
             {% endunless %}
           {% else %}
             {% for item in (1..4) %}
