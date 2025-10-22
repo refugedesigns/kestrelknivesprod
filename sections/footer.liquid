@@ -39,7 +39,7 @@
   <div class='mx-auto px-4 max-w-9xl'>
     <div class='grid grid-cols-1 lg:grid-cols-4 mb-4'>
       <!-- Left Column - Logo -->
-      <div class='flex flex-col md:flex-row items-center mb-4 lg:mb-0 justify-center lg:col-span-1  lg:pr-8'>
+      <div class='flex flex-col md:flex-row items-center mb-4 lg:mb-0 justify-center lg:col-span-1  lg:pr-8 bg-red-500'>
         {% assign footer_logo_image = section.settings.logo_image %}
         {% if footer_logo_image == blank and shop.brand_asset_default_logo %}
           {% assign footer_logo_image = shop.brand_asset_default_logo %}
@@ -205,7 +205,7 @@
       </div>
     </div>
   </div>
-  <div class='flex items-center justify-center gap-2 uppercase'>
+  <div class='flex items-center justify-center gap-2 uppercase bg-red-500'>
     <div>
       <p class='text-center text-white tracking-wide text-sm'>
         &copy; {{ "now" | date: "%Y" }} Kestrel Knives
