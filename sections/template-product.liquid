@@ -393,7 +393,23 @@
                                 {% if is_selected %} border-black bg-black text-white {% else %} border-gray-300 hover:border-black bg-white text-gray-900 {% endif %}
                               '
                             >
-                              {{ value }}
+                              {% assign size_name = value | upcase %}
+                              {% case size_name %}
+                                {% when "S" %}
+                                  SMALL
+                                {% when "M" %}
+                                  MEDIUM
+                                {% when "L" %}
+                                  LARGE
+                                {% when "X" %}
+                                  X-LARGE
+                                {% when "2X" %}
+                                  XX-LARGE
+                                {% when "3X" %}
+                                  XXX-LARGE
+                                {% else %}
+                                  {{ value }}
+                              {% endcase %}
                             </div>
                           </label>
                         {% endfor %}
@@ -557,7 +573,7 @@
             <div class='flex flex-col items-center'>
               <select
                 id='stickySizeSelector'
-                class='border border-gray-300 rounded-md px-3 py-2 text-sm font-medium bg-white focus:ring-2 focus:ring-black focus:border-black'
+                class='border border-gray-300 rounded-md px-3 py-2 text-sm font-medium bg-white focus:ring-2 focus:ring-black focus:border-black w-24 md:w-32'
                 onchange='updateStickyVariant()'
               >
                 {% for value in option.values %}
@@ -575,11 +591,11 @@
                         MEDIUM
                       {% when "L" %}
                         LARGE
-                      {% when "X" %}
+                      {% when "XL" %}
                         X-LARGE
-                      {% when "2X" %}
+                      {% when "2XL" %}
                         XX-LARGE
-                      {% when "3X" %}
+                      {% when "3XL" %}
                         XXX-LARGE
                       {% else %}
                         {{ size_name }}
