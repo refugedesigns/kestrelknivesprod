@@ -818,6 +818,7 @@
             const hasHiddenOfferTag = tags.some(tag => 
               String(tag).toLowerCase().includes('hidden_offer')
             );
+
             
             if (hasHiddenOfferTag) {
               return; // Skip this product
@@ -825,7 +826,7 @@
 
             // Filter out products with type "custom"
             const productType = String(product.product_type || product.type || '').toLowerCase();
-            if (productType.includes('custom')) {
+            if (productType.includes('custom') || productType.includes('mws_apo_generated')) {
               return; // Skip this product
             }
 
