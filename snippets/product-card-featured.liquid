@@ -75,54 +75,49 @@
           {% endunless %}
         </a>
 
-        <!--
-          Simple color/image swatches (if variant featured images exist) - hide for apparel
-        -->
+        <!-- Handle Color Variants (hide for Apparels) -->
         {% assign type_lower = product_obj.type | default: "" | downcase %}
-        {% unless type_lower contains "apparel"
+        {% unless product_obj.has_only_default_variant
+          or type_lower contains "apparel"
           or type_lower contains "accessories"
         %}
-          {% assign show_swatches = false %}
-          {% for v in product_obj.variants %}
-            {% if v.featured_image -%}
-              {%- assign show_swatches = true -%}
-              {%- break -%}
-            {%- endif %}
-          {% endfor %}
-          {% if show_swatches %}
-            <div class='mb-2'>
-              <div class='flex gap-2 justify-center'>
-                {% assign seen = "" %}
-                {% for v in product_obj.variants %}
-                  {% if v.featured_image %}
-                    {% assign token = "|"
-                      | append: v.featured_image.src
-                      | append: "|"
+          <div class='mb-2'>
+            <div class='flex gap-2 justify-center'>
+              {% assign unique_handle_colors = "" %}
+              {% for variant in product_obj.variants %}
+                {% if variant.option1 and variant.title != "Default Title" %}
+                  {% assign color_token = "|"
+                    | append: variant.option1
+                    | downcase
+                    | append: "|"
+                  %}
+                  {% unless unique_handle_colors contains color_token %}
+                    {% assign unique_handle_colors = unique_handle_colors
+                      | append: color_token
                     %}
-                    {% unless seen contains token %}
-                      {% assign seen = seen | append: token %}
-                      <button
-                        type='button'
-                        class='w-10 h-10 rounded-full border-2 border-gray-300 overflow-hidden focus:outline-none'
-                        @click='selectByHandle({{ v.option1 | json }})'
-                        :class="$el.dataset.handleLc && selectedOption1Lc === $el.dataset.handleLc ? 'ring-2 ring-black' : ''"
-                        title='{{ v.title }}'
-                        data-handle-lc='{{ v.option1 | strip | downcase }}'
-                      >
+                    <button
+                      type='button'
+                      class='w-10 h-10 rounded-full border-2 border-gray-300 overflow-hidden focus:outline-none focus:ring-2 focus:ring-black'
+                      @click='selectByHandle({{ variant.option1 | json }})'
+                      :class="$el.dataset.handleLc && selectedOption1Lc === $el.dataset.handleLc ? 'ring-2 ring-black' : ''"
+                      title='{{ variant.option1 }}'
+                      data-handle-lc='{{ variant.option1 | strip | downcase }}'
+                    >
+                      {% if variant.featured_image %}
                         <img
-                          src='{{ v.featured_image.src | image_url: width: 48 }}'
+                          src='{{ variant.featured_image.src | image_url: width: 48 }}'
                           width='48'
                           height='48'
-                          alt=''
+                          alt='{{ variant.option1 }}'
                           class='w-full h-full object-contain'
                         >
-                      </button>
-                    {% endunless %}
-                  {% endif %}
-                {% endfor %}
-              </div>
+                      {% endif %}
+                    </button>
+                  {% endunless %}
+                {% endif %}
+              {% endfor %}
             </div>
-          {% endif %}
+          </div>
         {% endunless %}
       </div>
     </div>
