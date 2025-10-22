@@ -347,7 +347,23 @@
                                 {% if is_selected %} border-black bg-black text-white {% else %} border-gray-300 hover:border-black bg-white text-gray-900 {% endif %}
                               '
                             >
-                              {{ value | upcase }}
+                              {% assign size_name = value | upcase %}
+                              {% case size_name %}
+                                {% when "S" %}
+                                  SMALL
+                                {% when "M" %}
+                                  MEDIUM
+                                {% when "L" %}
+                                  LARGE
+                                {% when "X" %}
+                                  X-LARGE
+                                {% when "2X" %}
+                                  XX-LARGE
+                                {% when "3X" %}
+                                  XXX-LARGE
+                                {% else %}
+                                  {{ size_name }}
+                              {% endcase %}
                             </div>
                           </label>
                         {% endfor %}
@@ -551,7 +567,23 @@
                       selected
                     {% endif %}
                   >
-                    {{ value | upcase }}
+                    {% assign size_name = value | upcase %}
+                    {% case size_name %}
+                      {% when "S" %}
+                        SMALL
+                      {% when "M" %}
+                        MEDIUM
+                      {% when "L" %}
+                        LARGE
+                      {% when "X" %}
+                        X-LARGE
+                      {% when "2X" %}
+                        XX-LARGE
+                      {% when "3X" %}
+                        XXX-LARGE
+                      {% else %}
+                        {{ size_name }}
+                    {% endcase %}
                   </option>
                 {% endfor %}
               </select>
