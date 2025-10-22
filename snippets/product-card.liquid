@@ -53,12 +53,22 @@
         @mouseenter='handleImageHover(true)'
         @mouseleave='handleImageHover(false)'
       >
+        <!-- Base image -->
         <img
           width='400'
           height='400'
-          :src='displayImage'
+          :src='currentImage'
           :alt="'{{ product_product.title }}'"
-          class='absolute inset-0 w-full h-full object-contain transition-opacity duration-300'
+          class='absolute inset-0 w-full h-full object-contain'
+        >
+        <!-- Hover image (crossfades in) -->
+        <img
+          width='400'
+          height='400'
+          x-show='secondImageSrc'
+          :src='secondImageSrc'
+          :alt="'{{ product_product.title }}'"
+          :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-100' : 'opacity-0')"
         >
       </a>
     </div>
@@ -454,6 +464,7 @@
         isAddingToCart: false,
         isAvailable: true,
         isHovering: false,
+        hoverImageLoaded: false,
 
         // Computed property for formatted price
         get formattedPrice() {
@@ -487,6 +498,15 @@
           }
           // Otherwise show current image
           return this.currentImage
+        },
+
+        // URL of second product image, if available
+        get secondImageSrc() {
+          if (!this.imagesData || this.imagesData.length < 2) return null
+          const img = this.imagesData[1]
+          if (!img) return null
+          if (typeof img === 'string') return img
+          return img.src || null
         },
 
         // Computed: currently selected handle color (option1)
@@ -592,6 +612,8 @@
 
           // Ensure initial image reflects the initially selected variant if it has a featured image
           this.updateImage()
+          // Preload hover image for smooth crossfade
+          this.preloadSecondImage()
         },
 
         openQuickView() {
@@ -880,10 +902,21 @@
         },
 
         handleImageHover(isEntering) {
-          // Only enable hover effect if there are at least 2 images
           if (this.imagesData && this.imagesData.length > 1) {
+            if (isEntering) this.preloadSecondImage()
             this.isHovering = isEntering
           }
+        },
+
+        preloadSecondImage() {
+          if (this.hoverImageLoaded) return
+          const src = this.secondImageSrc
+          if (!src) return
+          const img = new Image()
+          img.onload = () => {
+            this.hoverImageLoaded = true
+          }
+          img.src = src
         },
       })
     )
