@@ -39,7 +39,7 @@
   <div class='mx-auto px-4 max-w-9xl'>
     <div class='grid grid-cols-1 lg:grid-cols-4 mb-4'>
       <!-- Left Column - Logo -->
-      <div class='flex flex-col md:flex-row items-center mb-4 lg:mb-0 justify-center lg:col-span-1 bg-red-500'>
+      <div class='flex flex-col md:flex-row items-center mb-4 lg:mb-0 justify-center lg:col-span-1'>
         {% assign footer_logo_image = section.settings.logo_image %}
         {% if footer_logo_image == blank and shop.brand_asset_default_logo %}
           {% assign footer_logo_image = shop.brand_asset_default_logo %}
@@ -124,7 +124,7 @@
       </div>
 
       <!-- American Flag Column -->
-      <div class='lg:col-span-1 w-full space-y-4 flex flex-col items-center justify-center ml-8'>
+      <div class='lg:col-span-1 w-full space-y-4 flex flex-col items-center justify-center bg-red-500 ml-8'>
         <div class='flex flex-col items-center justify-center w-max'>
           <div class='w-28 h-auto mb-1'>
             <img
