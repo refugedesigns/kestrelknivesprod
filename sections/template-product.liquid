@@ -2143,8 +2143,21 @@
         if (!sizeSelector) return;
         
         const selectedSize = sizeSelector.value;
-        const productPage = document.querySelector('[x-data*="productPage"]');
+        console.log('Sticky size selector changed to:', selectedSize);
         
+        // Update the main product page size selection first
+        const sizeInputs = document.querySelectorAll('input[name^="options["]');
+        sizeInputs.forEach(input => {
+          const name = input.name.replace(/^options\[(.+)\]$/, '$1');
+          if (name.toLowerCase().includes('size') && input.value === selectedSize) {
+            input.checked = true;
+            // Trigger change event to update the main product page
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        });
+        
+        // Also update the product page component directly
+        const productPage = document.querySelector('[x-data*="productPage"]');
         if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
           // Find the variant that matches the selected size
           const variants = window.__product?.variants || [];
@@ -2158,6 +2171,8 @@
           });
           
           if (matchingVariant) {
+            console.log('Found matching variant:', matchingVariant);
+            
             // Update the hidden variant input
             const variantInput = document.getElementById('variantIdInput');
             if (variantInput) {
