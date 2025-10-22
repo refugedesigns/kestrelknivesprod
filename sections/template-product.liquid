@@ -2238,28 +2238,58 @@
               restoreSticky()
               return
             }
+            
+            // Get the current variant ID from the hidden input
             const variantInput = form.querySelector('input[name="id"]')
             const variantId = variantInput ? variantInput.value : null
+            console.log('Sticky add to cart - variant ID:', variantId)
+            
+            // If we have a size selector, make sure it's synced with the main page
+            const sizeSelector = document.getElementById('stickySizeSelector')
+            if (sizeSelector) {
+              console.log('Size selector value:', sizeSelector.value)
+              // Ensure the main page is updated with the current size selection
+              const sizeInputs = document.querySelectorAll('input[name^="options["]')
+              sizeInputs.forEach(input => {
+                const name = input.name.replace(/^options\[(.+)\]$/, '$1')
+                if (name.toLowerCase().includes('size') && input.value === sizeSelector.value) {
+                  input.checked = true
+                  input.dispatchEvent(new Event('change', { bubbles: true }))
+                }
+              })
+              
+              // Wait a moment for the variant to update
+              await new Promise(resolve => setTimeout(resolve, 100))
+              
+              // Get the updated variant ID
+              const updatedVariantId = variantInput ? variantInput.value : null
+              console.log('Updated variant ID after size sync:', updatedVariantId)
+            }
+            
             const productPage = document.querySelector('[x-data*="productPage"]')
             let quantity = 1
             if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
               quantity = productPage._x_dataStack[0].quantity || 1
             }
 
+            // Use the updated variant ID if available, otherwise use the original
+            const finalVariantId = sizeSelector && variantInput ? variantInput.value : variantId
+            console.log('Final variant ID for cart:', finalVariantId)
+            
             const cartSheet = document.querySelector('[x-data*="cartSheet"]')
             if (
               cartSheet &&
               cartSheet._x_dataStack &&
               cartSheet._x_dataStack[0] &&
               typeof cartSheet._x_dataStack[0].addToCart === 'function' &&
-              variantId
+              finalVariantId
             ) {
-              await cartSheet._x_dataStack[0].addToCart(variantId, quantity, 'sticky-button')
+              await cartSheet._x_dataStack[0].addToCart(finalVariantId, quantity, 'sticky-button')
               return
             }
 
             // Fallback
-            const payload = { id: variantId, quantity }
+            const payload = { id: finalVariantId, quantity }
             const res = await fetch('/cart/add.js', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
