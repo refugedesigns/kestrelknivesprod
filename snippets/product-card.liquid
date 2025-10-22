@@ -59,7 +59,7 @@
           height='400'
           :src='currentImage'
           :alt="'{{ product_product.title }}'"
-          class='absolute inset-0 w-full h-full object-contain'
+          :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
         >
         <!-- Hover image (crossfades in) -->
         <img
@@ -68,7 +68,7 @@
           x-show='secondImageSrc'
           :src='secondImageSrc'
           :alt="'{{ product_product.title }}'"
-          :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-100' : 'opacity-0')"
+          :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 pointer-events-none ' + ((isHovering && hoverImageLoaded) ? 'opacity-100' : 'opacity-0')"
         >
       </a>
     </div>
