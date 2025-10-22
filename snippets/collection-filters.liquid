@@ -431,11 +431,11 @@
           // Prefer server-provided facet metadata when available
           const meta = window.__filterMeta || {}
 
-          // Current page facet (may be partial). Filter out 'custom' and 'hidden offer'.
+          // Current page facet (may be partial). Filter out 'hidden offer'.
           const metaTypes = (meta.productTypes || [])
             .filter(t => {
               const val = String(t.value || '').toLowerCase()
-              return val !== 'custom' && !val.includes('hidden')
+              return !val.includes('hidden')
             })
             .map(t => ({
               value: String(t.value || ''),
