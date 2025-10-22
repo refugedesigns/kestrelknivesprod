@@ -504,8 +504,14 @@
         return products ? products.filter(p => !p.available).length : 0
       },
 
-      applyFilters() {
+      applyFilters(productTypeChanged = false) {
         if (this.isInitializing) return
+
+        // Reset availability filter when product type changes
+        if (productTypeChanged) {
+          this.selectedFilters.availabilitySelected = ''
+        }
+
         // Build server-side filter URL and navigate
         const url = new URL(window.location.href)
         // Always reset pagination to the first page when filters change
