@@ -1,8 +1,208 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "template-testimonials": {
-      "type": "template-testimonials"
+      "type": "template-testimonials",
+      "blocks": {
+        "testimonial_HyGpCE": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "The trip was amazing, man. I live in northern BC, Fort Nelson, a couple hours’ drive and 5 of our horses. 20 km trip into base camp, and day rides from there. 9 days on horses, 180+ km between boots and horseback. On the 7th day I shot my ram.The knife was amazing. My dad had his Havalon and I had my Kestrel. His Havalon handle snapped on him, and we finished the caping with my Kestrel",
+            "author": "Matt Parker",
+            "author_image": "shopify://shop_images/WhatsApp_Image_2025-09-29_at_22.06.11_8d81e47e.jpg",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
+        "testimonial_N6iVk9": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Being a professional guide and a son of a ranch butcher, I've skinned a lot of animals and a knife that can hold a sharp edge is a must. I've used many brands of knives and Kestrel Knives are the only one I've found that can hold a sharp edge the longest. I bought my first EDC about 3 years ago and skinned 2 elk and a 1,200 lbs buffalo with it so far and still haven't had to use my wet stone to resharpen it.",
+            "author": "Latigo Hext",
+            "author_image": "shopify://shop_images/image3.webp",
+            "object_fit": "cover",
+            "object_position": "bottom"
+          }
+        },
+        "testimonial_hLn6tW": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "My personal “kudos” on designing an ultralight knife that will meet the needs of Mountain Hunters. Great job. I recommend that serious Mountain Hunters purchase this very innovative knife to “take their game to another level.",
+            "author": "Randy Johnson, Full Curl Society Hall of Fame",
+            "author_image": "shopify://shop_images/image-asset_2_632fbb7b-0201-468e-bb04-da3066036db6.webp",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
+        "testimonial_UxFbUW": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Love the precision of this scalpel.",
+            "author": "Darren Hill",
+            "author_image": "shopify://shop_images/WhatsApp_Image_2025-09-26_at_00.32.14_1604c8bf.jpg",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
+        "testimonial_7eRwNm": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Kodiak ended with a billy goat, two Sitka Blacktail deer and a caribou. All dressed with the kestrel ultralighter in my hands. It does take some getting used to but once you understand how the knife works it cuts like butter and stays sharp... I only touched up the knife once with a field sharpening kit from Nathan after three animals and only because I wanted to try the sharpening kit. To my surprise I worked well fleshing out hides as well as cutting through meat.I use this knife all the time now, from cutting rope, meat, hides, vegetables, cardboard and whatever else happens to need severing.This is a great knife that's extremely light and stays sharp and will stay on my pack on all my future hunts.",
+            "author": "Jon C. ",
+            "author_image": "shopify://shop_images/image-asset_1_de7bfa55-7d2a-4db3-8ca6-0f9075a14ba2.webp",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
+        "testimonial_UDqLdD": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "I’ve carried the Kestrel Mountain Scalpel for years on every hunt from New Mexico antelope to Colorado high country mule deer and it’s never let me down. The replaceable blade design keeps it razor sharp when I need it most, and the lightweight build makes it a must have that earned its place in my pack. It's tough, reliable and purpose built for the mountain. This knife is made for serious hunters.",
+            "author": "Chad Ryker, Out of State Hunter",
+            "author_image": "shopify://shop_images/WhatsApp_Image_2025-10-09_at_11.21.42_3faba9ad.jpg",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
+        "testimonial_FMFEzz": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "What a great knife. These are the lightest weight knives I’ve ever seen and truly a necessity for the backcountry hunter.",
+            "author": "Chris C.",
+            "author_image": "shopify://shop_images/photo_1.webp",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
+        "testimonial_N8X9hR": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Just a quick note of thanks and to rave about my experience using your knives.  We’ve gone through sheep, caribou and countless whitetails using various models all with outstanding results.  The design and function are flawless and the emphasis on weight has made them a big hit as gifts for several guides along my travels.  And scary sharp, got a few scars to attest to this fact. Can’t tell you how much I appreciate the craftsmanship and service.",
+            "author": "Customer for life.",
+            "author_image": "shopify://shop_images/image-asset_3_dce7ef99-7cdf-4a40-aa2a-f1644906419d.webp",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
+        "testimonial_a7pVRd": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Used my Kestrel knife on my antelope buck. This is the third animal that I’ve used the knife on and it works awesome. It’s so light and thin you don’t even know it’s in your pack. The other thing I really like is that it’s so simple…no folding mechanism or blades to cut yourself on while changing them out (Havalon!) but enough mass behind the blade to really carve against bone, pry with, or whatever. Kestrel has it figured out…simple, effective, light, and cutting edge (pun intended)",
+            "author": "David Hamilton Vortex Optics",
+            "author_image": "shopify://shop_images/david.webp",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
+        "testimonial_gA7QJj": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "I’ve had these knives forever and they’re perfect to carry along in the mountains.",
+            "author": "Kyle Brundage",
+            "author_image": "shopify://shop_images/WhatsApp_Image_2025-09-25_at_01.40.41_9d4e2d83.jpg",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
+        "testimonial_48jm4P": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "I heard about Kestrel knives from Jason @ Kuiu and called him to see what he had to offer. After he sent me a titanium ultra light knife to look at, I immediately ordered several of them. I used it on a recent Stone sheep hunt in BC and it was wonderful and unbelievably lightweight. It retained its edge through the dressing and full body caping and is still sharp enough for several more. I had taken a couple of other kestrels with me and gave them to my guide and wrangler. They loved the feel and weight and the way the knife kept its edge.I've since ordered several more and will be passing them out around the world. Thanks Nate for a great knife and great customer interaction!!!!",
+            "author": "Tom ",
+            "author_image": "shopify://shop_images/IMG_0886.webp",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
+        "testimonial_Xmw7YB": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "I’ve owned an Ovis Hunter for years (10+ I think) and it’s a great knife. It holds an edge and sharpens easily, it’s bombproof, and it fits so well in my hand even when it’s covered in blood, dirt, and guts. It’s been with me on all my elk, deer, bear, and moose hunts all over North America and even on fishing trips. It’s gutted, skinned, butchered, deboned, and quartered many animals and has been my general go-to knife for life in the backcountry.",
+            "author": "Doug Asano",
+            "author_image": "shopify://shop_images/WhatsApp_Image_2025-09-22_at_11.56.03_e8e54833.jpg",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
+        "testimonial_drkRKa": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Dig my Kestrel knife. You never notice that you are even carrying it. At G3 Outfitters, we do some backpack hunting and we endorse this fine product. From Alaska to New Mexico's Gila Wilderness, I pack a Kestrel.",
+            "author": "H Jay Platt G3outfitters",
+            "author_image": "shopify://shop_images/harvey.webp",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
+        "testimonial_tQTUDz": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "I’ve been using my fixed blade mountain caper for years. I processed an entire mule deer buck with it this year.",
+            "author": "Andrew Giesler",
+            "author_image": "shopify://shop_images/WhatsApp_Image_2025-10-16_at_09.40.28_b72dfdcb.jpg",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
+        "testimonial_AxhXVD": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "I wanted to share a photo of my 11 1/2 year old warrior NWT ram. Absolutely fantastic hunt in beautiful country. I used my Kestrel knife to cape for a life sized mount. Your knife stayed sharp and is a joy to carry, perfect for sheep hunting. Thanks!",
+            "author": "Tom Oregon",
+            "author_image": "shopify://shop_images/tom.png",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
+        "carousel_review_C3y33P": {
+          "type": "carousel_review",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2025-09-13_at_14.22.36_e6fb4f7c.webp",
+            "rating": 5,
+            "review_text": "Nice to see you guys back in action as ye make incredible knives.",
+            "author": "John Tooher",
+            "product_title": ""
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_HyGpCE",
+        "testimonial_N6iVk9",
+        "testimonial_hLn6tW",
+        "testimonial_UxFbUW",
+        "testimonial_7eRwNm",
+        "testimonial_UDqLdD",
+        "testimonial_FMFEzz",
+        "testimonial_N8X9hR",
+        "testimonial_a7pVRd",
+        "testimonial_gA7QJj",
+        "testimonial_48jm4P",
+        "testimonial_Xmw7YB",
+        "testimonial_drkRKa",
+        "testimonial_tQTUDz",
+        "testimonial_AxhXVD",
+        "carousel_review_C3y33P"
+      ],
+      "settings": {
+        "headline": "See what Kestrel customers are saying...",
+        "enable_carousel": true,
+        "carousel_title": "Product Reviews",
+        "show_carousel_title": false,
+        "carousel_max_width": 1600,
+        "mobile_columns": 1,
+        "desktop_columns": 4
+      }
     }
   },
-  "order": ["template-testimonials"]
+  "order": [
+    "template-testimonials"
+  ]
 }
