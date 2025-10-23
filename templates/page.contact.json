@@ -1,8 +1,27 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "template-contact": {
-      "type": "template-contact"
+      "type": "template-contact",
+      "settings": {
+        "page_title": "GET IN TOUCH",
+        "faq_link": "",
+        "store_address": "3527 Sterrettania Rd, Erie, PA 16506, USA",
+        "map_provider": "embed",
+        "maps_api_key": "",
+        "map_zoom": 10
+      }
     }
   },
-  "order": ["template-contact"]
+  "order": [
+    "template-contact"
+  ]
 }
