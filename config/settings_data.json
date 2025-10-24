@@ -98,7 +98,7 @@
       },
       "15858443454929820475": {
         "type": "shopify://apps/k-contact-form-builder/blocks/app-extension/a78e9fdb-659e-4c4a-b275-236e9dafd0d3",
-        "disabled": true,
+        "disabled": false,
         "settings": {}
       }
     }
