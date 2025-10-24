@@ -50,6 +50,7 @@
           :src='currentImage'
           alt='{{ product_obj.title | escape }}'
           :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
+          loading='lazy'
         >
         <!-- Hover image (crossfades in) -->
         <img
@@ -59,6 +60,7 @@
           :src='secondImageSrc'
           alt='{{ product_obj.title | escape }}'
           :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 pointer-events-none ' + ((isHovering && hoverImageLoaded) ? 'opacity-100' : 'opacity-0')"
+          loading='lazy'
         >
       </a>
     </div>
@@ -381,10 +383,13 @@
             this.variantsData = JSON.parse(fcDecode(rawVariants))
             this.imagesData = JSON.parse(fcDecode(rawImages))
             if (this.imagesData && this.imagesData.length) {
-              this.currentImage =
-                typeof this.imagesData[0] === 'string'
-                  ? this.imagesData[0]
-                  : this.imagesData[0] && this.imagesData[0].src
+              // Optimize the first image URL like the original product card
+              const firstImg = this.imagesData[0]
+              if (typeof firstImg === 'string') {
+                this.currentImage = firstImg
+              } else if (firstImg && firstImg.src) {
+                this.currentImage = firstImg.src
+              }
             }
           } catch (e) {}
 
@@ -544,7 +549,7 @@
               v => v.id === this.selectedVariant
             )
 
-            // If variant has a featured image, use it
+            // If variant has a featured image, use it (already optimized by Shopify)
             if (selectedVariant && selectedVariant.featured_image) {
               this.currentImage = selectedVariant.featured_image.src
             } else {
