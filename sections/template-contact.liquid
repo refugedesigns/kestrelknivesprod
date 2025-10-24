@@ -68,8 +68,7 @@
   <div class='grid grid-cols-1 lg:grid-cols-4 gap-12 px-4 lg:px-0 max-w-7xl mx-4 md:mx-8 xl:mx-auto border border-gray-200 py-12 rounded-lg shadow-sm'>
     <!-- Contact Form (Left Side) -->
     <div class='lg:col-span-2 px-4'>
-      <div id='contact-id-7586' class="contact-kaktus -mt-12"></div>
-      {% comment %} {% form "contact" %}
+       {% form "contact" %}
         {% if form.errors %}
           <div class='border border-red-300 bg-red-50 p-4 mb-6 rounded'>
             <div class='flex items-center mb-2'>
@@ -225,7 +224,7 @@
         >
           Submit
         </button>
-      {% endform %} {% endcomment %}
+      {% endform %} 
     </div>
 
     <!-- Information Section (Right Side) -->
