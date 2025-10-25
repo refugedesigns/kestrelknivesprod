@@ -47,15 +47,16 @@
         <img
           width='400'
           height='400'
+          src='{{ product_obj.featured_image | default: product_obj.images.first | image_url: width: 400 }}'
           :src='currentImage'
           alt='{{ product_obj.title | escape }}'
           :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
-          loading='lazy'
         >
         <!-- Hover image (crossfades in) -->
         <img
           width='400'
           height='400'
+          x-cloak
           x-show='secondImageSrc'
           :src='secondImageSrc'
           alt='{{ product_obj.title | escape }}'
