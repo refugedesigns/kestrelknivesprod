@@ -144,6 +144,7 @@
       <!-- Add to Cart for knives/non-apparel -->
       <div class='px-4'>
         <button
+          x-cloak
           x-show='isAvailable'
           @click='addToCart'
           :disabled='isAddingToCart'
