@@ -1471,6 +1471,7 @@
 <script>
   window.__product = {{ product | json }};
   // Pre-format all variant prices using Shopify's money filter
+  console.log(product)
   window.__formattedPrices = {
     {% for variant in product.variants %}
       {{ variant.id }}: "{{ variant.price | money }}"{% unless forloop.last %},{% endunless %}
