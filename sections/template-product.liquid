@@ -2729,3 +2729,28 @@
   ]
 }
 {% endschema %}
+
+<script>
+  // Freshness check: if CDN served stale availability, reload once with cache-busting
+  document.addEventListener('DOMContentLoaded', async function () {
+    try {
+      const onceKey = 'kk_p_refresh_' + {{ product.id }};
+      if (sessionStorage.getItem(onceKey)) return;
+      const res = await fetch('/products/{{ product.handle }}.js', { cache: 'no-store' });
+      if (!res.ok) return;
+      const fresh = await res.json();
+      const freshVariant = (fresh.variants || []).find(v => v.id === {{ selected_variant.id }});
+      if (!freshVariant) return;
+      const staleAvail = {{ selected_variant.available | json }};
+      const freshAvail = !!freshVariant.available;
+      if (staleAvail !== freshAvail) {
+        sessionStorage.setItem(onceKey, '1');
+        const url = new URL(window.location.href);
+        url.searchParams.set('t', String(Date.now()));
+        window.location.replace(url.toString());
+      }
+    } catch (e) {
+      // silent
+    }
+  });
+</script>
