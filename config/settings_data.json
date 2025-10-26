@@ -71,11 +71,6 @@
     },
     "content_for_index": [],
     "blocks": {
-      "14656832010101544780": {
-        "type": "shopify://apps/apo-product-options/blocks/app-embed-block/a1199153-7462-4b5b-8a80-f0eefba85e99",
-        "disabled": false,
-        "settings": {}
-      },
       "4015264832934714879": {
         "type": "shopify://apps/trustoo-email-popups/blocks/app/a5670cf8-5705-4b01-ad9e-447033feae26",
         "disabled": false,
@@ -96,14 +91,9 @@
         "disabled": false,
         "settings": {}
       },
-      "15858443454929820475": {
-        "type": "shopify://apps/k-contact-form-builder/blocks/app-extension/a78e9fdb-659e-4c4a-b275-236e9dafd0d3",
-        "disabled": false,
-        "settings": {}
-      },
-      "6052823664294247695": {
-        "type": "shopify://apps/qikify-form-builder/blocks/app-embed/753fa0d7-50d4-480a-b094-cff26e632c36",
-        "disabled": false,
+      "14656832010101544780": {
+        "type": "shopify://apps/apo-product-options/blocks/app-embed-block/a1199153-7462-4b5b-8a80-f0eefba85e99",
+        "disabled": true,
         "settings": {}
       }
     }
