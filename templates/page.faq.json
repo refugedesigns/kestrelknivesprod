@@ -91,6 +91,14 @@
             "answer": "Yes. Any Kestrel knife can be mailed to us for free sharpening as often as you’d like. You just cover return shipping. To start, add the Knife Sharpening product (hyper link) to your cart and check out. We’ll get your edge back to factory sharp and return it ready for the next season.",
             "category": "Sharpening & Maintenance"
           }
+        },
+        "faq_item_FFn8jP": {
+          "type": "faq_item",
+          "settings": {
+            "question": "How do I sharpen my knife at home?",
+            "answer": "We recommend maintaining your edge with light stropping and occasional touch-ups using a fine stone or ceramic rod. For full resharpening, send it our way our team will handle it properly.",
+            "category": "Sharpening & Maintenance"
+          }
         }
       },
       "block_order": [
@@ -103,7 +111,8 @@
         "faq_item_yNLRDz",
         "faq_item_PQRGtg",
         "faq_item_PUzdcV",
-        "faq_item_Cqztxd"
+        "faq_item_Cqztxd",
+        "faq_item_FFn8jP"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
