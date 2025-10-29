@@ -6,14 +6,19 @@
 
 <div class='bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300'>
   <!-- Product Image -->
-  <div class='aspect-square bg-gray-50 rounded-t-lg overflow-hidden'>
+  <a
+    href='{{ product.url }}'
+    class='aspect-square bg-gray-50 rounded-t-lg overflow-hidden block hover:cursor-pointer'
+  >
     <img
-      src='{{ product.featured_image | img_url: '400x400' }}'
+      src='{{ product.featured_image | image_url: width: 400, height: 400 }}'
       alt='{{ product.title | escape }}'
       class='w-full h-full object-contain'
       loading='lazy'
+      width='400'
+      height='400'
     >
-  </div>
+  </a>
 
   <!-- Product Info -->
   <div class='p-4'>
