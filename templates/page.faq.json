@@ -51,6 +51,14 @@
             "answer": "Yes. We ship worldwide for the most part. For international orders, email sales@kestrelknives.com for a shipping quote. Please note that duties, VAT, and import taxes are the buyer’s responsibility and vary by country.",
             "category": "Shipping"
           }
+        },
+        "faq_item_VVneMr": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Will I receive a tracking number?",
+            "answer": "Yes. You’ll receive a confirmation email right after ordering, and another with tracking details once your package ships.",
+            "category": "Shipping"
+          }
         }
       },
       "block_order": [
@@ -58,7 +66,8 @@
         "faq_item_QUBntp",
         "faq_item_dFnxeH",
         "faq_item_ggEPQG",
-        "faq_item_gVttxV"
+        "faq_item_gVttxV",
+        "faq_item_VVneMr"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
