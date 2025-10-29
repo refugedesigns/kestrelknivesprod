@@ -75,6 +75,14 @@
             "answer": "Yes. Every knife includes a custom-fit black Kydex sheath, pre-drilled to work with a large array of carry clips.",
             "category": "Sheaths"
           }
+        },
+        "faq_item_PUzdcV": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Can I order a replacement sheath?",
+            "answer": "Yes. Replacement sheaths and a few color variations are available for every model. You can find them on our site <a>https://yu032m-t2.myshopify.com/products/replacement-sheaths</a>",
+            "category": "General"
+          }
         }
       },
       "block_order": [
@@ -85,7 +93,8 @@
         "faq_item_gVttxV",
         "faq_item_VVneMr",
         "faq_item_yNLRDz",
-        "faq_item_PQRGtg"
+        "faq_item_PQRGtg",
+        "faq_item_PUzdcV"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
