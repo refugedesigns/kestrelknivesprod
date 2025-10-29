@@ -43,13 +43,22 @@
             "answer": "We don’t run standard sales anymore. We price our knives fairly all year long, but if you’re in a unique situation or a longtime customer, reach out to us. We may be able to help with a discount.",
             "category": "Ordering & Availability"
           }
+        },
+        "faq_item_gVttxV": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do you ship internationally?",
+            "answer": "Yes. We ship worldwide for the most part. For international orders, email sales@kestrelknives.com for a shipping quote. Please note that duties, VAT, and import taxes are the buyer’s responsibility and vary by country.",
+            "category": "Shipping"
+          }
         }
       },
       "block_order": [
         "faq_item_crXQxr",
         "faq_item_QUBntp",
         "faq_item_dFnxeH",
-        "faq_item_ggEPQG"
+        "faq_item_ggEPQG",
+        "faq_item_gVttxV"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
