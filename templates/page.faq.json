@@ -1,8 +1,48 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "template-faq": {
-      "type": "template-faq"
+      "type": "template-faq",
+      "blocks": {
+        "faq_item_crXQxr": {
+          "type": "faq_item",
+          "settings": {
+            "question": "How do I create an account?",
+            "answer": "Creating an account is simple! Click the 'Sign Up' button in the top right corner, enter your email address, create a secure password, and verify your email.",
+            "category": "General"
+          }
+        }
+      },
+      "block_order": [
+        "faq_item_crXQxr"
+      ],
+      "settings": {
+        "page_title": "Frequently Asked Questions",
+        "page_subtitle": "Find answers to common questions about our services, billing, and support.",
+        "contact_title": "Still have questions?",
+        "live_chat_text": "Available 24/7 for instant support",
+        "email_text": "sales@kestrelknives.com",
+        "categories": "Ordering & Availability, Shipping, Sheaths, Sharpening & Maintenance, Knife Steels & Design, Custom Work, Care & Handle Options, Return & Exchanges",
+        "header_bg_color": "#ffffff",
+        "header_height": 200,
+        "title_color": "#1d1d1d",
+        "subtitle_color": "#8f9093",
+        "header_border_bottom": true,
+        "header_border_color": "#f2f2f2",
+        "header_padding_top": 5,
+        "header_padding_bottom": 4
+      }
     }
   },
-  "order": ["template-faq"]
+  "order": [
+    "template-faq"
+  ]
 }
