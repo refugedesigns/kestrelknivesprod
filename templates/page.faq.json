@@ -83,6 +83,14 @@
             "answer": "Yes. Replacement sheaths and a few color variations are available for every model. You can find them on our site https://kestrelknives.com/products/replacement-sheaths",
             "category": "General"
           }
+        },
+        "faq_item_Cqztxd": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Is it true you offer free sharpening?",
+            "answer": "Yes. Any Kestrel knife can be mailed to us for free sharpening as often as you’d like. You just cover return shipping. To start, add the Knife Sharpening product (hyper link) to your cart and check out. We’ll get your edge back to factory sharp and return it ready for the next season.",
+            "category": "Sharpening & Maintenance"
+          }
         }
       },
       "block_order": [
@@ -94,7 +102,8 @@
         "faq_item_VVneMr",
         "faq_item_yNLRDz",
         "faq_item_PQRGtg",
-        "faq_item_PUzdcV"
+        "faq_item_PUzdcV",
+        "faq_item_Cqztxd"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
