@@ -169,7 +169,15 @@
           "settings": {
             "question": "Apparel and print-on-demand gear",
             "answer": "Because apparel is made to order, we can offer returns or exchanges but not refunds once production begins.\nIf there’s a printing issue, defect, or damage, we’ll replace or refund it at no cost to you. \n\nShip the product to:\nKestrel MFG LLC\n5552 Pin Oak Dr\nEdinboro, PA 16412\n\nIf you just changed your mind or ordered the wrong size, we’re still happy to help with a return or exchange—you’ll just cover the shipping.",
-            "category": "General"
+            "category": "Returns & Exchanges"
+          }
+        },
+        "faq_item_iJ6zac": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Non-refundable items",
+            "answer": "Custom knives, Build-A-Knife program orders, discounted items, gift cards, and blemished or used knives cannot be returned.",
+            "category": "Returns & Exchanges"
           }
         }
       },
@@ -193,7 +201,8 @@
         "faq_item_PPAPz9",
         "faq_item_Q9LXfX",
         "faq_item_fDP3RH",
-        "faq_item_MWrqXK"
+        "faq_item_MWrqXK",
+        "faq_item_iJ6zac"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
