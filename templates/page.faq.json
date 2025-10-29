@@ -163,6 +163,14 @@
             "answer": "If your order isn’t right, contact us within 5 days of delivery. Knives must be unused and in original condition. All returns must be pre-approved before shipping them back.\nA 10% restocking fee applies to non-defective returns to cover labor and processing.",
             "category": "Returns & Exchanges"
           }
+        },
+        "faq_item_MWrqXK": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Apparel and print-on-demand gear",
+            "answer": "Because apparel is made to order, we can offer returns or exchanges but not refunds once production begins.\nIf there’s a printing issue, defect, or damage, we’ll replace or refund it at no cost to you. \n\nShip the product to:\nKestrel MFG LLC\n5552 Pin Oak Dr\nEdinboro, PA 16412\n\nIf you just changed your mind or ordered the wrong size, we’re still happy to help with a return or exchange—you’ll just cover the shipping.",
+            "category": "General"
+          }
         }
       },
       "block_order": [
@@ -184,7 +192,8 @@
         "faq_item_X7U8n3",
         "faq_item_PPAPz9",
         "faq_item_Q9LXfX",
-        "faq_item_fDP3RH"
+        "faq_item_fDP3RH",
+        "faq_item_MWrqXK"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
