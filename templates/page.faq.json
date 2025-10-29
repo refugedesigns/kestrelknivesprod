@@ -67,6 +67,14 @@
             "answer": "All domestic orders ship via USPS and include tracking. Delivery times depend on your location, but most arrive within a week.",
             "category": "Shipping"
           }
+        },
+        "faq_item_PQRGtg": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do your knives come with sheaths?",
+            "answer": "Yes. Every knife includes a custom-fit black Kydex sheath, pre-drilled to work with a large array of carry clips.",
+            "category": "Sheaths"
+          }
         }
       },
       "block_order": [
@@ -76,7 +84,8 @@
         "faq_item_ggEPQG",
         "faq_item_gVttxV",
         "faq_item_VVneMr",
-        "faq_item_yNLRDz"
+        "faq_item_yNLRDz",
+        "faq_item_PQRGtg"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
