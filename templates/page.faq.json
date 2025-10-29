@@ -123,6 +123,14 @@
             "answer": "We use only the best-performing steels available. Our current production models feature MagnaCut, S90V, and Nitro-V, depending on the design and intended use.",
             "category": "Knife Steels & Design"
           }
+        },
+        "faq_item_KNYjkh": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Why is one side of my titanium knife rough?",
+            "answer": "Titanium doesn’t hold an edge on its own, so each Ti knife is carbidized with tungsten carbide on one side. This creates micro-serrations that cut cleanly through soft materials like meat, cardboard, or rope.\nThe carbided layer is deep and durable thanks to our industrial process.\n\nTips:\n•\tTi edges perform best with draw cuts\n•\tThey’re not ideal for cutting hide\n•\tOnly sharpen the non-carbided side\n\nWe’re slowly moving away from titanium blades due to low demand, but we’ll continue sharpening and servicing all previous models.",
+            "category": "General"
+          }
         }
       },
       "block_order": [
@@ -139,7 +147,8 @@
         "faq_item_FFn8jP",
         "faq_item_4YRwFG",
         "faq_item_ALYraA",
-        "faq_item_kUiMmh"
+        "faq_item_kUiMmh",
+        "faq_item_KNYjkh"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
