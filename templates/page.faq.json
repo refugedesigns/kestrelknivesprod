@@ -155,6 +155,14 @@
             "answer": "We currently offer hunter orange, neon green, OD green, blue, black and tan camo.",
             "category": "Care & Handle Options"
           }
+        },
+        "faq_item_fDP3RH": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Knife returns",
+            "answer": "If your order isn’t right, contact us within 5 days of delivery. Knives must be unused and in original condition. All returns must be pre-approved before shipping them back.\nA 10% restocking fee applies to non-defective returns to cover labor and processing.",
+            "category": "Returns & Exchanges"
+          }
         }
       },
       "block_order": [
@@ -175,7 +183,8 @@
         "faq_item_KNYjkh",
         "faq_item_X7U8n3",
         "faq_item_PPAPz9",
-        "faq_item_Q9LXfX"
+        "faq_item_Q9LXfX",
+        "faq_item_fDP3RH"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
