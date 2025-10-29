@@ -124,9 +124,11 @@
             x-transition:leave-end='opacity-0 max-h-0'
           >
             <div class='border-t border-gray-100 pt-6 pb-6'>
-              <div class='text-gray-600 leading-relaxed text-lg'>
-                {{ block.settings.answer }}
-              </div>
+              <div
+                class='text-gray-600 leading-relaxed text-lg prose prose-gray max-w-none'
+                x-data="{ linkifyText(text) { return text.replace(/(https?:\/\/[^\s]+)/g, '<a href=\'$1\' class=\'text-blue-600 hover:text-blue-800 underline\' target=\'_blank\' rel=\'noopener\'>$1</a>'); } }"
+                x-html="linkifyText('{{ block.settings.answer | escape }}')"
+              ></div>
             </div>
           </div>
         </div>
