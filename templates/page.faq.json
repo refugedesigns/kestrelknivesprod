@@ -59,6 +59,14 @@
             "answer": "Yes. You’ll receive a confirmation email right after ordering, and another with tracking details once your package ships.",
             "category": "Shipping"
           }
+        },
+        "faq_item_yNLRDz": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Domestic shipments",
+            "answer": "All domestic orders ship via USPS and include tracking. Delivery times depend on your location, but most arrive within a week.",
+            "category": "Shipping"
+          }
         }
       },
       "block_order": [
@@ -67,7 +75,8 @@
         "faq_item_dFnxeH",
         "faq_item_ggEPQG",
         "faq_item_gVttxV",
-        "faq_item_VVneMr"
+        "faq_item_VVneMr",
+        "faq_item_yNLRDz"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
