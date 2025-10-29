@@ -35,12 +35,21 @@
             "answer": "Yes. We’re currently ramping up production to bring many of your favorite models and sets back. The goal is to honor the legacy of what made Kestrel great while pushing the craftsmanship even further.",
             "category": "Ordering & Availability"
           }
+        },
+        "faq_item_ggEPQG": {
+          "type": "faq_item",
+          "settings": {
+            "question": "When is the next sale?",
+            "answer": "We don’t run standard sales anymore. We price our knives fairly all year long, but if you’re in a unique situation or a longtime customer, reach out to us. We may be able to help with a discount.",
+            "category": "Ordering & Availability"
+          }
         }
       },
       "block_order": [
         "faq_item_crXQxr",
         "faq_item_QUBntp",
-        "faq_item_dFnxeH"
+        "faq_item_dFnxeH",
+        "faq_item_ggEPQG"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
