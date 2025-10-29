@@ -15,9 +15,9 @@
         "faq_item_crXQxr": {
           "type": "faq_item",
           "settings": {
-            "question": "How do I create an account?",
-            "answer": "Creating an account is simple! Click the 'Sign Up' button in the top right corner, enter your email address, create a secure password, and verify your email.",
-            "category": "General"
+            "question": "When will my knife ship?",
+            "answer": "Your knife will ship the next business day more often than not and tracking will be provided when the label is printed. Sometimes orders take a little longer, depending on current workload. If you need it by a certain date, send us a message and we’ll do our best to make it happen.",
+            "category": "Ordering & Availability"
           }
         }
       },
