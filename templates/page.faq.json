@@ -19,10 +19,19 @@
             "answer": "Your knife will ship the next business day more often than not and tracking will be provided when the label is printed. Sometimes orders take a little longer, depending on current workload. If you need it by a certain date, send us a message and we’ll do our best to make it happen.",
             "category": "Ordering & Availability"
           }
+        },
+        "faq_item_QUBntp": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Why are most knives sold out?",
+            "answer": "We build knives in limited runs to maintain precision and quality. Some models sell out fast, but we’re working toward keeping core models available more consistently. If there’s a knife you’ve been waiting on, join our email list to be notified as soon as it’s back in stock.",
+            "category": "Ordering & Availability"
+          }
         }
       },
       "block_order": [
-        "faq_item_crXQxr"
+        "faq_item_crXQxr",
+        "faq_item_QUBntp"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
