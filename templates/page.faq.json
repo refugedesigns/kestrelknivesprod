@@ -139,6 +139,14 @@
             "answer": "Yes. You can design your own knife through our Build-A-Knife Program (hyper link).\nFor bulk or specialty orders, like outfitter or company knives, reach out through our contact form. We’ll help bring your idea to life.",
             "category": "Custom Work"
           }
+        },
+        "faq_item_PPAPz9": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Doesn’t the paracord handle just get dirty?",
+            "answer": "Yes, but that’s part of its charm. Paracord is easy to replace. It’s not meant to be permanent think of it as a modular grip that can be swapped out in minutes. Not sure how to wrap? Add the Knife Sharpening product to your cart and check it, its covered.",
+            "category": "Care & Handle Options"
+          }
         }
       },
       "block_order": [
@@ -157,7 +165,8 @@
         "faq_item_ALYraA",
         "faq_item_kUiMmh",
         "faq_item_KNYjkh",
-        "faq_item_X7U8n3"
+        "faq_item_X7U8n3",
+        "faq_item_PPAPz9"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
