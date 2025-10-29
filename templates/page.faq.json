@@ -147,6 +147,14 @@
             "answer": "Yes, but that’s part of its charm. Paracord is easy to replace. It’s not meant to be permanent think of it as a modular grip that can be swapped out in minutes. Not sure how to wrap? Add the Knife Sharpening product to your cart and check it, its covered.",
             "category": "Care & Handle Options"
           }
+        },
+        "faq_item_Q9LXfX": {
+          "type": "faq_item",
+          "settings": {
+            "question": "What paracord colors do you offer?",
+            "answer": "We currently offer hunter orange, neon green, OD green, blue, black and tan camo.",
+            "category": "Care & Handle Options"
+          }
         }
       },
       "block_order": [
@@ -166,7 +174,8 @@
         "faq_item_kUiMmh",
         "faq_item_KNYjkh",
         "faq_item_X7U8n3",
-        "faq_item_PPAPz9"
+        "faq_item_PPAPz9",
+        "faq_item_Q9LXfX"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
