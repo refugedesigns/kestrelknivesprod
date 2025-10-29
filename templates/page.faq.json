@@ -131,6 +131,14 @@
             "answer": "Titanium doesn’t hold an edge on its own, so each Ti knife is carbidized with tungsten carbide on one side. This creates micro-serrations that cut cleanly through soft materials like meat, cardboard, or rope.\nThe carbided layer is deep and durable thanks to our industrial process.\n\nTips:\n•\tTi edges perform best with draw cuts\n•\tThey’re not ideal for cutting hide\n•\tOnly sharpen the non-carbided side\n\nWe’re slowly moving away from titanium blades due to low demand, but we’ll continue sharpening and servicing all previous models.",
             "category": "Knife Steels & Design"
           }
+        },
+        "faq_item_X7U8n3": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do you take custom orders?",
+            "answer": "Yes. You can design your own knife through our Build-A-Knife Program (hyper link).\nFor bulk or specialty orders, like outfitter or company knives, reach out through our contact form. We’ll help bring your idea to life.",
+            "category": "Custom Work"
+          }
         }
       },
       "block_order": [
@@ -148,7 +156,8 @@
         "faq_item_4YRwFG",
         "faq_item_ALYraA",
         "faq_item_kUiMmh",
-        "faq_item_KNYjkh"
+        "faq_item_KNYjkh",
+        "faq_item_X7U8n3"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
