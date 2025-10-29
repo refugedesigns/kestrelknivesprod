@@ -27,11 +27,20 @@
             "answer": "We build knives in limited runs to maintain precision and quality. Some models sell out fast, but we’re working toward keeping core models available more consistently. If there’s a knife you’ve been waiting on, join our email list to be notified as soon as it’s back in stock.",
             "category": "Ordering & Availability"
           }
+        },
+        "faq_item_dFnxeH": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Will you be bringing back old models?",
+            "answer": "Yes. We’re currently ramping up production to bring many of your favorite models and sets back. The goal is to honor the legacy of what made Kestrel great while pushing the craftsmanship even further.",
+            "category": "Ordering & Availability"
+          }
         }
       },
       "block_order": [
         "faq_item_crXQxr",
-        "faq_item_QUBntp"
+        "faq_item_QUBntp",
+        "faq_item_dFnxeH"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
