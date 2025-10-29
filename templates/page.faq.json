@@ -179,6 +179,14 @@
             "answer": "Custom knives, Build-A-Knife program orders, discounted items, gift cards, and blemished or used knives cannot be returned.",
             "category": "Returns & Exchanges"
           }
+        },
+        "faq_item_zNDwtQ": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Refund timeline",
+            "answer": "Refunds usually take 5–10 business days for transit, 3–5 for inspection, and up to 10 for your bank to process. Most are completed faster.\n\nWe recommend insuring any return shipment, as we can’t refund items lost or damaged in transit.",
+            "category": "General"
+          }
         }
       },
       "block_order": [
@@ -202,7 +210,8 @@
         "faq_item_Q9LXfX",
         "faq_item_fDP3RH",
         "faq_item_MWrqXK",
-        "faq_item_iJ6zac"
+        "faq_item_iJ6zac",
+        "faq_item_zNDwtQ"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
