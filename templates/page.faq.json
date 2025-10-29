@@ -115,6 +115,14 @@
             "answer": "All three are excellent steels—each with its own strengths.\nMagnaCut is the newest all-around performer with a balance of edge retention, toughness, and corrosion resistance.\n\nS90V offers extreme wear resistance and long edge life but takes more effort to sharpen.\n\nNitro-V is the easiest to maintain, with great edge stability and rust resistance, ideal for wet or humid environments.",
             "category": "Knife Steels & Design"
           }
+        },
+        "faq_item_kUiMmh": {
+          "type": "faq_item",
+          "settings": {
+            "question": "How do I create an account?",
+            "answer": "Creating an account is simple! Click the 'Sign Up' button in the top right corner, enter your email address, create a secure password, and verify your email.",
+            "category": "General"
+          }
         }
       },
       "block_order": [
@@ -130,7 +138,8 @@
         "faq_item_Cqztxd",
         "faq_item_FFn8jP",
         "faq_item_4YRwFG",
-        "faq_item_ALYraA"
+        "faq_item_ALYraA",
+        "faq_item_kUiMmh"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
