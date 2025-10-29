@@ -99,6 +99,14 @@
             "answer": "We recommend maintaining your edge with light stropping and occasional touch-ups using a fine stone or ceramic rod. For full resharpening, send it our way our team will handle it properly.",
             "category": "Sharpening & Maintenance"
           }
+        },
+        "faq_item_4YRwFG": {
+          "type": "faq_item",
+          "settings": {
+            "question": "I have rust spots on my knife what do I do?",
+            "answer": "No problem. Soak the blade in white vinegar for about ten minutes, then scrub lightly with a sponge. Always dry your knife fully after cleaning, and occasionally wipe it down with food-grade oil to keep corrosion away.",
+            "category": "Sharpening & Maintenance"
+          }
         }
       },
       "block_order": [
@@ -112,7 +120,8 @@
         "faq_item_PQRGtg",
         "faq_item_PUzdcV",
         "faq_item_Cqztxd",
-        "faq_item_FFn8jP"
+        "faq_item_FFn8jP",
+        "faq_item_4YRwFG"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
