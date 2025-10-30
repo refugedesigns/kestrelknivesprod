@@ -136,7 +136,80 @@
           {% endif %}
         </a>
         {% if section.settings.show_text_overlay %}
-          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none'>
+          <div class='absolute hidden md:block bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none'>
+            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20'>
+              {% assign s2_shadow = section.settings.slide_2_text_shadow_strength
+                | default: "soft"
+              %}
+              {% assign s2_op = "0.35" %}
+              {% case s2_shadow %}
+                {% when "none" -%}
+                  {%- assign s2_op = "0" %}
+                {% when "soft" -%}
+                  {%- assign s2_op = "0.35" %}
+                {% when "medium" -%}
+                  {%- assign s2_op = "0.6" %}
+                {% when "strong" -%}
+                  {%- assign s2_op = "0.85" %}
+              {% endcase %}
+              <div class='kk-text-wrap inline-block'>
+                {% if section.settings.slide_2_text_bg_enable %}
+                  {% assign s2_bg_op_pct = section.settings.slide_2_text_bg_opacity
+                    | default: 50
+                  %}
+                  {% assign s2_bg_alpha = s2_bg_op_pct | divided_by: 100.0 %}
+                  <div
+                    class='kk-text-bg'
+                    style='background-color: {{ section.settings.slide_2_text_bg_color | default: '#000000' | color_modify: 'alpha', s2_bg_alpha }}'
+                  ></div>
+                {% endif %}
+                <div class='kk-text-content'>
+                  <h1
+                    class='text-4xl md:text-6xl font-bold mb-4'
+                    style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
+                  >
+                    {{
+                      section.settings.slide_2_title
+                      | default: "Professional Grade"
+                    }}
+                  </h1>
+                  {% assign s2_subtitle = section.settings.slide_2_subtitle
+                    | default: "Tools that professionals trust"
+                  %}
+                  {% assign s2_sentences = s2_subtitle | split: "." %}
+                  {% for sentence in s2_sentences %}
+                    {% assign trimmed_sentence = sentence | strip %}
+                    {% if trimmed_sentence != blank %}
+                      <p
+                        class='text-lg md:text-xl mb-1'
+                        style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
+                      >
+                        {{ trimmed_sentence }}.
+                      </p>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+              {% if section.settings.slide_2_button_enable
+                and section.settings.slide_2_button_text != blank
+              %}
+                <div class='mt-4 pointer-events-auto'>
+                  <a
+                    href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
+                    class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                    style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
+                  >
+                    {{ section.settings.slide_2_button_text }}
+                  </a>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+
+        <!--Mobile texts and button -->
+          {% if section.settings.show_text_overlay %}
+          <div class='absolute  md:hidden bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center z-10 pointer-events-none'>
             <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20'>
               {% assign s2_shadow = section.settings.slide_2_text_shadow_strength
                 | default: "soft"
