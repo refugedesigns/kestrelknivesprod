@@ -15,7 +15,7 @@
         "settings": {
           "mobile_menu_title": "Menu",
           "logo_image": "shopify://shop_images/kestrel-ultralight-with-bird-black.png",
-          "logo_height_mobile": 52,
+          "logo_height_mobile": 60,
           "logo_height_desktop": 96,
           "menu": "customer-account-main-menu",
           "header_bg_color": "#ffffff",
