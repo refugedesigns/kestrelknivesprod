@@ -255,7 +255,6 @@
         <!-- Right Column - Product Info -->
         <div class='lg:col-span-5 mt-8 lg:mt-0'>
           <div class='lg:sticky lg:top-24'>
-
             <!-- Product Title -->
             <h1 class='text-4xl font-bold text-gray-900 mb-6'>
               {{ product.title }}
@@ -489,66 +488,65 @@
               {% endunless %}
 
               <div class='flex items-center gap-2'>
-              <!-- Quantity Selector -->
-              <div class='mb-6 border border-gray-300 py-1.5'>
-                <div class='flex items-center space-x-3'>
-                  <button
-                    type='button'
-                    @click='decreaseQuantity()'
-                    class='w-10 h-10 flex items-center justify-center'
-                  >
-                    <svg
-                      class='w-4 h-4'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
+                <!-- Quantity Selector -->
+                <div class='mb-6 border border-gray-300 py-1.5'>
+                  <div class='flex items-center space-x-3'>
+                    <button
+                      type='button'
+                      @click='decreaseQuantity()'
+                      class='w-10 h-10 flex items-center justify-center'
                     >
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-                    </svg>
-                  </button>
-                  <input
-                    type='number'
-                    x-model='quantity'
-                    min='1'
-                    class='w-20 text-center border-none bg-transparent'
-                  >
-                  <button
-                    type='button'
-                    @click='increaseQuantity()'
-                    class='w-10 h-10 flex items-center justify-center'
-                  >
-                    <svg
-                      class='w-4 h-4'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
+                      <svg
+                        class='w-4 h-4'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                      </svg>
+                    </button>
+                    <input
+                      type='number'
+                      x-model='quantity'
+                      min='1'
+                      class='w-20 text-center border-none bg-transparent'
                     >
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                  </button>
+                    <button
+                      type='button'
+                      @click='increaseQuantity()'
+                      class='w-10 h-10 flex items-center justify-center'
+                    >
+                      <svg
+                        class='w-4 h-4'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              
-              <!-- Add to Cart Button -->
-              <button
-                id='addToCartBtn'
-                type='submit'
-                class='w-full text-sm whitespace-nowrap md:text-base uppercase bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mb-6 {% if product_status_text != blank or selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
-                {% if product_status_text != blank
-                  or selected_variant.available == false
-                %}
-                  disabled
-                {% endif %}
-              >
-                {% if product_status_text != blank %}
-                  {{ product_status_text }}
-                {% elsif selected_variant.available == false %}
-                  SOLD OUT
-                {% else %}
-                  ADD TO CART
-                {% endif %}
-              </button>
+                <!-- Add to Cart Button -->
+                <button
+                  id='addToCartBtn'
+                  type='submit'
+                  class='w-full text-sm whitespace-nowrap md:text-base uppercase bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mb-6 {% if product_status_text != blank or selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
+                  {% if product_status_text != blank
+                    or selected_variant.available == false
+                  %}
+                    disabled
+                  {% endif %}
+                >
+                  {% if product_status_text != blank %}
+                    {{ product_status_text }}
+                  {% elsif selected_variant.available == false %}
+                    SOLD OUT
+                  {% else %}
+                    ADD TO CART
+                  {% endif %}
+                </button>
               </div>
             {% endform %}
           </div>
@@ -932,7 +930,7 @@
               <swiper-container
                 id='related-products-swiper'
                 class='mySwiper'
-                slides-per-view='1'
+                slides-per-view='2'
                 space-between='20'
                 navigation='true'
                 style='--swiper-navigation-color: #000000; --swiper-navigation-size: 35px;'
