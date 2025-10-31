@@ -85,6 +85,27 @@
       height: {{ section.settings.star_size_desktop | default: 20 }}px;
     }
   }
+
+  #thumbnailStrip {
+    scrollbar-width: none;
+  }
+
+  #thumbnailStrip::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    #thumbFadeLeft,
+    #thumbFadeRight {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    #thumbFadeLeft.is-visible,
+    #thumbFadeRight.is-visible {
+      opacity: 1;
+    }
+  }
 </style>
 
 <div class='bg-gray-50 mb-8' x-data='productPage()'>
@@ -111,7 +132,7 @@
         </h1>
       </div>
     {% endif %}
-    <main class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 {% unless tags_lower contains 'hidden_offer' %}pt-24{% endunless %}'>
+    <main class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 md:py-8 {% unless tags_lower contains 'hidden_offer' %}md:pt-24{% endunless %}'>
       <div class='lg:grid lg:grid-cols-12 lg:gap-12'>
         <!-- Left Column - Product Images -->
         <div class='lg:col-span-7'>
@@ -169,23 +190,71 @@
           </div>
 
           <!-- Thumbnail Images -->
-          <div id='thumbnailStrip' class='flex space-x-4 overflow-x-auto pb-2'>
-            {% for media in product.media %}
-              <button
-                @click='changeImage({{ forloop.index0 }})'
-                class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 {% if forloop.first %}border-black{% else %}border-gray-200 hover:border-black{% endif %} transition-colors'
+          <div class='relative hidden md:block'>
+            <div
+              id='thumbnailStrip'
+              class='flex space-x-4 overflow-x-auto pb-2'
+            >
+              {% for media in product.media %}
+                <button
+                  @click='changeImage({{ forloop.index0 }})'
+                  class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 {% if forloop.first %}border-black{% else %}border-gray-200 hover:border-black{% endif %} transition-colors'
+                >
+                  {% render "product-media", media: media %}
+                </button>
+              {% endfor %}
+            </div>
+            <div
+              id='thumbFadeLeft'
+              class='pointer-events-none absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-white to-transparent'
+            ></div>
+            <div
+              id='thumbFadeRight'
+              class='pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white to-transparent'
+            ></div>
+          </div>
+          <div class='mt-3 md:hidden flex items-center justify-center space-x-4'>
+            <button
+              type='button'
+              id='mobilePrevBtn'
+              class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md text-black hover:bg-gray-100 active:bg-gray-200 transition-colors'
+            >
+              <span class='sr-only'>Previous image</span>
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'
+                stroke-width='1.5'
+                stroke='currentColor'
+                class='size-6'
               >
-                {% render "product-media", media: media %}
-              </button>
-            {% endfor %}
+                <path stroke-linecap='round' stroke-linejoin='round' d='M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18'/>
+              </svg>
+            </button>
+            <div class='flex items-center space-x-2' id='mobileDots'></div>
+            <button
+              type='button'
+              id='mobileNextBtn'
+              class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md text-black hover:bg-gray-100 active:bg-gray-200 transition-colors'
+            >
+              <span class='sr-only'>Next image</span>
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'
+                stroke-width='1.5'
+                stroke='currentColor'
+                class='size-6'
+              >
+                <path stroke-linecap='round' stroke-linejoin='round' d='M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3'/>
+              </svg>
+            </button>
           </div>
         </div>
 
         <!-- Right Column - Product Info -->
         <div class='lg:col-span-5 mt-8 lg:mt-0'>
           <div class='lg:sticky lg:top-24'>
-            <!-- Brand -->
-            <p class='text-sm text-gray-500 mb-2'>{{ product.vendor }}</p>
 
             <!-- Product Title -->
             <h1 class='text-4xl font-bold text-gray-900 mb-6'>
@@ -419,16 +488,14 @@
                 {% endfor %}
               {% endunless %}
 
+              <div class='flex items-center gap-2'>
               <!-- Quantity Selector -->
-              <div class='mb-6'>
-                <label class='block text-sm font-medium text-gray-700 mb-2'
-                  >Quantity</label
-                >
+              <div class='mb-6 border border-gray-300 py-1.5'>
                 <div class='flex items-center space-x-3'>
                   <button
                     type='button'
                     @click='decreaseQuantity()'
-                    class='w-10 h-10 rounded-md border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors'
+                    class='w-10 h-10 flex items-center justify-center'
                   >
                     <svg
                       class='w-4 h-4'
@@ -443,12 +510,12 @@
                     type='number'
                     x-model='quantity'
                     min='1'
-                    class='w-20 text-center border border-gray-300 rounded-md py-2 focus:ring-2 focus:ring-black focus:border-black'
+                    class='w-20 text-center border-none bg-transparent'
                   >
                   <button
                     type='button'
                     @click='increaseQuantity()'
-                    class='w-10 h-10 rounded-md border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors'
+                    class='w-10 h-10 flex items-center justify-center'
                   >
                     <svg
                       class='w-4 h-4'
@@ -462,11 +529,12 @@
                 </div>
               </div>
 
+              
               <!-- Add to Cart Button -->
               <button
                 id='addToCartBtn'
                 type='submit'
-                class='w-full uppercase bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mb-6 {% if product_status_text != blank or selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
+                class='w-full text-sm whitespace-nowrap md:text-base uppercase bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mb-6 {% if product_status_text != blank or selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
                 {% if product_status_text != blank
                   or selected_variant.available == false
                 %}
@@ -481,6 +549,7 @@
                   ADD TO CART
                 {% endif %}
               </button>
+              </div>
             {% endform %}
           </div>
         </div>
@@ -511,8 +580,8 @@
   id='tabsNavigation'
   class='bg-white border-b border-t h-20 flex items-center border-gray-200 sticky top-16 z-18 transition-all duration-300'
 >
-  <div class='max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex items-center justify-between'>
-    <nav class='flex space-x-8'>
+  <div class='max-w-8xl flex mx-auto px-4 sm:px-6 lg:px-8 w-full items-center justify-center md:justify-between'>
+    <nav class='space-x-8 hidden md:flex'>
       {% if product.description != blank %}
         <button
           onclick="scrollToSection('specs')"
@@ -543,7 +612,7 @@
     </nav>
 
     <!-- Price, Size Selector (for apparel), and Add to Cart -->
-    <div class='flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4'>
+    <div class='flex items-center space-x-4'>
       {% comment %} Size Selector for Apparel Products {% endcomment %}
       {% assign product_type_lower = product.type | default: "" | downcase %}
       {% if product_type_lower contains "apparel"
@@ -1878,29 +1947,33 @@
                 }
               });
 
-              // Auto-scroll to make the selected thumbnail visible (robust)
+              // Auto-scroll only when clicking edge thumbnails and there are more to reveal
               if (thumbnailContainer && thumbnails[index]) {
                 const selected = thumbnails[index];
-                const padding = 12; // tolerance
+                const padding = 16;
                 const containerRect = thumbnailContainer.getBoundingClientRect();
                 const thumbRect = selected.getBoundingClientRect();
+                const containerWidth = thumbnailContainer.clientWidth;
+                const maxScroll = thumbnailContainer.scrollWidth - containerWidth;
+                const scrollLeft = thumbnailContainer.scrollLeft;
 
-                // If the thumbnail is left of the visible area, scroll left
-                if (thumbRect.left < containerRect.left + padding) {
-                  // Center the thumbnail in the viewport
-                  const centerOffset = (thumbnailContainer.clientWidth / 2) - (selected.clientWidth / 2);
-                  const target = Math.max(0, selected.offsetLeft - centerOffset);
+                const hasMoreLeft = scrollLeft > 0;
+                const hasMoreRight = scrollLeft < maxScroll;
+
+                if (thumbRect.left <= containerRect.left + padding && hasMoreLeft) {
+                  const target = Math.max(0, selected.offsetLeft - padding - containerWidth * 0.3);
                   thumbnailContainer.scrollTo({ left: target, behavior: 'smooth' });
-
-                // If the thumbnail is right of the visible area, scroll right
-                } else if (thumbRect.right > containerRect.right - padding) {
-                  // Center the thumbnail in the viewport
-                  const centerOffset = (thumbnailContainer.clientWidth / 2) - (selected.clientWidth / 2);
-                  const maxScroll = thumbnailContainer.scrollWidth - thumbnailContainer.clientWidth;
-                  const target = Math.min(maxScroll, selected.offsetLeft - centerOffset);
+                } else if (thumbRect.right >= containerRect.right - padding && hasMoreRight) {
+                  const target = Math.min(
+                    maxScroll,
+                    selected.offsetLeft + selected.clientWidth + padding + containerWidth * 0.3 - containerWidth
+                  );
                   thumbnailContainer.scrollTo({ left: target, behavior: 'smooth' });
                 }
               }
+
+              updateThumbFades();
+              updateMobileDots();
             }
           },
 
@@ -1945,6 +2018,96 @@
         };
       };
 
+
+      function getProductPageState() {
+        const el = document.querySelector('[x-data*="productPage"]');
+        if (el && el._x_dataStack && el._x_dataStack[0]) {
+          return el._x_dataStack[0];
+        }
+        if (window._productPageFallback) {
+          return window._productPageFallback;
+        }
+        return null;
+      }
+
+      function updateThumbFades() {
+        const strip = document.getElementById('thumbnailStrip');
+        const leftFade = document.getElementById('thumbFadeLeft');
+        const rightFade = document.getElementById('thumbFadeRight');
+        if (!strip || !leftFade || !rightFade) return;
+
+        const containerWidth = strip.clientWidth;
+        const maxScroll = strip.scrollWidth - containerWidth;
+        if (maxScroll <= 0) {
+          leftFade.classList.remove('is-visible');
+          rightFade.classList.remove('is-visible');
+          return;
+        }
+
+        const scrollLeft = strip.scrollLeft;
+        leftFade.classList.toggle('is-visible', scrollLeft > 0);
+        rightFade.classList.toggle('is-visible', scrollLeft < maxScroll - 1);
+      }
+
+      function updateMobileDots() {
+        const dotsEl = document.getElementById('mobileDots');
+        if (!dotsEl) return;
+
+        const state = getProductPageState();
+        const images = state && Array.isArray(state.productImages) ? state.productImages : [];
+        let total = images.length;
+        if (!total) {
+          total = {{ product.media.size }};
+        }
+
+        if (!total || total <= 1) {
+          dotsEl.innerHTML = '';
+          return;
+        }
+
+        const activeIndex = state && typeof state.currentImageIndex === 'number' ? state.currentImageIndex : 0;
+
+        let html = '';
+        for (let i = 0; i < total; i++) {
+          const activeClass = i === activeIndex ? 'bg-black' : 'bg-gray-300';
+          html += '<span class="inline-block mx-1 ' + activeClass + '" style="width:8px;height:8px;border-radius:2px;"></span>';
+        }
+        dotsEl.innerHTML = html;
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const strip = document.getElementById('thumbnailStrip');
+        if (strip) {
+          strip.addEventListener('scroll', updateThumbFades, { passive: true });
+        }
+
+        const prevBtn = document.getElementById('mobilePrevBtn');
+        const nextBtn = document.getElementById('mobileNextBtn');
+        if (prevBtn) {
+          prevBtn.addEventListener('click', function () {
+            const state = getProductPageState();
+            if (state && typeof state.previousImage === 'function') {
+              state.previousImage();
+            }
+          });
+        }
+        if (nextBtn) {
+          nextBtn.addEventListener('click', function () {
+            const state = getProductPageState();
+            if (state && typeof state.nextImage === 'function') {
+              state.nextImage();
+            }
+          });
+        }
+
+        updateThumbFades();
+        updateMobileDots();
+      });
+
+      window.addEventListener('resize', function () {
+        updateThumbFades();
+        updateMobileDots();
+      });
 
       // Helpers to match sticky offsets to header height so tabs don't overlap it
       function getHeaderHeight() {
