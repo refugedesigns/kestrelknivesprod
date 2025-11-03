@@ -115,9 +115,8 @@
 
       <!-- Slide 2 -->
       <swiper-slide class='relative slide-2'>
-        <a
-          href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
-          class='block w-full h-full'
+        <div
+          class='block w-full h-full klaviyo_hero_form_trigger'
         >
           {% if section.settings.slide_2_image != blank %}
             <img
@@ -134,7 +133,7 @@
               | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
             }}
           {% endif %}
-        </a>
+        </div>
         {% if section.settings.show_text_overlay %}
           <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none'>
             <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20'>
@@ -194,13 +193,12 @@
                 and section.settings.slide_2_button_text != blank
               %}
                 <div class='mt-4 pointer-events-auto'>
-                  <a
-                    href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
-                    class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                  <div
+                    class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300 klaviyo_hero_button_trigger'
                     style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
                   >
                     {{ section.settings.slide_2_button_text }}
-                  </a>
+                  </div>
                 </div>
               {% endif %}
             </div>
@@ -388,6 +386,22 @@
     </swiper-container>
   </div>
 </div>
+
+<script type="text/javascript">
+	document.querySelector('.klaviyo_hero_form_trigger').addEventListener('click', function (){
+		window._klOnsite = window._klOnsite || [];
+    window._klOnsite.push(['openForm', 'TRArE7']);
+	});
+</script>
+
+<script type="text/javascript">
+	document.querySelector('.klaviyo_hero_button_trigger').addEventListener('click', function (){
+		window._klOnsite = window._klOnsite || [];
+    window._klOnsite.push(['openForm', 'TRArE7']);
+	});
+</script>
+
+
 
 <!-- Swiper Styles -->
 <style>
