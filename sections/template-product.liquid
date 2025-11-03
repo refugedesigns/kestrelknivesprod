@@ -747,6 +747,7 @@
                     and field.value != blank
                     and field.type != "file_reference"
                     and field.type != "list.file_reference"
+                    and key != "product_status"
                   %}
                     {% assign label = key
                       | replace: "_", " "
