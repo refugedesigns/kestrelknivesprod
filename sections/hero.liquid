@@ -98,13 +98,12 @@
                 and section.settings.slide_1_button_text != blank
               %}
                 <div class='mt-4 mb-8 pointer-events-auto'>
-                  <a
-                    href='{{ section.settings.slide_1_button_url | default: "/collections/all" }}'
-                    class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                  <div
+                    class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300 klaviyo_hero_form_trigger'
                     style='background-color: {{ section.settings.slide_1_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_1_button_text_color | default: "#ffffff" }};'
                   >
                     {{ section.settings.slide_1_button_text }}
-                  </a>
+                  </div>
                 </div>
               {% endif %}
             </div>
