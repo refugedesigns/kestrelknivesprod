@@ -1779,46 +1779,26 @@
             const button = label ? label.querySelector('div') : null;
             if (button) {
               if (isSelected) {
-                // Selected state - check button type by classes
-                if (button.classList.contains('min-w-[3rem]') || 
-                    button.classList.contains('px-3') || 
-                    button.closest('.size-option') ||
-                    button.textContent.trim().length < 10) { // Short text usually means size/model buttons
-                  // Size/Model button selected state - black background, white text
-                  button.classList.remove('border-gray-300', 'hover:border-black', 'bg-white', 'text-gray-900');
-                  button.classList.add('border-black', 'bg-black', 'text-white');
-                } else {
-                  // Color option selected state - black border
-                  button.classList.remove('border-gray-300', 'hover:border-black');
-                  button.classList.add('border-black');
-                  
-                  // Update text color for color options
-                  const textSpan = button.parentElement.querySelector('span');
-                  if (textSpan) {
-                    textSpan.classList.remove('text-gray-600');
-                    textSpan.classList.add('text-black');
-                  }
+                // Selected state - black border only (no background)
+                button.classList.remove('border-gray-300', 'hover:border-black');
+                button.classList.add('border-black');
+                
+                // Update text color for color options
+                const textSpan = button.parentElement.querySelector('span');
+                if (textSpan) {
+                  textSpan.classList.remove('text-gray-600');
+                  textSpan.classList.add('text-black');
                 }
               } else {
-                // Unselected state
-                if (button.classList.contains('min-w-[3rem]') || 
-                    button.classList.contains('px-3') || 
-                    button.closest('.size-option') ||
-                    button.textContent.trim().length < 10) { // Short text usually means size/model buttons
-                  // Size/Model button unselected state - white background, gray border
-                  button.classList.remove('border-black', 'bg-black', 'text-white');
-                  button.classList.add('border-gray-300', 'hover:border-black', 'bg-white', 'text-gray-900');
-                } else {
-                  // Color option unselected state - gray border
-                  button.classList.remove('border-black');
-                  button.classList.add('border-gray-300', 'hover:border-black');
-                  
-                  // Reset text color for color options
-                  const textSpan = button.parentElement.querySelector('span');
-                  if (textSpan) {
-                    textSpan.classList.remove('text-black');
-                    textSpan.classList.add('text-gray-600');
-                  }
+                // Unselected state - gray border
+                button.classList.remove('border-black');
+                button.classList.add('border-gray-300', 'hover:border-black');
+                
+                // Reset text color for color options
+                const textSpan = button.parentElement.querySelector('span');
+                if (textSpan) {
+                  textSpan.classList.remove('text-black');
+                  textSpan.classList.add('text-gray-600');
                 }
               }
             }
