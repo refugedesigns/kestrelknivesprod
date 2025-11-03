@@ -182,6 +182,16 @@
             "object_position": "center"
           }
         },
+        "testimonial_LhgCKH": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "A knife should feel like an extension of your hand and that’s exactly what the Ovis Hunter is. The balance, the size, the Nitro-V steel, everything just works. It slices effortlessly and makes butchering game in the field a dream. I’ve owned plenty of high-end knives, but I always come back to this one. The Ovis Hunter is the knife I trust in the field, at camp, and everywhere in between",
+            "author": "Matt Riley, British Columbia Outdoorsman",
+            "author_image": "shopify://shop_images/Matt_Riley_2.jpg",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
         "carousel_review_C3y33P": {
           "type": "carousel_review",
           "settings": {
@@ -211,6 +221,7 @@
         "testimonial_tQTUDz",
         "testimonial_AxhXVD",
         "testimonial_UCMqKG",
+        "testimonial_LhgCKH",
         "carousel_review_C3y33P"
       ],
       "settings": {
