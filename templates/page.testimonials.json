@@ -32,6 +32,16 @@
             "object_position": "bottom"
           }
         },
+        "testimonial_LPHqbg": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Putting up some fur is where the rounded tip Ovis Scalpel really shines",
+            "author": "Ruben Urrutia - Lost Trail Outfitters",
+            "author_image": "shopify://shop_images/WhatsApp_Image_2025-10-31_at_19.18.48_b4f0c823.jpg",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
         "testimonial_hLn6tW": {
           "type": "testimonial",
           "settings": {
@@ -172,16 +182,6 @@
             "object_position": "center"
           }
         },
-        "testimonial_LPHqbg": {
-          "type": "testimonial",
-          "settings": {
-            "quote": "Putting up some fur is where the rounded tip Ovis Scalpel really shines",
-            "author": "Ruben Urrutia - Lost Trail Outfitters",
-            "author_image": "shopify://shop_images/WhatsApp_Image_2025-10-31_at_19.18.48_b4f0c823.jpg",
-            "object_fit": "cover",
-            "object_position": "center"
-          }
-        },
         "carousel_review_C3y33P": {
           "type": "carousel_review",
           "settings": {
@@ -196,6 +196,7 @@
       "block_order": [
         "testimonial_HyGpCE",
         "testimonial_N6iVk9",
+        "testimonial_LPHqbg",
         "testimonial_hLn6tW",
         "testimonial_UxFbUW",
         "testimonial_7eRwNm",
@@ -210,7 +211,6 @@
         "testimonial_tQTUDz",
         "testimonial_AxhXVD",
         "testimonial_UCMqKG",
-        "testimonial_LPHqbg",
         "carousel_review_C3y33P"
       ],
       "settings": {
