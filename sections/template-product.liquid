@@ -978,20 +978,47 @@
             }
 
             const isApparel = String(product.product_type || product.type || '').toLowerCase().includes('apparel');
-            const actionButton = isApparel
-              ? `<button onclick="openRelatedProductQuickView('${product.handle}')" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0">QUICK VIEW</button>`
-              : `<button onclick="addRelatedProductToCart('${product.handle}', '${product.url}')" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0">ADD TO CART</button>`;
-
+            
             // Get the first available variant or first variant for non-apparel products
             const displayVariant = product.variants && product.variants.length > 0 
               ? (product.variants.find(v => v.available) || product.variants[0])
               : null;
             
-            // Build the product title - include variant name for non-apparel
-            let displayTitle = product.title.toUpperCase();
-            if (!isApparel && displayVariant && displayVariant.title && displayVariant.title !== 'Default Title') {
-              displayTitle = `${product.title.toUpperCase()} - ${displayVariant.title.toUpperCase()}`;
+            const actionButton = isApparel
+              ? `<button onclick="openRelatedProductQuickView('${product.handle}')" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0">QUICK VIEW</button>`
+              : `<button onclick="addRelatedProductToCart('${product.handle}', '${product.url}', ${displayVariant ? displayVariant.id : 'null'})" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0">ADD TO CART</button>`;
+            
+            const productTitleUpper = (product.title || '').toUpperCase();
+
+            const variantPrimaryLabel = (() => {
+              if (!displayVariant) return null;
+              if (displayVariant.option1 && displayVariant.option1 !== 'Default Title') {
+                return displayVariant.option1;
+              }
+              const rawTitle = displayVariant.title || '';
+              if (!rawTitle || rawTitle === 'Default Title') return null;
+              return rawTitle.split('/')[0].trim();
+            })();
+
+            // Build the product title - include first variant name for non-apparel with multiple variants
+            let displayTitle = productTitleUpper;
+            if (!isApparel && product.variants && product.variants.length > 1 && variantPrimaryLabel) {
+              displayTitle = `${productTitleUpper} - ${variantPrimaryLabel.toUpperCase()}`;
             }
+
+            const resolveImageSrc = (image) => {
+              if (!image) return null;
+              if (typeof image === 'string') return image;
+              if (Array.isArray(image) && image.length) return resolveImageSrc(image[0]);
+              if (typeof image === 'object') {
+                return image.src || image.url || image.originalSrc || image.original_url || null;
+              }
+              return null;
+            };
+
+            const variantImage = resolveImageSrc(displayVariant ? (displayVariant.featured_image || displayVariant.image) : null);
+            const productImage = resolveImageSrc(product.featured_image) || resolveImageSrc(product.images && product.images[0]);
+            const displayImage = variantImage || productImage || '';
 
             const productSlide = `
               <swiper-slide style="height: 100%;">
@@ -999,8 +1026,8 @@
                   <div class="aspect-square bg-gray-50 rounded-t-lg overflow-hidden flex-shrink-0">
                   <a href="${product.url}" class="aspect-square hover:cursor-pointer bg-gray-50 rounded-t-lg overflow-hidden flex-shrink-0 block">
                     <img
-                      src="${product.featured_image}"
-                      alt="${product.title}"
+                      src="${displayImage}"
+                      alt="${displayTitle}"
                       class="w-full h-full object-contain"
                       loading="lazy"
                     >
@@ -1018,7 +1045,7 @@
                           ${new Intl.NumberFormat('{{ shop.locale }}', {
                             style: 'currency',
                             currency: '{{ shop.currency }}'
-                          }).format(product.price / 100)}
+                          }).format((displayVariant ? displayVariant.price : product.price) / 100)}
                         </span>
                       </div>
                     </div>
@@ -1043,8 +1070,29 @@
    });
 
   // Function to add related products to cart (uses handle or derives from URL)
-  window.addRelatedProductToCart = async function(handle, url) {
+  window.addRelatedProductToCart = async function(handle, url, variantId) {
     try {
+      // If we have a variant ID passed directly, use it
+      if (variantId && variantId !== 'null' && variantId !== null) {
+        // Prefer the same cart flow as the main product (cartSheet component)
+        const cartSheetEl = document.querySelector('[x-data*="cartSheet"]');
+        if (cartSheetEl && cartSheetEl._x_dataStack && cartSheetEl._x_dataStack[0] && typeof cartSheetEl._x_dataStack[0].addToCart === 'function') {
+          await cartSheetEl._x_dataStack[0].addToCart(variantId, 1);
+          return;
+        }
+
+        // Fallback: direct API call then open the cart
+        const cartResponse = await fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: variantId, quantity: 1 }),
+        });
+        if (!cartResponse.ok) throw new Error('Failed to add to cart');
+        window.dispatchEvent(new CustomEvent('open-cart'));
+        return;
+      }
+
+      // Fallback to old logic if no variant ID provided
       function extractHandle(u) {
         try {
           const path = new URL(u, window.location.origin).pathname;
