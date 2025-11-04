@@ -95,7 +95,7 @@
         "title": "Featured Collection",
         "featured_collection": "featured",
         "number_of_products_to_show": 4,
-        "mobile_collection": "featured-mobile",
+        "mobile_collection": "featured",
         "mobile_products_to_show": 4,
         "mobile_columns": 2,
         "desktop_columns": 4
