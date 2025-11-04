@@ -982,6 +982,17 @@
               ? `<button onclick="openRelatedProductQuickView('${product.handle}')" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0">QUICK VIEW</button>`
               : `<button onclick="addRelatedProductToCart('${product.handle}', '${product.url}')" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0">ADD TO CART</button>`;
 
+            // Get the first available variant or first variant for non-apparel products
+            const displayVariant = product.variants && product.variants.length > 0 
+              ? (product.variants.find(v => v.available) || product.variants[0])
+              : null;
+            
+            // Build the product title - include variant name for non-apparel
+            let displayTitle = product.title.toUpperCase();
+            if (!isApparel && displayVariant && displayVariant.title && displayVariant.title !== 'Default Title') {
+              displayTitle = `${product.title.toUpperCase()} - ${displayVariant.title.toUpperCase()}`;
+            }
+
             const productSlide = `
               <swiper-slide style="height: 100%;">
                 <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 h-full flex flex-col">
@@ -999,7 +1010,7 @@
                     <div class="flex-grow flex flex-col justify-between">
                       <div class="h-16 flex items-center justify-center">
                         <h3 class="text-lg font-bold text-black text-center line-clamp-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.5rem;">
-                          ${product.title.toUpperCase()}
+                          ${displayTitle}
                         </h3>
                       </div>
                       <div class="text-center mb-4">
