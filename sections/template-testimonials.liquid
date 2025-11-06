@@ -904,7 +904,7 @@
               {% assign testimonial_index = testimonial_index | plus: 1 %}
               {% if testimonial_index > break_count %}
                 <div
-                  class='relative h-[40rem] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer'
+                  class='relative h-[25rem] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer'
                   data-quote='{{ block.settings.quote | strip_newlines | escape }}'
                   data-author='{{ block.settings.author | escape }}'
                   data-image='{% if block.settings.author_image %}{{ block.settings.author_image | image_url: width: 2000 | escape }}{% endif %}'
