@@ -209,14 +209,17 @@
             {% endif %}
 
             <!-- Content Overlay with Background -->
-            <div class='absolute bottom-0 left-0 right-0 p-6 text-white bg-black/60'>
+            <div class='absolute bottom-0 left-0 right-0 p-6 text-white bg-black/60 flex flex-col gap-0.5'>
               <!-- Quote -->
-              <blockquote class='text-white text-sm leading-relaxed mb-0 italic'>
+              <blockquote
+                class='text-white text-sm leading-relaxed italic'
+                data-truncate='quote'
+              >
                 "{{ block.settings.quote }}"
               </blockquote>
 
               <!-- Author Name -->
-              <cite class='text-white font-semibold not-italic text-sm block mt-2'>
+              <cite class='text-white font-semibold not-italic text-sm'>
                 {{ block.settings.author }}
               </cite>
             </div>
@@ -758,13 +761,16 @@
     <!-- Quote Collapse Styles -->
     <style>
       .quote-base {
-        min-height: 3.5rem;
         display: block;
       }
-      /* Remove overflow clipping to avoid hiding inline preview */
-      .quote-collapsed {
-        max-height: none;
-        overflow: visible;
+      .quote-base.quote-collapsed .js-quote-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .quote-base.quote-expanded .js-quote-text {
+        display: block;
       }
     </style>
 
@@ -828,62 +834,80 @@
       })
     </script>
 
-    <!-- Truncate Quotes to N Words with Read More Toggle -->
+    <!-- Truncate Quotes to Consistent Preview Length with Read More Toggle -->
     <script>
       document.addEventListener('DOMContentLoaded', function () {
-        // Target only the card overlays, not the modal
+        // Target only the testimonial card overlays, not the modal
         const quoteBlocks = document.querySelectorAll(
-          'blockquote.text-white.text-sm.leading-relaxed.mb-0.italic'
+          'blockquote[data-truncate="quote"]'
         )
-        const MAX_WORDS = 20 // collapsed word limit
+        const MAX_WORDS = 22
+        const MAX_CHARS = 160
 
         quoteBlocks.forEach(el => {
-          // Always ensure uniform min height across cards
-          el.classList.add('quote-base')
           const fullTextRaw = (el.textContent || '').trim()
-          // Remove surrounding quotes if present
+          if (!fullTextRaw) return
+
+          // Remove surrounding quotes injected by Liquid
           const fullText = fullTextRaw.replace(/^"+|"+$/g, '')
-
-          // Split into words for uniform collapsed length
           const words = fullText.split(/\s+/)
-          if (!words || words.length <= MAX_WORDS) return
+          const needsTruncate =
+            words.length > MAX_WORDS || fullText.length > MAX_CHARS
 
-          const truncated = words.slice(0, MAX_WORDS).join(' ').trim()
+          el.classList.add('quote-base')
 
-          // Build structure: text span + button
+          if (!needsTruncate) {
+            el.textContent = `"${fullText}"`
+            return
+          }
+
+          const truncatedWords = words.slice(0, MAX_WORDS).join(' ')
+          let truncated = truncatedWords
+
+          if (truncated.length > MAX_CHARS) {
+            const trimmed = truncated.slice(0, MAX_CHARS)
+            const lastSpace = trimmed.lastIndexOf(' ')
+            truncated = lastSpace > 0 ? trimmed.slice(0, lastSpace) : trimmed
+          }
+
+          truncated = truncated.replace(/[\s,.!?;:-]+$/, '')
+          const collapsedText = `${truncated}…`
+
           const textSpan = document.createElement('span')
           textSpan.className = 'js-quote-text'
-          textSpan.textContent = `"${truncated}"`
+          textSpan.textContent = `"${collapsedText}"`
 
           const toggleBtn = document.createElement('button')
           toggleBtn.type = 'button'
-          toggleBtn.className = 'ml-1 underline text-blue-300 js-quote-toggle'
+          toggleBtn.className =
+            'ml-1 underline text-blue-300 js-quote-toggle focus:outline-none'
           toggleBtn.textContent = 'Read more'
           toggleBtn.setAttribute('aria-expanded', 'false')
 
-          // Prevent opening the modal when clicking the button
           toggleBtn.addEventListener('click', function (e) {
             e.preventDefault()
             e.stopPropagation()
-            const expanded = toggleBtn.getAttribute('aria-expanded') === 'true'
+            const expanded = el.classList.contains('quote-expanded')
+
             if (expanded) {
-              textSpan.textContent = `"${truncated}"`
+              el.classList.remove('quote-expanded')
+              el.classList.add('quote-collapsed')
+              textSpan.textContent = `"${collapsedText}"`
               toggleBtn.textContent = 'Read more'
               toggleBtn.setAttribute('aria-expanded', 'false')
-              // no overflow clipping; just revert text
             } else {
+              el.classList.remove('quote-collapsed')
+              el.classList.add('quote-expanded')
               textSpan.textContent = `"${fullText}"`
               toggleBtn.textContent = 'Show less'
               toggleBtn.setAttribute('aria-expanded', 'true')
-              // no overflow clipping; just show full text
             }
           })
 
-          // Replace blockquote content
           el.innerHTML = ''
           el.appendChild(textSpan)
           el.appendChild(toggleBtn)
-          // Keep base height only; do not clip content
+          el.classList.add('quote-collapsed')
         })
       })
     </script>
@@ -966,14 +990,17 @@
                   {% endif %}
 
                   <!-- Content Overlay with Background -->
-                  <div class='absolute bottom-0 left-0 right-0 p-6 text-white bg-black/60'>
+                  <div class='absolute bottom-0 left-0 right-0 p-6 text-white bg-black/60 flex flex-col gap-0.5'>
                     <!-- Quote -->
-                    <blockquote class='text-white text-sm leading-relaxed mb-0 italic'>
+                    <blockquote
+                      class='text-white text-sm leading-relaxed italic'
+                      data-truncate='quote'
+                    >
                       "{{ block.settings.quote }}"
                     </blockquote>
 
                     <!-- Author Name -->
-                    <cite class='text-white font-semibold not-italic text-sm block mt-2'>
+                    <cite class='text-white font-semibold not-italic text-sm'>
                       {{ block.settings.author }}
                     </cite>
                   </div>
