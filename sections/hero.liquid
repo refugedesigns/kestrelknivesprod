@@ -3,23 +3,8 @@
   <!-- Scaled Wrapper -->
   <div
     class='hero-scale-wrap'
-    style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %};'
+    style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %}; --hero-height-px: {{ section.settings.hero_height_px | default: 600 }}px; --hero-height-mobile-px: {{ section.settings.hero_height_mobile_px | default: 420 }}px;'
   >
-    {% liquid
-      assign default_ratio = 1.7778
-      assign slide_1_ratio = default_ratio
-      if section.settings.slide_1_image
-        assign slide_1_ratio = section.settings.slide_1_image.aspect_ratio | default: default_ratio
-      endif
-      assign slide_2_ratio = default_ratio
-      if section.settings.slide_2_image
-        assign slide_2_ratio = section.settings.slide_2_image.aspect_ratio | default: default_ratio
-      endif
-      assign slide_3_ratio = default_ratio
-      if section.settings.slide_3_image
-        assign slide_3_ratio = section.settings.slide_3_image.aspect_ratio | default: default_ratio
-      endif
-    %}
     <!-- Swiper Container -->
     <swiper-container
       class='hero-swiper'
@@ -32,12 +17,11 @@
       autoplay-delay='{{ section.settings.autoplay_delay | default: 5000 }}'
       autoplay-disable-on-interaction='false'
       loop='true'
-      auto-height='true'
     >
       <!-- Slide 1 -->
-      <swiper-slide class='relative slide-1' style='--slide-aspect: {{ slide_1_ratio }};'>
+      <swiper-slide class='relative slide-1'>
         <div
-          class='hero-slide-media block w-full klaviyo_hero_form_trigger'
+          class='block w-full h-full klaviyo_hero_form_trigger'
         >
           {% if section.settings.slide_1_image != blank %}
             <img
@@ -129,10 +113,10 @@
       </swiper-slide>
 
       <!-- Slide 2 -->
-      <swiper-slide class='relative slide-2' style='--slide-aspect: {{ slide_2_ratio }};'>
+      <swiper-slide class='relative slide-2'>
         <a
           href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
-          class='hero-slide-media block w-full'
+          class='block w-full h-full'
         >
           {% if section.settings.slide_2_image != blank %}
             <img
@@ -297,10 +281,10 @@
       </swiper-slide>
 
       <!-- Slide 3 -->
-      <swiper-slide class='relative slide-3' style='--slide-aspect: {{ slide_3_ratio }};'>
+      <swiper-slide class='relative slide-3'>
         <a
           href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
-          class='hero-slide-media block w-full'
+          class='block w-full h-full'
         >
           {% if section.settings.slide_3_image != blank %}
             <img
@@ -421,14 +405,14 @@
 <style>
   .hero-swiper {
     width: 100%;
-    height: auto;
+    height: var(--hero-height-px, 600px);
     border-radius: var(--hero-radius, 0px);
     overflow: hidden;
   }
 
   .hero-scale-wrap {
     width: 100%;
-    height: auto;
+    height: var(--hero-height-px, 600px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -444,30 +428,12 @@
 
   /* Ensure slides fill container and images cover */
   .hero-swiper swiper-slide {
-    height: auto;
-    width: 100%;
-    overflow: visible;
-    display: flex;
-    justify-content: center;
-    align-items: stretch;
-    position: relative;
-  }
-
-  .hero-slide-media {
-    width: 100%;
-    aspect-ratio: var(--slide-aspect, 1.7778);
-    display: block;
-    position: relative;
-    overflow: hidden;
-    border-radius: var(--hero-radius, 0px);
-  }
-
-  .hero-slide-media img {
-    border-radius: inherit;
-    transform-origin: center center;
-    width: 100%;
     height: 100%;
-    display: block;
+    overflow: hidden;
+  }
+  .hero-swiper swiper-slide img {
+    border-radius: var(--hero-radius, 0px);
+    transform-origin: center center;
   }
 
   /* Inline text background overlay block */
@@ -487,8 +453,13 @@
 
   /* On mobile keep scaling and compensate dimensions */
   @media (max-width: 768px) {
+    .hero-swiper,
+    .hero-scale-wrap {
+      height: var(--hero-height-mobile-px, var(--hero-height-px, 600px));
+    }
     .hero-scale-wrap .hero-swiper {
       width: calc(100% * var(--hero-scale-inv, 1));
+      height: calc(100% * var(--hero-scale-inv, 1));
       transform: scale(calc(var(--hero-scale, 100) / 100));
     }
   }
@@ -496,6 +467,15 @@
   .hero-swiper swiper-slide {
     text-align: center;
     font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .hero-swiper swiper-slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
 
   /* Per-slide responsive object-fit and object-position */
