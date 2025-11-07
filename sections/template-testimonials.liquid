@@ -211,12 +211,12 @@
             <!-- Content Overlay with Background -->
             <div class='absolute bottom-0 left-0 right-0 p-6 text-white bg-black/60'>
               <!-- Quote -->
-              <blockquote class='text-white text-sm leading-relaxed mb-1 italic'>
+              <blockquote class='text-white text-sm leading-relaxed mb-0 italic'>
                 "{{ block.settings.quote }}"
               </blockquote>
 
               <!-- Author Name -->
-              <cite class='text-white font-semibold not-italic text-sm'>
+              <cite class='text-white font-semibold not-italic text-sm block mt-2'>
                 {{ block.settings.author }}
               </cite>
             </div>
@@ -833,9 +833,9 @@
       document.addEventListener('DOMContentLoaded', function () {
         // Target only the card overlays, not the modal
         const quoteBlocks = document.querySelectorAll(
-          'blockquote.text-white.text-sm.leading-relaxed.mb-1.italic'
+          'blockquote.text-white.text-sm.leading-relaxed.mb-0.italic'
         )
-        const MAX_WORDS = 15 // collapsed word limit
+        const MAX_WORDS = 20 // collapsed word limit
 
         quoteBlocks.forEach(el => {
           // Always ensure uniform min height across cards
@@ -968,12 +968,12 @@
                   <!-- Content Overlay with Background -->
                   <div class='absolute bottom-0 left-0 right-0 p-6 text-white bg-black/60'>
                     <!-- Quote -->
-                    <blockquote class='text-white text-sm leading-relaxed mb-1 italic'>
+                    <blockquote class='text-white text-sm leading-relaxed mb-0 italic'>
                       "{{ block.settings.quote }}"
                     </blockquote>
 
                     <!-- Author Name -->
-                    <cite class='text-white font-semibold not-italic text-sm'>
+                    <cite class='text-white font-semibold not-italic text-sm block mt-2'>
                       {{ block.settings.author }}
                     </cite>
                   </div>
