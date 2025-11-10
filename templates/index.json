@@ -54,6 +54,7 @@
         "slide_2_button_text_color": "#ffffff",
         "slide_2_image": "shopify://shop_images/1.png",
         "slide_2_image_tablet": "shopify://shop_images/1.png",
+        "slide_2_image_mobile": "shopify://shop_images/mobile_1.png",
         "slide_2_image_fit": "cover",
         "slide_2_image_fit_mobile": "cover",
         "slide_2_image_fit_tablet": "cover",
