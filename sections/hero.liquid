@@ -1,4 +1,11 @@
 <!-- Hero Carousel Section -->
+<style>
+  @media (max-width: 1023px) {
+    .hero-overlay {
+      padding-top: calc(var(--header-height, 64px) + 16px);
+    }
+  }
+</style>
 <div class='relative pt-4 hero-root'>
   <!-- Scaled Wrapper -->
   <div
@@ -131,7 +138,7 @@
           {% endif %}
         </div>
         {% if section.settings.show_text_overlay %}
-          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none'>
+          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
             <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-12'>
               {% assign s1_shadow = section.settings.slide_1_text_shadow_strength
                 | default: "soft"
@@ -244,7 +251,7 @@
           {% endif %}
         </a>
         {% if section.settings.show_text_overlay %}
-          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none'>
+          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
             <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20'>
               {% assign s2_shadow = section.settings.slide_2_text_shadow_strength
                 | default: "soft"
@@ -432,7 +439,7 @@
           {% endif %}
         </a>
         {% if section.settings.show_text_overlay %}
-          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none'>
+          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
             <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20'>
               {% assign s3_shadow = section.settings.slide_3_text_shadow_strength
                 | default: "soft"
