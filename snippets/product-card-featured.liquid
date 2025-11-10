@@ -10,13 +10,13 @@
 {% assign product_obj = product_product %}
 
 <div
-  class='w-full py-6 px-3'
+  class='w-full py-4 px-2 sm:py-6 sm:px-3'
   data-product='{{ product_obj | json | escape }}'
   data-variants='{{ product_obj.variants | json | escape }}'
   data-images='{{ product_obj.images | json | escape }}'
   x-data='fcCard()'
 >
-  <div class='bg-white overflow-hidden w-full h-[600px] flex flex-col'>
+  <div class='bg-white overflow-hidden w-full h-[520px] sm:h-[560px] md:h-[600px] flex flex-col'>
     <!-- Image well -->
     <div class='relative h-[420px] bg-white overflow-hidden flex items-center justify-center'>
       {% assign kk_status = product_obj.metafields.custom.product_status
@@ -39,7 +39,7 @@
       <!-- fixed-width inner box so images never stretch the grid -->
       <a
         href='{{ product_obj.url }}'
-        class='relative h-full w-[280px] md:w-[320px] mx-auto block'
+        class='relative h-full w-full max-w-[240px] sm:max-w-[280px] md:max-w-[320px] mx-auto block'
         @mouseenter='handleImageHover(true)'
         @mouseleave='handleImageHover(false)'
       >
@@ -386,12 +386,17 @@
             this.variantsData = JSON.parse(fcDecode(rawVariants))
             this.imagesData = JSON.parse(fcDecode(rawImages))
 
-            const featured = this.productData ? this.productData.featured_image : null
-            const firstGallery = this.imagesData && this.imagesData.length
-              ? this.imagesData[0]
+            const featured = this.productData
+              ? this.productData.featured_image
               : null
+            const firstGallery =
+              this.imagesData && this.imagesData.length
+                ? this.imagesData[0]
+                : null
             this.productImageSrc =
-              this.resolveImageSrc(featured) || this.resolveImageSrc(firstGallery) || ''
+              this.resolveImageSrc(featured) ||
+              this.resolveImageSrc(firstGallery) ||
+              ''
             if (this.productImageSrc) {
               this.currentImage = this.productImageSrc
             }
@@ -496,11 +501,17 @@
           )
 
           let variantLabel = null
-          if (shouldAppend && this.variantsData && this.variantsData.length > 0) {
+          if (
+            shouldAppend &&
+            this.variantsData &&
+            this.variantsData.length > 0
+          ) {
             const variant = this.getVariantById(this.selectedVariant)
             if (variant) {
               let primary = variant.option1 || variant.title || ''
-              primary = String(primary || '').split('/')[0].trim()
+              primary = String(primary || '')
+                .split('/')[0]
+                .trim()
               if (
                 primary &&
                 primary !== 'Default Title' &&
@@ -634,9 +645,12 @@
           }
           const currentVariant = this.getVariantById(this.selectedVariant)
           const selectedImage = currentVariant
-            ? this.resolveImageSrc(currentVariant.featured_image || currentVariant.image)
+            ? this.resolveImageSrc(
+                currentVariant.featured_image || currentVariant.image
+              )
             : null
-          this.qvImage = selectedImage || this.currentImage || this.productImageSrc || ''
+          this.qvImage =
+            selectedImage || this.currentImage || this.productImageSrc || ''
           this.updateQVSelectedVariant()
           this.isQuickViewOpen = true
           document.body.style.overflow = 'hidden'
