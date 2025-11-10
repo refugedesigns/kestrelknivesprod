@@ -79,6 +79,7 @@
         "slide_3_button_text_color": "#ffffff",
         "slide_3_image": "shopify://shop_images/3.png",
         "slide_3_image_tablet": "shopify://shop_images/3.png",
+        "slide_3_image_mobile": "shopify://shop_images/mobile_3.png",
         "slide_3_image_fit": "cover",
         "slide_3_image_fit_mobile": "cover",
         "slide_3_image_fit_tablet": "cover",
