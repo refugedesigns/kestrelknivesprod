@@ -1,6 +1,12 @@
 <style>
   /* Responsive logo sizing */
-  @media (min-width: 768px) {
+  .header-logo {
+    height: {{ section.settings.logo_height_mobile | default: 32 }}px;
+    width: auto;
+    max-width: 100%;
+    display: block;
+  }
+  @media (min-width: 1024px) {
     .header-logo {
       height: {{ section.settings.logo_height_desktop | default: 80 }}px !important;
     }
@@ -30,28 +36,44 @@
       <!-- STORE NAME / STORE LOGO -->
       <div class='flex justify-start lg:flex-1 truncate'>
         {% assign logo_image = section.settings.logo_image %}
+        {% assign logo_height_mobile = section.settings.logo_height_mobile
+          | default: 32
+        %}
         {% if logo_image == blank and shop.brand_asset_default_logo %}
           {% assign logo_image = shop.brand_asset_default_logo %}
         {% endif %}
         {% if logo_image != blank %}
+          {% assign logo_natural_width = logo_image.width | default: 400 %}
+          {% assign logo_natural_height = logo_image.height | default: 200 %}
+          {% if logo_natural_height == 0 %}
+            {% assign logo_natural_height = 1 %}
+          {% endif %}
+          {% assign logo_width_mobile = logo_natural_width
+            | times: logo_height_mobile
+            | divided_by: logo_natural_height
+          %}
+          {% assign logo_width_mobile = logo_width_mobile | round %}
           <a href='{{ routes.root_url }}' class='flex items-center space-x-3'>
             <img
               src='{{ logo_image | image_url: width: 600 }}'
-              width='{{ logo_image.width }}'
-              height='{{ logo_image.height }}'
-              style='height: {{ section.settings.logo_height_mobile | default: 32 }}px;'
+              width='{{ logo_width_mobile }}'
+              height='{{ logo_height_mobile }}'
               class='header-logo lg:h-auto'
               alt='{{ shop.name }} Logo'
               loading='lazy'
             >
           </a>
         {% else %}
+          {% assign fallback_logo_width = logo_height_mobile
+            | times: 200
+            | divided_by: 80
+          %}
+          {% assign fallback_logo_width = fallback_logo_width | round %}
           <a href='{{ routes.root_url }}' class='flex items-center space-x-3'>
             <img
               src='{{ "logo_white.png" | asset_url }}'
-              width='200'
-              height='80'
-              style='height: {{ section.settings.logo_height_mobile | default: 32 }}px;'
+              width='{{ fallback_logo_width }}'
+              height='{{ logo_height_mobile }}'
               class='header-logo lg:h-auto'
               alt='{{ shop.name }} Logo'
               loading='lazy'
@@ -443,6 +465,12 @@
       document.addEventListener(eventName, setHeaderHeight)
     }
   })
+
+  const headerElement = document.getElementById('siteHeader')
+  if (headerElement && 'ResizeObserver' in window) {
+    const headerResizeObserver = new ResizeObserver(() => setHeaderHeight())
+    headerResizeObserver.observe(headerElement)
+  }
 
   setHeaderHeight()
 </script>
