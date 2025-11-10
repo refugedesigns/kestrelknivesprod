@@ -3,6 +3,17 @@
   @media (max-width: 1023px) {
     .hero-overlay {
       padding-top: calc(var(--header-height, 64px) + 16px);
+      padding-bottom: 32px;
+      align-items: center !important;
+      justify-content: center !important;
+      top: 0 !important;
+      bottom: 0 !important;
+    }
+
+    .hero-overlay .hero-overlay__inner {
+      margin-left: 0 !important;
+      margin-bottom: 0 !important;
+      text-align: center !important;
     }
   }
 </style>
@@ -139,7 +150,7 @@
         </div>
         {% if section.settings.show_text_overlay %}
           <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
-            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-12'>
+            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-12 hero-overlay__inner'>
               {% assign s1_shadow = section.settings.slide_1_text_shadow_strength
                 | default: "soft"
               %}
@@ -252,7 +263,7 @@
         </a>
         {% if section.settings.show_text_overlay %}
           <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
-            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20'>
+            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20 hero-overlay__inner'>
               {% assign s2_shadow = section.settings.slide_2_text_shadow_strength
                 | default: "soft"
               %}
@@ -440,7 +451,7 @@
         </a>
         {% if section.settings.show_text_overlay %}
           <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
-            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20'>
+            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20 hero-overlay__inner'>
               {% assign s3_shadow = section.settings.slide_3_text_shadow_strength
                 | default: "soft"
               %}
