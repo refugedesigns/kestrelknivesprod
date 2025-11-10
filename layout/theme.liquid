@@ -46,6 +46,9 @@
         min-height: 100vh;
         flex-direction: column;
       }
+      :root {
+        --header-height: 7rem;
+      }
       main[role='main'] {
         flex: 1 0 auto;
       }
@@ -53,7 +56,11 @@
   </head>
   <body class='min-h-screen flex flex-col'>
     {% section "header" %}
-    <main role='main' class='pt-20 md:pt-24 lg:pt-28 flex-1'>
+    <main
+      role='main'
+      class='flex-1'
+      style='padding-top: var(--header-height, 7rem);'
+    >
       {{ content_for_layout }}
     </main>
 

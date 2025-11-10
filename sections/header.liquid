@@ -36,19 +36,25 @@
         {% if logo_image != blank %}
           <a href='{{ routes.root_url }}' class='flex items-center space-x-3'>
             <img
-              src='{{ logo_image | img_url: "master" }}'
+              src='{{ logo_image | image_url: width: 600 }}'
+              width='{{ logo_image.width }}'
+              height='{{ logo_image.height }}'
               style='height: {{ section.settings.logo_height_mobile | default: 32 }}px;'
               class='header-logo lg:h-auto'
               alt='{{ shop.name }} Logo'
+              loading='lazy'
             >
           </a>
         {% else %}
           <a href='{{ routes.root_url }}' class='flex items-center space-x-3'>
             <img
               src='{{ "logo_white.png" | asset_url }}'
+              width='200'
+              height='80'
               style='height: {{ section.settings.logo_height_mobile | default: 32 }}px;'
               class='header-logo lg:h-auto'
               alt='{{ shop.name }} Logo'
+              loading='lazy'
             >
           </a>
         {% endif %}
@@ -403,6 +409,42 @@
       },
     }
   }
+
+  function setHeaderHeight() {
+    const header = document.getElementById('siteHeader')
+    if (!header) {
+      return
+    }
+
+    const headerHeight = header.offsetHeight
+    document.documentElement.style.setProperty(
+      '--header-height',
+      headerHeight + 'px'
+    )
+  }
+
+  const headerHeightEvents = [
+    'DOMContentLoaded',
+    'load',
+    'resize',
+    'shopify:section:load',
+    'shopify:section:select',
+    'shopify:section:deselect',
+    'shopify:block:select',
+    'shopify:block:deselect',
+  ]
+
+  headerHeightEvents.forEach(eventName => {
+    if (eventName === 'resize') {
+      window.addEventListener(eventName, setHeaderHeight)
+    } else if (eventName === 'load') {
+      window.addEventListener(eventName, setHeaderHeight)
+    } else {
+      document.addEventListener(eventName, setHeaderHeight)
+    }
+  })
+
+  setHeaderHeight()
 </script>
 
 {% schema %}
