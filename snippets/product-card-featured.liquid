@@ -37,9 +37,26 @@
       {% endif %}
 
       <!-- fixed-width inner box so images never stretch the grid -->
+      {% assign product_type_lower = product_obj.type
+        | default: ""
+        | downcase
+      %}
+      {% assign image_wrapper_classes = "relative h-full w-full mx-auto block" %}
+      {% if product_type_lower contains "apparel"
+        or product_type_lower contains "hoodie"
+        or product_type_lower contains "sweatshirt"
+      %}
+        {% assign image_wrapper_classes = image_wrapper_classes
+          | append: " max-w-[280px] sm:max-w-[320px] md:max-w-[360px]"
+        %}
+      {% else %}
+        {% assign image_wrapper_classes = image_wrapper_classes
+          | append: " max-w-[240px] sm:max-w-[280px] md:max-w-[320px]"
+        %}
+      {% endif %}
       <a
         href='{{ product_obj.url }}'
-        class='relative h-full w-full max-w-[240px] sm:max-w-[280px] md:max-w-[320px] mx-auto block'
+        class='{{ image_wrapper_classes }}'
         @mouseenter='handleImageHover(true)'
         @mouseleave='handleImageHover(false)'
       >
