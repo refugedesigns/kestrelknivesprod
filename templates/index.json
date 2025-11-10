@@ -29,6 +29,7 @@
         "slide_1_button_text_color": "#ffffff",
         "slide_1_image": "shopify://shop_images/2.png",
         "slide_1_image_tablet": "shopify://shop_images/2.png",
+        "slide_1_image_mobile": "shopify://shop_images/mobile_2.png",
         "slide_1_image_fit": "cover",
         "slide_1_image_fit_mobile": "cover",
         "slide_1_image_fit_tablet": "cover",
