@@ -569,6 +569,15 @@
         },
 
         updateImage() {
+          // For apparel, keep using the product's featured image (do not swap per variant)
+          const typeLower = (this.productData.type || '').toLowerCase()
+          if (
+            typeLower.includes('apparel') ||
+            typeLower.includes('accessories')
+          ) {
+            return
+          }
+
           const variant = this.getVariantById(this.selectedVariant)
           const variantImage = variant
             ? this.resolveImageSrc(
