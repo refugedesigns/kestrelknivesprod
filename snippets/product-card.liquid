@@ -26,9 +26,9 @@
     )
   '
 >
-  <div class='bg-white overflow-hidden w-full {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[600px]{% else %}h-[600px]{% endif %} flex flex-col transition-none'>
+  <div class='bg-white overflow-hidden w-full h-[600px] flex flex-col transition-none'>
     <!-- Product Image -->
-    <div class='relative {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[420px]{% else %}h-96{% endif %} bg-white overflow-hidden'>
+    <div class='relative {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[360px] md:h-[380px] lg:h-[400px]{% else %}h-96{% endif %} bg-white overflow-hidden'>
       <!-- Status / SOLD OUT Badge -->
       {% assign kk_status = product_product.metafields.custom.product_status
         | default: product_product.metafields.custom_fields.product_status
@@ -78,7 +78,7 @@
     </div>
 
     <!-- Product Info -->
-    <div class='p-4 md:p-6 flex flex-col {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}justify-center{% else %}justify-between{% endif %}'>
+    <div class='p-4 md:p-6 flex flex-col gap-3 justify-between'>
       <div>
         <!-- Product Name -->
         <a href='{{ product_product.url }}'>
