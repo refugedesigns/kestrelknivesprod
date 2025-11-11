@@ -8,7 +8,7 @@
 {% endcomment %}
 
 <div
-  class='w-full py-6 px-3 hover:cursor-pointer bg-yellow-500'
+  class='py-6 px-3 hover:cursor-pointer product-card bg-amber-300 w-full'
   data-product='{{ product_product | json | escape }}'
   data-variants='{{ product_product.variants | json | escape }}'
   data-images='{{ product_product.images | json | escape }}'
@@ -54,12 +54,16 @@
         @mouseleave='handleImageHover(false)'
       >
         <!-- Base image -->
+        {% assign product_type_lower = product_product.type
+          | default: ""
+          | downcase
+        %}
         <img
           width='400'
           height='400'
           :src='currentImage'
           :alt="'{{ product_product.title }}'"
-          :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
+          :class="'absolute inset-0 w-full h-full {% if product_type_lower contains "apparel" %}object-cover object-top{% else %}object-contain{% endif %} transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
         >
         <!-- Hover image (crossfades in) -->
         <img
@@ -68,7 +72,7 @@
           x-show='secondImageSrc'
           :src='secondImageSrc'
           :alt="'{{ product_product.title }}'"
-          :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 pointer-events-none ' + ((isHovering && hoverImageLoaded) ? 'opacity-100' : 'opacity-0')"
+          :class="'absolute inset-0 w-full h-full {% if product_type_lower contains "apparel" %}object-cover object-top{% else %}object-contain{% endif %} transition-opacity duration-300 pointer-events-none ' + ((isHovering && hoverImageLoaded) ? 'opacity-100' : 'opacity-0')"
         >
       </a>
     </div>
