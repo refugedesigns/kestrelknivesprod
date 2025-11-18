@@ -38,6 +38,11 @@
       "default": 80
     },
     {
+      "type": "url",
+      "id": "hero_link",
+      "label": "Hero Image Link"
+    },
+    {
       "type": "header",
       "content": "Social Media Links"
     },
@@ -168,23 +173,31 @@
 <!-- Hero Section -->
 {% if section.settings.hero_image %}
   <div
-    class='relative max-w-8xl mx-auto px-2 md:px-0 overflow-hidden'
+    class='relative max-w-8xl hover:cursor-pointer mx-auto px-2 md:px-0 overflow-hidden'
     style='padding-top: {{ section.settings.hero_padding_top }}px;'
   >
+    {% if section.settings.hero_link != blank %}
+      <a href='{{ section.settings.hero_link }}' class='block'>
+    {% endif %}
+
     {% if section.settings.hero_scale < 100 %}
       <img
         src='{{ section.settings.hero_image | image_url: width: 2000 }}'
         alt='{{ section.settings.hero_alt | escape }}'
-        class='block h-auto object-fit'
+        class='block h-auto object-fit {% if section.settings.hero_link != blank %}cursor-pointer transition-transform duration-300 hover:scale-[1.02]{% endif %}'
         style='width: {{ section.settings.hero_scale }}%; margin: 0 auto;'
       >
     {% else %}
       <img
         src='{{ section.settings.hero_image | image_url: width: 2000 }}'
         alt='{{ section.settings.hero_alt | escape }}'
-        class='w-full h-full object-fit'
+        class='w-full h-full object-fit {% if section.settings.hero_link != blank %}cursor-pointer transition-transform duration-300 hover:scale-[1.02]{% endif %}'
         style='transform: scale({{ section.settings.hero_scale | divided_by: 100.0 }}); transform-origin: center;'
       >
+    {% endif %}
+
+    {% if section.settings.hero_link != blank %}
+      </a>
     {% endif %}
   </div>
 {% endif %}

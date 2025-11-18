@@ -1,6 +1,12 @@
 <style>
   /* Responsive logo sizing */
-  @media (min-width: 768px) {
+  .header-logo {
+    height: {{ section.settings.logo_height_mobile | default: 32 }}px;
+    width: auto;
+    max-width: 100%;
+    display: block;
+  }
+  @media (min-width: 1024px) {
     .header-logo {
       height: {{ section.settings.logo_height_desktop | default: 80 }}px !important;
     }
@@ -26,35 +32,57 @@
   style='background-color: {{ section.settings.header_bg_color | default: "#000000" }}; {% if section.settings.header_border_bottom %}border-bottom: 1px solid {{ section.settings.header_border_color | default: "#ffffff" }};{% endif %}'
 >
   <div class='mx-auto px-4 sm:px-6 max-w-8xl'>
-    <div class='flex justify-between items-center py-2 md:justify-start md:space-x-10'>
+    <div class='flex justify-between items-center py-2 lg:justify-start lg:space-x-10'>
       <!-- STORE NAME / STORE LOGO -->
       <div class='flex justify-start lg:flex-1 truncate'>
         {% assign logo_image = section.settings.logo_image %}
+        {% assign logo_height_mobile = section.settings.logo_height_mobile
+          | default: 32
+        %}
         {% if logo_image == blank and shop.brand_asset_default_logo %}
           {% assign logo_image = shop.brand_asset_default_logo %}
         {% endif %}
         {% if logo_image != blank %}
+          {% assign logo_natural_width = logo_image.width | default: 400 %}
+          {% assign logo_natural_height = logo_image.height | default: 200 %}
+          {% if logo_natural_height == 0 %}
+            {% assign logo_natural_height = 1 %}
+          {% endif %}
+          {% assign logo_width_mobile = logo_natural_width
+            | times: logo_height_mobile
+            | divided_by: logo_natural_height
+          %}
+          {% assign logo_width_mobile = logo_width_mobile | round %}
           <a href='{{ routes.root_url }}' class='flex items-center space-x-3'>
             <img
-              src='{{ logo_image | img_url: "master" }}'
-              style='height: {{ section.settings.logo_height_mobile | default: 32 }}px;'
-              class='header-logo md:h-auto'
+              src='{{ logo_image | image_url: width: 600 }}'
+              width='{{ logo_width_mobile }}'
+              height='{{ logo_height_mobile }}'
+              class='header-logo lg:h-auto'
               alt='{{ shop.name }} Logo'
+              loading='lazy'
             >
           </a>
         {% else %}
+          {% assign fallback_logo_width = logo_height_mobile
+            | times: 200
+            | divided_by: 80
+          %}
+          {% assign fallback_logo_width = fallback_logo_width | round %}
           <a href='{{ routes.root_url }}' class='flex items-center space-x-3'>
             <img
               src='{{ "logo_white.png" | asset_url }}'
-              style='height: {{ section.settings.logo_height_mobile | default: 32 }}px;'
-              class='header-logo md:h-auto'
+              width='{{ fallback_logo_width }}'
+              height='{{ logo_height_mobile }}'
+              class='header-logo lg:h-auto'
               alt='{{ shop.name }} Logo'
+              loading='lazy'
             >
           </a>
         {% endif %}
       </div>
 
-      <div class='-mr-2 -my-2 ml-3 md:hidden'>
+      <div class='-mr-2 -my-2 ml-3 lg:hidden'>
         <button
           x-on:click='mobileMenuOpen = true'
           type='button'
@@ -66,7 +94,7 @@
       </div>
       <!-- NAVIGATION MENU -->
       <nav
-        class='hidden md:flex space-x-10'
+        class='hidden lg:flex space-x-10'
         @click.away='mobileMenuOpen = false'
       >
         {% if section.settings.menu.links == blank %}
@@ -138,7 +166,7 @@
         {% endfor %}
       </nav>
       <!-- CART BUTTON / ACCOUNT LINKS IF ENABLED -->
-      <div class='hidden md:flex items-center justify-end md:flex-1 space-x-5'>
+      <div class='hidden lg:flex items-center justify-end lg:flex-1 space-x-5'>
         <button
           @click='window.dispatchEvent(new CustomEvent("open-search"))'
           type='button'
@@ -199,7 +227,7 @@
       <div
         x-show='mobileMenuOpen'
         @click.away='mobileMenuOpen = false'
-        class='absolute z-10 top-0 inset-x-0 p-2 transform origin-top-left md:hidden'
+        class='absolute z-10 top-0 inset-x-0 p-2 transform origin-top-left lg:hidden'
       >
         <div
           class='shadow-lg rounded-lg ring-1 ring-black ring-opacity-5 w-full'
@@ -403,6 +431,48 @@
       },
     }
   }
+
+  function setHeaderHeight() {
+    const header = document.getElementById('siteHeader')
+    if (!header) {
+      return
+    }
+
+    const headerHeight = header.offsetHeight
+    document.documentElement.style.setProperty(
+      '--header-height',
+      headerHeight + 'px'
+    )
+  }
+
+  const headerHeightEvents = [
+    'DOMContentLoaded',
+    'load',
+    'resize',
+    'shopify:section:load',
+    'shopify:section:select',
+    'shopify:section:deselect',
+    'shopify:block:select',
+    'shopify:block:deselect',
+  ]
+
+  headerHeightEvents.forEach(eventName => {
+    if (eventName === 'resize') {
+      window.addEventListener(eventName, setHeaderHeight)
+    } else if (eventName === 'load') {
+      window.addEventListener(eventName, setHeaderHeight)
+    } else {
+      document.addEventListener(eventName, setHeaderHeight)
+    }
+  })
+
+  const headerElement = document.getElementById('siteHeader')
+  if (headerElement && 'ResizeObserver' in window) {
+    const headerResizeObserver = new ResizeObserver(() => setHeaderHeight())
+    headerResizeObserver.observe(headerElement)
+  }
+
+  setHeaderHeight()
 </script>
 
 {% schema %}

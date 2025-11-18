@@ -1,5 +1,34 @@
-<div class='max-w-4xl mx-auto py-12 md:py-16'>
-  <!-- Page Header -->
+
+
+<div class='text-center mt-24 mb-12 border-b border-gray-200 pb-8'>
+    <h1
+      id='guide-outfitter-header'
+      class='text-3xl md:text-4xl font-bold text-gray-900 mb-4'
+    >
+      Guide and Outfitter Application
+    </h1>
+    <p class='text-gray-700 text-lg'>
+      Join our network of professional guides and outfitters
+    </p>
+</div>
+
+<div class='relative py-16 px-4 sm:px-6 lg:px-8' style='background-image: url({{ "guide_and_outfitter_background.jpg" | asset_url }}); background-size: cover; background-position: center; background-repeat: no-repeat;'>
+  <!-- Optional overlay for better text readability -->
+  <div class='absolute inset-0 bg-black/30'></div>
+  
+  <div class='relative max-w-4xl mx-auto rounded-lg shadow-lg bg-white/95 backdrop-blur-sm p-8'>
+    
+    <!--pifyform-start-->
+<style>.pifyform.formloading iframe{visibility: hidden !important;} .pifyform.formloading{background-image: url(https://form-builder.pifyapp.com/assets/images/loading.gif?v=4.6);background-position: center 30px;background-size: 30px 30px;background-repeat: no-repeat;}</style>
+<div id="pifyform-35653" class="pifyform" style="margin:10px 0;">
+<script charset="UTF-8" defer>document.getElementById("pifyform-35653").classList.add("formloading");(function(h){function n(a){return null===a?null:a.scrollHeight>a.clientHeight?a:n(a.parentNode)}function t(b){if(b.data && typeof(b.data)=="string"){var f =null;try{f=JSON.parse(b.data);}catch(e){}if(f!=null&&f.height!=undefined){if(f.formId==undefined){d.style.height=f.height+"px"}else if("pifyform-"+f.formId==d.id){d.style.height=f.height+"px"} }if(f!=null&&f.redirect!=undefined&&f.redirect!=""){window.location.href=f.redirect;}if(f!=null&&f.retsetHeight!=undefined&&f.retsetHeight){d.style.height="520px";window.location.href="#pifyform-35653";}if(document.getElementsByClassName('lazyframe').length>0){var lazyframe=document.getElementsByClassName('lazyframe')[0];lazyframe.style.height="100%";lazyframe.removeAttribute("data-ratio");lazyframe.parentNode.style.overflow='hidden'} if(f!=null&&f.getter){b={};var f=[].concat(f.getter),k,h=f.length,m,c,g,e;for(k=0;k<h;k++){m=k;c=f[k]||{};c.n&&(m=c.n);g=null;try{switch(c.t){case "window":e=window;break;case "scrollParent":e=n(a)||window;break;default:e=a}if(c.e)if("rect"===c.v){g={};var l=e.getBoundingClientRect();g={top:l.top,left:l.left,width:l.width,height:l.height} }else g=e[c.v].apply(e,[].concat(c.e))||!0;else c.s?(e[c.v]=c.s,g=!0):g=e[c.v]||!1}catch(u){}b[m]=g}b.innerState=!p&&!q;a.contentWindow.postMessage(JSON.stringify({queryRes:b}),"*")} } }var d = document.getElementById("pifyform-35653");var a = document.createElement("iframe");d.style.overflowY="visible";d.style.overflowX="hidden";var p=d.style.height&&"auto"!==d.style.height,q="absolute"===d.style.position||window.getComputedStyle&&"absolute"===window.getComputedStyle(d,null).getPropertyValue("position")||d.currentStyle&&"absolute"===d.currentStyle.position;h.addEventListener&&h.addEventListener("message",t,!1);a.src="https://form-builder-en.pifyapp.com/form/s/35653";a.id="form-iframe-35653";a.onload=function(){document.getElementById("pifyform-35653").classList.remove("formloading");a.contentWindow.postMessage(JSON.stringify({parentUrl: window.location.href}), "*");};a.frameBorder=0;a.scrolling="no";a.style.display="block";a.style.minWidth="100%";a.style.width="100px";a.style.height="100%";a.style.border="none";a.style.overflow="auto";setTimeout(function(){if(!document.getElementById("form-iframe-35653")){d.appendChild(a);} },50);})(window);</script>
+</div>
+<!--pifyform-end-->
+
+  </div>
+</div>
+
+  {% comment %} <!-- Page Header -->
   <div class='text-center mb-12 border-b border-gray-200 pb-8'>
     <h1
       id='guide-outfitter-header'
@@ -282,7 +311,7 @@
         Submit
       </button>
     {% endform %}
-  </div>
+  </div> {% endcomment %}
 </div>
 
 {% schema %}
@@ -308,4 +337,4 @@
     }
   ]
 }
-{% endschema %}
+{% endschema %} 

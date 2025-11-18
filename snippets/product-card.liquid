@@ -8,7 +8,7 @@
 {% endcomment %}
 
 <div
-  class='w-full py-6 px-3 hover:cursor-pointer'
+  class='py-6 px-3 hover:cursor-pointer product-card w-full'
   data-product='{{ product_product | json | escape }}'
   data-variants='{{ product_product.variants | json | escape }}'
   data-images='{{ product_product.images | json | escape }}'
@@ -26,9 +26,9 @@
     )
   '
 >
-  <div class='bg-white overflow-hidden w-full {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[600px]{% else %}h-[600px]{% endif %} flex flex-col transition-none'>
+  <div class='bg-white overflow-hidden w-full {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[540px]{% else %}h-[600px]{% endif %} flex flex-col transition-none'>
     <!-- Product Image -->
-    <div class='relative {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[420px]{% else %}h-96{% endif %} bg-white overflow-hidden'>
+    <div class='relative {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[320px] md:h-[340px] lg:h-[360px]{% else %}h-96{% endif %} bg-white overflow-hidden'>
       <!-- Status / SOLD OUT Badge -->
       {% assign kk_status = product_product.metafields.custom.product_status
         | default: product_product.metafields.custom_fields.product_status
@@ -48,19 +48,37 @@
       {% endif %}
 
       <!-- Product Image -->
-      <a href='{{ product_product.url }}'>
+      <a
+        href='{{ product_product.url }}'
+        @mouseenter='handleImageHover(true)'
+        @mouseleave='handleImageHover(false)'
+      >
+        <!-- Base image -->
+        {% assign product_type_lower = product_product.type
+          | default: ""
+          | downcase
+        %}
         <img
           width='400'
           height='400'
           :src='currentImage'
           :alt="'{{ product_product.title }}'"
-          class='absolute inset-0 w-full h-full object-contain'
+          :class="'absolute inset-0 w-full h-full {% if product_type_lower contains "apparel" %}object-contain object-top{% else %}object-contain{% endif %} transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
+        >
+        <!-- Hover image (crossfades in) -->
+        <img
+          width='400'
+          height='400'
+          x-show='secondImageSrc'
+          :src='secondImageSrc'
+          :alt="'{{ product_product.title }}'"
+          :class="'absolute inset-0 w-full h-full {% if product_type_lower contains "apparel" %}object-contain object-top{% else %}object-contain{% endif %} transition-opacity duration-300 pointer-events-none ' + ((isHovering && hoverImageLoaded) ? 'opacity-100' : 'opacity-0')"
         >
       </a>
     </div>
 
     <!-- Product Info -->
-    <div class='p-4 md:p-6 flex flex-col {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}justify-center{% else %}justify-between{% endif %}'>
+    <div class='p-4 md:p-6 flex flex-col gap-3 justify-between'>
       <div>
         <!-- Product Name -->
         <a href='{{ product_product.url }}'>
@@ -445,14 +463,17 @@
         currentImage: currentImage,
         productData: {},
         variantsData: null,
+        imagesData: null,
         baseTitle: productTitle,
         isAddingToCart: false,
         isAvailable: true,
+        isHovering: false,
+        hoverImageLoaded: false,
 
         // Computed property for formatted price
         get formattedPrice() {
           if (!this.variantsData || this.variantsData.length === 0) {
-            return this.productData.price
+            return this.productData.price != null
               ? this.formatMoney(this.productData.price)
               : ''
           }
@@ -460,13 +481,36 @@
           const selectedVariant = this.variantsData.find(
             v => v.id === this.selectedVariant
           )
-          if (selectedVariant && selectedVariant.price) {
+          if (selectedVariant && selectedVariant.price != null) {
             return this.formatMoney(selectedVariant.price)
           }
 
-          return this.productData.price
+          return this.productData.price != null
             ? this.formatMoney(this.productData.price)
             : ''
+        },
+
+        // Computed property for display image (handles hover effect)
+        get displayImage() {
+          // If hovering and second image exists, show second image
+          if (
+            this.isHovering &&
+            this.imagesData &&
+            this.imagesData.length > 1
+          ) {
+            return this.imagesData[1].src || this.imagesData[1]
+          }
+          // Otherwise show current image
+          return this.currentImage
+        },
+
+        // URL of second product image, if available
+        get secondImageSrc() {
+          if (!this.imagesData || this.imagesData.length < 2) return null
+          const img = this.imagesData[1]
+          if (!img) return null
+          if (typeof img === 'string') return img
+          return img.src || null
         },
 
         // Computed: currently selected handle color (option1)
@@ -485,7 +529,7 @@
         // Computed property for Quick View formatted price
         get qvFormattedPrice() {
           if (!this.variantsData || this.variantsData.length === 0) {
-            return this.productData.price
+            return this.productData.price != null
               ? this.formatMoney(this.productData.price)
               : ''
           }
@@ -493,11 +537,11 @@
           const qvSelectedVariant = this.variantsData.find(
             v => v.id === this.qvSelectedVariantId
           )
-          if (qvSelectedVariant && qvSelectedVariant.price) {
+          if (qvSelectedVariant && qvSelectedVariant.price != null) {
             return this.formatMoney(qvSelectedVariant.price)
           }
 
-          return this.productData.price
+          return this.productData.price != null
             ? this.formatMoney(this.productData.price)
             : ''
         },
@@ -519,7 +563,7 @@
 
         // Format price from cents to currency
         formatMoney(cents) {
-          if (!cents || typeof cents !== 'number') return ''
+          if (typeof cents !== 'number' || cents == null) return ''
           try {
             return new Intl.NumberFormat('{{ shop.locale }}', {
               style: 'currency',
@@ -559,8 +603,10 @@
           // Get product data from data attributes (HTML entities decoded first)
           const rawProduct = this.$el.getAttribute('data-product') || '{}'
           const rawVariants = this.$el.getAttribute('data-variants') || '[]'
+          const rawImages = this.$el.getAttribute('data-images') || '[]'
           this.productData = JSON.parse(this.decodeHtmlEntities(rawProduct))
           this.variantsData = JSON.parse(this.decodeHtmlEntities(rawVariants))
+          this.imagesData = JSON.parse(this.decodeHtmlEntities(rawImages))
 
           // Set initial title with first variant color
           this.updateTitle()
@@ -570,6 +616,8 @@
 
           // Ensure initial image reflects the initially selected variant if it has a featured image
           this.updateImage()
+          // Preload hover image for smooth crossfade
+          this.preloadSecondImage()
         },
 
         openQuickView() {
@@ -855,6 +903,24 @@
             // No variants, use original title
             this.baseTitle = this.productData.title
           }
+        },
+
+        handleImageHover(isEntering) {
+          if (this.imagesData && this.imagesData.length > 1) {
+            if (isEntering) this.preloadSecondImage()
+            this.isHovering = isEntering
+          }
+        },
+
+        preloadSecondImage() {
+          if (this.hoverImageLoaded) return
+          const src = this.secondImageSrc
+          if (!src) return
+          const img = new Image()
+          img.onload = () => {
+            this.hoverImageLoaded = true
+          }
+          img.src = src
         },
       })
     )

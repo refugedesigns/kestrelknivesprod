@@ -190,6 +190,9 @@
       isInitializing: true,
 
       async init() {
+        // Clear any cached data that might contain hidden offer
+        sessionStorage.removeItem('kk_allProductTypes')
+
         // Build product types from products (await async fetch when needed)
         await this.buildProductTypes()
 
@@ -223,7 +226,10 @@
                 value: String(it.value || ''),
                 count: Number(it.count || 0),
               }))
-              .filter(it => it.value)
+              .filter(it => {
+                const val = String(it.value || '').toLowerCase()
+                return it.value && !val.includes('hidden')
+              })
           }
           // Fallback: fetch list of collections and map to product types heuristically
           const url2 = preview
@@ -246,8 +252,14 @@
             'home',
             'home-page',
             'homepage',
+            'hidden-offer',
           ]
-          const HIDE_TITLES = ['featured', 'home page', 'products']
+          const HIDE_TITLES = [
+            'featured',
+            'home page',
+            'products',
+            'hidden offer',
+          ]
           return colls
             .filter(c => {
               const h = String(c.handle || '').toLowerCase()
@@ -255,6 +267,7 @@
               if (!h && !t) return false
               if (HIDE_HANDLES.includes(h)) return false
               if (HIDE_TITLES.includes(t)) return false
+              if (t.includes('hidden') || h.includes('hidden')) return false
               return true
             })
             .map(c => ({ value: String(c.title || ''), count: 0 }))
@@ -270,14 +283,25 @@
           const cached = sessionStorage.getItem('kk_allProductTypes')
           const cachedTypes = cached ? JSON.parse(cached) : null
           // If cache exists but is suspiciously small (e.g., 0 or 1), refetch to ensure full list
-          if (cachedTypes && cachedTypes.length >= 2) return cachedTypes
+          if (cachedTypes && cachedTypes.length >= 2) {
+            // Filter out hidden offer from cached types
+            return cachedTypes.filter(t => {
+              const val = String(t.value || '').toLowerCase()
+              return !val.includes('hidden')
+            })
+          }
           const fetched = await this.fetchAllProductTypesFromAllCollection()
           if (fetched && fetched.length) {
+            // Filter out hidden offer from fetched types
+            const filtered = fetched.filter(t => {
+              const val = String(t.value || '').toLowerCase()
+              return !val.includes('hidden')
+            })
             sessionStorage.setItem(
               'kk_allProductTypes',
-              JSON.stringify(fetched)
+              JSON.stringify(filtered)
             )
-            return fetched
+            return filtered
           }
           return []
         } catch (e) {
@@ -407,9 +431,12 @@
           // Prefer server-provided facet metadata when available
           const meta = window.__filterMeta || {}
 
-          // Current page facet (may be partial). Filter out 'custom'.
+          // Current page facet (may be partial). Filter out 'hidden offer'.
           const metaTypes = (meta.productTypes || [])
-            .filter(t => String(t.value || '').toLowerCase() !== 'custom')
+            .filter(t => {
+              const val = String(t.value || '').toLowerCase()
+              return !val.includes('hidden')
+            })
             .map(t => ({
               value: String(t.value || ''),
               count: Number(t.count || 0),
@@ -433,7 +460,8 @@
           const counts = {}
           products.forEach(p => {
             const t = (p.product_type || p.type || '').toString().trim()
-            if (!t || t.toLowerCase() === 'custom') return
+            const tLower = t.toLowerCase()
+            if (!t || tLower.includes('hidden')) return
             counts[t] = (counts[t] || 0) + 1
           })
           this.productTypes = Object.keys(counts).map(k => ({
@@ -455,6 +483,7 @@
           productTypeSelected: '',
           availabilitySelected: '',
         }
+        // Clear cache to force refresh and remove any cached hidden offer data
         sessionStorage.removeItem('kk_allProductTypes')
         this.applyFilters()
       },
@@ -475,8 +504,14 @@
         return products ? products.filter(p => !p.available).length : 0
       },
 
-      applyFilters() {
+      applyFilters(productTypeChanged = false) {
         if (this.isInitializing) return
+
+        // Reset availability filter when product type changes
+        if (productTypeChanged) {
+          this.selectedFilters.availabilitySelected = ''
+        }
+
         // Build server-side filter URL and navigate
         const url = new URL(window.location.href)
         // Always reset pagination to the first page when filters change

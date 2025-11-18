@@ -1,10 +1,100 @@
 <!-- Hero Carousel Section -->
-<div class='relative pt-4 hero-root'>
+<style>
+  @media (max-width: 1023px) {
+    .hero-overlay {
+      padding-top: calc(var(--header-height, 64px) + 16px);
+      padding-bottom: 32px;
+      align-items: center !important;
+      justify-content: center !important;
+      top: 0 !important;
+      bottom: 0 !important;
+    }
+
+    .hero-overlay .hero-overlay__inner {
+      margin-left: 0 !important;
+      margin-bottom: 0 !important;
+      text-align: center !important;
+    }
+  }
+</style>
+<div class='relative hero-root' x-data x-cloak>
   <!-- Scaled Wrapper -->
   <div
     class='hero-scale-wrap'
-    style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %}; --hero-height-px: {{ section.settings.hero_height_px | default: 600 }}px; --hero-height-mobile-px: {{ section.settings.hero_height_mobile_px | default: 420 }}px;'
+    style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %};'
   >
+    {% liquid
+      assign default_ratio = 1.7778
+
+      assign slide_1_image_desktop = section.settings.slide_1_image
+      assign slide_1_image_tablet = section.settings.slide_1_image_tablet
+      assign slide_1_image_mobile = section.settings.slide_1_image_mobile
+      assign slide_1_ratio_desktop = default_ratio
+      if slide_1_image_desktop
+        assign slide_1_ratio_desktop = slide_1_image_desktop.aspect_ratio | default: default_ratio
+      endif
+      assign slide_1_ratio_tablet = slide_1_ratio_desktop
+      if slide_1_image_tablet
+        assign slide_1_ratio_tablet = slide_1_image_tablet.aspect_ratio | default: slide_1_ratio_desktop
+      endif
+      assign slide_1_ratio_mobile = slide_1_ratio_tablet
+      if slide_1_image_mobile
+        assign slide_1_ratio_mobile = slide_1_image_mobile.aspect_ratio | default: slide_1_ratio_tablet
+      endif
+      assign slide_1_base_image = slide_1_image_desktop
+      if slide_1_base_image == blank
+        assign slide_1_base_image = slide_1_image_tablet
+      endif
+      if slide_1_base_image == blank
+        assign slide_1_base_image = slide_1_image_mobile
+      endif
+
+      assign slide_2_image_desktop = section.settings.slide_2_image
+      assign slide_2_image_tablet = section.settings.slide_2_image_tablet
+      assign slide_2_image_mobile = section.settings.slide_2_image_mobile
+      assign slide_2_ratio_desktop = default_ratio
+      if slide_2_image_desktop
+        assign slide_2_ratio_desktop = slide_2_image_desktop.aspect_ratio | default: default_ratio
+      endif
+      assign slide_2_ratio_tablet = slide_2_ratio_desktop
+      if slide_2_image_tablet
+        assign slide_2_ratio_tablet = slide_2_image_tablet.aspect_ratio | default: slide_2_ratio_desktop
+      endif
+      assign slide_2_ratio_mobile = slide_2_ratio_tablet
+      if slide_2_image_mobile
+        assign slide_2_ratio_mobile = slide_2_image_mobile.aspect_ratio | default: slide_2_ratio_tablet
+      endif
+      assign slide_2_base_image = slide_2_image_desktop
+      if slide_2_base_image == blank
+        assign slide_2_base_image = slide_2_image_tablet
+      endif
+      if slide_2_base_image == blank
+        assign slide_2_base_image = slide_2_image_mobile
+      endif
+
+      assign slide_3_image_desktop = section.settings.slide_3_image
+      assign slide_3_image_tablet = section.settings.slide_3_image_tablet
+      assign slide_3_image_mobile = section.settings.slide_3_image_mobile
+      assign slide_3_ratio_desktop = default_ratio
+      if slide_3_image_desktop
+        assign slide_3_ratio_desktop = slide_3_image_desktop.aspect_ratio | default: default_ratio
+      endif
+      assign slide_3_ratio_tablet = slide_3_ratio_desktop
+      if slide_3_image_tablet
+        assign slide_3_ratio_tablet = slide_3_image_tablet.aspect_ratio | default: slide_3_ratio_desktop
+      endif
+      assign slide_3_ratio_mobile = slide_3_ratio_tablet
+      if slide_3_image_mobile
+        assign slide_3_ratio_mobile = slide_3_image_mobile.aspect_ratio | default: slide_3_ratio_tablet
+      endif
+      assign slide_3_base_image = slide_3_image_desktop
+      if slide_3_base_image == blank
+        assign slide_3_base_image = slide_3_image_tablet
+      endif
+      if slide_3_base_image == blank
+        assign slide_3_base_image = slide_3_image_mobile
+      endif
+    %}
     <!-- Swiper Container -->
     <swiper-container
       class='hero-swiper'
@@ -17,32 +107,50 @@
       autoplay-delay='{{ section.settings.autoplay_delay | default: 5000 }}'
       autoplay-disable-on-interaction='false'
       loop='true'
+      auto-height='true'
     >
       <!-- Slide 1 -->
-      <swiper-slide class='relative slide-1'>
-        <a
-          href='{{ section.settings.slide_1_button_url | default: "/collections/all" }}'
-          class='block w-full h-full'
+      <swiper-slide
+        class='relative slide-1'
+        style='--slide-aspect-desktop: {{ slide_1_ratio_desktop }}; --slide-aspect-tablet: {{ slide_1_ratio_tablet }}; --slide-aspect-mobile: {{ slide_1_ratio_mobile }};'
+      >
+        <div
+          class='hero-slide-media block w-full klaviyo_hero_form_trigger'
         >
-          {% if section.settings.slide_1_image != blank %}
-            <img
-              src='{{ section.settings.slide_1_image | image_url: width: 1920 }}'
-              alt='{{ section.settings.slide_1_title | default: "Premium Knives" }}'
-              class='w-full h-full'
-              width='{{ section.settings.slide_1_image.width }}'
-              height='{{ section.settings.slide_1_image.height }}'
-              style='transform: scale({{ section.settings.slide_1_image_zoom | default: 100 | divided_by: 100.0 }});'
-            >
+          {% if slide_1_base_image %}
+            <picture class='w-full h-full block'>
+              {% if slide_1_image_mobile %}
+                <source
+                  srcset='{{ slide_1_image_mobile | image_url: width: 1200 }}'
+                  media='(max-width: 767px)'
+                >
+              {% endif %}
+              {% if slide_1_image_tablet %}
+                <source
+                  srcset='{{ slide_1_image_tablet | image_url: width: 1600 }}'
+                  media='(max-width: 1024px)'
+                >
+              {% endif %}
+              <img
+                src='{{ slide_1_base_image | image_url: width: 1920 }}'
+                alt='{{ section.settings.slide_1_title | default: "Premium Knives" }}'
+                class='w-full h-full'
+                width='{{ slide_1_base_image.width }}'
+                height='{{ slide_1_base_image.height }}'
+                style='transform: scale({{ section.settings.slide_1_image_zoom | default: 100 | divided_by: 100.0 }});'
+                loading='lazy'
+              >
+            </picture>
           {% else %}
             {{
               "lifestyle-1"
               | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
             }}
           {% endif %}
-        </a>
+        </div>
         {% if section.settings.show_text_overlay %}
-          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none'>
-            <div class='text-center lg:text-left max-w-2xl px-4 lg:ml-16 lg:mb-16'>
+          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
+            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-12 hero-overlay__inner'>
               {% assign s1_shadow = section.settings.slide_1_text_shadow_strength
                 | default: "soft"
               %}
@@ -86,7 +194,7 @@
                     {% assign trimmed_sentence = sentence | strip %}
                     {% if trimmed_sentence != blank %}
                       <p
-                        class='text-lg md:text-xl mb-8'
+                        class='text-lg md:text-xl mb-1'
                         style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'
                       >
                         {{ trimmed_sentence }}.
@@ -99,13 +207,13 @@
                 and section.settings.slide_1_button_text != blank
               %}
                 <div class='mt-4 mb-8 pointer-events-auto'>
-                  <a
-                    href='{{ section.settings.slide_1_button_url | default: "/collections/all" }}'
-                    class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                  <button
+                    type='button'
+                    class='inline-block font-semibold py-3 px-8 cursor-pointer rounded-lg transition-colors duration-300 klaviyo_hero_button_form_trigger'
                     style='background-color: {{ section.settings.slide_1_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_1_button_text_color | default: "#ffffff" }};'
                   >
                     {{ section.settings.slide_1_button_text }}
-                  </a>
+                  </button>
                 </div>
               {% endif %}
             </div>
@@ -114,20 +222,38 @@
       </swiper-slide>
 
       <!-- Slide 2 -->
-      <swiper-slide class='relative slide-2'>
+      <swiper-slide
+        class='relative slide-2'
+        style='--slide-aspect-desktop: {{ slide_2_ratio_desktop }}; --slide-aspect-tablet: {{ slide_2_ratio_tablet }}; --slide-aspect-mobile: {{ slide_2_ratio_mobile }};'
+      >
         <a
           href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
-          class='block w-full h-full'
+          class='hero-slide-media block w-full'
         >
-          {% if section.settings.slide_2_image != blank %}
-            <img
-              src='{{ section.settings.slide_2_image | image_url: width: 1920 }}'
-              alt='{{ section.settings.slide_2_title | default: "Professional Grade" }}'
-              class='w-full h-full'
-              width='{{ section.settings.slide_2_image.width }}'
-              height='{{ section.settings.slide_2_image.height }}'
-              style='transform: scale({{ section.settings.slide_2_image_zoom | default: 100 | divided_by: 100.0 }});'
-            >
+          {% if slide_2_base_image %}
+            <picture class='w-full h-full block'>
+              {% if slide_2_image_mobile %}
+                <source
+                  srcset='{{ slide_2_image_mobile | image_url: width: 1200 }}'
+                  media='(max-width: 767px)'
+                >
+              {% endif %}
+              {% if slide_2_image_tablet %}
+                <source
+                  srcset='{{ slide_2_image_tablet | image_url: width: 1600 }}'
+                  media='(max-width: 1024px)'
+                >
+              {% endif %}
+              <img
+                src='{{ slide_2_base_image | image_url: width: 1920 }}'
+                alt='{{ section.settings.slide_2_title | default: "Professional Grade" }}'
+                class='w-full h-full'
+                width='{{ slide_2_base_image.width }}'
+                height='{{ slide_2_base_image.height }}'
+                style='transform: scale({{ section.settings.slide_2_image_zoom | default: 100 | divided_by: 100.0 }});'
+                loading='lazy'
+              >
+            </picture>
           {% else %}
             {{
               "lifestyle-1"
@@ -136,8 +262,8 @@
           {% endif %}
         </a>
         {% if section.settings.show_text_overlay %}
-          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none'>
-            <div class='text-center lg:text-left max-w-2xl px-4 lg:ml-16 lg:mb-16'>
+          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
+            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20 hero-overlay__inner'>
               {% assign s2_shadow = section.settings.slide_2_text_shadow_strength
                 | default: "soft"
               %}
@@ -181,7 +307,7 @@
                     {% assign trimmed_sentence = sentence | strip %}
                     {% if trimmed_sentence != blank %}
                       <p
-                        class='text-lg md:text-xl mb-8'
+                        class='text-lg md:text-xl mb-1'
                         style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
                       >
                         {{ trimmed_sentence }}.
@@ -206,23 +332,116 @@
             </div>
           </div>
         {% endif %}
+
+        <!-- Mobile texts and button -->
+        {% comment %}
+          {% if section.settings.show_text_overlay %}
+            <div class='absolute  md:hidden bottom-8 lg:-bottom-4 inset-0 z-10 pointer-events-none'>
+              <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20 flex flex-col items-center justify-between h-full pt-16 pb-14'>
+                {% assign s2_shadow = section.settings.slide_2_text_shadow_strength
+                  | default: "soft"
+                %}
+                {% assign s2_op = "0.35" %}
+                {% case s2_shadow %}
+                  {% when "none" -%}
+                    {%- assign s2_op = "0" %}
+                  {% when "soft" -%}
+                    {%- assign s2_op = "0.35" %}
+                  {% when "medium" -%}
+                    {%- assign s2_op = "0.6" %}
+                  {% when "strong" -%}
+                    {%- assign s2_op = "0.85" %}
+                {% endcase %}
+                <div class='kk-text-wrap inline-block'>
+                  {% if section.settings.slide_2_text_bg_enable %}
+                    {% assign s2_bg_op_pct = section.settings.slide_2_text_bg_opacity
+                      | default: 50
+                    %}
+                    {% assign s2_bg_alpha = s2_bg_op_pct | divided_by: 100.0 %}
+                    <div
+                      class='kk-text-bg'
+                      style='background-color: {{ section.settings.slide_2_text_bg_color | default: '#000000' | color_modify: 'alpha', s2_bg_alpha }}'
+                    ></div>
+                  {% endif %}
+                  <div class='kk-text-content'>
+                    <h1
+                      class='text-4xl md:text-6xl font-bold mb-4'
+                      style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
+                    >
+                      {{
+                        section.settings.slide_2_title
+                        | default: "Professional Grade"
+                      }}
+                    </h1>
+                    {% assign s2_subtitle = section.settings.slide_2_subtitle
+                      | default: "Tools that professionals trust"
+                    %}
+                    {% assign s2_sentences = s2_subtitle | split: "." %}
+                    {% for sentence in s2_sentences %}
+                      {% assign trimmed_sentence = sentence | strip %}
+                      {% if trimmed_sentence != blank %}
+                        <p
+                          class='text-lg md:text-xl mb-1'
+                          style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
+                        >
+                          {{ trimmed_sentence }}.
+                        </p>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+                {% if section.settings.slide_2_button_enable
+                  and section.settings.slide_2_button_text != blank
+                %}
+                  <div class='mt-4 pointer-events-auto'>
+                    <a
+                      href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
+                      class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                      style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
+                    >
+                      {{ section.settings.slide_2_button_text }}
+                    </a>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+        {% endcomment %}
       </swiper-slide>
 
       <!-- Slide 3 -->
-      <swiper-slide class='relative slide-3'>
+      <swiper-slide
+        class='relative slide-3'
+        style='--slide-aspect-desktop: {{ slide_3_ratio_desktop }}; --slide-aspect-tablet: {{ slide_3_ratio_tablet }}; --slide-aspect-mobile: {{ slide_3_ratio_mobile }};'
+      >
         <a
           href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
-          class='block w-full h-full'
+          class='hero-slide-media block w-full'
         >
-          {% if section.settings.slide_3_image != blank %}
-            <img
-              src='{{ section.settings.slide_3_image | image_url: width: 1920 }}'
-              alt='{{ section.settings.slide_3_title | default: "Handcrafted Excellence" }}'
-              class='w-full h-full'
-              width='{{ section.settings.slide_3_image.width }}'
-              height='{{ section.settings.slide_3_image.height }}'
-              style='transform: scale({{ section.settings.slide_3_image_zoom | default: 100 | divided_by: 100.0 }});'
-            >
+          {% if slide_3_base_image %}
+            <picture class='w-full h-full block'>
+              {% if slide_3_image_mobile %}
+                <source
+                  srcset='{{ slide_3_image_mobile | image_url: width: 1200 }}'
+                  media='(max-width: 767px)'
+                >
+              {% endif %}
+              {% if slide_3_image_tablet %}
+                <source
+                  srcset='{{ slide_3_image_tablet | image_url: width: 1600 }}'
+                  media='(max-width: 1024px)'
+                >
+              {% endif %}
+              <img
+                src='{{ slide_3_base_image | image_url: width: 1920 }}'
+                alt='{{ section.settings.slide_3_title | default: "Handcrafted Excellence" }}'
+                class='w-full h-full'
+                width='{{ slide_3_base_image.width }}'
+                height='{{ slide_3_base_image.height }}'
+                style='transform: scale({{ section.settings.slide_3_image_zoom | default: 100 | divided_by: 100.0 }});'
+                loading='lazy'
+              >
+            </picture>
           {% else %}
             {{
               "lifestyle-1"
@@ -231,8 +450,8 @@
           {% endif %}
         </a>
         {% if section.settings.show_text_overlay %}
-          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none'>
-            <div class='text-center lg:text-left max-w-2xl px-4 lg:ml-16 lg:mb-16'>
+          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
+            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20 hero-overlay__inner'>
               {% assign s3_shadow = section.settings.slide_3_text_shadow_strength
                 | default: "soft"
               %}
@@ -276,7 +495,7 @@
                     {% assign trimmed_sentence = sentence | strip %}
                     {% if trimmed_sentence != blank %}
                       <p
-                        class='text-lg md:text-xl mb-8'
+                        class='text-lg md:text-xl mb-1'
                         style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'
                       >
                         {{ trimmed_sentence }}.
@@ -316,18 +535,35 @@
   </div>
 </div>
 
+<script type='text/javascript'>
+  document
+    .querySelector('.klaviyo_hero_form_trigger')
+    .addEventListener('click', function () {
+      window._klOnsite = window._klOnsite || []
+      window._klOnsite.push(['openForm', 'TRArE7'])
+    })
+</script>
+<script type='text/javascript'>
+  document
+    .querySelector('.klaviyo_hero_button_form_trigger')
+    .addEventListener('click', function () {
+      window._klOnsite = window._klOnsite || []
+      window._klOnsite.push(['openForm', 'TRArE7'])
+    })
+</script>
+
 <!-- Swiper Styles -->
 <style>
   .hero-swiper {
     width: 100%;
-    height: var(--hero-height-px, 600px);
+    height: auto;
     border-radius: var(--hero-radius, 0px);
     overflow: hidden;
   }
 
   .hero-scale-wrap {
     width: 100%;
-    height: var(--hero-height-px, 600px);
+    height: auto;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -343,12 +579,36 @@
 
   /* Ensure slides fill container and images cover */
   .hero-swiper swiper-slide {
-    height: 100%;
-    overflow: hidden;
+    height: auto;
+    width: 100%;
+    overflow: visible;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    position: relative;
   }
-  .hero-swiper swiper-slide img {
+
+  .hero-slide-media {
+    width: 100%;
+    aspect-ratio: var(--slide-aspect-desktop, 1.7778);
+    display: block;
+    position: relative;
+    overflow: hidden;
     border-radius: var(--hero-radius, 0px);
+  }
+
+  .hero-slide-media picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-slide-media img {
+    border-radius: inherit;
     transform-origin: center center;
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 
   /* Inline text background overlay block */
@@ -366,31 +626,33 @@
     z-index: 1;
   }
 
+  @media (max-width: 1024px) {
+    .hero-slide-media {
+      aspect-ratio: var(
+        --slide-aspect-tablet,
+        var(--slide-aspect-desktop, 1.7778)
+      );
+    }
+  }
+
   /* On mobile keep scaling and compensate dimensions */
   @media (max-width: 768px) {
-    .hero-swiper,
-    .hero-scale-wrap {
-      height: var(--hero-height-mobile-px, var(--hero-height-px, 600px));
-    }
     .hero-scale-wrap .hero-swiper {
       width: calc(100% * var(--hero-scale-inv, 1));
-      height: calc(100% * var(--hero-scale-inv, 1));
       transform: scale(calc(var(--hero-scale, 100) / 100));
+    }
+
+    .hero-slide-media {
+      aspect-ratio: var(
+        --slide-aspect-mobile,
+        var(--slide-aspect-tablet, var(--slide-aspect-desktop, 1.7778))
+      );
     }
   }
 
   .hero-swiper swiper-slide {
     text-align: center;
     font-size: 18px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .hero-swiper swiper-slide img {
-    display: block;
-    width: 100%;
-    height: 100%;
   }
 
   /* Per-slide responsive object-fit and object-position */
@@ -650,6 +912,18 @@
       "id": "slide_1_image",
       "label": "Slide 1 Image"
     },
+    {
+      "type": "image_picker",
+      "id": "slide_1_image_tablet",
+      "label": "Slide 1 Image - Tablet (≤1024px)",
+      "info": "Optional override used on tablet viewports."
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_1_image_mobile",
+      "label": "Slide 1 Image - Mobile (≤768px)",
+      "info": "Optional override used on mobile viewports."
+    },
     { "type": "header", "content": "Slide 1 Responsive Image" },
     {
       "type": "select",
@@ -849,6 +1123,18 @@
       "id": "slide_2_image",
       "label": "Slide 2 Image"
     },
+    {
+      "type": "image_picker",
+      "id": "slide_2_image_tablet",
+      "label": "Slide 2 Image - Tablet (≤1024px)",
+      "info": "Optional override used on tablet viewports."
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_2_image_mobile",
+      "label": "Slide 2 Image - Mobile (≤768px)",
+      "info": "Optional override used on mobile viewports."
+    },
     { "type": "header", "content": "Slide 2 Responsive Image" },
     {
       "type": "select",
@@ -1047,6 +1333,18 @@
       "type": "image_picker",
       "id": "slide_3_image",
       "label": "Slide 3 Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_3_image_tablet",
+      "label": "Slide 3 Image - Tablet (≤1024px)",
+      "info": "Optional override used on tablet viewports."
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_3_image_mobile",
+      "label": "Slide 3 Image - Mobile (≤768px)",
+      "info": "Optional override used on mobile viewports."
     },
     { "type": "header", "content": "Slide 3 Responsive Image" },
     {

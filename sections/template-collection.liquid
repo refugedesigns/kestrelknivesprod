@@ -29,8 +29,21 @@
           </div>
 
           <!-- Products Grid -->
+          {% assign has_apparel_filter = false %}
+          {% assign apparel_url_string = request.path
+            | append: "?"
+            | append: request.query_string
+          %}
+          {% if apparel_url_string contains "filter.p.product_type=Apparel"
+            or apparel_url_string contains "filter.p.product_type=apparel"
+            or collection.handle contains "apparel"
+            or collection.title contains "Apparel"
+          %}
+            {% assign has_apparel_filter = true %}
+          {% endif %}
+
           <div
-            class='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+            class='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 {% if has_apparel_filter %}gap-2{% else %}gap-6{% endif %}'
             id='products-grid'
           >
             {% comment %}

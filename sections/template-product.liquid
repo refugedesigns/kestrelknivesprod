@@ -85,6 +85,27 @@
       height: {{ section.settings.star_size_desktop | default: 20 }}px;
     }
   }
+
+  #thumbnailStrip {
+    scrollbar-width: none;
+  }
+
+  #thumbnailStrip::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    #thumbFadeLeft,
+    #thumbFadeRight {
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    #thumbFadeLeft.is-visible,
+    #thumbFadeRight.is-visible {
+      opacity: 1;
+    }
+  }
 </style>
 
 <div class='bg-gray-50 mb-8' x-data='productPage()'>
@@ -111,7 +132,7 @@
         </h1>
       </div>
     {% endif %}
-    <main class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 {% unless tags_lower contains 'hidden_offer' %}pt-24{% endunless %}'>
+    <main class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8 {% unless tags_lower contains 'hidden_offer' %}md:pt-24{% endunless %}'>
       <div class='lg:grid lg:grid-cols-12 lg:gap-12'>
         <!-- Left Column - Product Images -->
         <div class='lg:col-span-7'>
@@ -169,24 +190,71 @@
           </div>
 
           <!-- Thumbnail Images -->
-          <div id='thumbnailStrip' class='flex space-x-4 overflow-x-auto pb-2'>
-            {% for media in product.media %}
-              <button
-                @click='changeImage({{ forloop.index0 }})'
-                class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 {% if forloop.first %}border-black{% else %}border-gray-200 hover:border-black{% endif %} transition-colors'
+          <div class='relative hidden md:block'>
+            <div
+              id='thumbnailStrip'
+              class='flex space-x-4 overflow-x-auto pb-2'
+            >
+              {% for media in product.media %}
+                <button
+                  @click='changeImage({{ forloop.index0 }})'
+                  class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 {% if forloop.first %}border-black{% else %}border-gray-200 hover:border-black{% endif %} transition-colors'
+                >
+                  {% render "product-media", media: media %}
+                </button>
+              {% endfor %}
+            </div>
+            <div
+              id='thumbFadeLeft'
+              class='pointer-events-none absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-white to-transparent'
+            ></div>
+            <div
+              id='thumbFadeRight'
+              class='pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white to-transparent'
+            ></div>
+          </div>
+          <div class='mt-3 md:hidden flex items-center justify-center space-x-4'>
+            <button
+              type='button'
+              id='mobilePrevBtn'
+              class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md text-black hover:bg-gray-100 active:bg-gray-200 transition-colors'
+            >
+              <span class='sr-only'>Previous image</span>
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'
+                stroke-width='1.5'
+                stroke='currentColor'
+                class='size-6'
               >
-                {% render "product-media", media: media %}
-              </button>
-            {% endfor %}
+                <path stroke-linecap='round' stroke-linejoin='round' d='M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18'/>
+              </svg>
+            </button>
+            <div class='flex items-center space-x-2' id='mobileDots'></div>
+            <button
+              type='button'
+              id='mobileNextBtn'
+              class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md text-black hover:bg-gray-100 active:bg-gray-200 transition-colors'
+            >
+              <span class='sr-only'>Next image</span>
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'
+                stroke-width='1.5'
+                stroke='currentColor'
+                class='size-6'
+              >
+                <path stroke-linecap='round' stroke-linejoin='round' d='M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3'/>
+              </svg>
+            </button>
           </div>
         </div>
 
         <!-- Right Column - Product Info -->
         <div class='lg:col-span-5 mt-8 lg:mt-0'>
           <div class='lg:sticky lg:top-24'>
-            <!-- Brand -->
-            <p class='text-sm text-gray-500 mb-2'>{{ product.vendor }}</p>
-
             <!-- Product Title -->
             <h1 class='text-4xl font-bold text-gray-900 mb-6'>
               {{ product.title }}
@@ -344,10 +412,26 @@
                             <div
                               class='
                                 min-w-[3rem] px-3 h-10 inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors
-                                {% if is_selected %} border-black bg-black text-white {% else %} border-gray-300 hover:border-black bg-white text-gray-900 {% endif %}
+                                {% if is_selected %} border-black text-black {% else %} border-gray-300 hover:border-black bg-white text-gray-900 {% endif %}
                               '
                             >
-                              {{ value | upcase }}
+                              {% assign size_name = value | upcase %}
+                              {% case size_name %}
+                                {% when "S" %}
+                                  SMALL
+                                {% when "M" %}
+                                  MEDIUM
+                                {% when "L" %}
+                                  LARGE
+                                {% when "X" %}
+                                  X-LARGE
+                                {% when "2X" %}
+                                  XX-LARGE
+                                {% when "3X" %}
+                                  XXX-LARGE
+                                {% else %}
+                                  {{ size_name }}
+                              {% endcase %}
                             </div>
                           </label>
                         {% endfor %}
@@ -374,10 +458,26 @@
                             <div
                               class='
                                 px-3 h-10 inline-flex items-center justify-center rounded-md border text-sm font-medium transition-colors
-                                {% if is_selected %} border-black bg-black text-white {% else %} border-gray-300 hover:border-black bg-white text-gray-900 {% endif %}
+                                {% if is_selected %} border-black text-black {% else %} border-gray-300 hover:border-black bg-white text-gray-900 {% endif %}
                               '
                             >
-                              {{ value }}
+                              {% assign size_name = value | upcase %}
+                              {% case size_name %}
+                                {% when "S" %}
+                                  SMALL
+                                {% when "M" %}
+                                  MEDIUM
+                                {% when "L" %}
+                                  LARGE
+                                {% when "X" %}
+                                  X-LARGE
+                                {% when "2X" %}
+                                  XX-LARGE
+                                {% when "3X" %}
+                                  XXX-LARGE
+                                {% else %}
+                                  {{ value }}
+                              {% endcase %}
                             </div>
                           </label>
                         {% endfor %}
@@ -387,68 +487,67 @@
                 {% endfor %}
               {% endunless %}
 
-              <!-- Quantity Selector -->
-              <div class='mb-6'>
-                <label class='block text-sm font-medium text-gray-700 mb-2'
-                  >Quantity</label
-                >
-                <div class='flex items-center space-x-3'>
-                  <button
-                    type='button'
-                    @click='decreaseQuantity()'
-                    class='w-10 h-10 rounded-md border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors'
-                  >
-                    <svg
-                      class='w-4 h-4'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
+              <div class='flex items-center gap-2'>
+                <!-- Quantity Selector -->
+                <div class='mb-6 border border-gray-300 py-1.5'>
+                  <div class='flex items-center space-x-3'>
+                    <button
+                      type='button'
+                      @click='decreaseQuantity()'
+                      class='w-10 h-10 flex items-center justify-center'
                     >
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-                    </svg>
-                  </button>
-                  <input
-                    type='number'
-                    x-model='quantity'
-                    min='1'
-                    class='w-20 text-center border border-gray-300 rounded-md py-2 focus:ring-2 focus:ring-black focus:border-black'
-                  >
-                  <button
-                    type='button'
-                    @click='increaseQuantity()'
-                    class='w-10 h-10 rounded-md border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors'
-                  >
-                    <svg
-                      class='w-4 h-4'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'
+                      <svg
+                        class='w-4 h-4'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                      </svg>
+                    </button>
+                    <input
+                      type='number'
+                      x-model='quantity'
+                      min='1'
+                      class='w-20 text-center border-none bg-transparent'
                     >
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                  </button>
+                    <button
+                      type='button'
+                      @click='increaseQuantity()'
+                      class='w-10 h-10 flex items-center justify-center'
+                    >
+                      <svg
+                        class='w-4 h-4'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <!-- Add to Cart Button -->
-              <button
-                id='addToCartBtn'
-                type='submit'
-                class='w-full uppercase bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mb-6 {% if product_status_text != blank or selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
-                {% if product_status_text != blank
-                  or selected_variant.available == false
-                %}
-                  disabled
-                {% endif %}
-              >
-                {% if product_status_text != blank %}
-                  {{ product_status_text }}
-                {% elsif selected_variant.available == false %}
-                  SOLD OUT
-                {% else %}
-                  ADD TO CART
-                {% endif %}
-              </button>
+                <!-- Add to Cart Button -->
+                <button
+                  id='addToCartBtn'
+                  type='submit'
+                  class='w-full text-sm whitespace-nowrap md:text-base uppercase bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mb-6 {% if product_status_text != blank or selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
+                  {% if product_status_text != blank
+                    or selected_variant.available == false
+                  %}
+                    disabled
+                  {% endif %}
+                >
+                  {% if product_status_text != blank %}
+                    {{ product_status_text }}
+                  {% elsif selected_variant.available == false %}
+                    SOLD OUT
+                  {% else %}
+                    ADD TO CART
+                  {% endif %}
+                </button>
+              </div>
             {% endform %}
           </div>
         </div>
@@ -479,8 +578,8 @@
   id='tabsNavigation'
   class='bg-white border-b border-t h-20 flex items-center border-gray-200 sticky top-16 z-18 transition-all duration-300'
 >
-  <div class='max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex items-center justify-between'>
-    <nav class='flex space-x-8'>
+  <div class='max-w-8xl flex mx-auto px-4 sm:px-6 lg:px-8 w-full items-center justify-center md:justify-between'>
+    <nav class='space-x-8 hidden md:flex'>
       {% if product.description != blank %}
         <button
           onclick="scrollToSection('specs')"
@@ -510,8 +609,55 @@
       {% endif %}
     </nav>
 
-    <!-- Price and Add to Cart -->
-    <div class='flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4'>
+    <!-- Price, Size Selector (for apparel), and Add to Cart -->
+    <div class='flex items-center space-x-4'>
+      {% comment %} Size Selector for Apparel Products {% endcomment %}
+      {% assign product_type_lower = product.type | default: "" | downcase %}
+      {% if product_type_lower contains "apparel"
+        and product.has_only_default_variant == false
+      %}
+        {% for option in product.options_with_values %}
+          {% assign option_name_downcase = option.name | downcase | strip %}
+          {% if option_name_downcase contains "size" %}
+            <div class='flex flex-col items-center'>
+              <select
+                id='stickySizeSelector'
+                class='border border-gray-300 rounded-md px-3 py-2 text-sm font-medium bg-white focus:ring-2 focus:ring-black focus:border-black w-24 md:w-32'
+                onchange='updateStickyVariant()'
+              >
+                {% for value in option.values %}
+                  <option
+                    value='{{ value | escape }}'
+                    {% if option.selected_value == value %}
+                      selected
+                    {% endif %}
+                  >
+                    {% assign size_name = value | upcase %}
+                    {% case size_name %}
+                      {% when "S" %}
+                        SMALL
+                      {% when "M" %}
+                        MEDIUM
+                      {% when "L" %}
+                        LARGE
+                      {% when "XL" %}
+                        X-LARGE
+                      {% when "2XL" %}
+                        XX-LARGE
+                      {% when "3XL" %}
+                        XXX-LARGE
+                      {% else %}
+                        {{ size_name }}
+                    {% endcase %}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            {% break %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+
       <div class='text-center md:text-right'>
         {% if product.type == "Custom" %}
           <span
@@ -529,6 +675,7 @@
           </span>
         {% endif %}
       </div>
+
       <button
         id='stickyAddToCartBtn'
         type='button'
@@ -600,6 +747,7 @@
                     and field.value != blank
                     and field.type != "file_reference"
                     and field.type != "list.file_reference"
+                    and key != "product_status"
                   %}
                     {% assign label = key
                       | replace: "_", " "
@@ -783,7 +931,7 @@
               <swiper-container
                 id='related-products-swiper'
                 class='mySwiper'
-                slides-per-view='1'
+                slides-per-view='2'
                 space-between='20'
                 navigation='true'
                 style='--swiper-navigation-color: #000000; --swiper-navigation-size: 35px;'
@@ -823,27 +971,73 @@
               return; // Skip this product
             }
 
+            // Filter out products with type "custom"
+            const productType = String(product.product_type || product.type || '').toLowerCase();
+            if (productType.includes('custom') || productType.includes('mws_apo_generated')) {
+              return; // Skip this product
+            }
+
             const isApparel = String(product.product_type || product.type || '').toLowerCase().includes('apparel');
+            
+            // Get the first available variant or first variant for non-apparel products
+            const displayVariant = product.variants && product.variants.length > 0 
+              ? (product.variants.find(v => v.available) || product.variants[0])
+              : null;
+            
             const actionButton = isApparel
               ? `<button onclick="openRelatedProductQuickView('${product.handle}')" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0">QUICK VIEW</button>`
-              : `<button onclick="addRelatedProductToCart('${product.handle}', '${product.url}')" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0">ADD TO CART</button>`;
+              : `<button onclick="addRelatedProductToCart('${product.handle}', '${product.url}', ${displayVariant ? displayVariant.id : 'null'})" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0">ADD TO CART</button>`;
+            
+            const productTitleUpper = (product.title || '').toUpperCase();
+
+            const variantPrimaryLabel = (() => {
+              if (!displayVariant) return null;
+              if (displayVariant.option1 && displayVariant.option1 !== 'Default Title') {
+                return displayVariant.option1;
+              }
+              const rawTitle = displayVariant.title || '';
+              if (!rawTitle || rawTitle === 'Default Title') return null;
+              return rawTitle.split('/')[0].trim();
+            })();
+
+            // Build the product title - include first variant name for non-apparel with multiple variants
+            let displayTitle = productTitleUpper;
+            if (!isApparel && product.variants && product.variants.length > 1 && variantPrimaryLabel) {
+              displayTitle = `${productTitleUpper} - ${variantPrimaryLabel.toUpperCase()}`;
+            }
+
+            const resolveImageSrc = (image) => {
+              if (!image) return null;
+              if (typeof image === 'string') return image;
+              if (Array.isArray(image) && image.length) return resolveImageSrc(image[0]);
+              if (typeof image === 'object') {
+                return image.src || image.url || image.originalSrc || image.original_url || null;
+              }
+              return null;
+            };
+
+            const variantImage = resolveImageSrc(displayVariant ? (displayVariant.featured_image || displayVariant.image) : null);
+            const productImage = resolveImageSrc(product.featured_image) || resolveImageSrc(product.images && product.images[0]);
+            const displayImage = variantImage || productImage || '';
 
             const productSlide = `
               <swiper-slide style="height: 100%;">
                 <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 h-full flex flex-col">
                   <div class="aspect-square bg-gray-50 rounded-t-lg overflow-hidden flex-shrink-0">
+                  <a href="${product.url}" class="aspect-square hover:cursor-pointer bg-gray-50 rounded-t-lg overflow-hidden flex-shrink-0 block">
                     <img
-                      src="${product.featured_image}"
-                      alt="${product.title}"
+                      src="${displayImage}"
+                      alt="${displayTitle}"
                       class="w-full h-full object-contain"
                       loading="lazy"
                     >
+                  </a>
                   </div>
                   <div class="p-4 flex flex-col justify-between flex-grow">
                     <div class="flex-grow flex flex-col justify-between">
                       <div class="h-16 flex items-center justify-center">
                         <h3 class="text-lg font-bold text-black text-center line-clamp-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.5rem;">
-                          ${product.title.toUpperCase()}
+                          ${displayTitle}
                         </h3>
                       </div>
                       <div class="text-center mb-4">
@@ -851,7 +1045,7 @@
                           ${new Intl.NumberFormat('{{ shop.locale }}', {
                             style: 'currency',
                             currency: '{{ shop.currency }}'
-                          }).format(product.price / 100)}
+                          }).format((displayVariant ? displayVariant.price : product.price) / 100)}
                         </span>
                       </div>
                     </div>
@@ -876,8 +1070,29 @@
    });
 
   // Function to add related products to cart (uses handle or derives from URL)
-  window.addRelatedProductToCart = async function(handle, url) {
+  window.addRelatedProductToCart = async function(handle, url, variantId) {
     try {
+      // If we have a variant ID passed directly, use it
+      if (variantId && variantId !== 'null' && variantId !== null) {
+        // Prefer the same cart flow as the main product (cartSheet component)
+        const cartSheetEl = document.querySelector('[x-data*="cartSheet"]');
+        if (cartSheetEl && cartSheetEl._x_dataStack && cartSheetEl._x_dataStack[0] && typeof cartSheetEl._x_dataStack[0].addToCart === 'function') {
+          await cartSheetEl._x_dataStack[0].addToCart(variantId, 1);
+          return;
+        }
+
+        // Fallback: direct API call then open the cart
+        const cartResponse = await fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: variantId, quantity: 1 }),
+        });
+        if (!cartResponse.ok) throw new Error('Failed to add to cart');
+        window.dispatchEvent(new CustomEvent('open-cart'));
+        return;
+      }
+
+      // Fallback to old logic if no variant ID provided
       function extractHandle(u) {
         try {
           const path = new URL(u, window.location.origin).pathname;
@@ -1385,6 +1600,7 @@
 <script>
   window.__product = {{ product | json }};
   // Pre-format all variant prices using Shopify's money filter
+
   window.__formattedPrices = {
     {% for variant in product.variants %}
       {{ variant.id }}: "{{ variant.price | money }}"{% unless forloop.last %},{% endunless %}
@@ -1488,6 +1704,13 @@
             // set initial UI state based on initialVariant
             this.updateSelectedVariantByOptions(this.selectedOptions);
 
+            // sync sticky size selector on initialization
+            setTimeout(() => {
+              if (typeof window.syncStickySizeSelector === 'function') {
+                window.syncStickySizeSelector();
+              }
+            }, 100);
+
             // watch for page scroll/resize (you already do this; keep in component)
           },
 
@@ -1580,6 +1803,11 @@
 
                // update add to cart button state
                this.updateAddToCartState(variant);
+               
+               // sync sticky size selector if it exists
+               if (typeof window.syncStickySizeSelector === 'function') {
+                 window.syncStickySizeSelector();
+               }
              }
           },
 
@@ -1611,46 +1839,26 @@
             const button = label ? label.querySelector('div') : null;
             if (button) {
               if (isSelected) {
-                // Selected state - check button type by classes
-                if (button.classList.contains('min-w-[3rem]') || 
-                    button.classList.contains('px-3') || 
-                    button.closest('.size-option') ||
-                    button.textContent.trim().length < 10) { // Short text usually means size/model buttons
-                  // Size/Model button selected state - black background, white text
-                  button.classList.remove('border-gray-300', 'hover:border-black', 'bg-white', 'text-gray-900');
-                  button.classList.add('border-black', 'bg-black', 'text-white');
-                } else {
-                  // Color option selected state - black border
-                  button.classList.remove('border-gray-300', 'hover:border-black');
-                  button.classList.add('border-black');
-                  
-                  // Update text color for color options
-                  const textSpan = button.parentElement.querySelector('span');
-                  if (textSpan) {
-                    textSpan.classList.remove('text-gray-600');
-                    textSpan.classList.add('text-black');
-                  }
+                // Selected state - black border only (no background)
+                button.classList.remove('border-gray-300', 'hover:border-black');
+                button.classList.add('border-black');
+                
+                // Update text color for color options
+                const textSpan = button.parentElement.querySelector('span');
+                if (textSpan) {
+                  textSpan.classList.remove('text-gray-600');
+                  textSpan.classList.add('text-black');
                 }
               } else {
-                // Unselected state
-                if (button.classList.contains('min-w-[3rem]') || 
-                    button.classList.contains('px-3') || 
-                    button.closest('.size-option') ||
-                    button.textContent.trim().length < 10) { // Short text usually means size/model buttons
-                  // Size/Model button unselected state - white background, gray border
-                  button.classList.remove('border-black', 'bg-black', 'text-white');
-                  button.classList.add('border-gray-300', 'hover:border-black', 'bg-white', 'text-gray-900');
-                } else {
-                  // Color option unselected state - gray border
-                  button.classList.remove('border-black');
-                  button.classList.add('border-gray-300', 'hover:border-black');
-                  
-                  // Reset text color for color options
-                  const textSpan = button.parentElement.querySelector('span');
-                  if (textSpan) {
-                    textSpan.classList.remove('text-black');
-                    textSpan.classList.add('text-gray-600');
-                  }
+                // Unselected state - gray border
+                button.classList.remove('border-black');
+                button.classList.add('border-gray-300', 'hover:border-black');
+                
+                // Reset text color for color options
+                const textSpan = button.parentElement.querySelector('span');
+                if (textSpan) {
+                  textSpan.classList.remove('text-black');
+                  textSpan.classList.add('text-gray-600');
                 }
               }
             }
@@ -1777,29 +1985,33 @@
                 }
               });
 
-              // Auto-scroll to make the selected thumbnail visible (robust)
+              // Auto-scroll only when clicking edge thumbnails and there are more to reveal
               if (thumbnailContainer && thumbnails[index]) {
                 const selected = thumbnails[index];
-                const padding = 12; // tolerance
+                const padding = 16;
                 const containerRect = thumbnailContainer.getBoundingClientRect();
                 const thumbRect = selected.getBoundingClientRect();
+                const containerWidth = thumbnailContainer.clientWidth;
+                const maxScroll = thumbnailContainer.scrollWidth - containerWidth;
+                const scrollLeft = thumbnailContainer.scrollLeft;
 
-                // If the thumbnail is left of the visible area, scroll left
-                if (thumbRect.left < containerRect.left + padding) {
-                  // Center the thumbnail in the viewport
-                  const centerOffset = (thumbnailContainer.clientWidth / 2) - (selected.clientWidth / 2);
-                  const target = Math.max(0, selected.offsetLeft - centerOffset);
+                const hasMoreLeft = scrollLeft > 0;
+                const hasMoreRight = scrollLeft < maxScroll;
+
+                if (thumbRect.left <= containerRect.left + padding && hasMoreLeft) {
+                  const target = Math.max(0, selected.offsetLeft - padding - containerWidth * 0.3);
                   thumbnailContainer.scrollTo({ left: target, behavior: 'smooth' });
-
-                // If the thumbnail is right of the visible area, scroll right
-                } else if (thumbRect.right > containerRect.right - padding) {
-                  // Center the thumbnail in the viewport
-                  const centerOffset = (thumbnailContainer.clientWidth / 2) - (selected.clientWidth / 2);
-                  const maxScroll = thumbnailContainer.scrollWidth - thumbnailContainer.clientWidth;
-                  const target = Math.min(maxScroll, selected.offsetLeft - centerOffset);
+                } else if (thumbRect.right >= containerRect.right - padding && hasMoreRight) {
+                  const target = Math.min(
+                    maxScroll,
+                    selected.offsetLeft + selected.clientWidth + padding + containerWidth * 0.3 - containerWidth
+                  );
                   thumbnailContainer.scrollTo({ left: target, behavior: 'smooth' });
                 }
               }
+
+              updateThumbFades();
+              updateMobileDots();
             }
           },
 
@@ -1844,6 +2056,96 @@
         };
       };
 
+
+      function getProductPageState() {
+        const el = document.querySelector('[x-data*="productPage"]');
+        if (el && el._x_dataStack && el._x_dataStack[0]) {
+          return el._x_dataStack[0];
+        }
+        if (window._productPageFallback) {
+          return window._productPageFallback;
+        }
+        return null;
+      }
+
+      function updateThumbFades() {
+        const strip = document.getElementById('thumbnailStrip');
+        const leftFade = document.getElementById('thumbFadeLeft');
+        const rightFade = document.getElementById('thumbFadeRight');
+        if (!strip || !leftFade || !rightFade) return;
+
+        const containerWidth = strip.clientWidth;
+        const maxScroll = strip.scrollWidth - containerWidth;
+        if (maxScroll <= 0) {
+          leftFade.classList.remove('is-visible');
+          rightFade.classList.remove('is-visible');
+          return;
+        }
+
+        const scrollLeft = strip.scrollLeft;
+        leftFade.classList.toggle('is-visible', scrollLeft > 0);
+        rightFade.classList.toggle('is-visible', scrollLeft < maxScroll - 1);
+      }
+
+      function updateMobileDots() {
+        const dotsEl = document.getElementById('mobileDots');
+        if (!dotsEl) return;
+
+        const state = getProductPageState();
+        const images = state && Array.isArray(state.productImages) ? state.productImages : [];
+        let total = images.length;
+        if (!total) {
+          total = {{ product.media.size }};
+        }
+
+        if (!total || total <= 1) {
+          dotsEl.innerHTML = '';
+          return;
+        }
+
+        const activeIndex = state && typeof state.currentImageIndex === 'number' ? state.currentImageIndex : 0;
+
+        let html = '';
+        for (let i = 0; i < total; i++) {
+          const activeClass = i === activeIndex ? 'bg-black' : 'bg-gray-300';
+          html += '<span class="inline-block mx-1 ' + activeClass + '" style="width:8px;height:8px;border-radius:2px;"></span>';
+        }
+        dotsEl.innerHTML = html;
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const strip = document.getElementById('thumbnailStrip');
+        if (strip) {
+          strip.addEventListener('scroll', updateThumbFades, { passive: true });
+        }
+
+        const prevBtn = document.getElementById('mobilePrevBtn');
+        const nextBtn = document.getElementById('mobileNextBtn');
+        if (prevBtn) {
+          prevBtn.addEventListener('click', function () {
+            const state = getProductPageState();
+            if (state && typeof state.previousImage === 'function') {
+              state.previousImage();
+            }
+          });
+        }
+        if (nextBtn) {
+          nextBtn.addEventListener('click', function () {
+            const state = getProductPageState();
+            if (state && typeof state.nextImage === 'function') {
+              state.nextImage();
+            }
+          });
+        }
+
+        updateThumbFades();
+        updateMobileDots();
+      });
+
+      window.addEventListener('resize', function () {
+        updateThumbFades();
+        updateMobileDots();
+      });
 
       // Helpers to match sticky offsets to header height so tabs don't overlap it
       function getHeaderHeight() {
@@ -2039,6 +2341,85 @@
         }
       });
 
+      // Function to update variant when sticky size selector changes
+      window.updateStickyVariant = function() {
+        const sizeSelector = document.getElementById('stickySizeSelector');
+        if (!sizeSelector) return;
+        
+        const selectedSize = sizeSelector.value;
+        console.log('Sticky size selector changed to:', selectedSize);
+        
+        // Update the main product page size selection first
+        const sizeInputs = document.querySelectorAll('input[name^="options["]');
+        sizeInputs.forEach(input => {
+          const name = input.name.replace(/^options\[(.+)\]$/, '$1');
+          if (name.toLowerCase().includes('size') && input.value === selectedSize) {
+            input.checked = true;
+            // Trigger change event to update the main product page
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        });
+        
+        // Also update the product page component directly
+        const productPage = document.querySelector('[x-data*="productPage"]');
+        if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
+          // Find the variant that matches the selected size
+          const variants = window.__product?.variants || [];
+          const matchingVariant = variants.find(variant => {
+            // Check if this variant's size option matches the selected size
+            const option1 = variant.option1;
+            const option2 = variant.option2;
+            const option3 = variant.option3;
+            
+            return option1 === selectedSize || option2 === selectedSize || option3 === selectedSize;
+          });
+          
+          if (matchingVariant) {
+            console.log('Found matching variant:', matchingVariant);
+            
+            // Update the hidden variant input
+            const variantInput = document.getElementById('variantIdInput');
+            if (variantInput) {
+              variantInput.value = matchingVariant.id;
+            }
+            
+            // Update the sticky price display
+            const stickyPrice = document.getElementById('stickyPrice');
+            if (stickyPrice) {
+              const formattedPrice = new Intl.NumberFormat('{{ shop.locale }}', {
+                style: 'currency',
+                currency: '{{ shop.currency }}'
+              }).format(matchingVariant.price / 100);
+              stickyPrice.textContent = formattedPrice;
+            }
+            
+            // Update the main product page variant selection
+            productPage._x_dataStack[0].updateSelectedVariantByOptions([selectedSize]);
+          }
+        }
+      };
+
+      // Function to sync sticky size selector with main product page selection
+      window.syncStickySizeSelector = function() {
+        const stickySizeSelector = document.getElementById('stickySizeSelector');
+        if (!stickySizeSelector) return;
+        
+        // Find the currently selected size from the main product page
+        const sizeInputs = document.querySelectorAll('input[name^="options["]');
+        let selectedSize = '';
+        
+        sizeInputs.forEach(input => {
+          const name = input.name.replace(/^options\[(.+)\]$/, '$1');
+          if (name.toLowerCase().includes('size') && input.checked) {
+            selectedSize = input.value;
+          }
+        });
+        
+        if (selectedSize && stickySizeSelector.value !== selectedSize) {
+          stickySizeSelector.value = selectedSize;
+        }
+      };
+
       // Provide a global stickyAddToCart for non-custom products (no text change)
       if (!window.stickyAddToCart) {
         window.stickyAddToCart = async function () {
@@ -2061,28 +2442,58 @@
               restoreSticky()
               return
             }
+            
+            // Get the current variant ID from the hidden input
             const variantInput = form.querySelector('input[name="id"]')
             const variantId = variantInput ? variantInput.value : null
+            console.log('Sticky add to cart - variant ID:', variantId)
+            
+            // If we have a size selector, make sure it's synced with the main page
+            const sizeSelector = document.getElementById('stickySizeSelector')
+            if (sizeSelector) {
+              console.log('Size selector value:', sizeSelector.value)
+              // Ensure the main page is updated with the current size selection
+              const sizeInputs = document.querySelectorAll('input[name^="options["]')
+              sizeInputs.forEach(input => {
+                const name = input.name.replace(/^options\[(.+)\]$/, '$1')
+                if (name.toLowerCase().includes('size') && input.value === sizeSelector.value) {
+                  input.checked = true
+                  input.dispatchEvent(new Event('change', { bubbles: true }))
+                }
+              })
+              
+              // Wait a moment for the variant to update
+              await new Promise(resolve => setTimeout(resolve, 100))
+              
+              // Get the updated variant ID
+              const updatedVariantId = variantInput ? variantInput.value : null
+              console.log('Updated variant ID after size sync:', updatedVariantId)
+            }
+            
             const productPage = document.querySelector('[x-data*="productPage"]')
             let quantity = 1
             if (productPage && productPage._x_dataStack && productPage._x_dataStack[0]) {
               quantity = productPage._x_dataStack[0].quantity || 1
             }
 
+            // Use the updated variant ID if available, otherwise use the original
+            const finalVariantId = sizeSelector && variantInput ? variantInput.value : variantId
+            console.log('Final variant ID for cart:', finalVariantId)
+            
             const cartSheet = document.querySelector('[x-data*="cartSheet"]')
             if (
               cartSheet &&
               cartSheet._x_dataStack &&
               cartSheet._x_dataStack[0] &&
               typeof cartSheet._x_dataStack[0].addToCart === 'function' &&
-              variantId
+              finalVariantId
             ) {
-              await cartSheet._x_dataStack[0].addToCart(variantId, quantity, 'sticky-button')
+              await cartSheet._x_dataStack[0].addToCart(finalVariantId, quantity, 'sticky-button')
               return
             }
 
             // Fallback
-            const payload = { id: variantId, quantity }
+            const payload = { id: finalVariantId, quantity }
             const res = await fetch('/cart/add.js', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -2521,3 +2932,29 @@
   ]
 }
 {% endschema %}
+
+<script>
+  // Freshness check: if CDN served stale availability, reload once with cache-busting
+  document.addEventListener('DOMContentLoaded', async function () {
+    try {
+      const onceKey = 'kk_p_refresh_' + {{ product.id }};
+      if (sessionStorage.getItem(onceKey)) return;
+      const res = await fetch('/products/{{ product.handle }}.js', { cache: 'no-store' });
+      if (!res.ok) return;
+      const fresh = await res.json();
+      const freshVariant = (fresh.variants || []).find(v => v.id === {{ selected_variant.id }});
+      if (!freshVariant) return;
+      const staleAvail = {{ selected_variant.available | json }};
+      const freshAvail = !!freshVariant.available;
+      if (staleAvail !== freshAvail) {
+        sessionStorage.setItem(onceKey, '1');
+        const url = new URL(window.location.href);
+        url.searchParams.set('t', String(Date.now()));
+        window.location.replace(url.toString());
+      }
+    } catch (e) {
+      // silent
+      console.log("Error in freshness check", e)
+    }
+  });
+</script>
