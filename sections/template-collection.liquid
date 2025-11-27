@@ -2,6 +2,16 @@
   window.__collectionProducts = {{ collection.products | json }};
 </script>
 
+{% assign collection_title_display = collection.title %}
+{% if collection.title %}
+  {% assign collection_title_normalized = collection.title | strip | downcase %}
+  {% if collection_title_normalized == "ultralight knives" %}
+    {% assign collection_title_display = collection.title
+      | append: " - 100% Made in the USA"
+    %}
+  {% endif %}
+{% endif %}
+
 <div class='px-4 py-16 mx-auto' x-data='collectionPage()' x-cloak>
   {% comment %}
     <a
@@ -11,9 +21,9 @@
     >
   {% endcomment %}
 
-  {% paginate collection.products by section.settings.number_of_products_per_page | default: 9 %}
+  {% paginate collection.products by section.settings.number_of_products_per_page | default: 19 %}
     <h1 class='text-3xl font-bold text-center mb-8' x-text='getPageTitle()'>
-      {{ collection.title }}
+      {{ collection_title_display }}
     </h1>
 
     <div class='max-w-7xl mx-auto'>
@@ -68,16 +78,21 @@
             {%- endcomment -%}
             {% assign has_position_tags = false %}
             {% for product in collection.products %}
-              {%- assign tags_lower = product.tags
-                | join: "||"
-                | downcase
-                | split: "||"
-              -%}
+              {%- assign tags_joined = product.tags | join: "||" | downcase -%}
+              {% assign tags_joined = "||"
+                | append: tags_joined
+                | append: "||"
+              %}
               {% for i in (1..999) %}
                 {% assign wanted = "product_" | append: i %}
                 {% assign wanted_alt = "position_" | append: i %}
-                {% if tags_lower contains wanted
-                  or tags_lower contains wanted_alt
+                {% assign wanted_token = "||" | append: wanted | append: "||" %}
+                {% assign wanted_alt_token = "||"
+                  | append: wanted_alt
+                  | append: "||"
+                %}
+                {% if tags_joined contains wanted_token
+                  or tags_joined contains wanted_alt_token
                 %}
                   {% assign has_position_tags = true %}
                   {% break %}
@@ -96,16 +111,29 @@
               {% for i in (1..999) %}
                 {% assign wanted = "product_" | append: i %}
                 {% assign wanted_alt = "position_" | append: i %}
+                {% assign wanted_token = "||" | append: wanted | append: "||" %}
+                {% assign wanted_alt_token = "||"
+                  | append: wanted_alt
+                  | append: "||"
+                %}
                 {% for product in collection.products %}
-                  {%- assign tags_lower = product.tags
+                  {%- assign tags_joined = product.tags
                     | join: "||"
                     | downcase
-                    | split: "||"
                   -%}
-                  {% if tags_lower contains wanted
-                    or tags_lower contains wanted_alt
+                  {% assign tags_joined = "||"
+                    | append: tags_joined
+                    | append: "||"
                   %}
-                    {% unless tags_lower contains "hidden_offer" %}
+                  {% assign has_wanted_tag = false %}
+                  {% if tags_joined contains wanted_token
+                    or tags_joined contains wanted_alt_token
+                  %}
+                    {% assign has_wanted_tag = true %}
+                  {% endif %}
+                  {% if has_wanted_tag %}
+                    {% assign hidden_token = "||hidden_offer||" %}
+                    {% unless tags_joined contains hidden_token %}
                       {% render "product-card", product_product: product %}
                       {% assign rendered_ids = rendered_ids
                         | append: product.id
@@ -189,6 +217,20 @@
         }
       },
 
+      decorateTitle(title) {
+        try {
+          const raw = title == null ? '' : String(title)
+          const trimmed = raw.trim()
+          if (trimmed.toLowerCase() === 'ultralight knives') {
+            const base = trimmed || 'Ultralight Knives'
+            return `${base} - 100% Made in the USA`
+          }
+          return trimmed || raw
+        } catch (e) {
+          return title
+        }
+      },
+
       getPageTitle() {
         try {
           const url = new URL(window.location.href)
@@ -202,7 +244,7 @@
             const selected = hasKnives
               ? types.find(t => String(t).toLowerCase() === 'knives')
               : types[0]
-            return this.toTitleCase(selected)
+            return this.decorateTitle(this.toTitleCase(selected))
           }
 
           // No explicit filter param; attempt to infer from collection handle
@@ -234,7 +276,8 @@
                 filterComponent._x_dataStack[0].productTypes) ||
               []
             const match = typesArr.find(t => matchesHandle(t.value, handle))
-            if (match && match.value) return this.toTitleCase(match.value)
+            if (match && match.value)
+              return this.decorateTitle(this.toTitleCase(match.value))
           }
         } catch (e) {
           /* ignore */
@@ -248,7 +291,7 @@
         } catch (e) {
           /* ignore */
         }
-        return '{{ collection.title }}'
+        return this.decorateTitle({{ collection.title | json }})
       },
 
       applyFilters(filterData) {
@@ -354,7 +397,7 @@
     {
       "type": "number",
       "id": "number_of_products_per_page",
-      "default": 9,
+      "default": 18,
       "label": "Number of products per page"
     },
     {

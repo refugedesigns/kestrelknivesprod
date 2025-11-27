@@ -116,6 +116,10 @@
       | downcase
       | split: "||"
     -%}
+    {% assign use_local_colors = false %}
+    {% if tags_lower contains "use_local_colors" %}
+      {% assign use_local_colors = true %}
+    {% endif %}
     {% if tags_lower contains "hidden_offer" %}
       <div
         class='text-center mb-8 px-6 py-4 rounded-lg my-8 h-40 flex items-center justify-center'
@@ -140,8 +144,10 @@
           <div class='aspect-square bg-white rounded-lg overflow-hidden mb-6 relative group'>
             <img
               id='mainImage'
-              src='{{ product.featured_image | img_url: '600x600' }}'
+              src='{{ product.featured_image | img_url: '2048x2048' }}'
               alt='{{ product.title | escape }}'
+              width='{{ product.featured_image.width | default: 2048 }}'
+              height='{{ product.featured_image.height | default: 2048 }}'
               class='w-full h-full object-contain transition-transform group-hover:scale-105'
             >
 
@@ -336,28 +342,30 @@
                           {% endif %}
 
                           {% assign option_image = null %}
-                          {% for variant in product.variants %}
-                            {% if option_position == 1
-                              and variant.option1 == value
-                            %}
-                              {% if variant.featured_image -%}
-                                {%- assign option_image = variant.featured_image -%}
-                              {%- endif %}
-                            {% elsif option_position == 2
-                              and variant.option2 == value
-                            %}
-                              {% if variant.featured_image -%}
-                                {%- assign option_image = variant.featured_image -%}
-                              {%- endif %}
-                            {% elsif option_position == 3
-                              and variant.option3 == value
-                            %}
-                              {% if variant.featured_image -%}
-                                {%- assign option_image = variant.featured_image -%}
-                              {%- endif %}
-                            {% endif %}
-                            {% if option_image %}{% break %}{% endif %}
-                          {% endfor %}
+                          {% unless use_local_colors %}
+                            {% for variant in product.variants %}
+                              {% if option_position == 1
+                                and variant.option1 == value
+                              %}
+                                {% if variant.featured_image -%}
+                                  {%- assign option_image = variant.featured_image -%}
+                                {%- endif %}
+                              {% elsif option_position == 2
+                                and variant.option2 == value
+                              %}
+                                {% if variant.featured_image -%}
+                                  {%- assign option_image = variant.featured_image -%}
+                                {%- endif %}
+                              {% elsif option_position == 3
+                                and variant.option3 == value
+                              %}
+                                {% if variant.featured_image -%}
+                                  {%- assign option_image = variant.featured_image -%}
+                                {%- endif %}
+                              {% endif %}
+                              {% if option_image %}{% break %}{% endif %}
+                            {% endfor %}
+                          {% endunless %}
 
                           <label class='relative cursor-pointer color-option'>
                             <input
@@ -370,11 +378,41 @@
                               {% endif %}
                             >
                             <div class='w-full aspect-square border-2 {% if is_selected %}border-black{% else %}border-gray-300 hover:border-black{% endif %} rounded-lg p-2 bg-white hover:bg-gray-100 transition-colors'>
-                              {% if option_image %}
+                              {% if use_local_colors %}
+                                {% assign product_asset_prefix = product.handle
+                                  | replace: "-", "_"
+                                %}
+                                {% assign option_name_token = option.name
+                                  | strip
+                                  | handleize
+                                  | replace: "-", "_"
+                                %}
+                                {% assign option_value_token = value
+                                  | strip
+                                  | handleize
+                                  | replace: "-", "_"
+                                %}
+                                {% assign option_asset_filename = product_asset_prefix
+                                  | append: "_"
+                                  | append: option_name_token
+                                  | append: "_"
+                                  | append: option_value_token
+                                  | append: ".png"
+                                %}
                                 <img
-                                  src='{{ option_image | img_url: '64x64' }}'
+                                  src='{{ option_asset_filename | asset_img_url: '64x64' }}'
                                   alt='{{ value }}'
                                   class='w-full h-full object-contain rounded-md'
+                                  width='64'
+                                  height='64'
+                                >
+                              {% elsif option_image %}
+                                <img
+                                  src='{{ option_image | image_url: width: 64 }}'
+                                  alt='{{ value }}'
+                                  class='w-full h-full object-contain rounded-md'
+                                  width='64'
+                                  height='64'
                                 >
                               {% else %}
                                 <div class='w-full h-full bg-white rounded-md flex items-center justify-center'>
@@ -1600,6 +1638,7 @@
 <script>
   window.__product = {{ product | json }};
   // Pre-format all variant prices using Shopify's money filter
+  console.log('product', {{ product | json }});
 
   window.__formattedPrices = {
     {% for variant in product.variants %}
@@ -1687,7 +1726,7 @@
           quantity: 1,
           productImages: [
             {% for media in product.media %}
-              '{{ media | img_url: "600x600" }}'{% unless forloop.last %},{% endunless %}
+              '{{ media | img_url: "2048x2048" }}'{% unless forloop.last %},{% endunless %}
             {% endfor %}
           ],
 

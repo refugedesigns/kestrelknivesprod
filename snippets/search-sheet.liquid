@@ -10,14 +10,14 @@
   x-transition:leave-end='translate-x-full'
   class='fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-xl z-50'
   style='display: none;'
-  @click.away='isOpen = false'
+  @click.away='closeSearch()'
 >
   <div class='flex flex-col h-full'>
     <!-- Search Header -->
     <div class='flex items-center justify-between p-4 border-b border-gray-200'>
       <h2 class='text-lg font-semibold text-gray-900'>Search</h2>
       <button
-        @click='isOpen = false'
+        @click='closeSearch()'
         class='text-gray-400 hover:text-gray-600 transition-colors'
       >
         <svg
@@ -211,6 +211,13 @@
         // Listen for open search events
         window.addEventListener('open-search', () => {
           this.openSearch()
+        })
+
+        // Watch for isOpen changes to ensure body overflow is reset
+        this.$watch('isOpen', value => {
+          if (!value) {
+            document.body.style.overflow = ''
+          }
         })
       },
 
