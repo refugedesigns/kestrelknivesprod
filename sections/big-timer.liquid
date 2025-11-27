@@ -9,7 +9,7 @@
 
       <!-- Countdown Timer -->
       <div
-        class='flex justify-center items-center gap-2 sm:gap-4 mb-8'
+        class='flex justify-center items-center gap-2 sm:gap-4 my-8'
         x-data='countdownTimer()'
       >
         <!-- Days -->
@@ -53,7 +53,7 @@
       <p class='text-lg text-white mb-8'>
         {{
           section.settings.slogan
-          | default: "Working Knives For Working People."
+          | default: ""
         }}
       </p>
 
@@ -63,145 +63,22 @@
         class='relative'
       >
         <button
-          @click='openForm'
-          class='{{ section.settings.button_color | default: 'bg-black' }} hover:{{ section.settings.button_color | default: 'bg-gray-900' }} text-white font-bold py-4 px-8 uppercase tracking-wide transition-colors duration-200 cursor-pointer'
+          class='{{ section.settings.button_color | default: 'bg-black' }} hover:{{ section.settings.button_color | default: 'bg-gray-900' }} text-white font-bold py-4 px-8 uppercase tracking-wide transition-colors duration-200 cursor-pointer klaviyo_form_trigger'
         >
           {{ section.settings.button_text | default: "NOTIFY ME" }}
         </button>
 
-        <!-- Email Signup Form Popup -->
-        <div
-          x-show='showForm'
-          x-transition:enter='transition ease-out duration-300'
-          x-transition:enter-start='opacity-0 scale-95'
-          x-transition:enter-end='opacity-100 scale-100'
-          x-transition:leave='transition ease-in duration-200'
-          x-transition:leave-start='opacity-100 scale-100'
-          x-transition:leave-end='opacity-0 scale-95'
-          class='absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full z-10 bg-white rounded-lg p-6 max-w-md mx-4 shadow-lg border'
-          @click.away='closeForm'
-          style='display: none;'
-        >
-          <button
-            @click='closeForm'
-            class='absolute top-2 right-2 text-gray-400 hover:text-gray-600'
-          >
-            <svg
-              class='w-5 h-5'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-
-          <form @submit.prevent='submit' novalidate>
-            <div class='text-center mb-4'>
-              <h3 class='text-lg font-semibold text-black mb-2'>
-                {{ section.settings.form_title | default: "Get Notified" }}
-              </h3>
-              <p class='text-sm text-gray-600'>
-                {{
-                  section.settings.form_subtitle
-                  | default: "Enter your email to be notified when we launch"
-                }}
-              </p>
-            </div>
-
-            <div class='space-y-4'>
-              <input
-                type='text'
-                x-model='name'
-                name='contact[name]'
-                placeholder='Full Name'
-                class='w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500'
-                required
-              >
-              <input
-                type='email'
-                x-model='email'
-                name='contact[email]'
-                placeholder='Email Address'
-                class='w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-orange-500'
-                required
-              >
-              <input
-                type='hidden'
-                name='contact[tags]'
-                value='blade-drop-notification'
-              >
-              <button
-                type='submit'
-                :disabled='submitting'
-                class='w-full {{ section.settings.button_color | default: 'bg-black' }} hover:{{ section.settings.button_color | default: 'bg-gray-900' }} text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 cursor-pointer'
-              >
-                <span
-                  x-text="submitting ? 'Submitting...' : 'Notify Me'"
-                ></span>
-              </button>
-            </div>
-
-            <div
-              x-show='errorMessage'
-              class='mt-4 text-sm text-red-600'
-              x-text='errorMessage'
-            ></div>
-          </form>
-        </div>
-
-        <!-- Success Notification -->
-        <div
-          x-show='showSuccess'
-          x-transition:enter='transition ease-out duration-300'
-          x-transition:enter-start='opacity-0 scale-95'
-          x-transition:enter-end='opacity-100 scale-100'
-          x-transition:leave='transition ease-in duration-200'
-          x-transition:leave-start='opacity-100 scale-100'
-          x-transition:leave-end='opacity-0 scale-95'
-          class='absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full z-10 bg-white rounded-lg p-6 max-w-md mx-4 shadow-lg border'
-          style='display: none;'
-        >
-          <button
-            @click='closeSuccess'
-            class='absolute top-2 right-2 text-gray-400 hover:text-gray-600'
-          >
-            <svg
-              class='w-5 h-5'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-          <div class='text-center'>
-            <h3 class='text-sm font-semibold text-black mb-1 uppercase'>
-              {{
-                section.settings.success_title
-                | default: "You're on the list!"
-              }}
-            </h3>
-            <h2 class='text-lg font-bold text-black mb-4 uppercase'>
-              {{
-                section.settings.success_subtitle
-                | default: "We'll notify you when we launch"
-              }}
-            </h2>
-            <div class='{{ section.settings.success_button_color | default: 'bg-orange-500' }} text-white py-3 px-4 rounded-lg'>
-              <p class='font-semibold text-sm'>
-                {{
-                  section.settings.success_message
-                  | default: "Thanks for signing up!"
-                }}
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
 {% endif %}
+
+<script type="text/javascript">
+	document.querySelector('.klaviyo_form_trigger').addEventListener('click', function (){
+		window._klOnsite = window._klOnsite || [];
+    window._klOnsite.push(['openForm', 'TRArE7']);
+	});
+</script>
 
 <!-- Countdown Timer Script -->
 <script>
