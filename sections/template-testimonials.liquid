@@ -156,6 +156,33 @@
         }
       }
     </style>
+    <style>
+      .testimonial-card__overlay {
+        padding: 0.9rem 1.25rem;
+      }
+      @media (min-width: 768px) {
+        .testimonial-card__overlay {
+          padding: 1.1rem 1.5rem;
+        }
+      }
+      .testimonial-card__quote {
+        font-size: 0.85rem !important;
+        line-height: 1.35 !important;
+        margin: 0 0 0.15rem !important;
+        padding: 0 !important;
+        border: none !important;
+        margin-left: 0 !important;
+      }
+      .testimonial-card__quote::before,
+      .testimonial-card__quote::after {
+        content: none !important;
+      }
+      .testimonial-card__author {
+        font-size: 0.75rem !important;
+        line-height: 1.2 !important;
+        margin: 0;
+      }
+    </style>
     <div class='testimonials-grid-first'>
       {% assign rendered = 0 %}
       {% for block in section.blocks %}
@@ -165,7 +192,7 @@
             {% assign img_ratio = has_image.aspect_ratio | default: 1 %}
           {% endif %}
           <div
-            class='relative w-full rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer'
+            class='relative w-full rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer testimonial-card'
             {% if has_image %}
               style='aspect-ratio: {{ img_ratio }};'
             {% else %}
@@ -209,17 +236,17 @@
             {% endif %}
 
             <!-- Content Overlay with Background -->
-            <div class='absolute bottom-0 left-0 right-0 p-6 text-white bg-black/60 flex flex-col gap-0.5'>
+            <div class='absolute bottom-0 left-0 right-0 text-white bg-black/60 flex flex-col gap-0 testimonial-card__overlay'>
               <!-- Quote -->
               <blockquote
-                class='text-white text-sm leading-relaxed italic'
+                class='testimonial-card__quote text-white italic'
                 data-truncate='quote'
               >
                 "{{ block.settings.quote }}"
               </blockquote>
 
               <!-- Author Name -->
-              <cite class='text-white font-semibold not-italic text-sm'>
+              <cite class='testimonial-card__author text-white font-semibold not-italic'>
                 {{ block.settings.author }}
               </cite>
             </div>
@@ -944,7 +971,7 @@
                   {% assign img_ratio = has_image.aspect_ratio | default: 1 %}
                 {% endif %}
                 <div
-                  class='relative w-full rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer'
+                  class='relative w-full rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer testimonial-card'
                   {% if has_image %}
                     style='aspect-ratio: {{ img_ratio }};'
                   {% else %}
@@ -990,17 +1017,17 @@
                   {% endif %}
 
                   <!-- Content Overlay with Background -->
-                  <div class='absolute bottom-0 left-0 right-0 p-6 text-white bg-black/60 flex flex-col gap-0.5'>
+                  <div class='absolute bottom-0 left-0 right-0 text-white bg-black/60 flex flex-col gap-0 testimonial-card__overlay'>
                     <!-- Quote -->
                     <blockquote
-                      class='text-white text-sm leading-relaxed italic'
+                      class='testimonial-card__quote text-white italic'
                       data-truncate='quote'
                     >
                       "{{ block.settings.quote }}"
                     </blockquote>
 
                     <!-- Author Name -->
-                    <cite class='text-white font-semibold not-italic text-sm'>
+                    <cite class='testimonial-card__author text-white font-semibold not-italic'>
                       {{ block.settings.author }}
                     </cite>
                   </div>
