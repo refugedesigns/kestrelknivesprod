@@ -438,9 +438,13 @@
             {% else %}
               <button
                 @click='qvAddToCart()'
-                class='w-full cursor-pointer bg-black text-white font-bold py-4 text-base hover:bg-gray-900'
+                :disabled='!qvCanAddToCart'
+                class='w-full text-white font-bold py-4 text-base transition-colors duration-200'
+                :class="qvCanAddToCart ? 'cursor-pointer bg-black hover:bg-gray-900' : 'bg-gray-400 cursor-not-allowed opacity-80'"
               >
-                Add to Cart
+                <span
+                  x-text="qvCanAddToCart ? 'Add to Cart' : 'Sold Out'"
+                ></span>
               </button>
             {% endif %}
             <a
@@ -544,6 +548,20 @@
           return this.productData.price != null
             ? this.formatMoney(this.productData.price)
             : ''
+        },
+        get qvSelectedVariantObj() {
+          if (!this.variantsData || !this.variantsData.length) return null
+          const targetId = this.qvSelectedVariantId || this.selectedVariant
+          return this.variantsData.find(v => v.id === targetId) || null
+        },
+        get qvCanAddToCart() {
+          if (this.productData && this.productData.available === false) {
+            return false
+          }
+          if (this.qvSelectedVariantObj) {
+            return !!this.qvSelectedVariantObj.available
+          }
+          return !!this.isAvailable
         },
         // Quick View state
         isQuickViewOpen: false,
@@ -753,6 +771,7 @@
         },
 
         async qvAddToCart() {
+          if (!this.qvCanAddToCart) return
           try {
             // Prefer cart sheet addToCart if available
             const cartSheet = document.querySelector('[x-data*="cartSheet"]')
