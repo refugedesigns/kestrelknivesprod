@@ -2546,19 +2546,15 @@
             if (!this.useComplexOptions) return;
             if (this.complexPreviewMode) return;
             this.complexPreviewMode = true;
+            this.restoreLayeredBase();
             const container = document.getElementById('complexOverlayContainer');
             if (container) container.classList.remove('hidden');
           },
 
           showLayeredPreview() {
             if (!this.useComplexOptions) return;
+            this.complexPreviewMode = false; // force re-enable
             this.ensureLayeredPreview();
-            const primaryValue = this.selectedOptions[0];
-            if (primaryValue) {
-              this.handleComplexPrimarySelection(primaryValue);
-            }
-            const container = document.getElementById('complexOverlayContainer');
-            if (container) container.classList.remove('hidden');
           },
 
           enterStandardMediaMode(imageUrl) {
@@ -2585,6 +2581,17 @@
             if (nextSrc) {
               baseImg.src = nextSrc;
             }
+          },
+
+          restoreLayeredBase() {
+            if (!this.useComplexOptions) return;
+            const primaryValue = this.selectedOptions[0];
+            const asset =
+              (primaryValue && this.lookupComplexAsset(0, primaryValue)) ||
+              complexConfig.defaultPrimaryAsset ||
+              complexConfig.fallbackImage ||
+              '';
+            this.setComplexBaseImage(asset);
           },
 
           updateComplexLayerElement(optionIndex, assetUrl) {
