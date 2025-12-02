@@ -379,9 +379,6 @@
                             >
                             <div class='w-full aspect-square border-2 {% if is_selected %}border-black{% else %}border-gray-300 hover:border-black{% endif %} rounded-lg p-2 bg-white hover:bg-gray-100 transition-colors'>
                               {% if use_local_colors %}
-                                {% assign product_asset_prefix = product.handle
-                                  | replace: "-", "_"
-                                %}
                                 {% assign option_name_token = option.name
                                   | strip
                                   | handleize
@@ -392,9 +389,7 @@
                                   | handleize
                                   | replace: "-", "_"
                                 %}
-                                {% assign option_asset_filename = product_asset_prefix
-                                  | append: "_"
-                                  | append: option_name_token
+                                {% assign option_asset_filename = option_name_token
                                   | append: "_"
                                   | append: option_value_token
                                   | append: ".png"
