@@ -235,7 +235,7 @@
         <div class='lg:col-span-7'>
           <!-- Main Image -->
           {% if use_complex_options %}
-            <div class='aspect-square bg-white rounded-lg overflow-hidden mb-6 complex-image-canvas' id='complexImageRoot'>
+            <div class='aspect-square bg-white rounded-lg overflow-hidden mb-6 complex-image-canvas relative' id='complexImageRoot'>
               <img
                 id='complexBaseImage'
                 src='{{ complex_base_image_src }}'
@@ -246,6 +246,14 @@
                 data-default-src='{{ complex_base_image_src }}'
               >
               <div id='complexOverlayContainer'></div>
+              <button
+                type='button'
+                x-show='!complexPreviewMode'
+                @click='showLayeredPreview()'
+                class='absolute top-4 right-4 bg-white/90 hover:bg-white text-xs font-semibold px-3 py-2 rounded-full shadow transition transform hover:scale-[1.02]'
+              >
+                Return to Custom Preview
+              </button>
             </div>
           {% else %}
             <div class='aspect-square bg-white rounded-lg overflow-hidden mb-6 relative group'>
@@ -303,69 +311,67 @@
             </div>
           {% endif %}
 
-          {% unless use_complex_options %}
-            <!-- Thumbnail Images -->
-            <div class='relative hidden md:block'>
-              <div
-                id='thumbnailStrip'
-                class='flex space-x-4 overflow-x-auto pb-2'
-              >
-                {% for media in product.media %}
-                  <button
-                    @click='changeImage({{ forloop.index0 }})'
-                    class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 {% if forloop.first %}border-black{% else %}border-gray-200 hover:border-black{% endif %} transition-colors'
-                  >
-                    {% render "product-media", media: media %}
-                  </button>
-                {% endfor %}
-              </div>
-              <div
-                id='thumbFadeLeft'
-                class='pointer-events-none absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-white to-transparent'
-              ></div>
-              <div
-                id='thumbFadeRight'
-                class='pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white to-transparent'
-              ></div>
-            </div>
-            <div class='mt-3 md:hidden flex items-center justify-center space-x-4'>
-              <button
-                type='button'
-                id='mobilePrevBtn'
-                class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md text-black hover:bg-gray-100 active:bg-gray-200 transition-colors'
-              >
-                <span class='sr-only'>Previous image</span>
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  fill='none'
-                  viewBox='0 0 24 24'
-                  stroke-width='1.5'
-                  stroke='currentColor'
-                  class='size-6'
+          <!-- Thumbnail Images -->
+          <div class='relative hidden md:block'>
+            <div
+              id='thumbnailStrip'
+              class='flex space-x-4 overflow-x-auto pb-2'
+            >
+              {% for media in product.media %}
+                <button
+                  @click='changeImage({{ forloop.index0 }})'
+                  class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 {% if forloop.first %}border-black{% else %}border-gray-200 hover:border-black{% endif %} transition-colors'
                 >
-                  <path stroke-linecap='round' stroke-linejoin='round' d='M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18'/>
-                </svg>
-              </button>
-              <div class='flex items-center space-x-2' id='mobileDots'></div>
-              <button
-                type='button'
-                id='mobileNextBtn'
-                class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md text-black hover:bg-gray-100 active:bg-gray-200 transition-colors'
-              >
-                <span class='sr-only'>Next image</span>
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  fill='none'
-                  viewBox='0 0 24 24'
-                  stroke-width='1.5'
-                  stroke='currentColor'
-                  class='size-6'
-                >
-                  <path stroke-linecap='round' stroke-linejoin='round' d='M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3'/>
-                </svg>
-              </button>
+                  {% render "product-media", media: media %}
+                </button>
+              {% endfor %}
             </div>
-          {% endunless %}
+            <div
+              id='thumbFadeLeft'
+              class='pointer-events-none absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-white to-transparent'
+            ></div>
+            <div
+              id='thumbFadeRight'
+              class='pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white to-transparent'
+            ></div>
+          </div>
+          <div class='mt-3 md:hidden flex items-center justify-center space-x-4'>
+            <button
+              type='button'
+              id='mobilePrevBtn'
+              class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md text-black hover:bg-gray-100 active:bg-gray-200 transition-colors'
+            >
+              <span class='sr-only'>Previous image</span>
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'
+                stroke-width='1.5'
+                stroke='currentColor'
+                class='size-6'
+              >
+                <path stroke-linecap='round' stroke-linejoin='round' d='M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18'/>
+              </svg>
+            </button>
+            <div class='flex items-center space-x-2' id='mobileDots'></div>
+            <button
+              type='button'
+              id='mobileNextBtn'
+              class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md text-black hover:bg-gray-100 active:bg-gray-200 transition-colors'
+            >
+              <span class='sr-only'>Next image</span>
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'
+                stroke-width='1.5'
+                stroke='currentColor'
+                class='size-6'
+              >
+                <path stroke-linecap='round' stroke-linejoin='round' d='M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3'/>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <!-- Right Column - Product Info -->
@@ -2132,6 +2138,7 @@
           ],
           useComplexOptions,
           complexLayerState: {},
+          complexPreviewMode: true,
 
           // dynamic selected options (kept in array ordered by product.options index)
           selectedOptions: initialOptions.slice(),
@@ -2503,6 +2510,7 @@
           },
 
           handleComplexLayerButton(button) {
+            this.ensureLayeredPreview();
             const optionIndex = Number(button.dataset.complexOptionIndex);
             const optionValue = button.dataset.optionValue;
             const assetUrl = button.dataset.asset || this.lookupComplexAsset(optionIndex, optionValue);
@@ -2524,6 +2532,7 @@
 
           handleComplexPrimarySelection(value, assetUrl) {
             if (!this.useComplexOptions) return;
+             this.ensureLayeredPreview();
             const resolvedAsset =
               assetUrl ||
               this.lookupComplexAsset(0, value) ||
@@ -2531,6 +2540,36 @@
               complexConfig.fallbackImage ||
               '';
             this.setComplexBaseImage(resolvedAsset);
+          },
+
+          ensureLayeredPreview() {
+            if (!this.useComplexOptions) return;
+            if (this.complexPreviewMode) return;
+            this.complexPreviewMode = true;
+            const container = document.getElementById('complexOverlayContainer');
+            if (container) container.classList.remove('hidden');
+          },
+
+          showLayeredPreview() {
+            if (!this.useComplexOptions) return;
+            this.ensureLayeredPreview();
+            const primaryValue = this.selectedOptions[0];
+            if (primaryValue) {
+              this.handleComplexPrimarySelection(primaryValue);
+            }
+            const container = document.getElementById('complexOverlayContainer');
+            if (container) container.classList.remove('hidden');
+          },
+
+          enterStandardMediaMode(imageUrl) {
+            if (!this.useComplexOptions) return;
+            this.complexPreviewMode = false;
+            const container = document.getElementById('complexOverlayContainer');
+            if (container) container.classList.add('hidden');
+            const baseImg = document.getElementById('complexBaseImage');
+            if (baseImg && imageUrl) {
+              baseImg.src = imageUrl;
+            }
           },
 
           setComplexBaseImage(assetUrl) {
@@ -2599,14 +2638,17 @@
           },
 
           changeImage(index) {
-            if (this.useComplexOptions) return;
             const mainImage = document.getElementById('mainImage');
             const thumbnails = Array.from(document.querySelectorAll('.thumbnail'));
             const thumbnailContainer = document.getElementById('thumbnailStrip');
 
             if (index >= 0 && index < this.productImages.length) {
               this.currentImageIndex = index;
-              if (mainImage) mainImage.src = this.productImages[index];
+              if (this.useComplexOptions) {
+                this.enterStandardMediaMode(this.productImages[index]);
+              } else if (mainImage) {
+                mainImage.src = this.productImages[index];
+              }
 
               // Update thumbnail borders
               thumbnails.forEach((thumbnail, i) => {
@@ -2650,13 +2692,11 @@
           },
 
           previousImage() {
-            if (this.useComplexOptions) return;
             const newIndex = this.currentImageIndex > 0 ? this.currentImageIndex - 1 : this.productImages.length - 1;
             this.changeImage(newIndex);
           },
 
           nextImage() {
-            if (this.useComplexOptions) return;
             const newIndex = this.currentImageIndex < this.productImages.length - 1 ? this.currentImageIndex + 1 : 0;
             this.changeImage(newIndex);
           },
