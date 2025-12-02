@@ -187,6 +187,7 @@
           | replace: " ", "_"
           | replace: "-", "_"
           | replace: "/", "_"
+          | replace: ".", "_"
         %}
         {% assign complex_primary_value_token = complex_primary_default_value
           | strip
@@ -194,6 +195,7 @@
           | replace: " ", "_"
           | replace: "-", "_"
           | replace: "/", "_"
+          | replace: ".", "_"
         %}
         {% assign complex_primary_asset_filename = 'cmp_'
           | append: complex_primary_option_token
@@ -471,6 +473,7 @@
                             | replace: " ", "_"
                             | replace: "-", "_"
                             | replace: "/", "_"
+                            | replace: ".", "_"
                           %}
                           {% assign complex_value_token = value
                             | strip
@@ -478,6 +481,7 @@
                             | replace: " ", "_"
                             | replace: "-", "_"
                             | replace: "/", "_"
+                            | replace: ".", "_"
                           %}
                           {% assign complex_asset_filename = 'cmp_'
                             | append: complex_option_token
@@ -571,6 +575,7 @@
                             | replace: " ", "_"
                             | replace: "-", "_"
                             | replace: "/", "_"
+                            | replace: ".", "_"
                           %}
                           {% assign complex_value_token = value
                             | strip
@@ -578,6 +583,7 @@
                             | replace: " ", "_"
                             | replace: "-", "_"
                             | replace: "/", "_"
+                            | replace: ".", "_"
                           %}
                           {% assign complex_asset_filename = 'cmp_'
                             | append: complex_option_token
@@ -678,6 +684,7 @@
                             | replace: " ", "_"
                             | replace: "-", "_"
                             | replace: "/", "_"
+                            | replace: ".", "_"
                           %}
                           {% assign complex_value_token = value
                             | strip
@@ -685,6 +692,7 @@
                             | replace: " ", "_"
                             | replace: "-", "_"
                             | replace: "/", "_"
+                            | replace: ".", "_"
                           %}
                           {% assign complex_asset_filename = 'cmp_'
                             | append: complex_option_token
@@ -757,6 +765,7 @@
                             | replace: " ", "_"
                             | replace: "-", "_"
                             | replace: "/", "_"
+                            | replace: ".", "_"
                           %}
                           {% assign complex_value_token = value
                             | strip
@@ -764,6 +773,7 @@
                             | replace: " ", "_"
                             | replace: "-", "_"
                             | replace: "/", "_"
+                            | replace: ".", "_"
                           %}
                           {% assign complex_asset_filename = 'cmp_'
                             | append: complex_option_token
@@ -1970,6 +1980,7 @@
                 | replace: " ", "_"
                 | replace: "-", "_"
                 | replace: "/", "_"
+                | replace: ".", "_"
               %}
               {% assign val_token = value
                 | strip
@@ -1977,6 +1988,7 @@
                 | replace: " ", "_"
                 | replace: "-", "_"
                 | replace: "/", "_"
+                | replace: ".", "_"
               %}
               {% assign asset_filename = 'cmp_'
                 | append: opt_token
