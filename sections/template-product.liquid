@@ -583,7 +583,30 @@
                               {% endif %}
                             >
                             <div class='w-full aspect-square border-2 {% if is_selected %}border-black{% else %}border-gray-300 hover:border-black{% endif %} rounded-lg p-2 bg-white hover:bg-gray-100 transition-colors'>
-                              {% if use_complex_options and complex_asset_thumb != blank %}
+                              {% if use_local_colors %}
+                                {% assign option_name_token = option.name
+                                  | strip
+                                  | handleize
+                                  | replace: "-", "_"
+                                %}
+                                {% assign option_value_token = value
+                                  | strip
+                                  | handleize
+                                  | replace: "-", "_"
+                                %}
+                                {% assign option_asset_filename = option_name_token
+                                  | append: "_"
+                                  | append: option_value_token
+                                  | append: ".png"
+                                %}
+                                <img
+                                  src='{{ option_asset_filename | asset_img_url: '64x64' }}'
+                                  alt='{{ value }}'
+                                  class='w-full h-full object-contain rounded-md'
+                                  width='64'
+                                  height='64'
+                                >
+                              {% elsif use_complex_options and complex_asset_thumb != blank %}
                                 <img
                                   src='{{ complex_asset_thumb }}'
                                   alt='{{ value }}'
@@ -591,31 +614,6 @@
                                   width='64'
                                   height='64'
                                 >
-                              {% elsif use_local_colors %}
-                                {% unless use_complex_options %}
-                                  {% assign option_name_token = option.name
-                                    | strip
-                                    | handleize
-                                    | replace: "-", "_"
-                                  %}
-                                  {% assign option_value_token = value
-                                    | strip
-                                    | handleize
-                                    | replace: "-", "_"
-                                  %}
-                                  {% assign option_asset_filename = option_name_token
-                                    | append: "_"
-                                    | append: option_value_token
-                                    | append: ".png"
-                                  %}
-                                  <img
-                                    src='{{ option_asset_filename | asset_img_url: '64x64' }}'
-                                    alt='{{ value }}'
-                                    class='w-full h-full object-contain rounded-md'
-                                    width='64'
-                                    height='64'
-                                  >
-                                {% endunless %}
                               {% elsif option_image %}
                                 <img
                                   src='{{ option_image | image_url: width: 64 }}'
