@@ -449,6 +449,22 @@
                         data-complex-option-wrapper='{{ option_index0 }}'
                       >
                         {% for value in option.values %}
+                          {% assign local_option_token = option.name
+                            | strip
+                            | handleize
+                            | replace: "-", "_"
+                          %}
+                          {% assign local_value_token = value
+                            | strip
+                            | handleize
+                            | replace: "-", "_"
+                          %}
+                          {% assign local_asset_filename = local_option_token
+                            | append: "_"
+                            | append: local_value_token
+                            | append: ".png"
+                          %}
+                          {% assign local_asset_thumb = local_asset_filename | asset_img_url: '256x256' %}
                           {% assign complex_option_token = option.name
                             | strip
                             | downcase
@@ -483,7 +499,12 @@
                               data-asset='{{ complex_asset_large }}'
                               aria-pressed='false'
                             >
-                              {% if complex_asset_thumb != blank %}
+                              {% if use_local_colors and local_asset_thumb != blank %}
+                                <img
+                                  src='{{ local_asset_thumb }}'
+                                  alt='{{ value | escape }}'
+                                >
+                              {% elsif complex_asset_thumb != blank %}
                                 <img
                                   src='{{ complex_asset_thumb }}'
                                   alt='{{ value | escape }}'
