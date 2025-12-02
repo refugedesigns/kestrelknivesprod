@@ -2003,6 +2003,7 @@
       {% endfor %}
     ]
   };
+  console.log('Complex options config:', window.__complexOptionsConfig);
 </script>
 {% else %}
 <script>
@@ -2564,8 +2565,13 @@
           lookupComplexAsset(optionIndex, value) {
             if (!complexConfig || !complexConfig.options) return '';
             const optionMeta = complexConfig.options.find(opt => Number(opt.index) === Number(optionIndex));
-            if (!optionMeta || !optionMeta.assets) return '';
-            return optionMeta.assets[value] || '';
+            if (!optionMeta || !optionMeta.assets) {
+              console.log('lookupComplexAsset: missing metadata', { optionIndex, value });
+              return '';
+            }
+            const asset = optionMeta.assets[value] || '';
+            console.log('lookupComplexAsset:', { optionIndex, value, asset });
+            return asset;
           },
 
           changeImage(index) {
