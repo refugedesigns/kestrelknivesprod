@@ -318,9 +318,14 @@
               class='flex space-x-4 overflow-x-auto pb-2'
             >
               {% for media in product.media %}
+                {% assign thumb_active = false %}
+                {% if forloop.index0 == 0 %}
+                  {% assign thumb_active = true %}
+                {% endif %}
                 <button
                   @click='changeImage({{ forloop.index0 }})'
-                  class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 {% if forloop.first %}border-black{% else %}border-gray-200 hover:border-black{% endif %} transition-colors'
+                  data-thumb-index='{{ forloop.index0 }}'
+                  class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 transition-colors {% if thumb_active %}border-black{% else %}border-gray-200 hover:border-black{% endif %}'
                 >
                   {% render "product-media", media: media %}
                 </button>
@@ -335,43 +340,43 @@
               class='pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white to-transparent'
             ></div>
           </div>
-          <div class='mt-3 md:hidden flex items-center justify-center space-x-4'>
-            <button
-              type='button'
-              id='mobilePrevBtn'
-              class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md text-black hover:bg-gray-100 active:bg-gray-200 transition-colors'
-            >
-              <span class='sr-only'>Previous image</span>
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                fill='none'
-                viewBox='0 0 24 24'
-                stroke-width='1.5'
-                stroke='currentColor'
-                class='size-6'
+            <div class='mt-3 md:hidden flex items-center justify-center space-x-4'>
+              <button
+                type='button'
+                id='mobilePrevBtn'
+                class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md text-black hover:bg-gray-100 active:bg-gray-200 transition-colors'
               >
-                <path stroke-linecap='round' stroke-linejoin='round' d='M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18'/>
-              </svg>
-            </button>
-            <div class='flex items-center space-x-2' id='mobileDots'></div>
-            <button
-              type='button'
-              id='mobileNextBtn'
-              class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md text-black hover:bg-gray-100 active:bg-gray-200 transition-colors'
-            >
-              <span class='sr-only'>Next image</span>
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                fill='none'
-                viewBox='0 0 24 24'
-                stroke-width='1.5'
-                stroke='currentColor'
-                class='size-6'
+                <span class='sr-only'>Previous image</span>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke-width='1.5'
+                  stroke='currentColor'
+                  class='size-6'
+                >
+                  <path stroke-linecap='round' stroke-linejoin='round' d='M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18'/>
+                </svg>
+              </button>
+              <div class='flex items-center space-x-2' id='mobileDots'></div>
+              <button
+                type='button'
+                id='mobileNextBtn'
+                class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md text-black hover:bg-gray-100 active:bg-gray-200 transition-colors'
               >
-                <path stroke-linecap='round' stroke-linejoin='round' d='M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3'/>
-              </svg>
-            </button>
-          </div>
+                <span class='sr-only'>Next image</span>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke-width='1.5'
+                  stroke='currentColor'
+                  class='size-6'
+                >
+                  <path stroke-linecap='round' stroke-linejoin='round' d='M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3'/>
+                </svg>
+              </button>
+            </div>
         </div>
 
         <!-- Right Column - Product Info -->
