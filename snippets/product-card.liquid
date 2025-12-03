@@ -6,6 +6,11 @@
   It is also used to display the product images and their images.
   It is also used to display the product images and their images.
 {% endcomment %}
+{% assign product_tags_lower = product_product.tags | join: '||' | downcase %}
+{% assign has_complex_tag = false %}
+{% if product_tags_lower contains 'use_complex_options' %}
+  {% assign has_complex_tag = true %}
+{% endif %}
 
 <div
   class='py-6 px-3 hover:cursor-pointer product-card w-full'
@@ -22,7 +27,8 @@
         {{ product_product.images[0] | image_url: width: 400 | json }}
       {% else %}
         null
-      {% endif %}
+      {% endif %},
+      {{ has_complex_tag | json }}
     )
   '
 >
@@ -462,7 +468,7 @@
   document.addEventListener('alpine:init', () => {
     Alpine.data(
       'productCard',
-      (selectedVariantId, productTitle, currentImage) => ({
+      (selectedVariantId, productTitle, currentImage, hasComplexOptionsTag) => ({
         selectedVariant: selectedVariantId,
         currentImage: currentImage,
         productData: {},
@@ -473,6 +479,7 @@
         isAvailable: true,
         isHovering: false,
         hoverImageLoaded: false,
+        useComplexOptionsTag: !!hasComplexOptionsTag,
 
         // Computed property for formatted price
         get formattedPrice() {
@@ -871,7 +878,7 @@
         updateImage() {
           // For apparel, keep using the product's featured_image (do not swap per variant)
           const typeLower = (this.productData.type || '').toLowerCase()
-          if (typeLower.includes('apparel')) {
+          if (typeLower.includes('apparel') || this.useComplexOptionsTag) {
             return
           }
           // Update image when variant changes (for knives/non-apparels)
