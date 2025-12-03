@@ -318,14 +318,11 @@
               class='flex space-x-4 overflow-x-auto pb-2'
             >
               {% for media in product.media %}
-                {% assign thumb_active = false %}
-                {% if forloop.index0 == 0 %}
-                  {% assign thumb_active = true %}
-                {% endif %}
                 <button
                   @click='changeImage({{ forloop.index0 }})'
                   data-thumb-index='{{ forloop.index0 }}'
-                  class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 transition-colors {% if thumb_active %}border-black{% else %}border-gray-200 hover:border-black{% endif %}'
+                  class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 transition-colors border-gray-200 hover:border-black'
+                  :class="currentImageIndex === {{ forloop.index0 }} ? 'border-black' : 'border-gray-200 hover:border-black'"
                 >
                   {% render "product-media", media: media %}
                 </button>
