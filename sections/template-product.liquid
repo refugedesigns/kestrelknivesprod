@@ -151,6 +151,12 @@
       opacity: 1;
     }
   }
+
+  /* Ensure line breaks are respected in product description */
+  .prose br {
+    display: block;
+    margin: 0.5em 0;
+  }
 </style>
 
 <div class='bg-gray-50 mb-8' x-data='productPage()'>
