@@ -876,9 +876,13 @@
         },
 
         updateImage() {
-          // For apparel, keep using the product's featured_image (do not swap per variant)
+          // For apparel/accessories/complex products, keep using the product's featured_image
           const typeLower = (this.productData.type || '').toLowerCase()
-          if (typeLower.includes('apparel') || this.useComplexOptionsTag) {
+          if (
+            typeLower.includes('apparel') ||
+            typeLower.includes('accessories') ||
+            this.useComplexOptionsTag
+          ) {
             return
           }
           // Update image when variant changes (for knives/non-apparels)
