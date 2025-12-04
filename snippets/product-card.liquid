@@ -55,13 +55,13 @@
         | default: product_product.metafields.global.product_status
       %}
       {% if kk_status != blank %}
-        <div class='absolute top-4 left-4 bg-black text-white font-bold px-3 py-1 text-sm uppercase z-10'>
+        <div class='absolute top-2 left-2 md:top-4 md:left-4 bg-black text-white font-bold px-2 py-1 text-xs md:text-sm uppercase z-10'>
           {{ kk_status }}
         </div>
       {% else %}
         <div
           x-show='!isAvailable'
-          class='absolute top-4 left-4 bg-black text-white font-bold px-3 py-1 text-sm uppercase z-10'
+          class='absolute top-2 left-2 md:top-4 md:left-4 bg-black text-white font-bold px-2 py-1 text-xs md:text-sm uppercase z-10'
         >
           SOLD OUT
         </div>
