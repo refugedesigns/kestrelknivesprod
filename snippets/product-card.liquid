@@ -139,7 +139,7 @@
                     <button
                       @click='selectByHandle({{ variant.option1 | json }})'
                       :class="$el.dataset.handleLc && selectedOption1Lc === $el.dataset.handleLc ? 'ring-2 ring-black' : ''"
-                      class='w-8 h-8 md:h-6 md:w-6 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-black overflow-hidden'
+                      class='h-6 w-6 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-black overflow-hidden'
                       title='{{ variant.option1 }}'
                       data-handle-lc='{{ variant.option1 | strip | downcase }}'
                     >
