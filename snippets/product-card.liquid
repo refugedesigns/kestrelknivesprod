@@ -139,7 +139,7 @@
                     <button
                       @click='selectByHandle({{ variant.option1 | json }})'
                       :class="$el.dataset.handleLc && selectedOption1Lc === $el.dataset.handleLc ? 'ring-2 ring-black' : ''"
-                      class='w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-black overflow-hidden'
+                      class='w-8 h-8 md:w-10 md:h-6 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-black overflow-hidden'
                       title='{{ variant.option1 }}'
                       data-handle-lc='{{ variant.option1 | strip | downcase }}'
                     >
@@ -183,8 +183,8 @@
 
                       {% if cmp_asset_thumb != blank %}
                         <img
-                          width='20'
-                          height='20'
+                          width='48'
+                          height='48'
                           src='{{ cmp_asset_thumb }}'
                           alt='{{ variant.option1 }}'
                           class='w-full h-full object-contain'
