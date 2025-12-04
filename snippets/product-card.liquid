@@ -48,7 +48,7 @@
 >
   <div class='bg-white overflow-hidden w-full flex flex-col transition-none {% unless is_apparel or is_accessory %}h-[600px]{% endunless %}'>
     <!-- Product Image -->
-    <div class='relative {% if is_apparel %}h-[260px] md:h-[320px] lg:h-[360px]{% else %}h-96{% endif %} bg-white overflow-hidden'>
+    <div class='relative {% if is_apparel %}h-[180px] md:h-[300px] lg:h-[360px]{% else %}h-96{% endif %} bg-white overflow-hidden'>
       <!-- Status / SOLD OUT Badge -->
       {% assign kk_status = product_product.metafields.custom.product_status
         | default: product_product.metafields.custom_fields.product_status
@@ -94,7 +94,7 @@
     </div>
 
     <!-- Product Info -->
-    <div class='p-4 md:p-6 flex flex-col gap-3 justify-between'>
+    <div class='p-4 md:p-6 flex flex-col {% if is_apparel %}gap-2{% else %}gap-3{% endif %} justify-between'>
       <div>
         <!-- Product Name -->
         <a href='{{ product_product.url }}'>
