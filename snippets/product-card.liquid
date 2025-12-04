@@ -34,7 +34,7 @@
 >
   <div class='bg-white overflow-hidden w-full {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[540px]{% else %}h-[600px]{% endif %} flex flex-col transition-none'>
     <!-- Product Image -->
-    <div class='relative bg-red-200 {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[320px] md:h-[340px] lg:h-[360px]{% else %}h-96{% endif %} bg-white overflow-hidden'>
+    <div class='relative bg-red-200 {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[320px] md:h-[340px] lg:h-[360px]{% else %}h-96{% endif %} overflow-hidden'>
       <!-- Status / SOLD OUT Badge -->
       {% assign kk_status = product_product.metafields.custom.product_status
         | default: product_product.metafields.custom_fields.product_status
