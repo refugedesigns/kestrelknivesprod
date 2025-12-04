@@ -1080,7 +1080,7 @@
         <!-- Description (Left - 7 columns) -->
         <div class='lg:col-span-7'>
           {% if product.description != blank %}
-            <div class='prose prose-black max-w-none'>
+            <div class='prose prose-black max-w-none whitespace-pre-wrap'>
               {{ product.description }}
             </div>
           {% endif %}
