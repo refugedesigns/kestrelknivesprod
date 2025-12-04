@@ -513,7 +513,7 @@
                           <div class='flex flex-col items-center'>
                             <button
                               type='button'
-                              class='complex-layer-option w-20 h-20 flex items-center justify-center'
+                              class='complex-layer-option w-full aspect-square flex items-center justify-center'
                               data-complex-option-button
                               data-complex-option-index='{{ option_index0 }}'
                               data-option-name='{{ option.name | escape }}'
@@ -537,7 +537,7 @@
                                 </span>
                               {% endif %}
                             </button>
-                            <span class='text-xs text-center block mt-2 font-medium text-gray-900'>
+                            <span class='text-xs text-center block mt-1 font-medium text-gray-900'>
                               {{ value | upcase }}
                             </span>
                           </div>
