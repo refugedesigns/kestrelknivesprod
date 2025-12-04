@@ -7,7 +7,7 @@
   {% assign collection_title_normalized = collection.title | strip | downcase %}
   {% if collection_title_normalized == "ultralight knives" %}
     {% assign collection_title_display = collection.title
-      | append: "<br><span class='text-2xl font-normal'>100% Made in the USA</span>"
+      | append: "<br>100% Made in the USA"
     %}
   {% endif %}
 {% endif %}
@@ -223,7 +223,7 @@
           const trimmed = raw.trim()
           if (trimmed.toLowerCase() === 'ultralight knives') {
             const base = trimmed || 'Ultralight Knives'
-            return `${base}<br><span class='text-2xl font-normal'>100% Made in the USA</span>`
+            return `${base}<br>100% Made in the USA`
           }
           return trimmed || raw
         } catch (e) {
