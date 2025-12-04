@@ -103,6 +103,16 @@
     border-radius: 0.5rem;
   }
 
+  /* Tighter spacing for rich text description */
+  .prose.prose-description p {
+    margin-top: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .prose.prose-description p:first-child {
+    margin-top: 0;
+  }
+
   /* Mobile sticky positioning */
   @media (max-width: 1024px) {
     .mobile-sticky {
@@ -1080,7 +1090,7 @@
         <!-- Description (Left - 7 columns) -->
         <div class='lg:col-span-7'>
           {% if product.description != blank %}
-            <div class='prose prose-black max-w-none whitespace-pre-wrap'>
+            <div class='prose prose-black prose-description max-w-none whitespace-pre-wrap'>
               {{ product.description }}
             </div>
           {% endif %}
