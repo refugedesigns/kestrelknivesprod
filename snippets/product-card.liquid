@@ -705,7 +705,7 @@
           this.selectedVariant = variantId
           this.updateTitle()
           this.checkAvailability()
-          this.updateImage()
+          this.updateImage(true)
           // Price will update automatically via the formattedPrice computed property
         },
 
@@ -721,7 +721,7 @@
           this.selectedVariant = chosen.id
           this.updateTitle()
           this.checkAvailability()
-          this.updateImage()
+          this.updateImage(true)
         },
 
         checkAvailability() {
@@ -875,16 +875,21 @@
           }
         },
 
-        updateImage() {
-          // For apparel/accessories/complex products, keep using the product's featured_image
+        updateImage(forceVariantImage = false) {
+          // Always keep featured image for apparels/accessories
           const typeLower = (this.productData.type || '').toLowerCase()
           if (
             typeLower.includes('apparel') ||
-            typeLower.includes('accessories') ||
-            this.useComplexOptionsTag
+            typeLower.includes('accessories')
           ) {
             return
           }
+          const hasComplexTag = this.useComplexOptionsTag
+
+          if (hasComplexTag && !forceVariantImage) {
+            return
+          }
+
           // Update image when variant changes (for knives/non-apparels)
           if (this.variantsData && this.variantsData.length > 0) {
             const selectedVariant = this.variantsData.find(
