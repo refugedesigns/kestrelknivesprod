@@ -12,6 +12,11 @@
   {% assign has_complex_tag = true %}
 {% endif %}
 
+{% assign product_type_lower = product_product.type | default: "" | downcase %}
+{% assign is_apparel = product_type_lower contains "apparel" %}
+{% assign is_accessory = product_type_lower contains "accessories" %}
+{% assign is_custom = product_type_lower contains "custom" %}
+
 <div
   class='py-6 px-3 hover:cursor-pointer product-card w-full'
   data-product='{{ product_product | json | escape }}'
@@ -32,9 +37,9 @@
     )
   '
 >
-  <div class='bg-white overflow-hidden w-full {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[540px]{% else %}h-[600px]{% endif %} flex flex-col transition-none'>
+  <div class='bg-white overflow-hidden w-full flex flex-col transition-none {% unless is_apparel or is_accessory %}h-[600px]{% endunless %}'>
     <!-- Product Image -->
-    <div class='relative bg-red-200 {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[200px] md:h-[340px] lg:h-[360px]{% else %}h-96{% endif %} overflow-hidden'>
+    <div class='relative {% if is_apparel %}h-[260px] md:h-[320px] lg:h-[360px]{% else %}h-96{% endif %} bg-white overflow-hidden'>
       <!-- Status / SOLD OUT Badge -->
       {% assign kk_status = product_product.metafields.custom.product_status
         | default: product_product.metafields.custom_fields.product_status
@@ -60,16 +65,12 @@
         @mouseleave='handleImageHover(false)'
       >
         <!-- Base image -->
-        {% assign product_type_lower = product_product.type
-          | default: ""
-          | downcase
-        %}
         <img
           width='400'
           height='400'
           :src='currentImage'
           :alt="'{{ product_product.title }}'"
-          :class="'absolute inset-0 w-full h-full {% if product_type_lower contains "apparel" %}object-contain object-top{% else %}object-contain{% endif %} transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
+          :class="'absolute inset-0 w-full h-full {% if is_apparel %}object-contain object-top{% else %}object-contain{% endif %} transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
         >
         <!-- Hover image (crossfades in) -->
         <img
@@ -78,7 +79,7 @@
           x-show='secondImageSrc'
           :src='secondImageSrc'
           :alt="'{{ product_product.title }}'"
-          :class="'absolute inset-0 w-full h-full {% if product_type_lower contains "apparel" %}object-contain object-top{% else %}object-contain{% endif %} transition-opacity duration-300 pointer-events-none ' + ((isHovering && hoverImageLoaded) ? 'opacity-100' : 'opacity-0')"
+          :class="'absolute inset-0 w-full h-full {% if is_apparel %}object-contain object-top{% else %}object-contain{% endif %} transition-opacity duration-300 pointer-events-none ' + ((isHovering && hoverImageLoaded) ? 'opacity-100' : 'opacity-0')"
         >
       </a>
     </div>
@@ -96,11 +97,7 @@
           </h2>
 
           <!-- Price -->
-          {% assign product_type_lower = product_product.type
-            | default: ""
-            | downcase
-          %}
-          {% unless product_type_lower contains "custom" %}
+          {% unless is_custom %}
             <div
               class='text-lg md:text-2xl font-bold text-gray-900 mb-4 text-center'
               x-text='formattedPrice'
@@ -111,13 +108,9 @@
         </a>
 
         <!-- Handle Color Variants (hide for Apparels) -->
-        {% assign product_type_lower = product_product.type
-          | default: ""
-          | downcase
-        %}
         {% unless product_product.has_only_default_variant
-          or product_type_lower contains "apparel"
-          or product_type_lower contains "accessories"
+          or is_apparel
+          or is_accessory
         %}
           <div class='mb-4'>
             <div class='flex flex-wrap gap-1 md:gap-2 justify-center'>
@@ -240,13 +233,9 @@
         {% endunless %}
       </div>
 
-      {% assign product_type_lower = product_product.type
-        | default: ""
-        | downcase
-      %}
-      {% unless product_type_lower contains "apparel"
-        or product_type_lower contains "custom"
-        or product_type_lower contains "accessories"
+      {% unless is_apparel
+        or is_custom
+        or is_accessory
       %}
         <!-- Add to Cart Button (only show when available and not apparels) -->
         <div x-show='isAvailable'>
@@ -262,9 +251,7 @@
         </div>
       {% endunless %}
 
-      {% if product_type_lower contains "apparel"
-        or product_type_lower contains "accessories"
-      %}
+      {% if is_apparel or is_accessory %}
         <!-- Quick View for Apparels -->
         <div class='mt-3'>
           <button
