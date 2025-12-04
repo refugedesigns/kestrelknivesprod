@@ -13,9 +13,18 @@
 {% endif %}
 
 {% assign product_type_lower = product_product.type | default: "" | downcase %}
-{% assign is_apparel = product_type_lower contains "apparel" %}
-{% assign is_accessory = product_type_lower contains "accessories" %}
-{% assign is_custom = product_type_lower contains "custom" %}
+{% assign is_apparel = false %}
+{% assign is_accessory = false %}
+{% assign is_custom = false %}
+{% if product_type_lower contains "apparel" %}
+  {% assign is_apparel = true %}
+{% endif %}
+{% if product_type_lower contains "accessories" %}
+  {% assign is_accessory = true %}
+{% endif %}
+{% if product_type_lower contains "custom" %}
+  {% assign is_custom = true %}
+{% endif %}
 
 <div
   class='py-6 px-3 hover:cursor-pointer product-card w-full'
