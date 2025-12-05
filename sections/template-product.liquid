@@ -46,17 +46,15 @@
     -moz-appearance: textfield;
   }
 
- #stickySizeSelector {
+#stickySizeSelector {
   appearance: none !important;
-  height: 22px !important;         /* or 20px, or whatever you need */
-  line-height: 22px !important;    /* align text vertically */
+  min-height: 20px !important; /* CRITICAL FIX */
+  height: 20px !important;
+  line-height: 20px !important;
+  padding: 0 18px 0 6px !important;
   font-size: 0.75rem !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  padding-left: 6px !important;
-  padding-right: 24px !important;  /* leave space for dropdown arrow */
-  box-sizing: border-box !important;
 }
+
 
 
  
