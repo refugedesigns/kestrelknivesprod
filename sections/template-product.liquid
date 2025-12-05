@@ -46,31 +46,20 @@
     -moz-appearance: textfield;
   }
 
-  #stickySizeSelector {
-    appearance: none !important;
-    font-size: 0.72rem !important;
-    line-height: 1 !important;
-    padding: 0.15rem 0.65rem 0.15rem 0.4rem !important;
-    width: auto !important;
-    min-width: 3.5rem !important;
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-  }
+ #stickySizeSelector {
+  appearance: none !important;
+  height: 22px !important;         /* or 20px, or whatever you need */
+  line-height: 22px !important;    /* align text vertically */
+  font-size: 0.75rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 6px !important;
+  padding-right: 24px !important;  /* leave space for dropdown arrow */
+  box-sizing: border-box !important;
+}
 
-  #stickySizeSelector option {
-    font-size: 0.8rem;
-  }
 
-  @media (min-width: 768px) {
-    #stickySizeSelector {
-      font-size: 0.85rem !important;
-      min-width: 4.25rem !important;
-    }
-    #stickySizeSelector option {
-      font-size: 0.95rem;
-    }
-  }
+ 
 
   /* Focus states for accessibility */
   button:focus-visible,
@@ -1021,7 +1010,7 @@
             <div class='flex flex-col items-center bg-red-200'>
               <select
                 id='stickySizeSelector'
-                class='border border-gray-300 h-6 rounded-md text-xs md:text-sm font-semibold bg-white focus:ring-2 focus:ring-black focus:border-black text-center tracking-wide uppercase'
+              class="border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-black focus:border-black text-center uppercase"
                 onchange='updateStickyVariant()'
               >
                 {% for value in option.values %}
