@@ -1,8 +1,9 @@
 <div class='container mx-auto min-h-[calc(100vh-40vh)]' x-data='searchPage()'>
-  {% paginate search.results by 18 %}
+  {% paginate search.results by 9 %}
     <h1 class='text-xl my-4 text-center'>Search Results</h1>
 
-    <div class='flex justify-center items-center mx-4'>
+    <div class='flex justify-center items-center'>
+      <div class='w-full max-w-md px-4 mx-auto'>
       <form
         action='{{ routes.search_url }}'
         method='get'
@@ -23,6 +24,7 @@
           Search
         </button>
       </form>
+      </div>
     </div>
 
     {% if search.performed %}
