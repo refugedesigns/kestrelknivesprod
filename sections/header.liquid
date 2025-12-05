@@ -132,8 +132,8 @@
                   style='border-color: {{ section.settings.child_menu_border_color | default: "#000000" }}; --tw-ring-color: {{ section.settings.child_menu_border_color | default: "#000000" }};'
                 >
                   <div
-                    class='relative grid gap-6 px-5 py-6 sm:gap-8 sm:p-8'
-                    style='background-color: {{ section.settings.child_menu_bg_color | default: "#1f2937" }};'
+                    class='relative grid gap-6 px-5 bg-gray-200 py-6 sm:gap-8 sm:p-8'
+                    {% comment %} style='background-color: {{ section.settings.child_menu_bg_color | default: "#1f2937" }};' {% endcomment %}
                   >
                     {% for childlink in link.links %}
                       <a
