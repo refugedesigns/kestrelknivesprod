@@ -1000,6 +1000,7 @@
               >
                 {% for value in option.values %}
                   <option
+                    class="text-sm"
                     value='{{ value | escape }}'
                     {% if option.selected_value == value %}
                       selected
