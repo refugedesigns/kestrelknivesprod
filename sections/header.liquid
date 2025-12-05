@@ -22,6 +22,18 @@
   .child-menu-link:hover p {
     color: {{ section.settings.child_menu_hover_text_color | default: "#ffffff" }} !important;
   }
+
+  /* Mobile child links background */
+  @media (max-width: 1023px) {
+    .mobile-child-container {
+      background-color: #f3f4f6 !important;
+      border-radius: 0.375rem;
+      padding: 0.75rem 0.5rem;
+    }
+    .mobile-child-link span {
+      color: #1f2937 !important;
+    }
+  }
 </style>
 
 <div
@@ -132,8 +144,8 @@
                   style='border-color: {{ section.settings.child_menu_border_color | default: "#000000" }}; --tw-ring-color: {{ section.settings.child_menu_border_color | default: "#000000" }};'
                 >
                   <div
-                    class='relative grid gap-6 px-5 bg-gray-200 py-6 sm:gap-8 sm:p-8'
-                    {% comment %} style='background-color: {{ section.settings.child_menu_bg_color | default: "#1f2937" }};' {% endcomment %}
+                    class='relative grid gap-6 px-5 py-6 sm:gap-8 sm:p-8'
+                    style='background-color: {{ section.settings.child_menu_bg_color | default: "#1f2937" }};'
                   >
                     {% for childlink in link.links %}
                       <a
@@ -289,12 +301,12 @@
 
                       <div
                         x-show='{{ mobile_link_handle }}'
-                        class='grid gap-y-2 py-3'
+                        class='mobile-child-container grid gap-y-2 py-3'
                       >
                         {% for childlink in link.links %}
                           <a
                             href='{{ childlink.url }}'
-                            class='-m-3 p-3 mt-2 flex items-center rounded-md'
+                            class='mobile-child-link -m-3 p-3 mt-2 flex items-center rounded-md'
                             style='color: {{ section.settings.mobile_menu_link_color | default: "#ffffff" }}; transition: background-color 0.2s ease, color 0.2s ease;'
                             onmouseover='this.style.backgroundColor="{{ section.settings.mobile_menu_link_hover_bg_color | default: "#374151" }}"; this.style.color="{{ section.settings.mobile_menu_link_hover_text_color | default: "#ffffff" }}"'
                             onmouseout='this.style.backgroundColor="transparent"; this.style.color="{{ section.settings.mobile_menu_link_color | default: "#ffffff" }}"'
