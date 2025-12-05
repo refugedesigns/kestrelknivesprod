@@ -2,11 +2,11 @@
   {% paginate search.results by 18 %}
     <h1 class='text-xl my-4 text-center'>Search Results</h1>
 
-    <div class='flex justify-center items-center px-2'>
+    <div class='flex justify-center items-center'>
       <form
         action='{{ routes.search_url }}'
         method='get'
-        class='border flex rounded'
+        class='border flex rounded px-4'
       >
         <input
           type='search'
