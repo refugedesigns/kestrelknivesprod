@@ -47,23 +47,31 @@
   }
 
   #stickySizeSelector {
-    font-size: 0.7rem;
-    line-height: 0.95rem;
-    padding: 0.15rem 0.5rem;
-    min-width: 4rem;
-    height: 1.75rem;
+    appearance: none;
+    font-size: 0.72rem;
+    line-height: 1;
+    padding: 0.15rem 0.65rem 0.15rem 0.4rem;
+    width: auto;
+    min-width: 3.5rem;
+    height: 1.55rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
   }
 
+  #stickySizeSelector option {
+    font-size: 0.8rem;
+  }
+
   @media (min-width: 768px) {
     #stickySizeSelector {
       font-size: 0.85rem;
-      line-height: 1.05rem;
-      padding: 0.2rem 0.65rem;
-      min-width: 4.75rem;
-      height: 2rem;
+      padding: 0.2rem 0.75rem 0.2rem 0.5rem;
+      height: 1.85rem;
+      min-width: 4.25rem;
+    }
+    #stickySizeSelector option {
+      font-size: 0.95rem;
     }
   }
 
