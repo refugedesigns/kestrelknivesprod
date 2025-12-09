@@ -16,7 +16,7 @@
   data-images='{{ product_obj.images | json | escape }}'
   x-data='fcCard()'
 >
-  <div class='bg-white overflow-hidden w-full h-[520px] sm:h-[560px] md:h-[600px] flex flex-col'>
+  <div class='bg-white overflow-hidden w-full flex flex-col'>
     <!-- Image well -->
     <div class='relative h-[180px] md:h-[300px] lg:h-[300px] bg-white overflow-hidden flex items-center justify-center'>
       {% assign kk_status = product_obj.metafields.custom.product_status
