@@ -5,7 +5,7 @@
     <!-- Mobile Collection -->
     <div class='block md:hidden'>
       <div
-        class='grid gap-4 w-full'
+        class='grid w-full gap-2 md:gap-6'
         style='grid-template-columns: repeat({{ section.settings.mobile_columns | default: 2 }}, 1fr);'
       >
         {% if section.settings.mobile_collection %}
@@ -36,7 +36,7 @@
     <!-- Tablet Collection -->
     <div class='hidden md:block lg:hidden'>
       <div
-        class='grid gap-4 w-full'
+        class='grid w-full gap-2 md:gap-6'
         style='grid-template-columns: repeat({{ section.settings.tablet_columns | default: 2 }}, 1fr);'
       >
         {% assign tablet_collection = section.settings.tablet_collection
@@ -71,7 +71,7 @@
     <!-- Desktop Collection -->
     <div class='hidden lg:block'>
       <div
-        class='grid gap-4 w-full'
+        class='grid w-full gap-2 md:gap-6'
         style='grid-template-columns: repeat({{ section.settings.desktop_columns | default: 3 }}, 1fr);'
       >
         {% if section.settings.featured_collection %}
@@ -121,6 +121,7 @@
       "id": "number_of_products_to_show",
       "min": 3,
       "max": 12,
+      "step": 1,
       "default": 3,
       "label": "Desktop: Number of products to show"
     },
