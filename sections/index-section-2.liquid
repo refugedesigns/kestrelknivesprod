@@ -24,19 +24,28 @@
   <div class='absolute inset-0 flex items-center justify-center'>
     <div class='text-center max-w-4xl px-4'>
       {% if section.settings.title != blank %}
-        <h2 class='text-4xl md:text-6xl font-bold text-white mb-8 leading-tight whitespace-pre-line'>
+        <h2
+          class='text-4xl md:text-6xl font-bold text-white mb-8 leading-tight'
+          style='white-space: pre-line;'
+        >
           {{ section.settings.title }}
         </h2>
       {% endif %}
 
       {% if section.settings.subtitle != blank %}
-        <p class='text-xl md:text-2xl text-white mb-8 leading-relaxed whitespace-pre-line'>
+        <p
+          class='text-xl md:text-2xl text-white mb-8 leading-relaxed'
+          style='white-space: pre-line;'
+        >
           {{ section.settings.subtitle }}
         </p>
       {% endif %}
 
       {% if section.settings.description != blank %}
-        <p class='text-lg text-white mb-10 leading-relaxed max-w-2xl mx-auto whitespace-pre-line'>
+        <p
+          class='text-lg text-white mb-10 leading-relaxed max-w-2xl mx-auto'
+          style='white-space: pre-line;'
+        >
           {{ section.settings.description }}
         </p>
       {% endif %}
