@@ -1,7 +1,7 @@
 <!-- Index Section 2 - Full Width Image with Text Overlay -->
 <div
   class='relative w-full overflow-hidden'
-  style='height: {{ section.settings.section_height_vh | default: 70 }}vh; min-height: {{ section.settings.min_height | default: "700" }}px;'
+  style='height: {{ section.settings.section_height_vh | default: 70 }}vh; min-height: {{ section.settings.min_height | default: "500" }}px;'
 >
   <!-- Background Image -->
   {% if section.settings.image != blank %}
@@ -22,33 +22,21 @@
 
   <!-- Text Content Overlay -->
   <div class='absolute inset-0 flex items-center justify-center'>
-    <div
-      class='text-center max-w-4xl px-4 flex flex-col items-center'
-      style='gap: 1.75rem; margin: 0 auto;'
-    >
+    <div class='text-center max-w-4xl px-4'>
       {% if section.settings.title != blank %}
-        <h2
-          class='text-4xl md:text-6xl font-bold text-white leading-tight'
-          style='white-space: pre-line; margin: 0 !important; line-height: 1.2 !important;'
-        >
+        <h2 class='text-4xl md:text-6xl font-bold text-white mb-6 leading-tight'>
           {{ section.settings.title }}
         </h2>
       {% endif %}
 
       {% if section.settings.subtitle != blank %}
-        <p
-          class='text-xl md:text-2xl text-white leading-relaxed'
-          style='white-space: pre-line; margin: 0 !important; line-height: 1.5 !important;'
-        >
+        <p class='text-xl md:text-2xl text-white mb-8 leading-relaxed'>
           {{ section.settings.subtitle }}
         </p>
       {% endif %}
 
       {% if section.settings.description != blank %}
-        <p
-          class='text-lg text-white leading-relaxed max-w-2xl mx-auto'
-          style='white-space: pre-line; margin: 0 !important; line-height: 1.6 !important;'
-        >
+        <p class='text-lg text-white mb-10 leading-relaxed max-w-2xl mx-auto'>
           {{ section.settings.description }}
         </p>
       {% endif %}
@@ -59,7 +47,6 @@
         <a
           href='{{ section.settings.button_url }}'
           class='inline-block bg-white hover:bg-gray-100 text-black font-semibold py-4 px-10 rounded-lg transition-colors duration-200 text-lg'
-          style='margin-top: 0.5rem;'
         >
           {{ section.settings.button_text }}
         </a>
@@ -124,7 +111,7 @@
       "min": 300,
       "max": 800,
       "step": 50,
-      "default": 700,
+      "default": 500,
       "unit": "px"
     },
     {
