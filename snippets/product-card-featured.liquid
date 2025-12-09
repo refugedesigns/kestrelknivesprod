@@ -18,7 +18,7 @@
 >
   <div class='bg-white overflow-hidden w-full h-[520px] sm:h-[560px] md:h-[600px] flex flex-col'>
     <!-- Image well -->
-    <div class='relative h-[420px] bg-white overflow-hidden flex items-center justify-center'>
+    <div class='relative h-[180px] md:h-[300px] lg:h-[300px] bg-white overflow-hidden flex items-center justify-center'>
       {% assign kk_status = product_obj.metafields.custom.product_status
         | default: product_obj.metafields.custom_fields.product_status
         | default: product_obj.metafields.global.product_status
