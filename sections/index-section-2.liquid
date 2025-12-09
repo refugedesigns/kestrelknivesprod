@@ -24,13 +24,13 @@
   <div class='absolute inset-0 flex items-center justify-center'>
     <div class='text-center max-w-4xl px-4 flex flex-col items-center'>
       {% if section.settings.title != blank %}
-        <h2 class='text-4xl md:text-6xl font-bold text-white leading-tight mb-6'>
+        <h2 class='text-4xl md:text-6xl font-bold text-white leading-tight' style='margin: 0 !important;'>
           {{ section.settings.title }}
         </h2>
       {% endif %}
 
       {% if section.settings.subtitle != blank %}
-        <p class='text-xl md:text-2xl text-white leading-relaxed mb-8'>
+        <p class='text-xl md:text-2xl text-white leading-relaxed' style='margin: 0 0 1.5rem 0 !important;'>
           {{ section.settings.subtitle }}
         </p>
       {% endif %}
