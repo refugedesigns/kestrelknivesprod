@@ -184,6 +184,16 @@
     {% assign complex_primary_default_value = '' %}
     {% assign complex_primary_default_asset = '' %}
     {% assign complex_base_image_src = product.featured_image | img_url: '2048x2048' %}
+{% assign complex_product_token = product.handle
+  | strip
+  | downcase
+  | replace: " ", "_"
+  | replace: "-", "_"
+  | replace: "/", "_"
+  | replace: ".", "_"
+  | replace: "__", "_"
+  | replace: "__", "_"
+%}
     {% if tags_lower contains "use_complex_options" %}
       {% assign use_complex_options = true %}
     {% endif %}
@@ -216,12 +226,14 @@
           | replace: "__", "_"
           | replace: "__", "_"
         %}
-        {% assign complex_primary_asset_filename = 'cmp_'
-          | append: complex_primary_option_token
-          | append: '_'
-          | append: complex_primary_value_token
-          | append: '.png'
-        %}
+  {% assign complex_primary_asset_filename = 'cmp_'
+    | append: complex_product_token
+    | append: '_'
+    | append: complex_primary_option_token
+    | append: '_'
+    | append: complex_primary_value_token
+    | append: '.png'
+  %}
         {% assign complex_primary_default_asset = complex_primary_asset_filename | asset_img_url: '2048x2048' %}
         {% if complex_primary_default_asset != blank %}
           {% assign complex_base_image_src = complex_primary_default_asset %}
@@ -515,6 +527,8 @@
                             | replace: "__", "_"
                           %}
                           {% assign complex_asset_filename = 'cmp_'
+                            | append: complex_product_token
+                            | append: '_'
                             | append: complex_option_token
                             | append: '_'
                             | append: complex_value_token
@@ -621,6 +635,8 @@
                             | replace: "__", "_"
                           %}
                           {% assign complex_asset_filename = 'cmp_'
+                            | append: complex_product_token
+                            | append: '_'
                             | append: complex_option_token
                             | append: '_'
                             | append: complex_value_token
@@ -734,6 +750,8 @@
                             | replace: "__", "_"
                           %}
                           {% assign complex_asset_filename = 'cmp_'
+                            | append: complex_product_token
+                            | append: '_'
                             | append: complex_option_token
                             | append: '_'
                             | append: complex_value_token
@@ -2038,6 +2056,8 @@
                 | replace: "__", "_"
               %}
               {% assign asset_filename = 'cmp_'
+                | append: complex_product_token
+                | append: '_'
                 | append: opt_token
                 | append: '_'
                 | append: val_token
