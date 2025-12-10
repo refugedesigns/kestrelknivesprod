@@ -19,7 +19,7 @@
     },
     {
       "type": "range",
-      "id": "header_height",
+      "id": "header_height_px",
       "label": "Header Image Height",
       "min": 50,
       "max": 800,
@@ -155,7 +155,7 @@
     <style>
       @media (min-width: 768px) {
         .relative.w-full.overflow-hidden > div:first-child {
-          height: {{ section.settings.header_height | default: 400 }}px !important;
+          height: {{ section.settings.header_height_px | default: 400 }}px !important;
         }
       }
     </style>
