@@ -1,8 +1,32 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "template-about-us": {
-      "type": "template-about-us"
+      "type": "template-about-us",
+      "settings": {
+        "header_alt": "About Us",
+        "header_height_px": 400,
+        "header_height_mobile": 300,
+        "header_position": "center",
+        "header_bg_color": "#ffffff",
+        "header_height_custom": 90,
+        "title_color": "#1d1d1d",
+        "header_border_bottom": true,
+        "header_border_color": "#f2f2f2",
+        "header_padding_top": 2,
+        "header_padding_bottom": 2
+      }
     }
   },
-  "order": ["template-about-us"]
+  "order": [
+    "template-about-us"
+  ]
 }
