@@ -6,9 +6,28 @@
   It is also used to display the product images and their images.
   It is also used to display the product images and their images.
 {% endcomment %}
+{% assign product_tags_lower = product_product.tags | join: '||' | downcase %}
+{% assign has_complex_tag = false %}
+{% if product_tags_lower contains 'use_complex_options' %}
+  {% assign has_complex_tag = true %}
+{% endif %}
+
+{% assign product_type_lower = product_product.type | default: "" | downcase %}
+{% assign is_apparel = false %}
+{% assign is_accessory = false %}
+{% assign is_custom = false %}
+{% if product_type_lower contains "apparel" %}
+  {% assign is_apparel = true %}
+{% endif %}
+{% if product_type_lower contains "accessories" %}
+  {% assign is_accessory = true %}
+{% endif %}
+{% if product_type_lower contains "custom" %}
+  {% assign is_custom = true %}
+{% endif %}
 
 <div
-  class='py-6 px-3 hover:cursor-pointer product-card w-full'
+  class='py-3 px-3 hover:cursor-pointer product-card w-full'
   data-product='{{ product_product | json | escape }}'
   data-variants='{{ product_product.variants | json | escape }}'
   data-images='{{ product_product.images | json | escape }}'
@@ -22,26 +41,27 @@
         {{ product_product.images[0] | image_url: width: 400 | json }}
       {% else %}
         null
-      {% endif %}
+      {% endif %},
+      {{ has_complex_tag | json }}
     )
   '
 >
-  <div class='bg-white overflow-hidden w-full {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[540px]{% else %}h-[600px]{% endif %} flex flex-col transition-none'>
+  <div class='bg-white overflow-hidden w-full flex flex-col transition-none'>
     <!-- Product Image -->
-    <div class='relative {% assign product_type_lower = product_product.type | default: "" | downcase %}{% if product_type_lower contains "apparel" %}h-[320px] md:h-[340px] lg:h-[360px]{% else %}h-96{% endif %} bg-white overflow-hidden'>
+    <div class='relative h-[180px] md:h-[300px] lg:h-[300px] bg-white overflow-hidden'>
       <!-- Status / SOLD OUT Badge -->
       {% assign kk_status = product_product.metafields.custom.product_status
         | default: product_product.metafields.custom_fields.product_status
         | default: product_product.metafields.global.product_status
       %}
       {% if kk_status != blank %}
-        <div class='absolute top-4 left-4 bg-black text-white font-bold px-3 py-1 text-sm uppercase z-10'>
+        <div class='absolute top-2 left-2 md:top-4 md:left-4 bg-black text-white font-bold px-2 py-1 text-xs md:text-sm uppercase z-10'>
           {{ kk_status }}
         </div>
       {% else %}
         <div
           x-show='!isAvailable'
-          class='absolute top-4 left-4 bg-black text-white font-bold px-3 py-1 text-sm uppercase z-10'
+          class='absolute top-2 left-2 md:top-4 md:left-4 bg-black text-white font-bold px-2 py-1 text-xs md:text-sm uppercase z-10'
         >
           SOLD OUT
         </div>
@@ -54,16 +74,12 @@
         @mouseleave='handleImageHover(false)'
       >
         <!-- Base image -->
-        {% assign product_type_lower = product_product.type
-          | default: ""
-          | downcase
-        %}
         <img
           width='400'
           height='400'
           :src='currentImage'
           :alt="'{{ product_product.title }}'"
-          :class="'absolute inset-0 w-full h-full {% if product_type_lower contains "apparel" %}object-contain object-top{% else %}object-contain{% endif %} transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
+          :class="'absolute inset-0 w-full h-full {% if is_apparel %}object-contain object-top{% else %}object-contain{% endif %} transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
         >
         <!-- Hover image (crossfades in) -->
         <img
@@ -72,13 +88,13 @@
           x-show='secondImageSrc'
           :src='secondImageSrc'
           :alt="'{{ product_product.title }}'"
-          :class="'absolute inset-0 w-full h-full {% if product_type_lower contains "apparel" %}object-contain object-top{% else %}object-contain{% endif %} transition-opacity duration-300 pointer-events-none ' + ((isHovering && hoverImageLoaded) ? 'opacity-100' : 'opacity-0')"
+          :class="'absolute inset-0 w-full h-full {% if is_apparel %}object-contain object-top{% else %}object-contain{% endif %} transition-opacity duration-300 pointer-events-none ' + ((isHovering && hoverImageLoaded) ? 'opacity-100' : 'opacity-0')"
         >
       </a>
     </div>
 
     <!-- Product Info -->
-    <div class='p-4 md:p-6 flex flex-col gap-3 justify-between'>
+    <div class='p-4 md:p-6 flex flex-col {% if is_apparel %}gap-2{% else %}gap-3{% endif %} justify-between'>
       <div>
         <!-- Product Name -->
         <a href='{{ product_product.url }}'>
@@ -90,11 +106,7 @@
           </h2>
 
           <!-- Price -->
-          {% assign product_type_lower = product_product.type
-            | default: ""
-            | downcase
-          %}
-          {% unless product_type_lower contains "custom" %}
+          {% unless is_custom %}
             <div
               class='text-lg md:text-2xl font-bold text-gray-900 mb-4 text-center'
               x-text='formattedPrice'
@@ -105,14 +117,11 @@
         </a>
 
         <!-- Handle Color Variants (hide for Apparels) -->
-        {% assign product_type_lower = product_product.type
-          | default: ""
-          | downcase
-        %}
         {% unless product_product.has_only_default_variant
-          or product_type_lower contains "apparel"
-          or product_type_lower contains "accessories"
+          or is_apparel
+          or is_accessory
         %}
+          {% assign handle_option_name = product_product.options | first | default: 'Handle Color' %}
           <div class='mb-4'>
             <div class='flex flex-wrap gap-1 md:gap-2 justify-center'>
               {% assign unique_handle_colors = "" %}
@@ -130,27 +139,55 @@
                     <button
                       @click='selectByHandle({{ variant.option1 | json }})'
                       :class="$el.dataset.handleLc && selectedOption1Lc === $el.dataset.handleLc ? 'ring-2 ring-black' : ''"
-                      class='w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-black overflow-hidden'
+                      class='h-6 w-6 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-black overflow-hidden'
                       title='{{ variant.option1 }}'
                       data-handle-lc='{{ variant.option1 | strip | downcase }}'
                     >
                       {% assign color_image = "" %}
                       {% assign option_lower = variant.option1 | downcase %}
+                      {% assign cmp_option_token = handle_option_name
+                        | strip
+                        | downcase
+                        | replace: " ", "_"
+                        | replace: "-", "_"
+                        | replace: "/", "_"
+                        | replace: ".", "_"
+                        | replace: "__", "_"
+                        | replace: "__", "_"
+                      %}
+                      {% assign cmp_value_token = variant.option1
+                        | strip
+                        | downcase
+                        | replace: " ", "_"
+                        | replace: "-", "_"
+                        | replace: "/", "_"
+                        | replace: ".", "_"
+                        | replace: "__", "_"
+                        | replace: "__", "_"
+                      %}
+                      {% assign cmp_asset_filename = ''
+                        | append: cmp_option_token
+                        | append: '_'
+                        | append: cmp_value_token
+                        | append: '.png'
+                      %}
+                      {% assign cmp_asset_thumb = cmp_asset_filename | asset_img_url: '64x64' %}
 
                       {%- comment -%}
                         Priority for swatch image:
                         1) Variant featured_image
-                        2) Uploaded override in section settings (by color name)
-                        3) Fallback asset color chip or plain colored circle
+                        2) Local CMP asset (cmp_option_name_option_value.png)
+                        3) Uploaded override in section settings (by color name)
+                        4) Fallback asset color chip or plain colored circle
                       {%- endcomment -%}
 
-                      {% if variant.featured_image %}
+                      {% if cmp_asset_thumb != blank %}
                         <img
                           width='48'
                           height='48'
-                          src='{{ variant.featured_image | image_url: width: 48 }}'
+                          src='{{ cmp_asset_thumb }}'
                           alt='{{ variant.option1 }}'
-                          class='w-full h-full object-contain'
+                          class='w-full h-full object-cover'
                         >
                       {% else %}
                         {%- comment -%} Settings-based overrides {%- endcomment -%}
@@ -234,13 +271,9 @@
         {% endunless %}
       </div>
 
-      {% assign product_type_lower = product_product.type
-        | default: ""
-        | downcase
-      %}
-      {% unless product_type_lower contains "apparel"
-        or product_type_lower contains "custom"
-        or product_type_lower contains "accessories"
+      {% unless is_apparel
+        or is_custom
+        or is_accessory
       %}
         <!-- Add to Cart Button (only show when available and not apparels) -->
         <div x-show='isAvailable'>
@@ -256,9 +289,7 @@
         </div>
       {% endunless %}
 
-      {% if product_type_lower contains "apparel"
-        or product_type_lower contains "accessories"
-      %}
+      {% if is_apparel or is_accessory %}
         <!-- Quick View for Apparels -->
         <div class='mt-3'>
           <button
@@ -299,7 +330,7 @@
               alt=''
               width='160'
               height='160'
-              class='w-40 h-40 object-cover'
+              class='w-40 h-40 object-contain'
             >
             <div class='min-w-0'>
               <p
@@ -438,9 +469,13 @@
             {% else %}
               <button
                 @click='qvAddToCart()'
-                class='w-full cursor-pointer bg-black text-white font-bold py-4 text-base hover:bg-gray-900'
+                :disabled='!qvCanAddToCart'
+                class='w-full text-white font-bold py-4 text-base transition-colors duration-200'
+                :class="qvCanAddToCart ? 'cursor-pointer bg-black hover:bg-gray-900' : 'bg-gray-400 cursor-not-allowed opacity-80'"
               >
-                Add to Cart
+                <span
+                  x-text="qvCanAddToCart ? 'Add to Cart' : 'SOLD OUT'"
+                ></span>
               </button>
             {% endif %}
             <a
@@ -458,7 +493,7 @@
   document.addEventListener('alpine:init', () => {
     Alpine.data(
       'productCard',
-      (selectedVariantId, productTitle, currentImage) => ({
+      (selectedVariantId, productTitle, currentImage, hasComplexOptionsTag) => ({
         selectedVariant: selectedVariantId,
         currentImage: currentImage,
         productData: {},
@@ -469,6 +504,7 @@
         isAvailable: true,
         isHovering: false,
         hoverImageLoaded: false,
+        useComplexOptionsTag: !!hasComplexOptionsTag,
 
         // Computed property for formatted price
         get formattedPrice() {
@@ -544,6 +580,20 @@
           return this.productData.price != null
             ? this.formatMoney(this.productData.price)
             : ''
+        },
+        get qvSelectedVariantObj() {
+          if (!this.variantsData || !this.variantsData.length) return null
+          const targetId = this.qvSelectedVariantId || this.selectedVariant
+          return this.variantsData.find(v => v.id === targetId) || null
+        },
+        get qvCanAddToCart() {
+          if (this.productData && this.productData.available === false) {
+            return false
+          }
+          if (this.qvSelectedVariantObj) {
+            return !!this.qvSelectedVariantObj.available
+          }
+          return !!this.isAvailable
         },
         // Quick View state
         isQuickViewOpen: false,
@@ -680,7 +730,7 @@
           this.selectedVariant = variantId
           this.updateTitle()
           this.checkAvailability()
-          this.updateImage()
+          this.updateImage(true)
           // Price will update automatically via the formattedPrice computed property
         },
 
@@ -696,7 +746,7 @@
           this.selectedVariant = chosen.id
           this.updateTitle()
           this.checkAvailability()
-          this.updateImage()
+          this.updateImage(true)
         },
 
         checkAvailability() {
@@ -753,6 +803,7 @@
         },
 
         async qvAddToCart() {
+          if (!this.qvCanAddToCart) return
           try {
             // Prefer cart sheet addToCart if available
             const cartSheet = document.querySelector('[x-data*="cartSheet"]')
@@ -849,12 +900,21 @@
           }
         },
 
-        updateImage() {
-          // For apparel, keep using the product's featured_image (do not swap per variant)
+        updateImage(forceVariantImage = false) {
+          // Always keep featured image for apparels/accessories
           const typeLower = (this.productData.type || '').toLowerCase()
-          if (typeLower.includes('apparel')) {
+          if (
+            typeLower.includes('apparel') ||
+            typeLower.includes('accessories')
+          ) {
             return
           }
+          const hasComplexTag = this.useComplexOptionsTag
+
+          if (hasComplexTag && !forceVariantImage) {
+            return
+          }
+
           // Update image when variant changes (for knives/non-apparels)
           if (this.variantsData && this.variantsData.length > 0) {
             const selectedVariant = this.variantsData.find(

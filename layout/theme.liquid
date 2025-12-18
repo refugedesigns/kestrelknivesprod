@@ -17,13 +17,22 @@
     >
     {{ content_for_header }}
     <!-- Header hook for plugins -->
-    {{ "application.css" | asset_url | stylesheet_tag }}
+    {%- comment -%} {{ "application.css" | asset_url | stylesheet_tag }} {%- endcomment -%}
     <script src='{{ application.js | asset_url }}' defer></script>
     <script
       defer
       src='https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js'
     ></script>
 
+    <style type='text/tailwindcss'>
+      @theme {
+        --breakpoint-sm: 640px;
+        --breakpoint-md: 768px;
+        --breakpoint-lg: 1100px; /* start above 1024px */
+        --breakpoint-xl: 1280px;
+        --breakpoint-2xl: 1536px;
+      }
+    </style>
     <script
       src='https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4'
       defer

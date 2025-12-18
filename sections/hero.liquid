@@ -1,9 +1,27 @@
 <!-- Hero Carousel Section -->
 <style>
+  .hero-overlay {
+    padding-bottom: 3rem;
+  }
+
+  .hero-overlay .hero-overlay__inner {
+    margin-bottom: 3rem;
+  }
+
+  @media (max-width: 768px) {
+    .hero-overlay {
+      padding-bottom: 4.5rem;
+    }
+
+    .hero-overlay .hero-overlay__inner {
+      margin-bottom: 3.5rem !important;
+    }
+  }
+
   @media (max-width: 1023px) {
     .hero-overlay {
       padding-top: calc(var(--header-height, 64px) + 16px);
-      padding-bottom: 32px;
+      padding-bottom: 56px;
       align-items: center !important;
       justify-content: center !important;
       top: 0 !important;
@@ -12,7 +30,6 @@
 
     .hero-overlay .hero-overlay__inner {
       margin-left: 0 !important;
-      margin-bottom: 0 !important;
       text-align: center !important;
     }
   }

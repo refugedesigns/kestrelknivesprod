@@ -46,6 +46,19 @@
     -moz-appearance: textfield;
   }
 
+#stickySizeSelector {
+  appearance: none !important;
+  min-height: 30px !important; /* CRITICAL FIX */
+  height: 30px !important;
+  line-height: 20px !important;
+  padding: 0 14px 0 6px !important;
+  font-size: 0.75rem !important;
+}
+
+
+
+ 
+
   /* Focus states for accessibility */
   button:focus-visible,
   input:focus-visible {
@@ -57,6 +70,52 @@
   .aspect-square {
     aspect-ratio: 1 / 1;
   }
+
+  /* Complex option image stacking */
+  .complex-image-canvas {
+    position: relative;
+    background: #fff;
+  }
+
+  .complex-image-canvas img {
+    object-fit: contain;
+  }
+
+  #complexOverlayContainer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  #complexOverlayContainer img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .complex-layer-option {
+    border: 2px solid #d1d5db;
+    border-radius: 0.75rem;
+    padding: 0.35rem;
+    background: #fff;
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .complex-layer-option.is-active {
+    border-color: #111827;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+  }
+
+  .complex-layer-option img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 0.5rem;
+  }
+
 
   /* Mobile sticky positioning */
   @media (max-width: 1024px) {
@@ -86,6 +145,25 @@
     }
   }
 
+  /* Reviews truncation */
+  .review-quote {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.6;
+    transition: all 0.2s ease;
+  }
+  .review-quote.collapsed {
+    -webkit-line-clamp: 3;
+  }
+  .review-quote.expanded {
+    -webkit-line-clamp: unset;
+    max-height: none;
+  }
+  .review-toggle {
+    color: #000;
+  }
+
   #thumbnailStrip {
     scrollbar-width: none;
   }
@@ -106,6 +184,7 @@
       opacity: 1;
     }
   }
+
 </style>
 
 <div class='bg-gray-50 mb-8' x-data='productPage()'>
@@ -119,6 +198,66 @@
     {% assign use_local_colors = false %}
     {% if tags_lower contains "use_local_colors" %}
       {% assign use_local_colors = true %}
+    {% endif %}
+    {% assign use_complex_options = false %}
+    {% assign complex_primary_default_value = '' %}
+    {% assign complex_primary_default_asset = '' %}
+    {% assign complex_base_image_src = product.featured_image | img_url: '2048x2048' %}
+{% assign complex_product_token = product.handle
+  | strip
+  | downcase
+  | replace: " ", "_"
+  | replace: "-", "_"
+  | replace: "/", "_"
+  | replace: ".", "_"
+  | replace: "__", "_"
+  | replace: "__", "_"
+%}
+    {% if tags_lower contains "use_complex_options" %}
+      {% assign use_complex_options = true %}
+    {% endif %}
+    {% if use_complex_options and product.options_with_values.size > 0 %}
+      {% assign complex_primary_option = product.options_with_values.first %}
+      {% assign complex_primary_default_value = complex_primary_option.values.first %}
+      {% if complex_primary_default_value %}
+        {% assign complex_default_variant = product.variants | where: "option1", complex_primary_default_value | first %}
+        {% if complex_default_variant %}
+          {% assign selected_variant = complex_default_variant %}
+        {% endif %}
+
+        {% assign complex_primary_option_token = complex_primary_option.name
+          | strip
+          | downcase
+          | replace: " ", "_"
+          | replace: "-", "_"
+          | replace: "/", "_"
+          | replace: ".", "_"
+          | replace: "__", "_"
+          | replace: "__", "_"
+        %}
+        {% assign complex_primary_value_token = complex_primary_default_value
+          | strip
+          | downcase
+          | replace: " ", "_"
+          | replace: "-", "_"
+          | replace: "/", "_"
+          | replace: ".", "_"
+          | replace: "__", "_"
+          | replace: "__", "_"
+        %}
+  {% assign complex_primary_asset_filename = 'cmp_'
+    | append: complex_product_token
+    | append: '_'
+    | append: complex_primary_option_token
+    | append: '_'
+    | append: complex_primary_value_token
+    | append: '.png'
+  %}
+        {% assign complex_primary_default_asset = complex_primary_asset_filename | asset_img_url: '2048x2048' %}
+        {% if complex_primary_default_asset != blank %}
+          {% assign complex_base_image_src = complex_primary_default_asset %}
+        {% endif %}
+      {% endif %}
     {% endif %}
     {% if tags_lower contains "hidden_offer" %}
       <div
@@ -141,59 +280,82 @@
         <!-- Left Column - Product Images -->
         <div class='lg:col-span-7'>
           <!-- Main Image -->
-          <div class='aspect-square bg-white rounded-lg overflow-hidden mb-6 relative group'>
-            <img
-              id='mainImage'
-              src='{{ product.featured_image | img_url: '2048x2048' }}'
-              alt='{{ product.title | escape }}'
-              width='{{ product.featured_image.width | default: 2048 }}'
-              height='{{ product.featured_image.height | default: 2048 }}'
-              class='w-full h-full object-contain transition-transform group-hover:scale-105'
-            >
+          {% if use_complex_options %}
+            <div class='aspect-square bg-white rounded-lg overflow-hidden mb-6 complex-image-canvas relative' id='complexImageRoot'>
+              <img
+                id='complexBaseImage'
+                src='{{ complex_base_image_src }}'
+                alt='{{ product.title | escape }} base layer'
+                width='{{ product.featured_image.width | default: 2048 }}'
+                height='{{ product.featured_image.height | default: 2048 }}'
+                class='w-full h-full'
+                data-default-src='{{ complex_base_image_src }}'
+              >
+              <div id='complexOverlayContainer'></div>
+              <button
+                type='button'
+                x-show='!complexPreviewMode'
+                @click='showLayeredPreview()'
+                class='absolute top-4 right-4 bg-white/90 hover:bg-white text-xs font-semibold px-3 py-2 rounded-full shadow transition transform hover:scale-[1.02]'
+              >
+                Return to Custom Preview
+              </button>
+            </div>
+          {% else %}
+            <div class='aspect-square bg-white rounded-lg overflow-hidden mb-6 relative group'>
+              <img
+                id='mainImage'
+                src='{{ product.featured_image | img_url: '2048x2048' }}'
+                alt='{{ product.title | escape }}'
+                width='{{ product.featured_image.width | default: 2048 }}'
+                height='{{ product.featured_image.height | default: 2048 }}'
+                class='w-full h-full object-contain transition-transform group-hover:scale-105'
+              >
 
-            <!-- Magnifying Glass Button -->
-            <button
-              @click='openGallery()'
-              class='absolute top-4 right-4 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
-            >
-              <svg
-                class='w-5 h-5'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
+              <!-- Magnifying Glass Button -->
+              <button
+                @click='openGallery()'
+                class='absolute top-4 right-4 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
               >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
-              </svg>
-            </button>
+                <svg
+                  class='w-5 h-5'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                </svg>
+              </button>
 
-            <!-- Navigation Arrows -->
-            <button
-              @click='previousImage()'
-              class='absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
-            >
-              <svg
-                class='w-5 h-5'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
+              <!-- Navigation Arrows -->
+              <button
+                @click='previousImage()'
+                class='absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
               >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-              </svg>
-            </button>
-            <button
-              @click='nextImage()'
-              class='absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
-            >
-              <svg
-                class='w-5 h-5'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
+                <svg
+                  class='w-5 h-5'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+              </button>
+              <button
+                @click='nextImage()'
+                class='absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
               >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-              </svg>
-            </button>
-          </div>
+                <svg
+                  class='w-5 h-5'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
+            </div>
+          {% endif %}
 
           <!-- Thumbnail Images -->
           <div class='relative hidden md:block'>
@@ -204,7 +366,9 @@
               {% for media in product.media %}
                 <button
                   @click='changeImage({{ forloop.index0 }})'
-                  class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 {% if forloop.first %}border-black{% else %}border-gray-200 hover:border-black{% endif %} transition-colors'
+                  data-thumb-index='{{ forloop.index0 }}'
+                  class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 transition-colors border-gray-200 hover:border-black'
+                  :class="currentImageIndex === {{ forloop.index0 }} ? 'border-black' : 'border-gray-200 hover:border-black'"
                 >
                   {% render "product-media", media: media %}
                 </button>
@@ -219,43 +383,43 @@
               class='pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white to-transparent'
             ></div>
           </div>
-          <div class='mt-3 md:hidden flex items-center justify-center space-x-4'>
-            <button
-              type='button'
-              id='mobilePrevBtn'
-              class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md text-black hover:bg-gray-100 active:bg-gray-200 transition-colors'
-            >
-              <span class='sr-only'>Previous image</span>
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                fill='none'
-                viewBox='0 0 24 24'
-                stroke-width='1.5'
-                stroke='currentColor'
-                class='size-6'
+            <div class='mt-3 md:hidden flex items-center justify-center space-x-4'>
+              <button
+                type='button'
+                id='mobilePrevBtn'
+                class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md text-black hover:bg-gray-100 active:bg-gray-200 transition-colors'
               >
-                <path stroke-linecap='round' stroke-linejoin='round' d='M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18'/>
-              </svg>
-            </button>
-            <div class='flex items-center space-x-2' id='mobileDots'></div>
-            <button
-              type='button'
-              id='mobileNextBtn'
-              class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md text-black hover:bg-gray-100 active:bg-gray-200 transition-colors'
-            >
-              <span class='sr-only'>Next image</span>
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                fill='none'
-                viewBox='0 0 24 24'
-                stroke-width='1.5'
-                stroke='currentColor'
-                class='size-6'
+                <span class='sr-only'>Previous image</span>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke-width='1.5'
+                  stroke='currentColor'
+                  class='size-6'
+                >
+                  <path stroke-linecap='round' stroke-linejoin='round' d='M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18'/>
+                </svg>
+              </button>
+              <div class='flex items-center space-x-2' id='mobileDots'></div>
+              <button
+                type='button'
+                id='mobileNextBtn'
+                class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-md text-black hover:bg-gray-100 active:bg-gray-200 transition-colors'
               >
-                <path stroke-linecap='round' stroke-linejoin='round' d='M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3'/>
-              </svg>
-            </button>
-          </div>
+                <span class='sr-only'>Next image</span>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke-width='1.5'
+                  stroke='currentColor'
+                  class='size-6'
+                >
+                  <path stroke-linecap='round' stroke-linejoin='round' d='M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3'/>
+                </svg>
+              </button>
+            </div>
         </div>
 
         <!-- Right Column - Product Info -->
@@ -316,6 +480,16 @@
                     | strip
                   %}
                   {% assign option_position = forloop.index %}
+                  {% assign option_index0 = option_position | minus: 1 %}
+                  {% assign is_complex_primary = false %}
+                  {% assign is_complex_overlay = false %}
+                  {% if use_complex_options %}
+                    {% if option_position == 1 %}
+                      {% assign is_complex_primary = true %}
+                    {% elsif option_position > 1 %}
+                      {% assign is_complex_overlay = true %}
+                    {% endif %}
+                  {% endif %}
 
                   <div class='mb-6'>
                     <h3 class='text-lg font-semibold mb-3'>
@@ -329,16 +503,110 @@
                       - default: text buttons
                     {% endcomment %}
 
-                    {% if option_name_downcase contains "color"
+                    {% if is_complex_overlay %}
+                      <div
+                        class='grid grid-cols-5 gap-3'
+                        data-complex-option-wrapper='{{ option_index0 }}'
+                      >
+                        {% for value in option.values %}
+                          {% assign local_option_token = option.name
+                            | strip
+                            | handleize
+                            | replace: "-", "_"
+                          %}
+                          {% assign local_value_token = value
+                            | strip
+                            | handleize
+                            | replace: "-", "_"
+                          %}
+                          {% assign local_asset_filename = local_option_token
+                            | append: "_"
+                            | append: local_value_token
+                            | append: ".png"
+                          %}
+                          {% assign local_asset_thumb = local_asset_filename | asset_img_url: '256x256' %}
+                          {% assign complex_option_token = option.name
+                            | strip
+                            | downcase
+                            | replace: " ", "_"
+                            | replace: "-", "_"
+                            | replace: "/", "_"
+                            | replace: ".", "_"
+                            | replace: "__", "_"
+                            | replace: "__", "_"
+                          %}
+                          {% assign complex_value_token = value
+                            | strip
+                            | downcase
+                            | replace: " ", "_"
+                            | replace: "-", "_"
+                            | replace: "/", "_"
+                            | replace: ".", "_"
+                            | replace: "__", "_"
+                            | replace: "__", "_"
+                          %}
+                          {% assign complex_asset_filename = 'cmp_'
+                            | append: complex_product_token
+                            | append: '_'
+                            | append: complex_option_token
+                            | append: '_'
+                            | append: complex_value_token
+                            | append: '.png'
+                          %}
+                          {% assign complex_asset_large = complex_asset_filename | asset_img_url: '2048x2048' %}
+                          {% assign complex_asset_thumb = complex_asset_filename | asset_img_url: '256x256' %}
+
+                          <div class='flex flex-col items-center'>
+                            <button
+                              type='button'
+                              class='complex-layer-option w-full aspect-square flex items-center justify-center'
+                              data-complex-option-button
+                              data-complex-option-index='{{ option_index0 }}'
+                              data-option-name='{{ option.name | escape }}'
+                              data-option-value='{{ value | escape }}'
+                              data-asset='{{ complex_asset_large }}'
+                              aria-pressed='false'
+                            >
+                              {% if use_local_colors and local_asset_thumb != blank %}
+                                <img
+                                  src='{{ local_asset_thumb }}'
+                                  alt='{{ value | escape }}'
+                                >
+                              {% elsif complex_asset_thumb != blank %}
+                                <img
+                                  src='{{ complex_asset_thumb }}'
+                                  alt='{{ value | escape }}'
+                                >
+                              {% else %}
+                                <span class='text-xs font-semibold text-gray-800'>
+                                  {{ value | upcase }}
+                                </span>
+                              {% endif %}
+                            </button>
+                            <span class='text-xs text-center block mt-1 font-medium text-gray-900'>
+                              {{ value | upcase }}
+                            </span>
+                          </div>
+                        {% endfor %}
+                      </div>
+
+                    {% elsif option_name_downcase contains "color"
                       or option_name_downcase contains "colour"
                       or option_name_downcase contains "handle"
                       or option_name_downcase contains "colourway"
+                      or option_name_downcase contains "model"
                     %}
                       <div class='grid grid-cols-5 gap-3'>
                         {% for value in option.values %}
                           {% assign is_selected = false %}
-                          {% if option.selected_value == value %}
-                            {% assign is_selected = true %}
+                          {% if is_complex_primary %}
+                            {% if forloop.first %}
+                              {% assign is_selected = true %}
+                            {% endif %}
+                          {% elsif option.selected_value == value %}
+                            {% unless use_complex_options %}
+                              {% assign is_selected = true %}
+                            {% endunless %}
                           {% endif %}
 
                           {% assign option_image = null %}
@@ -366,6 +634,36 @@
                               {% if option_image %}{% break %}{% endif %}
                             {% endfor %}
                           {% endunless %}
+                          {% assign complex_option_token = option.name
+                            | strip
+                            | downcase
+                            | replace: " ", "_"
+                            | replace: "-", "_"
+                            | replace: "/", "_"
+                            | replace: ".", "_"
+                            | replace: "__", "_"
+                            | replace: "__", "_"
+                          %}
+                          {% assign complex_value_token = value
+                            | strip
+                            | downcase
+                            | replace: " ", "_"
+                            | replace: "-", "_"
+                            | replace: "/", "_"
+                            | replace: ".", "_"
+                            | replace: "__", "_"
+                            | replace: "__", "_"
+                          %}
+                          {% assign complex_asset_filename = 'cmp_'
+                            | append: complex_product_token
+                            | append: '_'
+                            | append: complex_option_token
+                            | append: '_'
+                            | append: complex_value_token
+                            | append: '.png'
+                          %}
+                          {% assign complex_asset_large = complex_asset_filename | asset_img_url: '2048x2048' %}
+                          {% assign complex_asset_thumb = complex_asset_filename | asset_img_url: '128x128' %}
 
                           <label class='relative cursor-pointer color-option'>
                             <input
@@ -373,15 +671,17 @@
                               name='options[{{ option.name }}]'
                               value='{{ value | escape }}'
                               class='sr-only'
+                              data-option-index='{{ option_index0 }}'
+                              data-option-value='{{ value | escape }}'
+                              {% if is_complex_primary %}
+                                data-complex-asset='{{ complex_asset_large }}'
+                              {% endif %}
                               {% if is_selected %}
                                 checked
                               {% endif %}
                             >
                             <div class='w-full aspect-square border-2 {% if is_selected %}border-black{% else %}border-gray-300 hover:border-black{% endif %} rounded-lg p-2 bg-white hover:bg-gray-100 transition-colors'>
                               {% if use_local_colors %}
-                                {% assign product_asset_prefix = product.handle
-                                  | replace: "-", "_"
-                                %}
                                 {% assign option_name_token = option.name
                                   | strip
                                   | handleize
@@ -392,15 +692,21 @@
                                   | handleize
                                   | replace: "-", "_"
                                 %}
-                                {% assign option_asset_filename = product_asset_prefix
-                                  | append: "_"
-                                  | append: option_name_token
+                                {% assign option_asset_filename = option_name_token
                                   | append: "_"
                                   | append: option_value_token
                                   | append: ".png"
                                 %}
                                 <img
                                   src='{{ option_asset_filename | asset_img_url: '64x64' }}'
+                                  alt='{{ value }}'
+                                  class='w-full h-full object-contain rounded-md'
+                                  width='64'
+                                  height='64'
+                                >
+                              {% elsif use_complex_options and complex_asset_thumb != blank %}
+                                <img
+                                  src='{{ complex_asset_thumb }}'
                                   alt='{{ value }}'
                                   class='w-full h-full object-contain rounded-md'
                                   width='64'
@@ -433,9 +739,45 @@
                       <div class='flex flex-wrap gap-2'>
                         {% for value in option.values %}
                           {% assign is_selected = false %}
-                          {% if option.selected_value == value %}
-                            {% assign is_selected = true %}
+                          {% if is_complex_primary %}
+                            {% if forloop.first %}
+                              {% assign is_selected = true %}
+                            {% endif %}
+                          {% elsif option.selected_value == value %}
+                            {% unless use_complex_options %}
+                              {% assign is_selected = true %}
+                            {% endunless %}
                           {% endif %}
+
+                          {% assign complex_option_token = option.name
+                            | strip
+                            | downcase
+                            | replace: " ", "_"
+                            | replace: "-", "_"
+                            | replace: "/", "_"
+                            | replace: ".", "_"
+                            | replace: "__", "_"
+                            | replace: "__", "_"
+                          %}
+                          {% assign complex_value_token = value
+                            | strip
+                            | downcase
+                            | replace: " ", "_"
+                            | replace: "-", "_"
+                            | replace: "/", "_"
+                            | replace: ".", "_"
+                            | replace: "__", "_"
+                            | replace: "__", "_"
+                          %}
+                          {% assign complex_asset_filename = 'cmp_'
+                            | append: complex_product_token
+                            | append: '_'
+                            | append: complex_option_token
+                            | append: '_'
+                            | append: complex_value_token
+                            | append: '.png'
+                          %}
+                          {% assign complex_asset_large = complex_asset_filename | asset_img_url: '2048x2048' %}
 
                           <label class='cursor-pointer'>
                             <input
@@ -443,6 +785,11 @@
                               name='options[{{ option.name }}]'
                               value='{{ value | escape }}'
                               class='sr-only'
+                              data-option-index='{{ option_index0 }}'
+                              data-option-value='{{ value | escape }}'
+                              {% if is_complex_primary %}
+                                data-complex-asset='{{ complex_asset_large }}'
+                              {% endif %}
                               {% if is_selected %}
                                 checked
                               {% endif %}
@@ -479,9 +826,43 @@
                       <div class='flex flex-wrap gap-2'>
                         {% for value in option.values %}
                           {% assign is_selected = false %}
-                          {% if option.selected_value == value %}
-                            {% assign is_selected = true %}
+                          {% if is_complex_primary %}
+                            {% if forloop.first %}
+                              {% assign is_selected = true %}
+                            {% endif %}
+                          {% elsif option.selected_value == value %}
+                            {% unless use_complex_options %}
+                              {% assign is_selected = true %}
+                            {% endunless %}
                           {% endif %}
+
+                          {% assign complex_option_token = option.name
+                            | strip
+                            | downcase
+                            | replace: " ", "_"
+                            | replace: "-", "_"
+                            | replace: "/", "_"
+                            | replace: ".", "_"
+                            | replace: "__", "_"
+                            | replace: "__", "_"
+                          %}
+                          {% assign complex_value_token = value
+                            | strip
+                            | downcase
+                            | replace: " ", "_"
+                            | replace: "-", "_"
+                            | replace: "/", "_"
+                            | replace: ".", "_"
+                            | replace: "__", "_"
+                            | replace: "__", "_"
+                          %}
+                          {% assign complex_asset_filename = 'cmp_'
+                            | append: complex_option_token
+                            | append: '_'
+                            | append: complex_value_token
+                            | append: '.png'
+                          %}
+                          {% assign complex_asset_large = complex_asset_filename | asset_img_url: '2048x2048' %}
 
                           <label class='cursor-pointer'>
                             <input
@@ -489,6 +870,11 @@
                               name='options[{{ option.name }}]'
                               value='{{ value | escape }}'
                               class='sr-only'
+                              data-option-index='{{ option_index0 }}'
+                              data-option-value='{{ value | escape }}'
+                              {% if is_complex_primary %}
+                                data-complex-asset='{{ complex_asset_large }}'
+                              {% endif %}
                               {% if is_selected %}
                                 checked
                               {% endif %}
@@ -614,7 +1000,7 @@
 
 <div
   id='tabsNavigation'
-  class='bg-white border-b border-t h-20 flex items-center border-gray-200 sticky top-16 z-18 transition-all duration-300'
+  class='bg-white hidden md:flex border-b border-t h-20 items-center border-gray-200 sticky top-16 z-18 transition-all duration-300'
 >
   <div class='max-w-8xl flex mx-auto px-4 sm:px-6 lg:px-8 w-full items-center justify-center md:justify-between'>
     <nav class='space-x-8 hidden md:flex'>
@@ -660,7 +1046,7 @@
             <div class='flex flex-col items-center'>
               <select
                 id='stickySizeSelector'
-                class='border border-gray-300 rounded-md px-3 py-2 text-sm font-medium bg-white focus:ring-2 focus:ring-black focus:border-black w-24 md:w-32'
+              class="border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-black focus:border-black text-center uppercase"
                 onchange='updateStickyVariant()'
               >
                 {% for value in option.values %}
@@ -740,7 +1126,7 @@
 <!-- Content Sections -->
 <div class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
   <!-- Specifications Section -->
-  <section id='specs' class='py-16'>
+  <section id='specs' class='py-4'>
     <div class='max-w-7xl mx-auto'>
       <div class='grid grid-cols-1 lg:grid-cols-12 gap-12'>
         <!-- Description (Left - 7 columns) -->
@@ -872,12 +1258,33 @@
         {% for block in section.blocks %}
           {% if block.type == "review" %}
             <swiper-slide>
-              <div class='bg-gradient-to-br from-white to-blue-50 rounded-lg p-8 shadow-sm border border-gray-100 h-full flex flex-col justify-between mx-auto'>
+              <div class='bg-gradient-to-br from-white to-blue-50 rounded-lg mt-4 p-8 shadow-sm border border-gray-100 h-full flex flex-col justify-between mx-auto'>
                 <!-- Review Text -->
-                <div class='flex-grow mb-6'>
-                  <p class='text-gray-700 text-lg text-center leading-relaxed'>
-                    {{ block.settings.review_text }}
+                {% assign review_text = block.settings.review_text | strip %}
+                {% assign review_truncated = review_text | truncate: 180, "" %}
+                {% assign review_len = review_text | size %}
+                {% assign review_trunc_len = review_truncated | size %}
+                {% assign is_truncated = false %}
+                {% if review_len > review_trunc_len %}
+                  {% assign is_truncated = true %}
+                {% endif %}
+                <div class='flex-grow mb-6 text-center'>
+                  <p
+                    class='review-quote text-gray-700 text-lg leading-relaxed mb-2 {% if is_truncated %}collapsed{% endif %}'
+                    data-full-text='{{ review_text | escape }}'
+                    data-trunc-text='{{ review_truncated | escape }}'
+                  >
+                    {% if is_truncated %}
+                      {{ review_truncated }}...
+                    {% else %}
+                      {{ review_text }}
+                    {% endif %}
                   </p>
+                  {% if is_truncated %}
+                    <button type='button' class='review-toggle text-sm font-semibold mt-2'>
+                      Read more
+                    </button>
+                  {% endif %}
                 </div>
 
                 <!-- Star Rating -->
@@ -921,6 +1328,52 @@
   </section>
 {% endif %}
 
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const reviewSwiperEl = document.querySelector('.reviews-swiper');
+    if (!reviewSwiperEl) return;
+
+    const tryAttachHoverPause = () => {
+      const inst = reviewSwiperEl.swiper;
+      if (!inst || !inst.autoplay) return false;
+      reviewSwiperEl.addEventListener('mouseenter', () => inst.autoplay.stop());
+      reviewSwiperEl.addEventListener('mouseleave', () => inst.autoplay.start());
+      return true;
+    };
+
+    // If already initialized, attach immediately; otherwise wait for ready
+    if (!tryAttachHoverPause()) {
+      reviewSwiperEl.addEventListener('ready', tryAttachHoverPause, { once: true });
+      // Fallback retry in case ready doesn't fire
+      setTimeout(tryAttachHoverPause, 500);
+    }
+  });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const quotes = document.querySelectorAll('.review-quote');
+    quotes.forEach(q => {
+      const toggle = q.nextElementSibling;
+      if (!toggle || !toggle.classList.contains('review-toggle')) return;
+
+      const full = q.dataset.fullText || '';
+      const trunc = q.dataset.truncText || '';
+
+      toggle.addEventListener('click', () => {
+        const isExpanded = q.classList.toggle('expanded');
+        if (isExpanded) {
+          q.textContent = full;
+          toggle.textContent = 'Read less';
+        } else {
+          q.textContent = trunc ? `${trunc}...` : full;
+          toggle.textContent = 'Read more';
+        }
+      });
+    });
+  });
+</script>
+
 {% comment %}
   <!-- Start of Judge.me code -->
   <div style='clear:both'></div>
@@ -962,7 +1415,7 @@
         if (products && products.length > 0) {
           // Create the entire section dynamically
           const relatedSection = document.createElement('section');
-          relatedSection.className = 'py-16 bg-gray-50';
+          relatedSection.className = 'py-8 bg-gray-50';
           relatedSection.innerHTML = `
             <div class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
               <h2 class='text-lg font-bold text-black mb-8 uppercase'>{{ section.settings.related_heading | default: 'Members Also Bought' }}</h2>
@@ -1654,6 +2107,64 @@
   };
 </script>
 
+{% if use_complex_options %}
+<script>
+  window.__complexOptionsConfig = {
+    enabled: true,
+    fallbackImage: '{{ product.featured_image | img_url: '2048x2048' }}',
+    primaryOptionIndex: 0,
+    defaultPrimaryValue: {{ complex_primary_default_value | json }},
+    defaultPrimaryAsset: {{ complex_base_image_src | json }},
+    options: [
+      {% for option in product.options_with_values %}
+        {
+          name: {{ option.name | json }},
+          index: {{ forloop.index0 }},
+          assets: {
+            {% for value in option.values %}
+              {% assign opt_token = option.name
+                | strip
+                | downcase
+                | replace: " ", "_"
+                | replace: "-", "_"
+                | replace: "/", "_"
+                | replace: ".", "_"
+                | replace: "__", "_"
+                | replace: "__", "_"
+              %}
+              {% assign val_token = value
+                | strip
+                | downcase
+                | replace: " ", "_"
+                | replace: "-", "_"
+                | replace: "/", "_"
+                | replace: ".", "_"
+                | replace: "__", "_"
+                | replace: "__", "_"
+              %}
+              {% assign asset_filename = 'cmp_'
+                | append: complex_product_token
+                | append: '_'
+                | append: opt_token
+                | append: '_'
+                | append: val_token
+                | append: '.png'
+              %}
+              {{ value | json }}: {{ asset_filename | asset_img_url: '2048x2048' | json }}{% unless forloop.last %},{% endunless %}
+            {% endfor %}
+          }
+        }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ]
+  };
+  console.log('Complex options config:', window.__complexOptionsConfig);
+</script>
+{% else %}
+<script>
+  window.__complexOptionsConfig = { enabled: false };
+</script>
+{% endif %}
+
 <script>
     /*
       Dynamic variant handling for any product options.
@@ -1666,6 +2177,8 @@
       // Helper config — expand or adjust keywords if needed
       const COLOR_KEYWORDS = ['color','colour','handle','colourway','finish','shade'];
       const SIZE_KEYWORDS = ['size','waist','length','inches','cm','sizing'];
+      const complexConfig = window.__complexOptionsConfig || { enabled: false };
+      const useComplexOptions = !!complexConfig.enabled;
 
       function isColorOption(name) {
         if (!name) return false;
@@ -1719,6 +2232,24 @@
         if (initialVariant.option3 !== undefined) initialOptions.push(initialVariant.option3);
       }
 
+      if (useComplexOptions && initialOptions.length) {
+        const fallbackPrimary =
+          (product.options_with_values &&
+            product.options_with_values[0] &&
+            product.options_with_values[0].values &&
+            product.options_with_values[0].values[0]) ||
+          '';
+        const defaultPrimary =
+          complexConfig.defaultPrimaryValue ||
+          initialOptions[0] ||
+          fallbackPrimary ||
+          '';
+        initialOptions[0] = defaultPrimary;
+        for (let i = 1; i < initialOptions.length; i++) {
+          initialOptions[i] = '';
+        }
+      }
+
       // Expose Alpine-style productPage object (keeps your existing Alpine usage)
       window.productPage = function () {
         return {
@@ -1729,13 +2260,20 @@
               '{{ media | img_url: "2048x2048" }}'{% unless forloop.last %},{% endunless %}
             {% endfor %}
           ],
+          useComplexOptions,
+          complexLayerState: {},
+          complexPreviewMode: true,
 
           // dynamic selected options (kept in array ordered by product.options index)
           selectedOptions: initialOptions.slice(),
 
           init() {
             // initial image set
-            this.changeImage(0);
+            if (this.useComplexOptions) {
+              this.initComplexOptions();
+            } else {
+              this.changeImage(0);
+            }
 
             // Populate option input listeners (radio/button inputs)
             this.bindOptionInputs();
@@ -1757,14 +2295,19 @@
             // find all inputs that select options (name like options[Option Name])
             const optionInputs = document.querySelectorAll('input[name^="options["], select[name^="options["]');
             optionInputs.forEach(input => {
+              const nameAttr = input.name.replace(/^options\[(.+)\]$/, '$1');
+              const optionIndex = this.getOptionIndexByName(nameAttr); // 0-based
+              if (optionIndex !== -1) {
+                input.dataset.optionIndex = optionIndex;
+              }
               input.addEventListener('change', (e) => {
-                const name = input.name.replace(/^options\[(.+)\]$/, '$1');
-                // Determine which option index this corresponds to in product.options
-                const optionIndex = this.getOptionIndexByName(name); // 0-based
                 if (optionIndex === -1) return;
 
                 const value = input.value;
                 this.selectedOptions[optionIndex] = value;
+                if (this.useComplexOptions && optionIndex === 0) {
+                  this.handleComplexPrimarySelection(value, input.dataset.complexAsset || null);
+                }
                 this.updateSelectedVariantByOptions(this.selectedOptions);
               });
             });
@@ -1794,23 +2337,61 @@
             // Normalize length to product.options length
             const optionCount = (product.options || []).length;
             const normalized = new Array(optionCount).fill('');
-            for (let i = 0; i < optionCount; i++) normalized[i] = optionsArray[i] || (product.options_with_values && product.options_with_values[i] && product.options_with_values[i].selected_value) || '';
+            for (let i = 0; i < optionCount; i++) {
+              if (optionsArray[i]) {
+                normalized[i] = optionsArray[i];
+              } else if (!this.useComplexOptions) {
+                normalized[i] =
+                  (product.options_with_values &&
+                    product.options_with_values[i] &&
+                    product.options_with_values[i].selected_value) ||
+                  '';
+              }
+            }
 
-            const key = variantKeyFromOptionsArray(normalized);
+            let variant = null;
 
-            let variant = variantsMap[key];
-
-            // If exact variant not found try to find a match by partial values (best effort)
-            if (!variant) {
-              // try to find first variant which matches all non-empty selected values
-              variant = variants.find(v => {
-                for (let i = 0; i < normalized.length; i++) {
-                  if (normalized[i] && ((v.options[i] || '').toString().trim() !== normalized[i].toString().trim())) {
-                    return false;
-                  }
+            if (this.useComplexOptions) {
+              const desiredPrimary =
+                (normalized[0] ||
+                  complexConfig.defaultPrimaryValue ||
+                  '') + '';
+              variant =
+                variants.find(v => {
+                  return (
+                    (v.options &&
+                      v.options[0] &&
+                      v.options[0].toString().trim()) === desiredPrimary.trim()
+                  );
+                }) ||
+                variants.find(v => v.available) ||
+                variants[0] ||
+                null;
+              if (variant) {
+                normalized[0] = variant.options[0];
+                for (let i = 1; i < optionCount; i++) {
+                  normalized[i] = variant.options[i];
                 }
-                return true;
-              });
+              }
+            } else {
+              const key = variantKeyFromOptionsArray(normalized);
+              variant = variantsMap[key];
+
+              // If exact variant not found try to find a match by partial values (best effort)
+              if (!variant) {
+                // try to find first variant which matches all non-empty selected values
+                variant = variants.find(v => {
+                  for (let i = 0; i < normalized.length; i++) {
+                    if (
+                      normalized[i] &&
+                      (v.options[i] || '').toString().trim() !== normalized[i].toString().trim()
+                    ) {
+                      return false;
+                    }
+                  }
+                  return true;
+                });
+              }
             }
 
             // final fallback
@@ -1833,7 +2414,7 @@
                this.updateAvailability(variant);
 
                // update main image if variant has featured_image
-               if (variant.featured_image) {
+              if (!this.useComplexOptions && variant.featured_image) {
                  const mainImage = document.getElementById('mainImage');
                  if (mainImage && mainImage.src.indexOf(variant.featured_image) === -1) {
                    mainImage.src = variant.featured_image;
@@ -2004,6 +2585,189 @@
             }
           },
 
+          initComplexOptions() {
+            this.ensureComplexPrimaryDefault();
+            this.resetComplexLayerUI();
+            this.bindComplexLayerButtons();
+            const defaultPrimaryInput = document.querySelector('input[data-option-index="0"][type="radio"]:checked') ||
+              document.querySelector('input[data-option-index="0"][type="radio"]');
+            if (defaultPrimaryInput) {
+              const asset = defaultPrimaryInput.dataset.complexAsset || this.lookupComplexAsset(0, defaultPrimaryInput.value);
+              const resolved = asset || complexConfig.defaultPrimaryAsset || complexConfig.fallbackImage || '';
+              this.setComplexBaseImage(resolved);
+              this.selectedOptions[0] = defaultPrimaryInput.value;
+            } else {
+              this.setComplexBaseImage(complexConfig.defaultPrimaryAsset || complexConfig.fallbackImage || '');
+            }
+          },
+
+          ensureComplexPrimaryDefault() {
+            const checked = document.querySelector('input[data-option-index="0"][type="radio"]:checked');
+            if (checked) {
+              return;
+            }
+            const firstRadio = document.querySelector('input[data-option-index="0"][type="radio"]');
+            if (firstRadio) {
+              firstRadio.checked = true;
+            }
+          },
+
+          resetComplexLayerUI() {
+            this.complexLayerState = {};
+            const container = document.getElementById('complexOverlayContainer');
+            if (container) container.innerHTML = '';
+            const buttons = document.querySelectorAll('[data-complex-option-button]');
+            buttons.forEach(btn => {
+              btn.classList.remove('is-active');
+              btn.setAttribute('aria-pressed', 'false');
+            });
+          },
+
+          bindComplexLayerButtons() {
+            const buttons = document.querySelectorAll('[data-complex-option-button]');
+            buttons.forEach(button => {
+              button.addEventListener('click', (event) => {
+                if (event) event.preventDefault();
+                this.handleComplexLayerButton(button);
+              });
+            });
+          },
+
+          handleComplexLayerButton(button) {
+            this.ensureLayeredPreview();
+            const optionIndex = Number(button.dataset.complexOptionIndex);
+            const optionValue = button.dataset.optionValue;
+            const assetUrl = button.dataset.asset || this.lookupComplexAsset(optionIndex, optionValue);
+            const currentState = this.complexLayerState[optionIndex];
+            const isActive = currentState && currentState.value === optionValue;
+
+            if (isActive) {
+              this.complexLayerState[optionIndex] = null;
+              this.selectedOptions[optionIndex] = '';
+              this.updateComplexLayerElement(optionIndex, null);
+              this.setComplexLayerButtonState(optionIndex, optionValue, false);
+            } else {
+              this.complexLayerState[optionIndex] = { value: optionValue, asset: assetUrl };
+              this.selectedOptions[optionIndex] = optionValue;
+              this.updateComplexLayerElement(optionIndex, assetUrl);
+              this.setComplexLayerButtonState(optionIndex, optionValue, true);
+            }
+          },
+
+          handleComplexPrimarySelection(value, assetUrl) {
+            if (!this.useComplexOptions) return;
+             this.ensureLayeredPreview();
+            const resolvedAsset =
+              assetUrl ||
+              this.lookupComplexAsset(0, value) ||
+              complexConfig.defaultPrimaryAsset ||
+              complexConfig.fallbackImage ||
+              '';
+            this.setComplexBaseImage(resolvedAsset);
+          },
+
+          ensureLayeredPreview() {
+            if (!this.useComplexOptions) return;
+            if (this.complexPreviewMode) return;
+            this.complexPreviewMode = true;
+            this.restoreLayeredBase();
+            const container = document.getElementById('complexOverlayContainer');
+            if (container) container.classList.remove('hidden');
+          },
+
+          showLayeredPreview() {
+            if (!this.useComplexOptions) return;
+            this.complexPreviewMode = false; // force re-enable
+            this.ensureLayeredPreview();
+          },
+
+          enterStandardMediaMode(imageUrl) {
+            if (!this.useComplexOptions) return;
+            this.complexPreviewMode = false;
+            const container = document.getElementById('complexOverlayContainer');
+            if (container) container.classList.add('hidden');
+            const baseImg = document.getElementById('complexBaseImage');
+            if (baseImg && imageUrl) {
+              baseImg.src = imageUrl;
+            }
+          },
+
+          setComplexBaseImage(assetUrl) {
+            const baseImg = document.getElementById('complexBaseImage');
+            if (!baseImg) return;
+            const sanitized = typeof assetUrl === 'string' ? assetUrl.trim() : '';
+            const fallback =
+              complexConfig.defaultPrimaryAsset ||
+              complexConfig.fallbackImage ||
+              baseImg.getAttribute('data-default-src') ||
+              '';
+            const nextSrc = sanitized || fallback;
+            if (nextSrc) {
+              baseImg.src = nextSrc;
+            }
+          },
+
+          restoreLayeredBase() {
+            if (!this.useComplexOptions) return;
+            const primaryValue = this.selectedOptions[0];
+            const asset =
+              (primaryValue && this.lookupComplexAsset(0, primaryValue)) ||
+              complexConfig.defaultPrimaryAsset ||
+              complexConfig.fallbackImage ||
+              '';
+            this.setComplexBaseImage(asset);
+          },
+
+          updateComplexLayerElement(optionIndex, assetUrl) {
+            const container = document.getElementById('complexOverlayContainer');
+            if (!container) return;
+            const selector = `[data-layer-group="${optionIndex}"]`;
+            let img = container.querySelector(selector);
+            if (assetUrl) {
+              if (!img) {
+                img = document.createElement('img');
+                img.dataset.layerGroup = optionIndex;
+                container.appendChild(img);
+              }
+              img.src = assetUrl;
+              img.style.zIndex = String(10 + Number(optionIndex || 0));
+            } else if (img) {
+              img.remove();
+            }
+          },
+
+          setComplexLayerButtonState(optionIndex, value, active) {
+            const selector = `[data-complex-option-button][data-complex-option-index="${optionIndex}"]`;
+            const buttons = document.querySelectorAll(selector);
+            buttons.forEach(btn => {
+              const isTarget = btn.dataset.optionValue === value;
+              if (isTarget) {
+                if (active) {
+                  btn.classList.add('is-active');
+                  btn.setAttribute('aria-pressed', 'true');
+                } else {
+                  btn.classList.remove('is-active');
+                  btn.setAttribute('aria-pressed', 'false');
+                }
+              } else if (active) {
+                btn.classList.remove('is-active');
+                btn.setAttribute('aria-pressed', 'false');
+              }
+            });
+          },
+
+          lookupComplexAsset(optionIndex, value) {
+            if (!complexConfig || !complexConfig.options) return '';
+            const optionMeta = complexConfig.options.find(opt => Number(opt.index) === Number(optionIndex));
+            if (!optionMeta || !optionMeta.assets) {
+              console.log('lookupComplexAsset: missing metadata', { optionIndex, value });
+              return '';
+            }
+            const asset = optionMeta.assets[value] || '';
+            console.log('lookupComplexAsset:', { optionIndex, value, asset });
+            return asset;
+          },
+
           changeImage(index) {
             const mainImage = document.getElementById('mainImage');
             const thumbnails = Array.from(document.querySelectorAll('.thumbnail'));
@@ -2011,7 +2775,11 @@
 
             if (index >= 0 && index < this.productImages.length) {
               this.currentImageIndex = index;
-              if (mainImage) mainImage.src = this.productImages[index];
+              if (this.useComplexOptions) {
+                this.enterStandardMediaMode(this.productImages[index]);
+              } else if (mainImage) {
+                mainImage.src = this.productImages[index];
+              }
 
               // Update thumbnail borders
               thumbnails.forEach((thumbnail, i) => {
@@ -2065,6 +2833,7 @@
           },
 
           openGallery() {
+            if (this.useComplexOptions) return;
             const fullscreenGallery = document.querySelector('[x-data*="fullscreenGallery"]');
             if (fullscreenGallery && fullscreenGallery._x_dataStack && fullscreenGallery._x_dataStack[0]) {
               fullscreenGallery._x_dataStack[0].isOpen = true;
@@ -2084,6 +2853,7 @@
           },
 
           openFullscreenGallery() {
+            if (this.useComplexOptions) return;
             const fullscreenGallery = document.querySelector('[x-data*="fullscreenGallery"]');
             if (fullscreenGallery && fullscreenGallery._x_dataStack && fullscreenGallery._x_dataStack[0]) {
               fullscreenGallery._x_dataStack[0].isOpen = true;

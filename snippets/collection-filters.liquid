@@ -25,19 +25,6 @@
       </button>
 
       <div x-show='filtersOpen.productType' class='space-y-2'>
-        <!-- All option -->
-        <label class='flex items-center space-x-2 cursor-pointer'>
-          <input
-            type='radio'
-            name='productType'
-            value=''
-            x-model='selectedFilters.productTypeSelected'
-            @change='applyFilters(true)'
-            class='border-gray-300 text-black focus:ring-gray-900'
-          >
-          <span class='text-sm text-gray-700'>All</span>
-        </label>
-
         <template x-for='t in productTypes' :key='t.value'>
           <label class='flex items-center space-x-2 cursor-pointer'>
             <input
@@ -253,12 +240,14 @@
             'home-page',
             'homepage',
             'hidden-offer',
+            'featured-mobile'
           ]
           const HIDE_TITLES = [
             'featured',
             'home page',
             'products',
             'hidden offer',
+            'featured mobile'
           ]
           return colls
             .filter(c => {

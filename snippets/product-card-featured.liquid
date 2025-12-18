@@ -16,9 +16,9 @@
   data-images='{{ product_obj.images | json | escape }}'
   x-data='fcCard()'
 >
-  <div class='bg-white overflow-hidden w-full h-[520px] sm:h-[560px] md:h-[600px] flex flex-col'>
+  <div class='bg-white overflow-hidden w-full flex flex-col'>
     <!-- Image well -->
-    <div class='relative h-[420px] bg-white overflow-hidden flex items-center justify-center'>
+    <div class='relative h-[180px] md:h-[300px] lg:h-[300px] bg-white overflow-hidden flex items-center justify-center'>
       {% assign kk_status = product_obj.metafields.custom.product_status
         | default: product_obj.metafields.custom_fields.product_status
         | default: product_obj.metafields.global.product_status
@@ -113,6 +113,7 @@
           or type_lower contains "apparel"
           or type_lower contains "accessories"
         %}
+          {% assign handle_option_name = product_obj.options | first | default: 'Handle Color' %}
           <div class='mb-2'>
             <div class='flex gap-2 justify-center flex-wrap max-w-[260px] sm:max-w-none md:max-w-full mx-auto'>
               {% assign unique_handle_colors = "" %}
@@ -129,20 +130,108 @@
                     %}
                     <button
                       type='button'
-                      class='w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full border-2 border-gray-300 overflow-hidden focus:outline-none focus:ring-2 focus:ring-black'
+                      class='w-6 h-6 rounded-full border-2 border-gray-300 overflow-hidden focus:outline-none focus:ring-2 focus:ring-black'
                       @click='selectByHandle({{ variant.option1 | json }})'
                       :class="$el.dataset.handleLc && selectedOption1Lc === $el.dataset.handleLc ? 'ring-2 ring-black' : ''"
                       title='{{ variant.option1 }}'
                       data-handle-lc='{{ variant.option1 | strip | downcase }}'
                     >
-                      {% if variant.featured_image %}
+                      {% assign option_lower = variant.option1 | downcase %}
+                      {% assign cmp_option_token = handle_option_name
+                        | strip
+                        | downcase
+                        | replace: " ", "_"
+                        | replace: "-", "_"
+                        | replace: "/", "_"
+                        | replace: ".", "_"
+                        | replace: "__", "_"
+                        | replace: "__", "_"
+                      %}
+                      {% assign cmp_value_token = variant.option1
+                        | strip
+                        | downcase
+                        | replace: " ", "_"
+                        | replace: "-", "_"
+                        | replace: "/", "_"
+                        | replace: ".", "_"
+                        | replace: "__", "_"
+                        | replace: "__", "_"
+                      %}
+                      {% assign cmp_asset_filename = ''
+                        | append: cmp_option_token
+                        | append: '_'
+                        | append: cmp_value_token
+                        | append: '.png'
+                      %}
+                      {% assign cmp_asset_thumb = cmp_asset_filename | asset_img_url: '64x64' %}
+                      {% assign color_image = "" %}
+                      {% if cmp_asset_thumb != blank %}
                         <img
-                          src='{{ variant.featured_image.src | image_url: width: 48 }}'
+                          src='{{ cmp_asset_thumb }}'
                           width='48'
                           height='48'
                           alt='{{ variant.option1 }}'
                           class='w-full h-full object-contain'
                         >
+                      {% else %}
+                        {% if option_lower contains "black" and option_lower contains "orange" %}
+                          {% if section.settings.black_orange_image %}
+                            {% assign color_image = section.settings.black_orange_image | image_url: width: 48 %}
+                          {% else %}
+                            {% assign color_image = "black_w_orange_liner.png" %}
+                          {% endif %}
+                        {% elsif option_lower contains "orange" %}
+                          {% if section.settings.orange_image %}
+                            {% assign color_image = section.settings.orange_image | image_url: width: 48 %}
+                          {% else %}
+                            {% assign color_image = "orange.png" %}
+                          {% endif %}
+                        {% elsif option_lower contains "black" %}
+                          {% if section.settings.black_image %}
+                            {% assign color_image = section.settings.black_image | image_url: width: 48 %}
+                          {% else %}
+                            {% assign color_image = "black_w_orange_liner.png" %}
+                          {% endif %}
+                        {% elsif option_lower contains "green" %}
+                          {% if section.settings.green_image %}
+                            {% assign color_image = section.settings.green_image | image_url: width: 48 %}
+                          {% else %}
+                            {% assign color_image = "od_green.png" %}
+                          {% endif %}
+                        {% elsif option_lower contains "camo"
+                          or option_lower contains "earth"
+                        %}
+                          {% if section.settings.camo_image %}
+                            {% assign color_image = section.settings.camo_image | image_url: width: 48 %}
+                          {% else %}
+                            {% assign color_image = "earth_camo.png" %}
+                          {% endif %}
+                        {% endif %}
+
+                        {% if color_image != "" %}
+                          {% if color_image contains "//" %}
+                            <img
+                              src='{{ color_image }}'
+                              width='48'
+                              height='48'
+                              alt='{{ variant.option1 }}'
+                              class='w-full h-full object-cover'
+                            >
+                          {% else %}
+                            <img
+                              src='{{ color_image | asset_url }}'
+                              width='48'
+                              height='48'
+                              alt='{{ variant.option1 }}'
+                              class='w-full h-full object-cover'
+                            >
+                          {% endif %}
+                        {% else %}
+                          <div
+                            class='w-full h-full rounded-full'
+                            style='background-color: {{ variant.option1 | downcase | replace: ' ', '' }}'
+                          ></div>
+                        {% endif %}
                       {% endif %}
                     </button>
                   {% endunless %}

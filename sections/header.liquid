@@ -22,6 +22,45 @@
   .child-menu-link:hover p {
     color: {{ section.settings.child_menu_hover_text_color | default: "#ffffff" }} !important;
   }
+
+  /* Mobile child links background */
+  @media (max-width: 1023px) {
+    .mobile-child-container {
+      background-color: #dcdcdd !important;
+      border-radius: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      margin: 0.5rem 0;
+    }
+    .mobile-child-link span {
+      color: #1f2937 !important;
+    }
+  }
+
+  /* Explicit breakpoint control for menu toggle vs desktop nav */
+  .header-mobile-trigger {
+    display: block;
+  }
+  .header-desktop-nav {
+    display: none;
+  }
+  @media (min-width: 1100px) {
+    .header-mobile-trigger {
+      display: none !important;
+    }
+    .header-desktop-nav {
+      display: flex !important;
+    }
+  }
+
+  /* Mobile menu panel visibility */
+  .mobile-menu-panel {
+    display: block;
+  }
+  @media (min-width: 1100px) {
+    .mobile-menu-panel {
+      display: none !important;
+    }
+  }
 </style>
 
 <div
@@ -82,11 +121,11 @@
         {% endif %}
       </div>
 
-      <div class='-mr-2 -my-2 ml-3 lg:hidden'>
+      <div class='-mr-2 -my-2 ml-3 lg:hidden header-mobile-trigger'>
         <button
           x-on:click='mobileMenuOpen = true'
           type='button'
-          class='p-2 inline-flex items-center justify-center focus:outline-none'
+          class='p-2 pr-4 inline-flex items-center justify-center focus:outline-none'
           style='color: {{ section.settings.mobile_menu_button_color | default: "#ffffff" }};'
         >
           {% render "icon-menu" %}
@@ -94,7 +133,7 @@
       </div>
       <!-- NAVIGATION MENU -->
       <nav
-        class='hidden lg:flex space-x-10'
+        class='hidden lg:flex space-x-10 header-desktop-nav'
         @click.away='mobileMenuOpen = false'
       >
         {% if section.settings.menu.links == blank %}
@@ -227,7 +266,7 @@
       <div
         x-show='mobileMenuOpen'
         @click.away='mobileMenuOpen = false'
-        class='absolute z-10 top-0 inset-x-0 p-2 transform origin-top-left lg:hidden'
+        class='fixed z-10 inset-0 p-2 transform origin-top-left lg:hidden mobile-menu-panel max-h-screen overflow-y-auto w-screen'
       >
         <div
           class='shadow-lg rounded-lg ring-1 ring-black ring-opacity-5 w-full'
@@ -289,12 +328,13 @@
 
                       <div
                         x-show='{{ mobile_link_handle }}'
-                        class='grid gap-y-2 py-3'
+                        class='mobile-child-container grid gap-y-2 py-3'
+                        style='border-radius: 0.5rem; padding: 0.75rem;'
                       >
                         {% for childlink in link.links %}
                           <a
                             href='{{ childlink.url }}'
-                            class='-m-3 p-3 mt-2 flex items-center rounded-md'
+                            class='mobile-child-link -m-3 p-3 mt-2 flex items-center rounded-md'
                             style='color: {{ section.settings.mobile_menu_link_color | default: "#ffffff" }}; transition: background-color 0.2s ease, color 0.2s ease;'
                             onmouseover='this.style.backgroundColor="{{ section.settings.mobile_menu_link_hover_bg_color | default: "#374151" }}"; this.style.color="{{ section.settings.mobile_menu_link_hover_text_color | default: "#ffffff" }}"'
                             onmouseout='this.style.backgroundColor="transparent"; this.style.color="{{ section.settings.mobile_menu_link_color | default: "#ffffff" }}"'

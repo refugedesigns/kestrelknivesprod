@@ -2,23 +2,23 @@
   {% paginate search.results by 9 %}
     <h1 class='text-xl my-4 text-center'>Search Results</h1>
 
-    <div class='flex justify-center items-center'>
+    <div class='flex justify-center items-center px-4'>
       <form
         action='{{ routes.search_url }}'
         method='get'
-        class='border flex rounded'
+        class='border flex rounded w-full max-w-md overflow-hidden'
       >
         <input
           type='search'
           name='q'
           placeholder='Search'
           value='{{ search.terms | escape }}'
-          class='px-4 py-2 w-80 border-none'
+          class='px-4 py-2 flex-1 border-none text-base md:text-lg'
         >
 
         <button
           type='submit'
-          class='bg-gray-900 hover:bg-gray-700 text-white border px-4'
+          class='bg-gray-900 hover:bg-gray-700 text-white border px-6 py-2 text-base md:text-lg font-semibold'
         >
           Search
         </button>
@@ -40,7 +40,7 @@
               {{ search.terms | escape }}
             </p>
             <div
-              class='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'
+              class='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6'
               id='search-results-grid'
             >
               {% for item in search.results %}

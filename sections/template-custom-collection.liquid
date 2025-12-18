@@ -1,43 +1,33 @@
 <style>
-  #products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 400px));
-    gap: 1.5rem;
-    justify-content: center;
-    place-items: start;
-  }
-
-  @media (max-width: 640px) {
-    #products-grid {
-      grid-template-columns: 1fr;
-      place-items: center;
-    }
-  }
+  /* Using Tailwind grid utilities to match template-collection layout */
 </style>
 
 <script>
   window.__collectionProducts = {{ collection.products | json }};
 </script>
 
-<div class='px-4 py-16 mx-auto' x-data='customCollectionPage()' x-cloak>
+<div class='px-4 py-4 mx-auto' x-data='customCollectionPage()' x-cloak>
   {% paginate collection.products by section.settings.number_of_products_per_page | default: 9 %}
     <div
-      class='text-center mb-8 px-6 py-4 rounded-lg my-8 h-40 flex items-center justify-center'
+      class='text-center mb-8 px-6 py-4 rounded-lg flex items-center justify-center'
       style='background-color: {{ section.settings.page_title_bg_color | default: "#ffffff" }};'
     >
       <h1
-        class='text-3xl md:text-4xl font-bold text-gray-900 mb-4'
+        class='text-xl md:text-4xl font-bold text-gray-900 mb-4'
         style='color: {{ section.settings.page_title_color | default: "#000000" }};'
       >
         {{ section.settings.page_title | default: "Hidden Offer" }}
       </h1>
     </div>
 
-    <div class='max-w-7xl mx-auto'>
+    <div class='max-w-2xl mx-auto'>
       {%- comment -%} Product count removed {%- endcomment -%}
 
       <!-- Products Grid -->
-      <div id='products-grid'>
+      <div
+        id='products-grid'
+        class='grid grid-cols-2 md:grid-cols-2 gap-2 md:gap-8'
+      >
         {% assign hidden_offer_count = 0 %}
 
         {% comment %}

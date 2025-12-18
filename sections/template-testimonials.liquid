@@ -131,7 +131,7 @@
 }
 {% endschema %}
 
-<div class='py-16 px-4 bg-gray-50 min-h-screen'>
+<div class='py-4 px-4 bg-gray-50 min-h-screen'>
   <div class='mx-auto'>
     <!-- Section Header -->
     <div class='text-center mb-12'>
@@ -799,6 +799,62 @@
       .quote-base.quote-expanded .js-quote-text {
         display: block;
       }
+
+      .modal-quote {
+        max-height: 2rem;
+        overflow: hidden;
+      }
+      .modal-quote--expanded {
+        max-height: none;
+      }
+      @media (min-width: 768px) {
+        .modal-quote {
+          max-height: 4rem;
+        }
+      }
+
+      /* Force small typography and clamp on mobile to avoid reflow conflicts */
+      @media (max-width: 767px) {
+        .testimonial-modal-quote {
+          font-size: 12px !important;
+          line-height: 1.35 !important;
+          max-height: 2.7rem !important; /* ~2 lines */
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .testimonial-modal-quote.modal-quote--expanded {
+          -webkit-line-clamp: unset;
+          max-height: none !important;
+          display: block;
+        }
+        .testimonial-modal-content {
+          padding: 0.5rem !important;
+        }
+        .testimonial-modal-author {
+          font-size: 12px !important;
+          line-height: 1.25 !important;
+        }
+        .testimonial-modal-toggle {
+          font-size: 11px !important;
+          line-height: 1.1 !important;
+        }
+      }
+
+      /* Remove default blockquote styling and tighten vertical rhythm */
+      .testimonial-modal-quote {
+        margin: 0 0 0.35rem !important;
+        padding: 0 !important;
+        border: none !important;
+      }
+      .testimonial-modal-toggle {
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .testimonial-modal-author {
+        margin: 0 !important;
+      }
     </style>
 
     <!-- Initialize Swiper -->
@@ -1351,15 +1407,30 @@
       </div>
 
       <!-- Review Content -->
-      <div class='p-8 bg-black/40 absolute bottom-0 left-0 right-0'>
-        <div class='text-center'>
-          <blockquote class='text-white text-lg md:text-xl leading-relaxed mb-6 italic'>
+      <div class='p-2 md:p-6 bg-black/40 absolute bottom-0 left-0 right-0 testimonial-modal-content'>
+        <div class='text-left max-w-4xl mx-auto'>
+          <blockquote
+            class='text-white text-xs md:text-xl leading-snug md:leading-relaxed mb-[2px] italic modal-quote testimonial-modal-quote'
+            :class="{ 'modal-quote--expanded': modalExpanded }"
+          >
             <span
-              x-text='selectedTestimonial ? `"${selectedTestimonial.quote}"` : ""'
+              class='block text-white'
+              x-text='modalExpanded ? modalFullTextDisplay : modalCollapsedText'
             ></span>
           </blockquote>
-
-          <cite class='text-white font-semibold not-italic text-lg md:text-xl'>
+          <div x-show='modalToggleVisible' class='mt-[2px] mb-1'>
+            <button
+              type='button'
+              class='text-white underline text-[11px] md:text-sm focus:outline-none testimonial-modal-toggle leading-none'
+              @click='toggleModalQuote()'
+            >
+              <span x-text='modalExpanded ? "Show less" : "Read more"'></span>
+            </button>
+          </div>
+          <cite
+            class='text-white font-semibold not-italic text-xs md:text-lg block leading-snug testimonial-modal-author'
+            style='line-height: 1.25; color: #fff;'
+          >
             <span
               x-text='selectedTestimonial ? selectedTestimonial.author : ""'
             ></span>
@@ -1383,17 +1454,58 @@
     return {
       isOpen: false,
       selectedTestimonial: null,
+      modalExpanded: false,
+      modalCollapsedText: '',
+      modalFullTextDisplay: '',
+      modalToggleVisible: false,
 
       openModal(testimonial) {
         this.selectedTestimonial = testimonial
         this.isOpen = true
         document.body.style.overflow = 'hidden'
+
+        const fullRaw = testimonial && testimonial.quote ? String(testimonial.quote).trim() : ''
+        const { collapsed, full, needsToggle } = this.truncateQuote(fullRaw)
+        this.modalCollapsedText = collapsed
+        this.modalFullTextDisplay = full
+        this.modalToggleVisible = needsToggle
+        this.modalExpanded = false
       },
 
       closeModal() {
         this.isOpen = false
         this.selectedTestimonial = null
         document.body.style.overflow = 'auto'
+      },
+
+      toggleModalQuote() {
+        this.modalExpanded = !this.modalExpanded
+      },
+
+      truncateQuote(text) {
+        const MAX_WORDS = 22
+        const MAX_CHARS = 160
+        const safe = (text || '').trim()
+        const fullDisplay = `"${safe}"`
+        if (!safe) {
+          return { collapsed: '', full: '', needsToggle: false }
+        }
+
+        const words = safe.split(/\s+/)
+        const needsTruncate = words.length > MAX_WORDS || safe.length > MAX_CHARS
+        if (!needsTruncate) {
+          return { collapsed: fullDisplay, full: fullDisplay, needsToggle: false }
+        }
+
+        let truncated = words.slice(0, MAX_WORDS).join(' ')
+        if (truncated.length > MAX_CHARS) {
+          const trimmed = truncated.slice(0, MAX_CHARS)
+          const lastSpace = trimmed.lastIndexOf(' ')
+          truncated = lastSpace > 0 ? trimmed.slice(0, lastSpace) : trimmed
+        }
+        truncated = truncated.replace(/[\s,.!?;:-]+$/, '')
+        const collapsed = `"${truncated}…"`
+        return { collapsed, full: fullDisplay, needsToggle: true }
       },
       init() {
         window.addEventListener('open-testimonial', e => {

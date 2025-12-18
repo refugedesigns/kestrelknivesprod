@@ -19,11 +19,11 @@
     },
     {
       "type": "range",
-      "id": "header_height",
+      "id": "header_height_px",
       "label": "Header Image Height",
-      "min": 200,
+      "min": 50,
       "max": 800,
-      "step": 50,
+      "step": 10,
       "default": 400,
       "unit": "px"
     },
@@ -33,7 +33,7 @@
       "label": "Header Image Height - Mobile",
       "min": 150,
       "max": 600,
-      "step": 50,
+      "step": 10,
       "default": 300,
       "unit": "px"
     },
@@ -71,10 +71,10 @@
       "type": "range",
       "id": "header_height_custom",
       "label": "Header height",
-      "min": 200,
+      "min": 50,
       "max": 600,
-      "step": 16,
-      "default": 200,
+      "step": 10,
+      "default": 50,
       "unit": "px"
     },
     {
@@ -99,7 +99,7 @@
       "type": "range",
       "id": "header_padding_top",
       "label": "Header padding top",
-      "min": 2,
+      "min": 0,
       "max": 8,
       "step": 0.5,
       "default": 4,
@@ -109,7 +109,7 @@
       "type": "range",
       "id": "header_padding_bottom",
       "label": "Header padding bottom",
-      "min": 2,
+      "min": 0,
       "max": 8,
       "step": 0.5,
       "default": 4,
@@ -155,7 +155,7 @@
     <style>
       @media (min-width: 768px) {
         .relative.w-full.overflow-hidden > div:first-child {
-          height: {{ section.settings.header_height | default: 400 }}px !important;
+          height: {{ section.settings.header_height_px | default: 400 }}px !important;
         }
       }
     </style>
@@ -168,7 +168,7 @@
   <div class='bg-gray-50'>
     <header
       class='text-white relative overflow-hidden flex items-center justify-center'
-      style='background-color: {{ section.settings.header_bg_color | default: "#000000" }}; min-height: {{ section.settings.header_height_custom | default: "200" }}px; padding-top: {{ section.settings.header_padding_top | default: "4" }}rem; padding-bottom: {{ section.settings.header_padding_bottom | default: "4" }}rem; {% if section.settings.header_border_bottom %}border-bottom: 2px solid {{ section.settings.header_border_color | default: "#ffffff" }};{% endif %}'
+      style='background-color: {{ section.settings.header_bg_color | default: "#000000" }}; min-height: {{ section.settings.header_height_custom | default: "50" }}px; padding-top: {{ section.settings.header_padding_top | default: "4" }}rem; padding-bottom: {{ section.settings.header_padding_bottom | default: "4" }}rem; {% if section.settings.header_border_bottom %}border-bottom: 2px solid {{ section.settings.header_border_color | default: "#ffffff" }};{% endif %}'
     >
       <div class='container mx-auto px-4 relative z-10 flex flex-col items-center justify-center'>
         <div class='text-center'>
