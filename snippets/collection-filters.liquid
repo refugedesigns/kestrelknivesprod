@@ -26,20 +26,41 @@
 
       <div x-show='filtersOpen.productType' class='space-y-2'>
         <template x-for='t in productTypes' :key='t.value'>
-          <label class='flex items-center space-x-2 cursor-pointer'>
-            <input
-              type='radio'
-              name='productType'
-              :value='t.value'
-              x-model='selectedFilters.productTypeSelected'
-              @change='applyFilters(true)'
-              class='border-gray-300 text-black focus:ring-gray-900'
+          <div>
+            <label class='flex items-center space-x-2 cursor-pointer'>
+              <input
+                type='radio'
+                name='productType'
+                :value='t.value'
+                x-model='selectedFilters.productTypeSelected'
+                @change='applyFilters(true)'
+                class='border-gray-300 text-black focus:ring-gray-900'
+              >
+              <span
+                class='text-sm text-gray-700'
+                x-text='titleCase(t.value)'
+              ></span>
+            </label>
+
+            <!-- Inline apparel tag drill-down (only under Apparel) -->
+            <template
+              x-if="t.value && t.value.toLowerCase() === 'apparel' && selectedFilters.productTypeSelected && selectedFilters.productTypeSelected.toLowerCase() === 'apparel' && apparelTagsTop.length"
             >
-            <span
-              class='text-sm text-gray-700'
-              x-text='titleCase(t.value)'
-            ></span>
-          </label>
+              <div class='mt-2 space-y-2 pl-6'>
+                <template x-for='tag in apparelTagsTop' :key='tag.handle'>
+                  <label class='flex items-center space-x-2 cursor-pointer'>
+                    <input
+                      type='checkbox'
+                      :checked='selectedFilters.apparelTagSelected === tag.handle'
+                      @change='toggleApparelTag(tag.handle, $event.target.checked)'
+                      class='border-gray-300 text-black focus:ring-gray-900'
+                    >
+                    <span class='text-sm text-gray-700' x-text='tag.label'></span>
+                  </label>
+                </template>
+              </div>
+            </template>
+          </div>
         </template>
       </div>
     </div>
@@ -171,9 +192,16 @@
       selectedFilters: {
         productType: [],
         productTypeSelected: '',
+        apparelTagSelected: '',
         availabilitySelected: '',
       },
       productTypes: [],
+      apparelTags: [],
+      get apparelTagsTop() {
+        return (this.apparelTags || []).filter(
+          t => String(t.handle || '').toLowerCase().indexOf('position') === -1
+        )
+      },
       isInitializing: true,
 
       async init() {
@@ -185,6 +213,9 @@
 
         // Hydrate selections from URL so checked states reflect current filters
         this.hydrateFromUrl()
+
+        // Build apparel tag options from current products
+        this.buildApparelTags()
 
         // Mark initialization complete
         this.isInitializing = false
@@ -410,8 +441,110 @@
               this.selectedFilters.availabilitySelected = 'out-of-stock'
             }
           }
+
+          // Apparel tag (filter.p.tag)
+          const tagParam = url.searchParams.get('filter.p.tag')
+          if (tagParam) {
+            this.selectedFilters.apparelTagSelected = tagParam
+          }
+
+          // Apparel tag from path /collections/all/{tag}
+          const pathMatch = (url.pathname || '').match(/\/collections\/all\/([^\/]+)/)
+          if (
+            pathMatch &&
+            pathMatch[1] &&
+            this.selectedFilters.productTypeSelected.toLowerCase() === 'apparel'
+          ) {
+            this.selectedFilters.apparelTagSelected = decodeURIComponent(pathMatch[1])
+          }
         } catch (e) {
           // ignore
+        }
+      },
+
+      toggleApparelTag(tag, checked) {
+        if (checked) {
+          this.selectedFilters.apparelTagSelected = tag
+        } else {
+          this.selectedFilters.apparelTagSelected = ''
+        }
+        this.applyFilters()
+      },
+
+      titleCase(str) {
+        try {
+          return String(str || '')
+            .toLowerCase()
+            .split(/\s+/)
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' ')
+        } catch (e) {
+          return str
+        }
+      },
+
+      buildApparelTags() {
+        try {
+          // Only build when apparel is selected
+          if (
+            !this.selectedFilters.productTypeSelected ||
+            this.selectedFilters.productTypeSelected.toLowerCase() !== 'apparel'
+          ) {
+            this.apparelTags = []
+            return
+          }
+
+          const cached = sessionStorage.getItem('kk_apparelTagsAll')
+          const map = {}
+          if (cached) {
+            try {
+              const arr = JSON.parse(cached)
+              arr.forEach(t => {
+                if (t && t.handle) map[String(t.handle)] = t.label || t.handle
+              })
+            } catch (e) {
+              // ignore cache parse errors
+            }
+          }
+
+          const products = window.__collectionProducts || []
+
+          products.forEach(p => {
+            const typeVal = String(p.product_type || p.type || '').toLowerCase()
+            if (typeVal !== 'apparel') return
+            const tags = p.tags || []
+            tags.forEach(tag => {
+              const raw = String(tag || '').trim()
+              if (!raw) return
+              const low = raw.toLowerCase()
+              if (low.includes('hidden')) return
+              const handle = this.toHandleSafe(raw)
+              if (!handle) return
+              if (!map[handle]) {
+                map[handle] = this.titleCase(raw)
+              }
+            })
+          })
+
+          const arr = Object.keys(map)
+            .sort()
+            .map(h => ({ handle: h, label: map[h] }))
+          this.apparelTags = arr
+          sessionStorage.setItem('kk_apparelTagsAll', JSON.stringify(arr))
+        } catch (e) {
+          this.apparelTags = []
+        }
+      },
+
+      toHandleSafe(val) {
+        try {
+          return String(val || '')
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '')
+        } catch (e) {
+          return ''
         }
       },
 
@@ -470,6 +603,7 @@
         this.selectedFilters = {
           productType: [],
           productTypeSelected: '',
+          apparelTagSelected: '',
           availabilitySelected: '',
         }
         // Clear cache to force refresh and remove any cached hidden offer data
@@ -499,6 +633,8 @@
         // Reset availability filter when product type changes
         if (productTypeChanged) {
           this.selectedFilters.availabilitySelected = ''
+          this.selectedFilters.apparelTagSelected = ''
+          this.apparelTags = []
         }
 
         // Build server-side filter URL and navigate
@@ -542,6 +678,24 @@
             url.pathname = '/collections/all'
           }
         }
+
+        // Apparel tag — MUST be in pathname, not query params
+        if (
+          selected &&
+          selected.toLowerCase() === 'apparel' &&
+          this.selectedFilters.apparelTagSelected
+        ) {
+          const tagHandle = toHandle(this.selectedFilters.apparelTagSelected)
+          if (tagHandle) {
+            url.pathname = `/collections/all/${tagHandle}`
+          }
+        } else {
+          // If no apparel tag, ensure we’re not stuck on a tag URL
+          if (url.pathname.match(/\/collections\/all\/[^/]+$/)) {
+            url.pathname = '/collections/all'
+          }
+        }
+
         // availability
         url.searchParams.delete('filter.v.availability')
         const availabilitySelected =

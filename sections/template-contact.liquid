@@ -65,10 +65,17 @@
   </div>
 
   <!-- Main Content -->
-  <div class='grid grid-cols-1 lg:grid-cols-4 gap-12 px-4 lg:px-0 max-w-7xl mx-4 md:mx-8 xl:mx-auto border border-gray-200 py-12 rounded-lg shadow-sm'>
+  <div class='grid grid-cols-1 lg:grid-cols-4 gap-12 lg:px-0 max-w-7xl mx-4 md:mx-8 xl:mx-auto border border-gray-200 py-12 rounded-lg shadow-sm'>
     <!-- Contact Form (Left Side) -->
-    <div class='lg:col-span-2 px-4'>
-      <div class="contact-kaktus"></div>
+    <div class='lg:col-span-2'>
+    
+	<!--pifyform-start-->
+<style>.pifyform.formloading iframe{visibility: hidden !important;} .pifyform.formloading{background-image: url(https://form-builder.pifyapp.com/assets/images/loading.gif?v=4.6);background-position: center 30px;background-size: 30px 30px;background-repeat: no-repeat;}</style>
+<div id="pifyform-35649" class="pifyform" style="margin:5px 0;">
+<script charset="UTF-8" defer>document.getElementById("pifyform-35649").classList.add("formloading");(function(h){function n(a){return null===a?null:a.scrollHeight>a.clientHeight?a:n(a.parentNode)}function t(b){if(b.data && typeof(b.data)=="string"){var f =null;try{f=JSON.parse(b.data);}catch(e){}if(f!=null&&f.height!=undefined){if(f.formId==undefined){d.style.height=f.height+"px"}else if("pifyform-"+f.formId==d.id){d.style.height=f.height+"px"} }if(f!=null&&f.redirect!=undefined&&f.redirect!=""){window.location.href=f.redirect;}if(f!=null&&f.retsetHeight!=undefined&&f.retsetHeight){d.style.height="520px";window.location.href="#pifyform-35649";}if(document.getElementsByClassName('lazyframe').length>0){var lazyframe=document.getElementsByClassName('lazyframe')[0];lazyframe.style.height="100%";lazyframe.removeAttribute("data-ratio");lazyframe.parentNode.style.overflow='hidden'} if(f!=null&&f.getter){b={};var f=[].concat(f.getter),k,h=f.length,m,c,g,e;for(k=0;k<h;k++){m=k;c=f[k]||{};c.n&&(m=c.n);g=null;try{switch(c.t){case "window":e=window;break;case "scrollParent":e=n(a)||window;break;default:e=a}if(c.e)if("rect"===c.v){g={};var l=e.getBoundingClientRect();g={top:l.top,left:l.left,width:l.width,height:l.height} }else g=e[c.v].apply(e,[].concat(c.e))||!0;else c.s?(e[c.v]=c.s,g=!0):g=e[c.v]||!1}catch(u){}b[m]=g}b.innerState=!p&&!q;a.contentWindow.postMessage(JSON.stringify({queryRes:b}),"*")} } }var parentQueryString="";try{var currentParams = new URLSearchParams(window.location.search);parentQueryString=currentParams.size > 0 ? "?"+currentParams.toString() : "";}catch(er){};var d = document.getElementById("pifyform-35649");var a = document.createElement("iframe");d.style.overflowY="visible";d.style.overflowX="hidden";var p=d.style.height&&"auto"!==d.style.height,q="absolute"===d.style.position||window.getComputedStyle&&"absolute"===window.getComputedStyle(d,null).getPropertyValue("position")||d.currentStyle&&"absolute"===d.currentStyle.position;h.addEventListener&&h.addEventListener("message",t,!1);a.src="https://form-builder-en.pifyapp.com/form/s/35649"+parentQueryString;a.id="form-iframe-35649";a.onload=function(){document.getElementById("pifyform-35649").classList.remove("formloading");a.contentWindow.postMessage(JSON.stringify({parentUrl: window.location.href}), "*");};a.frameBorder=0;a.scrolling="no";a.style.display="block";a.style.minWidth="100%";a.style.width="100px";a.style.height="100%";a.style.border="none";a.style.overflow="auto";setTimeout(function(){if(!document.getElementById("form-iframe-35649")){d.appendChild(a);} },50);})(window);</script>
+</div>
+<!--pifyform-end-->
+
       {% comment %} {% form "contact" %}
         {% if form.errors %}
           <div class='border border-red-300 bg-red-50 p-4 mb-6 rounded'>
@@ -229,7 +236,7 @@
     </div>
 
     <!-- Information Section (Right Side) -->
-    <div class='lg:col-span-2'>
+    <div class='lg:col-span-2 px-4'>
       <div class='prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-headings:uppercase prose-headings:tracking-wide prose-headings:text-lg prose-headings:mb-3 prose-p:text-gray-700 prose-p:mb-6 prose-a:text-black prose-a:hover:text-gray-900 prose-a:underline contact-content'>
         {{ page.content }}
       </div>

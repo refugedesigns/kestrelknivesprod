@@ -1,9 +1,9 @@
 <!-- Index Section 1 - Placeholder with Image and Text -->
-<div class='pt-16 pb-0 lg:py-16 bg-gray-50'>
+<div class='pt-16 pb-0 md:py-16 bg-gray-50'>
   <div class='max-w-6xl mx-auto px-4'>
-    <div class='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center'>
+    <div class='grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center'>
       <!-- Image Section -->
-      <div class='order-2 lg:order-1 -mx-4 lg:mx-0'>
+      <div class='order-2 md:order-1 -mx-4 md:mx-0'>
         {% if section.settings.image != blank %}
           <img
             src='{{ section.settings.image | img_url: '800x600' }}'
@@ -19,12 +19,12 @@
       </div>
 
       <!-- Text Content Section -->
-      <div class='order-1 lg:order-2'>
-        <div class='max-w-lg flex flex-col' style='gap: 0;'>
+      <div class='order-1 md:order-2'>
+        <div class='max-w-lg flex flex-col space-y-3 md:space-y-4'>
           {% if section.settings.title != blank %}
             <h2
-              class='text-3xl md:text-4xl font-bold text-gray-900'
-              style='margin: 0 !important; white-space: normal !important; line-height: 1.2 !important;'
+              class='text-3xl md:text-4xl font-bold text-gray-900 leading-tight mb-0'
+              style='margin: 0 0 0.75rem 0;'
             >
               {{ section.settings.title }}
             </h2>
@@ -32,8 +32,8 @@
 
           {% if section.settings.subtitle != blank %}
             <p
-              class='text-lg text-gray-600 leading-relaxed'
-              style='margin: 0 0 0.25rem 0 !important; white-space: normal !important; line-height: 1.4 !important;'
+              class='text-lg text-gray-600 leading-relaxed mb-2'
+              style='line-height: 1.6; margin: 0 0 0.75rem 0;'
             >
               {{ section.settings.subtitle }}
             </p>
@@ -41,8 +41,8 @@
 
           {% if section.settings.description != blank %}
             <p
-              class='text-base text-gray-700 leading-relaxed'
-              style='margin: 0 !important; white-space: normal !important; line-height: 1.5 !important;'
+              class='text-base text-gray-700 leading-relaxed mb-0'
+              style='margin: 0.50rem 0 0 0;'
             >
               {{ section.settings.description }}
             </p>
@@ -53,8 +53,7 @@
           %}
             <a
               href='{{ section.settings.button_url }}'
-              class='inline-block bg-black hover:bg-gray-800 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200'
-              style='margin: 0.25rem 0 0 0;'
+              class='inline-block bg-black hover:bg-gray-800 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200 mt-1'
             >
               {{ section.settings.button_text }}
             </a>

@@ -1,250 +1,200 @@
 <div
-  class='min-h-screen flex'
+  class='min-h-screen bg-white pt-16'
   x-data='{ registerForm: true }'
   x-cloak
 >
-  <!-- Left Side - Image -->
-  {% if section.settings.show_left_image %}
-    <div class='hidden lg:flex lg:w-1/2 relative'>
-      {% if section.settings.left_image
-        and section.settings.left_image != blank
-      %}
-        <img
-          src='{{ section.settings.left_image | image_url: width: 800 }}'
-          alt='{{ section.settings.left_image.alt | default: "Register background" }}'
-          class='w-full h-full object-cover'
-        >
-      {% else %}
-        <img
-          src='{{ "register.webp" | asset_url }}'
-          alt='Register background'
-          class='w-full h-full object-cover'
-          width='800'
-          height='600'
-        >
-      {% endif %}
-      <!-- Overlay content -->
-      <div class='absolute inset-0 bg-black/20 flex flex-col justify-between p-8'>
-        <!-- Top content -->
-        <div class='flex justify-between items-start'>
-          <div class='text-white'>
-            <h2 class='text-2xl font-bold mb-2'>
-              Join {{ section.settings.shop_name }}
-            </h2>
-            <p class='text-lg opacity-90'>
-              Create your account and start your journey
-            </p>
-          </div>
-        </div>
-        <!-- Bottom content -->
-        <div class='text-white'>
-          <div class='flex items-center mb-4'>
-            <div class='w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-3'>
-              <svg class='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
-                <path d='M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z'/>
-              </svg>
-            </div>
-            <span class='text-lg font-medium'>Join Our Community</span>
-          </div>
-          <blockquote class='text-xl italic'>
-            "Where craftsmanship meets passion"
-          </blockquote>
+  <div class='max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16'>
+    <div x-show='registerForm'>
+      <div class='mb-8 text-center md:text-left'>
+        <p class='text-gray-600'>
+          Join {{ section.settings.shop_name }} Community
+        </p>
+
+        <!-- Why Join Section -->
+        <div class='mt-4 text-xs text-gray-600'>
+          <h3 class='font-semibold text-gray-700 text-left' style='margin-bottom: 0.4 !important;'>Why join?</h3>
+          <ul class='space-y-1.5 list-none pl-0'>
+            <li class='flex items-start font-semibold'>
+              <span class='mr-2 text-gray-400'>•</span>
+              <span>Priority drop alerts — members are notified first</span>
+            </li>
+            <li class='flex items-start font-semibold'>
+              <span class='mr-2 text-gray-400'>•</span>
+              <span>Member-only knife giveaways</span>
+            </li>
+            <li class='flex items-start font-semibold'>
+              <span class='mr-2 text-gray-400'>•</span>
+              <span>Field tester opportunities — members selected first</span>
+            </li>
+            <li class='flex items-start font-semibold'>
+              <span class='mr-2 text-gray-400'>•</span>
+              <span>Exclusive discounts reserved for members only</span>
+            </li>
+            <li class='flex items-start font-semibold'>
+              <span class='mr-2 text-gray-400'>•</span>
+              <span>Early access to new builds and prototypes</span>
+            </li>
+            <li class='flex items-start font-semibold'>
+              <span class='mr-2 text-gray-400'>•</span>
+              <span>Insider updates and private releases</span>
+            </li>
+          </ul>
         </div>
       </div>
-    </div>
-  {% endif %}
 
-  <!-- Right Side - Register Form -->
-  <div class='w-full {% if section.settings.show_left_image %}lg:w-1/2{% endif %} flex items-center justify-center px-6 py-12'>
-    <div class='w-full max-w-md'>
-      <!-- Brand Logo/Name -->
-      <div class='text-center mb-8'>
-        <a href='{{ routes.root_url }}' class='inline-block'>
-          {% if section.settings.logo_image
-            and section.settings.logo_image != blank
+      {% form "create_customer" %}
+        {% if form.errors %}
+          {% comment %} Check if it's a verification message (success) or actual errors {% endcomment %}
+          {% assign error_text = form.errors | default_errors | downcase %}
+          {% if error_text contains "email"
+            and error_text contains "verify"
           %}
-            <img
-              src='{{ section.settings.logo_image | image_url: width: 200 }}'
-              alt='{{ section.settings.shop_name }} Logo'
-              class='h-28 mx-auto'
-            >
-          {% elsif "logo.png" %}
-            <img
-              src='{{ "logo.png" | asset_url }}'
-              alt='{{ section.settings.shop_name }} Logo'
-              class='h-28 mx-auto'
-            >
+            {% comment %} This is a verification message - show as success {% endcomment %}
+            <div class='mb-6 p-4 bg-green-50 border border-green-200 rounded-lg'>
+              <div class='flex'>
+                <div class='flex-shrink-0'>
+                  <svg
+                    class='h-5 w-5 text-green-400'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
+                  >
+                    <path fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' clip-rule='evenodd' />
+                  </svg>
+                </div>
+                <div class='ml-3'>
+                  <h3 class='text-sm font-medium text-green-800'>
+                    Account Created Successfully!
+                  </h3>
+                  <div class='mt-2 text-sm text-green-700'>
+                    {{ form.errors | default_errors }}
+                  </div>
+                  <div class='mt-2 text-sm text-green-600'>
+                    Please check your email and click the verification link to
+                    activate your account.
+                  </div>
+                </div>
+              </div>
+            </div>
           {% else %}
-            <h1 class='text-3xl font-bold text-gray-900'>
-              {{ section.settings.shop_name }}
-            </h1>
-          {% endif %}
-        </a>
-      </div>
-
-      <!-- Register Form -->
-      <div x-show='registerForm'>
-        <div class='mb-8'>
-          <h2 class='text-2xl font-bold text-gray-900 mb-2'>Create Account</h2>
-          <p class='text-gray-600'>
-            Join {{ section.settings.shop_name }} Community
-          </p>
-        </div>
-
-        {% form "create_customer" %}
-          {% if form.errors %}
-            {% comment %} Check if it's a verification message (success) or actual errors {% endcomment %}
-            {% assign error_text = form.errors | default_errors | downcase %}
-            {% if error_text contains "email"
-              and error_text contains "verify"
-            %}
-              {% comment %} This is a verification message - show as success {% endcomment %}
-              <div class='mb-6 p-4 bg-green-50 border border-green-200 rounded-lg'>
-                <div class='flex'>
-                  <div class='flex-shrink-0'>
-                    <svg
-                      class='h-5 w-5 text-green-400'
-                      viewBox='0 0 20 20'
-                      fill='currentColor'
-                    >
-                      <path fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' clip-rule='evenodd' />
-                    </svg>
-                  </div>
-                  <div class='ml-3'>
-                    <h3 class='text-sm font-medium text-green-800'>
-                      Account Created Successfully!
-                    </h3>
-                    <div class='mt-2 text-sm text-green-700'>
-                      {{ form.errors | default_errors }}
-                    </div>
-                    <div class='mt-2 text-sm text-green-600'>
-                      Please check your email and click the verification link to
-                      activate your account.
-                    </div>
+            {% comment %} These are actual form errors {% endcomment %}
+            <div class='mb-6 p-4 bg-red-50 border border-red-200 rounded-lg'>
+              <div class='flex'>
+                <div class='flex-shrink-0'>
+                  <svg
+                    class='h-5 w-5 text-red-400'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
+                  >
+                    <path fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' clip-rule='evenodd' />
+                  </svg>
+                </div>
+                <div class='ml-3'>
+                  <h3 class='text-sm font-medium text-red-800'>
+                    Please correct the following errors:
+                  </h3>
+                  <div class='mt-2 text-sm text-red-700'>
+                    {{ form.errors | default_errors }}
                   </div>
                 </div>
               </div>
-            {% else %}
-              {% comment %} These are actual form errors {% endcomment %}
-              <div class='mb-6 p-4 bg-red-50 border border-red-200 rounded-lg'>
-                <div class='flex'>
-                  <div class='flex-shrink-0'>
-                    <svg
-                      class='h-5 w-5 text-red-400'
-                      viewBox='0 0 20 20'
-                      fill='currentColor'
-                    >
-                      <path fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' clip-rule='evenodd' />
-                    </svg>
-                  </div>
-                  <div class='ml-3'>
-                    <h3 class='text-sm font-medium text-red-800'>
-                      Please correct the following errors:
-                    </h3>
-                    <div class='mt-2 text-sm text-red-700'>
-                      {{ form.errors | default_errors }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {% endif %}
+            </div>
           {% endif %}
+        {% endif %}
 
-          <div class='space-y-4'>
-            <div>
-              <label
-                for='first_name'
-                class='block text-sm font-medium text-gray-700 mb-1'
-              >
-                First Name
-              </label>
-              <input
-                type='text'
-                name='customer[first_name]'
-                id='first_name'
-                autocomplete='given-name'
-                class='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black'
-                placeholder='Enter your first name'
-                required
-              >
-            </div>
-
-            <div>
-              <label
-                for='last_name'
-                class='block text-sm font-medium text-gray-700 mb-1'
-              >
-                Last Name
-              </label>
-              <input
-                type='text'
-                name='customer[last_name]'
-                id='last_name'
-                autocomplete='family-name'
-                class='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black'
-                placeholder='Enter your last name'
-                required
-              >
-            </div>
-
-            <div>
-              <label
-                for='email_address'
-                class='block text-sm font-medium text-gray-700 mb-1'
-              >
-                Email Address
-              </label>
-              <input
-                type='email'
-                name='customer[email]'
-                id='email_address'
-                autocomplete='email'
-                class='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black'
-                placeholder='Enter your email address'
-                required
-              >
-            </div>
-
-            <div>
-              <label
-                for='password'
-                class='block text-sm font-medium text-gray-700 mb-1'
-              >
-                Password
-              </label>
-              <input
-                type='password'
-                name='customer[password]'
-                id='password'
-                autocomplete='new-password'
-                class='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black'
-                placeholder='Create a password'
-                required
-              >
-            </div>
+        <div class='space-y-4'>
+          <div>
+            <label
+              for='first_name'
+              class='block text-sm font-medium text-gray-700 mb-1'
+            >
+              First Name
+            </label>
+            <input
+              type='text'
+              name='customer[first_name]'
+              id='first_name'
+              autocomplete='given-name'
+              class='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black'
+              placeholder='Enter your first name'
+              required
+            >
           </div>
 
-          <div class='mt-6'>
-            <button
-              type='submit'
-              class='w-full bg-black text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-800 transition-colors duration-200'
+          <div>
+            <label
+              for='last_name'
+              class='block text-sm font-medium text-gray-700 mb-1'
             >
-              Create Account
-            </button>
+              Last Name
+            </label>
+            <input
+              type='text'
+              name='customer[last_name]'
+              id='last_name'
+              autocomplete='family-name'
+              class='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black'
+              placeholder='Enter your last name'
+              required
+            >
           </div>
-        {% endform %}
 
-        <div class='mt-6 text-center'>
-          <p class='text-gray-600'>
-            Already have an account?
-            <a
-              href='{{ routes.account_login_url }}'
-              class='text-blue-600 hover:text-blue-500 font-medium'
+          <div>
+            <label
+              for='email_address'
+              class='block text-sm font-medium text-gray-700 mb-1'
             >
-              Sign in
-            </a>
-          </p>
+              Email Address
+            </label>
+            <input
+              type='email'
+              name='customer[email]'
+              id='email_address'
+              autocomplete='email'
+              class='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black'
+              placeholder='Enter your email address'
+              required
+            >
+          </div>
+
+          <div>
+            <label
+              for='password'
+              class='block text-sm font-medium text-gray-700 mb-1'
+            >
+              Password
+            </label>
+            <input
+              type='password'
+              name='customer[password]'
+              id='password'
+              autocomplete='new-password'
+              class='w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black'
+              placeholder='Create a password'
+              required
+            >
+          </div>
         </div>
+
+        <div class='mt-6'>
+          <button
+            type='submit'
+            class='w-full bg-black text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-800 transition-colors duration-200'
+          >
+            Create Account
+          </button>
+        </div>
+      {% endform %}
+
+      <div class='mt-6 text-center'>
+        <p class='text-gray-600'>
+          Already have an account?
+          <a
+            href='{{ routes.account_login_url }}'
+            class='text-blue-600 hover:text-blue-500 font-medium'
+          >
+            Sign in
+          </a>
+        </p>
       </div>
     </div>
   </div>
@@ -259,35 +209,13 @@
       "id": "shop_name",
       "label": "Shop Name",
       "default": "Kestrel Knives"
-    },
-    {
-      "type": "image_picker",
-      "id": "logo_image",
-      "label": "Logo Image"
-    },
-    {
-      "type": "header",
-      "content": "Left Side Image"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_left_image",
-      "label": "Show left side image",
-      "default": true
-    },
-    {
-      "type": "image_picker",
-      "id": "left_image",
-      "label": "Custom left side image",
-      "info": "If not uploaded, the default register image will be used"
     }
   ],
   "presets": [
     {
       "name": "Customer Register",
       "settings": {
-        "shop_name": "Kestrel Knives",
-        "show_left_image": true
+        "shop_name": "Kestrel Knives"
       }
     }
   ]

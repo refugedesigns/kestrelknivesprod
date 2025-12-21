@@ -166,7 +166,7 @@
           {% endif %}
         </div>
         {% if section.settings.show_text_overlay %}
-          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
+          <div class='absolute bottom-4 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
             <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-12 hero-overlay__inner'>
               {% assign s1_shadow = section.settings.slide_1_text_shadow_strength
                 | default: "soft"
@@ -193,7 +193,7 @@
                     style='background-color: {{ section.settings.slide_1_text_bg_color | default: '#000000' | color_modify: 'alpha', s1_bg_alpha }}'
                   ></div>
                 {% endif %}
-                <div class='kk-text-content'>
+                <div class='kk-text-content mt-12 lg:mt-0'>
                   <h1
                     class='text-4xl md:text-6xl font-bold mb-4'
                     style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'
@@ -223,7 +223,7 @@
               {% if section.settings.slide_1_button_enable
                 and section.settings.slide_1_button_text != blank
               %}
-                <div class='mt-4 mb-8 pointer-events-auto'>
+                <div class='mt-12 lg:mt-4 mb-8 pointer-events-auto'>
                   <button
                     type='button'
                     class='inline-block font-semibold py-3 px-8 cursor-pointer rounded-lg transition-colors duration-300 klaviyo_hero_button_form_trigger'
@@ -306,7 +306,7 @@
                     style='background-color: {{ section.settings.slide_2_text_bg_color | default: '#000000' | color_modify: 'alpha', s2_bg_alpha }}'
                   ></div>
                 {% endif %}
-                <div class='kk-text-content'>
+                <div class='kk-text-content pt-4'>
                   <h1
                     class='text-4xl md:text-6xl font-bold mb-4'
                     style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
@@ -336,7 +336,7 @@
               {% if section.settings.slide_2_button_enable
                 and section.settings.slide_2_button_text != blank
               %}
-                <div class='mt-4 pointer-events-auto'>
+                <div class='mt-24 lg:mt-4 pointer-events-auto'>
                   <a
                     href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
                     class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
@@ -524,7 +524,7 @@
               {% if section.settings.slide_3_button_enable
                 and section.settings.slide_3_button_text != blank
               %}
-                <div class='mt-4 pointer-events-auto'>
+                <div class='mt-12 pointer-events-auto'>
                   <a
                     href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
                     class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
