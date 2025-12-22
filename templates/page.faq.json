@@ -1,8 +1,269 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "template-faq": {
-      "type": "template-faq"
+      "type": "template-faq",
+      "blocks": {
+        "faq_item_crXQxr": {
+          "type": "faq_item",
+          "settings": {
+            "question": "When will my knife ship?",
+            "answer": "Your knife will ship the next business day more often than not and tracking will be provided when the label is printed. Sometimes orders take a little longer, depending on current workload. If you need it by a certain date, send us a message and we’ll do our best to make it happen.",
+            "category": "Ordering & Availability",
+            "show_item": true
+          }
+        },
+        "faq_item_QUBntp": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Why are most knives sold out?",
+            "answer": "We build knives in limited runs to maintain precision and quality. Some models sell out fast, but we’re working toward keeping core models available more consistently. If there’s a knife you’ve been waiting on, join our email list to be notified as soon as it’s back in stock.",
+            "category": "Ordering & Availability",
+            "show_item": true
+          }
+        },
+        "faq_item_dFnxeH": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Will you be bringing back old models?",
+            "answer": "Yes. We’re currently ramping up production to bring many of your favorite models and sets back. The goal is to honor the legacy of what made Kestrel great while pushing the craftsmanship even further.",
+            "category": "Ordering & Availability",
+            "show_item": true
+          }
+        },
+        "faq_item_ggEPQG": {
+          "type": "faq_item",
+          "settings": {
+            "question": "When is the next sale?",
+            "answer": "We don’t run standard sales anymore. We price our knives fairly all year long, but if you’re in a unique situation or a longtime customer, reach out to us. We may be able to help with a discount.",
+            "category": "Ordering & Availability",
+            "show_item": true
+          }
+        },
+        "faq_item_gVttxV": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do you ship internationally?",
+            "answer": "Yes. We ship worldwide for the most part. For international orders, email sales@kestrelknives.com for a shipping quote. Please note that duties, VAT, and import taxes are the buyer’s responsibility and vary by country.",
+            "category": "Shipping",
+            "show_item": true
+          }
+        },
+        "faq_item_VVneMr": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Will I receive a tracking number?",
+            "answer": "Yes. You’ll receive a confirmation email right after ordering, and another with tracking details once your package ships.",
+            "category": "Shipping",
+            "show_item": true
+          }
+        },
+        "faq_item_yNLRDz": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Domestic shipments",
+            "answer": "All domestic orders ship via USPS and include tracking. Delivery times depend on your location, but most arrive within a week.",
+            "category": "Shipping",
+            "show_item": true
+          }
+        },
+        "faq_item_PQRGtg": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do your knives come with sheaths?",
+            "answer": "Yes. Every knife includes a custom-fit black Kydex sheath, pre-drilled to work with a large array of carry clips.",
+            "category": "Sheaths",
+            "show_item": true
+          }
+        },
+        "faq_item_PUzdcV": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Can I order a replacement sheath?",
+            "answer": "Yes. Replacement sheaths and a few color variations are available for every model. You can find them on our site https://kestrelknives.com/products/knife-sheaths",
+            "category": "Sheaths",
+            "show_item": true
+          }
+        },
+        "faq_item_Cqztxd": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Is it true you offer free sharpening?",
+            "answer": "Yes. Any Kestrel knife can be mailed to us for free sharpening as often as you’d like. You just cover return shipping. To start, add the Knife Sharpening product (hyper link) to your cart and check out. We’ll get your edge back to factory sharp and return it ready for the next season.",
+            "category": "Sharpening & Maintenance",
+            "show_item": true
+          }
+        },
+        "faq_item_FFn8jP": {
+          "type": "faq_item",
+          "settings": {
+            "question": "How do I sharpen my knife at home?",
+            "answer": "We recommend maintaining your edge with light stropping and occasional touch-ups using a fine stone or ceramic rod. For full resharpening, send it our way our team will handle it properly.",
+            "category": "Sharpening & Maintenance",
+            "show_item": true
+          }
+        },
+        "faq_item_4YRwFG": {
+          "type": "faq_item",
+          "settings": {
+            "question": "I have rust spots on my knife what do I do?",
+            "answer": "No problem. Soak the blade in white vinegar for about ten minutes, then scrub lightly with a sponge. Always dry your knife fully after cleaning, and occasionally wipe it down with food-grade oil to keep corrosion away.",
+            "category": "Sharpening & Maintenance",
+            "show_item": true
+          }
+        },
+        "faq_item_ALYraA": {
+          "type": "faq_item",
+          "settings": {
+            "question": "What’s the difference between MagnaCut, S90V, and Nitro-V?",
+            "answer": "All three are excellent steels—each with its own strengths.\nMagnaCut is the newest all-around performer with a balance of edge retention, toughness, and corrosion resistance.\n\nS90V offers extreme wear resistance and long edge life but takes more effort to sharpen.\n\nNitro-V is the easiest to maintain, with great edge stability and rust resistance, ideal for wet or humid environments.",
+            "category": "Knife Steels & Design",
+            "show_item": true
+          }
+        },
+        "faq_item_kUiMmh": {
+          "type": "faq_item",
+          "settings": {
+            "question": "What steels do you use?",
+            "answer": "We use only the best-performing steels available. Our current production models feature MagnaCut, S90V, and Nitro-V, depending on the design and intended use.",
+            "category": "Knife Steels & Design",
+            "show_item": true
+          }
+        },
+        "faq_item_KNYjkh": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Why is one side of my titanium knife rough?",
+            "answer": "Titanium doesn’t hold an edge on its own, so each Ti knife is carbidized with tungsten carbide on one side. This creates micro-serrations that cut cleanly through soft materials like meat, cardboard, or rope.\nThe carbided layer is deep and durable thanks to our industrial process.\n\nTips:\n•\tTi edges perform best with draw cuts\n•\tThey’re not ideal for cutting hide\n•\tOnly sharpen the non-carbided side\n\nWe’re slowly moving away from titanium blades due to low demand, but we’ll continue sharpening and servicing all previous models.",
+            "category": "Knife Steels & Design",
+            "show_item": true
+          }
+        },
+        "faq_item_WPC3pA": {
+          "type": "faq_item",
+          "settings": {
+            "question": "How do I create an account?",
+            "answer": "Creating an account is simple! Click the 'Register' button in the top right corner, enter your email address, create a secure password, and verify your email.",
+            "category": "General",
+            "show_item": true
+          }
+        },
+        "faq_item_X7U8n3": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do you take custom orders?",
+            "answer": "Yes. You can design your own knife through our Build-A-Knife Program https://kestrelknives.com/products/build-your-knife-ovis-hunter-only.\nFor bulk or specialty orders, like outfitter or company knives, reach out through our contact form. We’ll help bring your idea to life.",
+            "category": "Custom Work",
+            "show_item": false
+          }
+        },
+        "faq_item_PPAPz9": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Doesn’t the paracord handle just get dirty?",
+            "answer": "Yes, but that’s part of its charm. Paracord is easy to replace. It’s not meant to be permanent think of it as a modular grip that can be swapped out in minutes. Not sure how to wrap? Add the Knife Sharpening product to your cart and check it, its covered.",
+            "category": "Care & Handle Options",
+            "show_item": true
+          }
+        },
+        "faq_item_Q9LXfX": {
+          "type": "faq_item",
+          "settings": {
+            "question": "What paracord colors do you offer?",
+            "answer": "We currently offer hunter orange, neon green, OD green, blue, black and tan camo.",
+            "category": "Care & Handle Options",
+            "show_item": true
+          }
+        },
+        "faq_item_fDP3RH": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Knife returns",
+            "answer": "If your order isn’t right, contact us within 5 days of delivery. Knives must be unused and in original condition. All returns must be pre-approved before shipping them back.\nA 10% restocking fee applies to non-defective returns to cover labor and processing.",
+            "category": "Return & Exchanges",
+            "show_item": true
+          }
+        },
+        "faq_item_MWrqXK": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Apparel and print-on-demand gear",
+            "answer": "Because apparel is made to order, we can offer returns or exchanges but not refunds once production begins.\nIf there’s a printing issue, defect, or damage, we’ll replace or refund it at no cost to you. \n\nShip the product to:\nKestrel MFG LLC\n5552 Pin Oak Dr\nEdinboro, PA 16412\n\nIf you just changed your mind or ordered the wrong size, we’re still happy to help with a return or exchange—you’ll just cover the shipping.",
+            "category": "Return & Exchanges",
+            "show_item": true
+          }
+        },
+        "faq_item_iJ6zac": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Non-refundable items",
+            "answer": "Custom knives, Apparel, discounted items, gift cards, and blemished or used knives cannot be returned.",
+            "category": "Return & Exchanges",
+            "show_item": true
+          }
+        },
+        "faq_item_zNDwtQ": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Refund timeline",
+            "answer": "Refunds usually take 5–10 business days for transit, 3–5 for inspection, and up to 10 for your bank to process. Most are completed faster.\n\nWe recommend insuring any return shipment, as we can’t refund items lost or damaged in transit.",
+            "category": "Return & Exchanges",
+            "show_item": true
+          }
+        }
+      },
+      "block_order": [
+        "faq_item_crXQxr",
+        "faq_item_QUBntp",
+        "faq_item_dFnxeH",
+        "faq_item_ggEPQG",
+        "faq_item_gVttxV",
+        "faq_item_VVneMr",
+        "faq_item_yNLRDz",
+        "faq_item_PQRGtg",
+        "faq_item_PUzdcV",
+        "faq_item_Cqztxd",
+        "faq_item_FFn8jP",
+        "faq_item_4YRwFG",
+        "faq_item_ALYraA",
+        "faq_item_kUiMmh",
+        "faq_item_KNYjkh",
+        "faq_item_WPC3pA",
+        "faq_item_X7U8n3",
+        "faq_item_PPAPz9",
+        "faq_item_Q9LXfX",
+        "faq_item_fDP3RH",
+        "faq_item_MWrqXK",
+        "faq_item_iJ6zac",
+        "faq_item_zNDwtQ"
+      ],
+      "settings": {
+        "page_title": "Frequently Asked Questions",
+        "page_subtitle": "Find answers to common questions about our services, billing, and support.",
+        "contact_title": "Still have questions?",
+        "live_chat_text": "Available 24/7 for instant support",
+        "email_text": "sales@kestrelknives.com",
+        "categories": "Ordering & Availability, Shipping, Sheaths, Sharpening & Maintenance, Knife Steels & Design, Custom Work, Care & Handle Options, Return & Exchanges",
+        "header_bg_color": "#ffffff",
+        "header_height": 200,
+        "title_color": "#1d1d1d",
+        "subtitle_color": "#8f9093",
+        "header_border_bottom": true,
+        "header_border_color": "#f2f2f2",
+        "header_padding_top": 5,
+        "header_padding_bottom": 4
+      }
     }
   },
-  "order": ["template-faq"]
+  "order": [
+    "template-faq"
+  ]
 }
