@@ -92,6 +92,14 @@
             "link": "https://instagram.com/kestrelknives"
           }
         },
+        "media_image_YqWFhf": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/ovis_lifestyle.jpg",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
         "media_image_qmGgyU": {
           "type": "media_image",
           "settings": {
@@ -224,6 +232,7 @@
         "media_image_ntmjWg",
         "media_image_FTcicd",
         "media_image_hxMN9W",
+        "media_image_YqWFhf",
         "media_image_qmGgyU",
         "media_image_64xJKk",
         "media_image_UBQWmt",
