@@ -19,26 +19,28 @@
     margin-bottom: 0;
   }
 
-   /* Force Klaviyo form to stay inside container */
-  .klaviyo-form-T9eiNG {
-    position: relative !important;
-    z-index: 20 !important;
-  }
+  /* Force Klaviyo to render form INSIDE the container */
+.klaviyo-form-T9eiNG {
+  display: block !important;
+  position: relative !important;
+}
 
-  /* Give the form wrapper actual height */
-  .klaviyo-form-T9eiNG > div {
-    position: relative !important;
-    z-index: 20 !important;
-  }
+.klaviyo-form-T9eiNG > div {
+  position: relative !important;
+  z-index: 20 !important;
+}
 
-  /* Fix Shopify theme wiping backgrounds */
-  .klaviyo-form-T9eiNG form {
-    background: transparent !important;
-  }
+/* Prevent Shopify theme from removing background/shadow */
+.klaviyo-form-version-cookie,
+.klaviyo-form,
+.klaviyo-form * {
+  background: transparent !important;
+}
+
 </style>
 
 
-<section class='relative px-4 sm:px-6 lg:px-8 py-2' style='background-image: url({{ "field_tester_program.jpg" | asset_url }}); background-size: cover; background-position: center; background-repeat: no-repeat;'>
+<section class='gear-testing-wrapper relative px-4 sm:px-6 lg:px-8 py-2' style='background-image: url({{ "field_tester_program.jpg" | asset_url }}); background-size: cover; background-position: center; background-repeat: no-repeat;'>
   <!-- Optional overlay for better text readability -->
   <div class='absolute inset-0 bg-black/30'></div>
   
@@ -54,6 +56,27 @@
 
   </div>
 </section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const wrapper = document.querySelector(".gear-testing-wrapper");
+  const klaviyoContainer = document.querySelector(".klaviyo-form-T9eiNG");
+
+  function resizeWrapper() {
+    if (klaviyoContainer && wrapper) {
+      const h = klaviyoContainer.offsetHeight;
+      if (h > 0) wrapper.style.minHeight = h + 100 + "px"; // padding
+    }
+  }
+
+  // Run when form scripts finish loading
+  const observer = new MutationObserver(resizeWrapper);
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  resizeWrapper();
+});
+</script>
+
 
 
 {% schema %}
