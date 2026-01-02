@@ -57,25 +57,15 @@
   </div>
 </section>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const wrapper = document.querySelector(".gear-testing-wrapper");
-  const klaviyoContainer = document.querySelector(".klaviyo-form-T9eiNG");
-
-  function resizeWrapper() {
-    if (klaviyoContainer && wrapper) {
-      const h = klaviyoContainer.offsetHeight;
-      if (h > 0) wrapper.style.minHeight = h + 100 + "px"; // padding
-    }
-  }
-
-  // Run when form scripts finish loading
-  const observer = new MutationObserver(resizeWrapper);
-  observer.observe(document.body, { childList: true, subtree: true });
-
-  resizeWrapper();
-});
+<script type="text/javascript">
+  var _klOnsite = _klOnsite || [];
+  _klOnsite.push({
+    formId: "T9eiNG",
+    container: ".klaviyo-form-T9eiNG"
+  });
 </script>
+
+<script async src="https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=XQ9CWA"></script>
 
 
 
