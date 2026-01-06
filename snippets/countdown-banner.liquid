@@ -46,6 +46,22 @@
     style='display: none; padding-top: var(--countdown-banner-height, 40px);'
   >
     <div class='max-w-2xl mx-auto px-4 sm:px-6 py-8'>
+      <div class='relative mb-4 flex justify-center'>
+        <button
+          @click='closeDrawer()'
+          class='absolute right-0 top-0 text-white hover:text-gray-300 transition-colors'
+          aria-label='Close'
+        >
+          <svg
+            class='w-6 h-6'
+            fill='none'
+            stroke='currentColor'
+            viewBox='0 0 24 24'
+          >
+            <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 18L18 6M6 6l12 12'/>
+          </svg>
+        </button>
+      </div>
       <div class="klaviyo-form-QReqgv hidden lg:block"></div>
       <div class="klaviyo-form-XV8rPN lg:hidden"></div>
     </div>
