@@ -40,14 +40,13 @@
           "cart_badge_text_color": "#f2f2f2",
           "countdown_enabled": true,
           "countdown_title": "OVIS HUNTER RETURNS",
-          "countdown_text": "UNTIL THE NEXT BLADE DROP:",
           "countdown_target_date": "2025-12-31T23:59:59",
           "countdown_bg_color": "#000000",
           "countdown_border_color": "#dc2626",
           "countdown_text_color": "#ffffff",
           "notify_button_text": "NOTIFY ME",
-          "notify_button_bg_color": "#ea580c",
-          "notify_button_text_color": "#ffffff"
+          "notify_button_bg_color": "#ffffff",
+          "notify_button_text_color": "#151313"
         }
       },
       "footer": {
