@@ -46,9 +46,99 @@
     style='display: none; padding-top: var(--countdown-banner-height, 40px);'
   >
     <div class='max-w-2xl mx-auto px-4 sm:px-6 py-8'>
-   <div class="klaviyo-form-QReqgv hidden lg:block"></div>
-   <div class="klaviyo-form-XV8rPN lg:hidden"></div>
+      <div class="klaviyo-form-QReqgv hidden lg:block"></div>
+      <div class="klaviyo-form-XV8rPN lg:hidden"></div>
+    </div>
   </div>
 </div>
+
+<script>
+  function countdownBanner() {
+    return {
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      drawerOpen: false,
+
+      init() {
+        this.startCountdown()
+        this.setupScrollBehavior()
+        this.updateBannerHeight()
+        window.addEventListener('resize', () => this.updateBannerHeight())
+      },
+
+      updateBannerHeight() {
+        const banner = document.getElementById('countdownBanner')
+        if (banner) {
+          const height = banner.offsetHeight
+          document.documentElement.style.setProperty('--countdown-banner-height', height + 'px')
+        }
+      },
+
+      setupScrollBehavior() {
+        const banner = document.getElementById('countdownBanner')
+        const header = document.getElementById('siteHeader')
+        if (!banner || !header) return
+
+        let ticking = false
+        const handleScroll = () => {
+          if (!ticking) {
+            window.requestAnimationFrame(() => {
+              const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+              const bannerHeight = banner.offsetHeight
+
+              if (scrollTop > bannerHeight) {
+                banner.style.transform = 'translateY(-100%)'
+                header.style.top = '0'
+              } else {
+                banner.style.transform = 'translateY(0)'
+                header.style.top = bannerHeight + 'px'
+              }
+              ticking = false
+            })
+            ticking = true
+          }
+        }
+        window.addEventListener('scroll', handleScroll, { passive: true })
+      },
+
+      startCountdown() {
+        const targetDate = new Date('{{ section.settings.countdown_target_date | default: "2025-12-31T23:59:59" }}').getTime()
+        const updateCountdown = () => {
+          const now = new Date().getTime()
+          const distance = targetDate - now
+
+          if (distance < 0) {
+            this.days = this.hours = this.minutes = this.seconds = 0
+            return
+          }
+
+          this.days = Math.floor(distance / (1000 * 60 * 60 * 24))
+          this.hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+          this.minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+          this.seconds = Math.floor((distance % (1000 * 60)) / 1000)
+        }
+        updateCountdown()
+        setInterval(updateCountdown, 1000)
+      },
+
+      get formattedTime() {
+        const pad = n => String(n).padStart(2, '0')
+        return `${pad(this.days)}:${pad(this.hours)}:${pad(this.minutes)}:${pad(this.seconds)}`
+      },
+
+      openDrawer() {
+        this.drawerOpen = true
+        document.body.style.overflow = 'hidden'
+      },
+
+      closeDrawer() {
+        this.drawerOpen = false
+        document.body.style.overflow = ''
+      },
+    }
+  }
+</script>
 {% endif %}
 
