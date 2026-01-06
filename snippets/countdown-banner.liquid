@@ -3,11 +3,16 @@
   <div
     id='countdownBanner'
     class='fixed top-0 left-0 right-0 z-30 transition-transform duration-300'
-    style='background-color: {{ section.settings.countdown_bg_color | default: "#000000" }}; border-bottom: 2px solid {{ section.settings.countdown_border_color | default: "#dc2626" }};'
+    style='background-color: {{ section.settings.countdown_bg_color | default: "#000000" }};'
   >
     <div class='mx-auto px-4 sm:px-6 max-w-8xl'>
       <div class='flex items-center justify-center py-2 space-x-4 text-center'>
-        {% if section.settings.countdown_title != blank %}
+        <span
+          class='text-white text-xs sm:text-sm font-medium whitespace-nowrap flex items-center space-x-2'
+          style='color: {{ section.settings.countdown_text_color | default: "#ffffff" }};'
+        >
+          <span x-text='formattedTime'></span>
+           {% if section.settings.countdown_title != blank %}
           <span
             class='text-white text-xs sm:text-sm font-bold whitespace-nowrap'
             style='color: {{ section.settings.countdown_text_color | default: "#ffffff" }};'
@@ -15,12 +20,6 @@
             {{ section.settings.countdown_title }}
           </span>
         {% endif %}
-        <span
-          class='text-white text-xs sm:text-sm font-medium whitespace-nowrap flex items-center space-x-2'
-          style='color: {{ section.settings.countdown_text_color | default: "#ffffff" }};'
-        >
-          <span x-text='formattedTime'></span>
-          <span>{{ section.settings.countdown_text | default: "UNTIL THE NEXT BLADE DROP:" }}</span>
         </span>
         <button
           @click='openDrawer()'
