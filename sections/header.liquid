@@ -269,7 +269,7 @@
         x-show='mobileMenuOpen'
         @click.away='mobileMenuOpen = false'
         class='fixed z-10 inset-0 p-2 transform origin-top-left lg:hidden mobile-menu-panel max-h-screen overflow-y-auto w-screen'
-        style='top: var(--header-height, 64px); left: 0; right: 0; bottom: 0;'
+        style='top: 0; left: 0; right: 0; bottom: 0; padding-top: var(--header-height, 64px);'
       >
         <div
           class='shadow-lg rounded-lg ring-1 ring-black ring-opacity-5 w-full'
