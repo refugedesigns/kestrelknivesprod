@@ -44,7 +44,7 @@
           "countdown_bg_color": "#000000",
           "countdown_border_color": "#dc2626",
           "countdown_text_color": "#ffffff",
-          "notify_button_text": "NOTIFY ME",
+          "notify_button_text": "NOTIFY ME!",
           "notify_button_bg_color": "#ffffff",
           "notify_button_text_color": "#151313"
         }
