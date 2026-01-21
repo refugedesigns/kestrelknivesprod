@@ -982,6 +982,16 @@
         margin-bottom: 0.5rem;
       }
       .carousel-review-quote {
+        font-size: 0.875rem;
+        line-height: 1.5;
+      }
+      @media (min-width: 768px) {
+        .carousel-review-quote {
+          font-size: 1.125rem;
+          line-height: 1.75;
+        }
+      }
+      .carousel-review-quote {
         position: relative;
         padding-right: 1.25rem;
         display: -webkit-box;
@@ -1052,6 +1062,10 @@
         display: none !important;
       }
       @media (max-width: 767px) {
+        .carousel-review-quote {
+          font-size: 0.875rem !important;
+          line-height: 1.5 !important;
+        }
         .carousel-review-quote {
           -webkit-line-clamp: 2;
         }
