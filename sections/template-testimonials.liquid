@@ -902,6 +902,7 @@
       }
       .modal-quote--expanded {
         max-height: none;
+        overflow: visible;
       }
       @media (min-width: 768px) {
         .modal-quote {
@@ -924,9 +925,12 @@
           -webkit-line-clamp: unset;
           max-height: none !important;
           display: block;
+          overflow: visible;
         }
         .testimonial-modal-content {
           padding: 0.5rem !important;
+          max-height: 60vh;
+          overflow-y: auto;
         }
         .testimonial-modal-author {
           font-size: 12px !important;
@@ -950,6 +954,27 @@
       }
       .testimonial-modal-author {
         margin: 0 !important;
+      }
+      .testimonial-modal-content-inner {
+        max-height: 60vh;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+      }
+      .testimonial-modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+      }
+      .testimonial-modal-text {
+        max-height: 10.5rem;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+      }
+      .testimonial-modal-text.is-expanded {
+        max-height: none;
+        overflow: visible;
       }
 
       /* Carousel review text clamp + scroll */
@@ -1651,10 +1676,10 @@
 
       <!-- Review Content -->
       <div class='p-2 md:p-6 bg-black/40 absolute bottom-0 left-0 right-0 testimonial-modal-content'>
-        <div class='text-left max-w-4xl mx-auto'>
+        <div class='text-left max-w-4xl mx-auto testimonial-modal-content-inner'>
           <blockquote
-            class='text-white text-xs md:text-xl leading-snug md:leading-relaxed mb-[2px] italic modal-quote testimonial-modal-quote'
-            :class="{ 'modal-quote--expanded': modalExpanded }"
+            class='text-white text-xs md:text-xl leading-snug md:leading-relaxed mb-[2px] italic modal-quote testimonial-modal-quote testimonial-modal-text'
+            :class="{ 'modal-quote--expanded': modalExpanded, 'is-expanded': modalExpanded }"
           >
             <span
               class='block text-white'
@@ -1670,7 +1695,7 @@
               Read more
             </button>
           </div>
-          <div class='flex items-center justify-between gap-3'>
+          <div class='testimonial-modal-footer'>
             <cite
               class='text-white font-semibold not-italic text-xs md:text-lg block leading-snug testimonial-modal-author'
               style='line-height: 1.25; color: #fff;'
