@@ -1,0 +1,8 @@
+{
+  "sections": {
+    "template-page-gear-testing-program": {
+      "type": "template-gear-testing-program"
+    }
+  },
+  "order": ["template-page-gear-testing-program"]
+}

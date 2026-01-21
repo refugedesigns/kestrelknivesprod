@@ -63,12 +63,14 @@
   }
 </style>
 
+{% render "countdown-banner", section: section %}
+
 <div
   id='siteHeader'
-  class='fixed w-full z-20 top-0 start-0'
+  class='fixed w-full z-20 start-0'
   x-data='{ mobileMenuOpen: false, searchBarOpen: false }'
   x-cloak
-  style='background-color: {{ section.settings.header_bg_color | default: "#000000" }}; {% if section.settings.header_border_bottom %}border-bottom: 1px solid {{ section.settings.header_border_color | default: "#ffffff" }};{% endif %}'
+  style='background-color: {{ section.settings.header_bg_color | default: "#000000" }}; {% if section.settings.header_border_bottom %}border-bottom: 1px solid {{ section.settings.header_border_color | default: "#ffffff" }};{% endif %} {% if section.settings.countdown_enabled %}top: var(--countdown-banner-height, 0px);{% else %}top: 0;{% endif %}'
 >
   <div class='mx-auto px-4 sm:px-6 max-w-8xl'>
     <div class='flex justify-between items-center py-2 lg:justify-start lg:space-x-10'>
@@ -266,7 +268,8 @@
       <div
         x-show='mobileMenuOpen'
         @click.away='mobileMenuOpen = false'
-        class='fixed z-10 inset-0 p-2 transform origin-top-left lg:hidden mobile-menu-panel max-h-screen overflow-y-auto w-screen'
+        class='fixed z-30 inset-0 p-2 transform origin-top-left lg:hidden mobile-menu-panel max-h-screen overflow-y-auto w-screen'
+        style='top: 0; left: 0; right: 0; bottom: 0; padding-top: 20px;'
       >
         <div
           class='shadow-lg rounded-lg ring-1 ring-black ring-opacity-5 w-full'
@@ -314,7 +317,7 @@
                     %}
                     <div
                       class='relative'
-                      x-data='{ {{ mobile_link_handle }}: false }'
+                      x-data='{ {{ mobile_link_handle }}: true }'
                     >
                       <button
                         x-on:click='{{ mobile_link_handle }} = ! {{ mobile_link_handle }}'
@@ -474,15 +477,21 @@
 
   function setHeaderHeight() {
     const header = document.getElementById('siteHeader')
-    if (!header) {
-      return
+    const countdownBanner = document.getElementById('countdownBanner')
+    
+    let totalHeight = 0
+    
+    if (countdownBanner) {
+      totalHeight += countdownBanner.offsetHeight
     }
-
-    const headerHeight = header.offsetHeight
-    document.documentElement.style.setProperty(
-      '--header-height',
-      headerHeight + 'px'
-    )
+    
+    if (header) {
+      totalHeight += header.offsetHeight
+      document.documentElement.style.setProperty(
+        '--header-height',
+        totalHeight + 'px'
+      )
+    }
   }
 
   const headerHeightEvents = [
@@ -683,6 +692,94 @@
       "id": "cart_badge_text_color",
       "label": "Cart badge text color",
       "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Countdown Banner Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "countdown_enabled",
+      "label": "Enable countdown banner",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "countdown_show_timer",
+      "label": "Show countdown timer",
+      "default": true,
+      "info": "When disabled, only the title and button will be shown"
+    },
+    {
+      "type": "text",
+      "id": "countdown_title",
+      "label": "Banner title (e.g., OVIS HUNTER RETURNS)",
+      "default": "OVIS HUNTER RETURNS"
+    },
+    {
+      "type": "text",
+      "id": "countdown_target_date",
+      "label": "Target date (YYYY-MM-DDTHH:mm:ss)",
+      "default": "2025-12-31T23:59:59",
+      "info": "Format: YYYY-MM-DDTHH:mm:ss (e.g., 2025-12-31T23:59:59)"
+    },
+    {
+      "type": "color",
+      "id": "countdown_bg_color",
+      "label": "Banner background color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "countdown_border_color",
+      "label": "Banner border color",
+      "default": "#dc2626"
+    },
+    {
+      "type": "color",
+      "id": "countdown_text_color",
+      "label": "Banner text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "notify_button_text",
+      "label": "Button text",
+      "default": "NOTIFY ME"
+    },
+    {
+      "type": "select",
+      "id": "notify_button_action",
+      "label": "Button action",
+      "default": "drawer",
+      "options": [
+        {
+          "value": "drawer",
+          "label": "Open drawer"
+        },
+        {
+          "value": "link",
+          "label": "Go to link"
+        }
+      ]
+    },
+    {
+      "type": "url",
+      "id": "notify_button_link",
+      "label": "Button link",
+      "info": "Only used when button action is set to 'Go to link'"
+    },
+    {
+      "type": "color",
+      "id": "notify_button_bg_color",
+      "label": "Button background color",
+      "default": "#ea580c"
+    },
+    {
+      "type": "color",
+      "id": "notify_button_text_color",
+      "label": "Button text color",
+      "default": "#ffffff"
     }
   ]
 }

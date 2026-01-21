@@ -1,0 +1,64 @@
+<div class='max-w-4xl mx-auto text-center mt-4 mb-4 px-4 border-b border-gray-200 pb-4'>
+  <h1
+    id='gear-testing-program-header'
+    class='text-3xl md:text-4xl font-bold text-gray-900 mb-8'
+  >
+    {{ section.settings.page_title }}
+  </h1>
+  <div class='text-gray-700 text-sm text-left pl-4 leading-relaxed gear-testing-subtitle mt-4'>
+    {{ section.settings.subtitle }}
+  </div>
+</div>
+
+<style>
+  /* Preserve paragraph spacing for the rich text subtitle without affecting other sections */
+  .gear-testing-subtitle p {
+    margin: 0 0 0.4rem;
+  }
+  .gear-testing-subtitle p:last-child {
+    margin-bottom: 0;
+  }
+</style>
+
+
+<section class='relative px-4 sm:px-6 lg:px-8 py-2' style='background-image: url({{ "field_tester_program.jpg" | asset_url }}); background-size: cover; background-position: center; background-repeat: no-repeat;'>
+  <!-- Optional overlay for better text readability -->
+  <div class='absolute inset-0 bg-black/30'></div>
+  
+  <div class='relative max-w-4xl mx-auto rounded-lg shadow-lg bg-white/30 backdrop-blur-sm p-2'>
+    
+   
+	
+
+    <div class="klaviyo-form-T9eiNG"></div>
+
+
+
+  </div>
+</section>
+
+
+{% schema %}
+{
+  "name": "Gear Testing Program",
+  "settings": [
+    {
+      "type": "text",
+      "id": "page_title",
+      "label": "Page Title",
+      "default": "Kestrel Community Gear Testing Program"
+    },
+    {
+      "type": "richtext",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "<p>We don’t test our gear in a boardroom. We test it where it matters — in the field, on the trail, and under real conditions.</p><p>The Kestrel Knives Gear Testing Program is how we involve our community directly in shaping future knives and gear. Selected members will receive early access to upcoming products in exchange for real-world use, honest feedback, and content sharing.</p>"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Gear Testing Program"
+    }
+  ]
+}
+{% endschema %} 

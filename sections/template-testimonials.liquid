@@ -306,8 +306,8 @@
                           </div>
                         {% endif %}
                       </div>
-                      <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
-                        <div class='flex items-center mb-3 md:mb-4'>
+                      <div class='w-full md:w-1/2 px-4 pb-4 pt-3 md:px-8 md:pb-8 md:pt-6 flex flex-col carousel-review-content'>
+                        <div class='flex items-center mb-2 md:mb-3 carousel-review-stars'>
                           <div class='flex text-yellow-400 mr-3'>
                             {% for i in (1..5) %}
                               {% if i <= review.rating %}
@@ -331,23 +331,58 @@
                             {{- review.rating }}/5</span
                           >
                         </div>
-                        <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>
-                          "{{ review.content }}"
-                        </blockquote>
-                        <div class='flex items-center'>
-                          <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
-                            <span class='text-gray-600 font-semibold text-xs md:text-sm'>
-                              {{- review.author | slice: 0, 1 | upcase -}}
-                            </span>
+                        <div class='carousel-review-text'>
+                          <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed italic carousel-review-quote'>
+                            "{{ review.content }}"
+                          </blockquote>
+                          <div class='flex items-center carousel-review-author'>
+                            <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
+                              <span class='text-gray-600 font-semibold text-xs md:text-sm'>
+                                {{- review.author | slice: 0, 1 | upcase -}}
+                              </span>
+                            </div>
+                            <div>
+                              <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'>
+                                {{- review.author -}}
+                              </cite>
+                              <p class='text-xs md:text-sm text-gray-500'>
+                                {{ product.title }}
+                              </p>
+                            </div>
+                            <div class='flex text-yellow-400 ml-3 carousel-review-stars-inline'>
+                              {% for i in (1..5) %}
+                                {% if i <= review.rating %}
+                                  <svg
+                                    class='w-4 h-4 md:w-5 md:h-5 fill-current'
+                                    viewBox='0 0 20 20'
+                                  >
+                                    <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
+                                  </svg>
+                                {% else %}
+                                  <svg
+                                    class='w-4 h-4 md:w-5 md:h-5 text-gray-300'
+                                    viewBox='0 0 20 20'
+                                  >
+                                    <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
+                                  </svg>
+                                {% endif %}
+                              {% endfor %}
+                            </div>
+                            <button
+                              type='button'
+                              class='carousel-review-close'
+                            >
+                              Show less
+                            </button>
                           </div>
-                          <div>
-                            <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'>
-                              {{- review.author -}}
-                            </cite>
-                            <p class='text-xs md:text-sm text-gray-500'>
-                              {{ product.title }}
-                            </p>
-                          </div>
+                        </div>
+                        <div class='carousel-review-footer'>
+                          <button
+                            type='button'
+                            class='carousel-review-toggle'
+                          >
+                            Read more
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -383,8 +418,8 @@
                           </div>
                         {% endif %}
                       </div>
-                      <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
-                        <div class='flex items-center mb-3 md:mb-4'>
+                      <div class='w-full md:w-1/2 px-4 pb-4 pt-3 md:px-8 md:pb-8 md:pt-6 flex flex-col carousel-review-content'>
+                        <div class='flex items-center mb-2 md:mb-3 carousel-review-stars'>
                           <div class='flex text-yellow-400 mr-3'>
                             {% for i in (1..5) %}
                               {% if i <= block.settings.rating %}
@@ -408,27 +443,62 @@
                             {{- block.settings.rating }}/5</span
                           >
                         </div>
-                        <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>
-                          "{{ block.settings.review_text }}"
-                        </blockquote>
-                        <div class='flex items-center'>
-                          <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
-                            <span class='text-gray-600 font-semibold text-xs md:text-sm'>
-                              {{-
-                                block.settings.author
-                                | slice: 0, 1
-                                | upcase
-                              -}}
-                            </span>
+                        <div class='carousel-review-text'>
+                          <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed italic carousel-review-quote'>
+                            "{{ block.settings.review_text }}"
+                          </blockquote>
+                          <div class='flex items-center carousel-review-author'>
+                            <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
+                              <span class='text-gray-600 font-semibold text-xs md:text-sm'>
+                                {{-
+                                  block.settings.author
+                                  | slice: 0, 1
+                                  | upcase
+                                -}}
+                              </span>
+                            </div>
+                            <div>
+                              <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'>
+                                {{- block.settings.author -}}
+                              </cite>
+                              <p class='text-xs md:text-sm text-gray-500'>
+                                {{ block.settings.product_title }}
+                              </p>
+                            </div>
+                            <div class='flex text-yellow-400 ml-3 carousel-review-stars-inline'>
+                              {% for i in (1..5) %}
+                                {% if i <= block.settings.rating %}
+                                  <svg
+                                    class='w-4 h-4 md:w-5 md:h-5 fill-current'
+                                    viewBox='0 0 20 20'
+                                  >
+                                    <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
+                                  </svg>
+                                {% else %}
+                                  <svg
+                                    class='w-4 h-4 md:w-5 md:h-5 text-gray-300'
+                                    viewBox='0 0 20 20'
+                                  >
+                                    <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
+                                  </svg>
+                                {% endif %}
+                              {% endfor %}
+                            </div>
+                            <button
+                              type='button'
+                              class='carousel-review-close'
+                            >
+                              Show less
+                            </button>
                           </div>
-                          <div>
-                            <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'>
-                              {{- block.settings.author -}}
-                            </cite>
-                            <p class='text-xs md:text-sm text-gray-500'>
-                              {{ block.settings.product_title }}
-                            </p>
-                          </div>
+                        </div>
+                        <div class='carousel-review-footer'>
+                          <button
+                            type='button'
+                            class='carousel-review-toggle'
+                          >
+                            Read more
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -447,8 +517,8 @@
                         | placeholder_svg_tag: "w-full h-full bg-gray-200 object-cover"
                       }}
                     </div>
-                    <div class='w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-center'>
-                      <div class='flex items-center mb-3 md:mb-4'>
+                    <div class='w-full md:w-1/2 px-4 pb-4 pt-3 md:px-8 md:pb-8 md:pt-6 flex flex-col carousel-review-content'>
+                      <div class='flex items-center mb-2 md:mb-3 carousel-review-stars'>
                         <div class='flex text-yellow-400 mr-3'>
                           {% for i in (1..5) %}
                             <svg
@@ -463,23 +533,49 @@
                           >5/5</span
                         >
                       </div>
-                      <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed mb-4 md:mb-6 italic'>
-                        "Add your first review in the theme editor."
-                      </blockquote>
-                      <div class='flex items-center'>
-                        <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
-                          <span class='text-gray-600 font-semibold text-xs md:text-sm'
-                            >A</span
+                      <div class='carousel-review-text'>
+                        <blockquote class='text-gray-800 text-sm md:text-lg leading-relaxed italic carousel-review-quote'>
+                          "Add your first review in the theme editor."
+                        </blockquote>
+                        <div class='flex items-center carousel-review-author'>
+                          <div class='w-8 h-8 md:w-12 md:h-12 bg-gray-300 rounded-full mr-3 md:mr-4 flex items-center justify-center'>
+                            <span class='text-gray-600 font-semibold text-xs md:text-sm'
+                              >A</span
+                            >
+                          </div>
+                          <div>
+                            <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'
+                              >Anonymous</cite
+                            >
+                            <p class='text-xs md:text-sm text-gray-500'>
+                              Product Name
+                            </p>
+                          </div>
+                          <div class='flex text-yellow-400 ml-3 carousel-review-stars-inline'>
+                            {% for i in (1..5) %}
+                              <svg
+                                class='w-4 h-4 md:w-5 md:h-5 fill-current'
+                                viewBox='0 0 20 20'
+                              >
+                                <path d='M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z'/>
+                              </svg>
+                            {% endfor %}
+                          </div>
+                          <button
+                            type='button'
+                            class='carousel-review-close'
                           >
+                            Show less
+                          </button>
                         </div>
-                        <div>
-                          <cite class='text-gray-900 font-semibold not-italic text-sm md:text-base block'
-                            >Anonymous</cite
-                          >
-                          <p class='text-xs md:text-sm text-gray-500'>
-                            Product Name
-                          </p>
-                        </div>
+                      </div>
+                      <div class='carousel-review-footer'>
+                        <button
+                          type='button'
+                          class='carousel-review-toggle'
+                        >
+                          Read more
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -855,6 +951,90 @@
       .testimonial-modal-author {
         margin: 0 !important;
       }
+
+      /* Carousel review text clamp + scroll */
+      .carousel-review-text {
+        margin-bottom: 0.5rem;
+      }
+      .carousel-review-quote {
+        position: relative;
+        padding-right: 1.25rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .carousel-review-text.is-expanded .carousel-review-quote {
+        display: block;
+        -webkit-line-clamp: unset;
+        overflow: visible;
+      }
+      .carousel-review-text.is-truncated:not(.is-expanded) .carousel-review-quote::after {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        padding-left: 0.25rem;
+        background: #ffffff;
+      }
+      .carousel-review-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 1rem;
+      }
+      .carousel-review-quote {
+        margin-bottom: 0.5rem;
+      }
+      .carousel-review-content.is-expanded .carousel-review-stars {
+        display: none;
+      }
+      .carousel-review-stars-inline {
+        display: none;
+      }
+      .carousel-review-content.is-expanded .carousel-review-stars-inline {
+        display: inline-flex;
+      }
+      .carousel-review-close {
+        margin-left: auto;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        text-decoration: underline;
+        color: #2563eb;
+        background: transparent;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        display: none;
+      }
+      .carousel-review-content.is-expanded .carousel-review-close {
+        display: inline-flex;
+      }
+      .carousel-review-content.is-expanded .carousel-review-toggle {
+        display: none;
+      }
+      .carousel-review-toggle {
+        margin-left: auto;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        text-decoration: underline;
+        color: #2563eb;
+        background: transparent;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+      }
+      .carousel-review-toggle[hidden] {
+        display: none !important;
+      }
+      @media (max-width: 767px) {
+        .carousel-review-quote {
+          -webkit-line-clamp: 2;
+        }
+        .carousel-review-footer {
+          flex-wrap: wrap;
+          row-gap: 0.5rem;
+        }
+      }
     </style>
 
     <!-- Initialize Swiper -->
@@ -991,6 +1171,69 @@
           el.appendChild(textSpan)
           el.appendChild(toggleBtn)
           el.classList.add('quote-collapsed')
+        })
+      })
+    </script>
+
+    <!-- Carousel review text toggle -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const reviewBlocks = document.querySelectorAll('.carousel-review-text')
+
+        reviewBlocks.forEach(block => {
+          const quote = block.querySelector('.carousel-review-quote')
+          const content = block.closest('.carousel-review-content')
+          const toggle = content ? content.querySelector('.carousel-review-toggle') : null
+          const closeBtn = content ? content.querySelector('.carousel-review-close') : null
+          if (!quote || !toggle) return
+
+          const setCollapsed = () => {
+            block.classList.remove('is-expanded')
+            if (content) {
+              content.classList.remove('is-expanded')
+            }
+            toggle.textContent = 'Read more'
+            toggle.setAttribute('aria-expanded', 'false')
+          }
+
+          const updateToggleVisibility = () => {
+            setCollapsed()
+            const needsToggle = quote.scrollHeight > quote.clientHeight + 1
+            if (!needsToggle) {
+              toggle.setAttribute('hidden', 'true')
+              block.classList.remove('is-truncated')
+              return
+            }
+            toggle.removeAttribute('hidden')
+            block.classList.add('is-truncated')
+          }
+
+          toggle.addEventListener('click', function (e) {
+            e.preventDefault()
+            const expanded = block.classList.toggle('is-expanded')
+            if (content) {
+              content.classList.toggle('is-expanded', expanded)
+            }
+            block.classList.toggle('is-truncated', !expanded)
+            toggle.textContent = expanded ? 'Show less' : 'Read more'
+            toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false')
+          })
+
+          if (closeBtn) {
+            closeBtn.addEventListener('click', function (e) {
+              e.preventDefault()
+              block.classList.remove('is-expanded')
+              if (content) {
+                content.classList.remove('is-expanded')
+              }
+              block.classList.add('is-truncated')
+              toggle.textContent = 'Read more'
+              toggle.setAttribute('aria-expanded', 'false')
+            })
+          }
+
+          requestAnimationFrame(updateToggleVisibility)
+          window.addEventListener('resize', updateToggleVisibility)
         })
       })
     </script>
@@ -1418,23 +1661,33 @@
               x-text='modalExpanded ? modalFullTextDisplay : modalCollapsedText'
             ></span>
           </blockquote>
-          <div x-show='modalToggleVisible' class='mt-[2px] mb-1'>
+          <div x-show='modalToggleVisible && !modalExpanded' class='mt-[2px] mb-1'>
             <button
               type='button'
               class='text-white underline text-[11px] md:text-sm focus:outline-none testimonial-modal-toggle leading-none'
               @click='toggleModalQuote()'
             >
-              <span x-text='modalExpanded ? "Show less" : "Read more"'></span>
+              Read more
             </button>
           </div>
-          <cite
-            class='text-white font-semibold not-italic text-xs md:text-lg block leading-snug testimonial-modal-author'
-            style='line-height: 1.25; color: #fff;'
-          >
-            <span
-              x-text='selectedTestimonial ? selectedTestimonial.author : ""'
-            ></span>
-          </cite>
+          <div class='flex items-center justify-between gap-3'>
+            <cite
+              class='text-white font-semibold not-italic text-xs md:text-lg block leading-snug testimonial-modal-author'
+              style='line-height: 1.25; color: #fff;'
+            >
+              <span
+                x-text='selectedTestimonial ? selectedTestimonial.author : ""'
+              ></span>
+            </cite>
+            <button
+              type='button'
+              x-show='modalToggleVisible && modalExpanded'
+              class='text-white underline text-[11px] md:text-sm focus:outline-none testimonial-modal-toggle leading-none'
+              @click='toggleModalQuote()'
+            >
+              Show less
+            </button>
+          </div>
         </div>
       </div>
     </div>

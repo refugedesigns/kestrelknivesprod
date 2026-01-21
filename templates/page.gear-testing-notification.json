@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "template-page-gear-testing-notification": {
+      "type": "template-gear-testing-notification"
+    }
+  },
+  "order": ["template-page-gear-testing-notification"]
+}
+

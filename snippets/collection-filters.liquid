@@ -246,7 +246,7 @@
               }))
               .filter(it => {
                 const val = String(it.value || '').toLowerCase()
-                return it.value && !val.includes('hidden')
+                return it.value && !val.includes('hidden') && val !== 'custom'
               })
           }
           // Fallback: fetch list of collections and map to product types heuristically
@@ -307,7 +307,7 @@
             // Filter out hidden offer from cached types
             return cachedTypes.filter(t => {
               const val = String(t.value || '').toLowerCase()
-              return !val.includes('hidden')
+              return !val.includes('hidden') && val !== 'custom'
             })
           }
           const fetched = await this.fetchAllProductTypesFromAllCollection()
@@ -315,7 +315,7 @@
             // Filter out hidden offer from fetched types
             const filtered = fetched.filter(t => {
               const val = String(t.value || '').toLowerCase()
-              return !val.includes('hidden')
+              return !val.includes('hidden') && val !== 'custom'
             })
             sessionStorage.setItem(
               'kk_allProductTypes',
@@ -334,25 +334,27 @@
           const url = new URL(window.location.href)
 
           // Product types (multiple allowed)
-          const types = url.searchParams.getAll('filter.p.product_type')
-          if (types && types.length) {
-            this.selectedFilters.productType = types
-            // If URL has both Knives and Custom, select Knives (since Custom is hidden)
-            const hasKnives = types.some(t => t.toLowerCase() === 'knives')
-            const hasCustom = types.some(t => t.toLowerCase() === 'Custom')
-
-            if (hasKnives && hasCustom) {
-              // Both present, select Knives
-              this.selectedFilters.productTypeSelected = types.find(
-                t => t.toLowerCase() === 'knives'
-              )
-            } else if (hasCustom && !hasKnives) {
-              // Only Custom (from old URL or direct access), don't select anything
-              this.selectedFilters.productTypeSelected = ''
-            } else {
-              // Normal case: use first type
-              this.selectedFilters.productTypeSelected = types[0]
+          const types = url.searchParams.getAll('filter.p.product_type') || []
+          const filteredTypes = types.filter(
+            t => String(t || '').toLowerCase() !== 'custom'
+          )
+          if (types.length && filteredTypes.length !== types.length) {
+            // Clean legacy Custom filter from URL
+            url.searchParams.delete('filter.p.product_type')
+            filteredTypes.forEach(t =>
+              url.searchParams.append('filter.p.product_type', t)
+            )
+            const cleanedUrl = url.toString()
+            if (cleanedUrl !== window.location.href) {
+              window.location.replace(cleanedUrl)
+              return
             }
+          }
+
+          if (filteredTypes && filteredTypes.length) {
+            this.selectedFilters.productType = filteredTypes
+            // Use first type as the selected value (single-select UI)
+            this.selectedFilters.productTypeSelected = filteredTypes[0]
 
             // Ensure the selected type is in productTypes array
             if (this.selectedFilters.productTypeSelected) {
@@ -410,24 +412,6 @@
               )
               if (matchType) {
                 this.selectedFilters.productTypeSelected = matchType.value
-
-                // Auto-redirect to include custom products when on knives collection
-                if (
-                  matchType.value.toLowerCase() === 'knives' ||
-                  collectionHandle === 'knives'
-                ) {
-                  // Redirect to add both Knives and custom filters
-                  const newUrl = new URL(window.location.href)
-                  newUrl.searchParams.append(
-                    'filter.p.product_type',
-                    matchType.value
-                  )
-                  newUrl.searchParams.append('filter.p.product_type', 'Custom')
-                  if (newUrl.toString() !== window.location.href) {
-                    window.location.href = newUrl.toString()
-                    return
-                  }
-                }
               }
             }
           }
@@ -557,7 +541,7 @@
           const metaTypes = (meta.productTypes || [])
             .filter(t => {
               const val = String(t.value || '').toLowerCase()
-              return !val.includes('hidden')
+              return !val.includes('hidden') && val !== 'custom'
             })
             .map(t => ({
               value: String(t.value || ''),
@@ -583,7 +567,7 @@
           products.forEach(p => {
             const t = (p.product_type || p.type || '').toString().trim()
             const tLower = t.toLowerCase()
-            if (!t || tLower.includes('hidden')) return
+            if (!t || tLower.includes('hidden') || tLower === 'custom') return
             counts[t] = (counts[t] || 0) + 1
           })
           this.productTypes = Object.keys(counts).map(k => ({
@@ -655,10 +639,6 @@
         url.searchParams.delete('filter.p.product_type')
         if (selected) {
           url.searchParams.append('filter.p.product_type', selected)
-          // When Knives is selected, also include custom products
-          if (selected.toLowerCase() === 'knives') {
-            url.searchParams.append('filter.p.product_type', 'Custom')
-          }
         }
 
         // If the selected type does not match the current collection handle,
