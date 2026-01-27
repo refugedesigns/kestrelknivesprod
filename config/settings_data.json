@@ -1,5 +1,115 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
-  "current": "Default",
+  "current": {
+    "sections": {
+      "header": {
+        "type": "header",
+        "settings": {
+          "mobile_menu_title": "Menu",
+          "logo_image": "shopify://shop_images/kestrel-ultralight-with-bird-black.png",
+          "logo_height_mobile": 60,
+          "logo_height_desktop": 96,
+          "menu": "customer-account-main-menu",
+          "header_bg_color": "#ffffff",
+          "header_border_bottom": true,
+          "header_border_color": "#f2f2f2",
+          "menu_link_color": "#000000",
+          "child_menu_bg_color": "#f2f2f2",
+          "child_menu_link_color": "#4b5563",
+          "child_menu_border_color": "#000000",
+          "child_menu_hover_bg_color": "#4b5563",
+          "child_menu_hover_text_color": "#ffffff",
+          "mobile_menu_button_color": "#000000",
+          "mobile_menu_bg_color": "#f2f2f2",
+          "mobile_menu_title_color": "#000000",
+          "mobile_menu_link_color": "#000000",
+          "mobile_menu_link_hover_bg_color": "#374151",
+          "mobile_menu_link_hover_text_color": "#ffffff",
+          "mobile_menu_border_color": "#374151",
+          "mobile_menu_close_button_bg_color": "#1f2937",
+          "mobile_menu_close_button_color": "#ffffff",
+          "cart_badge_bg_color": "#111827",
+          "cart_badge_text_color": "#f2f2f2",
+          "countdown_enabled": true,
+          "countdown_show_timer": true,
+          "countdown_title": "OVIS HUNTER DROPS: 30/01/206",
+          "countdown_target_date": "2026-01-30T19:00:00",
+          "countdown_bg_color": "#000000",
+          "countdown_border_color": "#dc2626",
+          "countdown_text_color": "#ffffff",
+          "notify_button_text": "",
+          "notify_button_action": "drawer",
+          "notify_button_link": "shopify://collections/knives",
+          "notify_button_bg_color": "#ffffff",
+          "notify_button_text_color": "#151313"
+        }
+      },
+      "footer": {
+        "type": "footer",
+        "settings": {
+          "logo_image": "shopify://shop_images/kestrel-ultralight-with-bird-white.png",
+          "logo_height_mobile": 72,
+          "logo_height_desktop": 116,
+          "footer_bg_color": "#000000",
+          "twitter_url": "https://twitter.com/KestrelKnives",
+          "youtube_url": "https://www.youtube.com/@kestrelknives",
+          "facebook_url": "https://www.facebook.com/kestrelknives",
+          "email": "mailto:sales@kestrelknives.com",
+          "instagram_url": "https://instagram.com/kestrelknives",
+          "link_color": "#ffffff",
+          "guide_url": "",
+          "privacy_url": "",
+          "shipping_url": "",
+          "faq_url": "",
+          "contact_url": "",
+          "icon_color": "#ffffff",
+          "input_bg_color": "#111827",
+          "input_border_color": "#4b5563",
+          "button_bg_color": "#000000",
+          "button_text_color": "#ffffff",
+          "notification_title": "Sign up to get notifications for our",
+          "notification_success_message": "Thanks for signing up!",
+          "notification_button_color": "bg-black"
+        }
+      }
+    },
+    "content_for_index": [],
+    "blocks": {
+      "855628211100114053": {
+        "type": "shopify://apps/klaviyo-email-marketing-sms/blocks/klaviyo-onsite-embed/2632fe16-c075-4321-a88b-50b567f42507",
+        "disabled": false,
+        "settings": {}
+      },
+      "13768625480086291342": {
+        "type": "shopify://apps/forms/blocks/forms/8744a304-fcb1-4347-b211-bb6b4759a76a",
+        "disabled": true,
+        "settings": {}
+      },
+      "4015264832934714879": {
+        "type": "shopify://apps/trustoo-email-popups/blocks/app/a5670cf8-5705-4b01-ad9e-447033feae26",
+        "disabled": true,
+        "settings": {}
+      },
+      "14656832010101544780": {
+        "type": "shopify://apps/apo-product-options/blocks/app-embed-block/a1199153-7462-4b5b-8a80-f0eefba85e99",
+        "disabled": false,
+        "settings": {}
+      },
+      "4735065489610544183": {
+        "type": "shopify://apps/ga-gdpr-ccpa-cookie-banner/blocks/app-embeded/bfd074ea-697a-4267-b8cd-e53d5d340a6a",
+        "disabled": false,
+        "settings": {}
+      }
+    }
+  },
   "presets": {
     "Default": {}
   }
