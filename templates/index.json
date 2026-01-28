@@ -1,25 +1,154 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero-section": {
-      "type": "hero"
+      "type": "hero",
+      "settings": {
+        "hero_height_px": 600,
+        "hero_height_mobile_px": 420,
+        "autoplay_delay": 5000,
+        "scale_percent": 100,
+        "scale_radius": 16,
+        "show_text_overlay": true,
+        "slide_1_button_enable": true,
+        "slide_1_text_bg_enable": false,
+        "slide_1_text_bg_color": "#000000",
+        "slide_1_text_bg_opacity": 50,
+        "slide_1_text_shadow_strength": "soft",
+        "slide_1_text_shadow_blur": 6,
+        "slide_1_text_color": "#ffffff",
+        "slide_1_button_bg_color": "#ffffff",
+        "slide_1_button_text_color": "#000000",
+        "slide_1_image": "shopify://shop_images/2.2.png",
+        "slide_1_image_tablet": "shopify://shop_images/tablet_2.2.png",
+        "slide_1_image_mobile": "shopify://shop_images/tablet_2.2.png",
+        "slide_1_image_fit": "cover",
+        "slide_1_image_fit_mobile": "cover",
+        "slide_1_image_fit_tablet": "cover",
+        "slide_1_image_fit_desktop": "cover",
+        "slide_1_image_position": "center",
+        "slide_1_image_position_mobile": "top",
+        "slide_1_image_position_tablet": "center",
+        "slide_1_image_position_desktop": "bottom",
+        "slide_1_image_zoom": 100,
+        "slide_1_title": "Ovis Hunter 2.0",
+        "slide_1_subtitle": "Returns in Magnacut.\nTrusted hard. Tested even harder.",
+        "slide_1_button_text": "Get First Access Here",
+        "slide_1_button_url": "shopify://pages/subscribe",
+        "slide_2_button_enable": true,
+        "slide_2_text_bg_enable": false,
+        "slide_2_text_bg_color": "#000000",
+        "slide_2_text_bg_opacity": 50,
+        "slide_2_text_shadow_strength": "soft",
+        "slide_2_text_shadow_blur": 6,
+        "slide_2_text_color": "#ffffff",
+        "slide_2_button_bg_color": "#ffffff",
+        "slide_2_button_text_color": "#000000",
+        "slide_2_image": "shopify://shop_images/1.png",
+        "slide_2_image_tablet": "shopify://shop_images/tablet_3.png",
+        "slide_2_image_mobile": "shopify://shop_images/tablet_3.png",
+        "slide_2_image_fit": "cover",
+        "slide_2_image_fit_mobile": "cover",
+        "slide_2_image_fit_tablet": "cover",
+        "slide_2_image_fit_desktop": "cover",
+        "slide_2_image_position": "center",
+        "slide_2_image_position_mobile": "center",
+        "slide_2_image_position_tablet": "center",
+        "slide_2_image_position_desktop": "center",
+        "slide_2_image_zoom": 100,
+        "slide_2_title": "Ready When You Are",
+        "slide_2_subtitle": "Check out in stock knives.",
+        "slide_2_button_text": "Explore Knives",
+        "slide_2_button_url": "shopify://collections/knives",
+        "slide_3_button_enable": true,
+        "slide_3_text_bg_enable": false,
+        "slide_3_text_bg_color": "#000000",
+        "slide_3_text_bg_opacity": 50,
+        "slide_3_text_shadow_strength": "soft",
+        "slide_3_text_shadow_blur": 6,
+        "slide_3_text_color": "#ffffff",
+        "slide_3_button_bg_color": "#ffffff",
+        "slide_3_button_text_color": "#000000",
+        "slide_3_image": "shopify://shop_images/3.png",
+        "slide_3_image_tablet": "shopify://shop_images/tablet.png",
+        "slide_3_image_mobile": "shopify://shop_images/tablet.png",
+        "slide_3_image_fit": "cover",
+        "slide_3_image_fit_mobile": "cover",
+        "slide_3_image_fit_tablet": "cover",
+        "slide_3_image_fit_desktop": "cover",
+        "slide_3_image_position": "center",
+        "slide_3_image_position_mobile": "center",
+        "slide_3_image_position_tablet": "center",
+        "slide_3_image_position_desktop": "center",
+        "slide_3_image_zoom": 100,
+        "slide_3_title": "Free Lifetime Sharpening",
+        "slide_3_subtitle": "Your knife keeps its history.\nYour blade gets new life.",
+        "slide_3_button_text": "Send Yours In",
+        "slide_3_button_url": "shopify://products/knife-sharpening"
+      }
     },
     "featured-collection": {
       "type": "featured-collection",
       "settings": {
-        "featured_collection": "all"
+        "title": "Featured Collection",
+        "featured_collection": "featured",
+        "number_of_products_to_show": 4,
+        "mobile_collection": "featured-mobile",
+        "mobile_products_to_show": 4,
+        "mobile_columns": 2,
+        "tablet_collection": "featured",
+        "tablet_products_to_show": 4,
+        "tablet_columns": 2,
+        "desktop_columns": 4
       }
     },
     "index-section-2": {
-      "type": "index-section-2"
+      "type": "index-section-2",
+      "settings": {
+        "title": "Ultralight by Design",
+        "subtitle": "Functional simplicity meets American craftsmanship.",
+        "description": "Built with purpose, designed for the field, and trusted by those who live in it.\nNo excess. No compromise. Just a knife that works for you season after season.",
+        "image": "shopify://shop_images/lifestyle_knife_2.jpg",
+        "section_height_vh": 25,
+        "min_height": 500,
+        "button_text": "Explore Collection",
+        "button_url": ""
+      }
     },
     "big-timer": {
       "type": "big-timer",
       "settings": {
-        "show_timer": true
+        "show_timer": true,
+        "main_title": "Ovis Hunter 2.0 Returns In Magnacut:",
+        "slogan": "",
+        "button_text": "NOTIFY ME!",
+        "target_date": "2026-01-30T19:00:00",
+        "form_title": "Get Notified",
+        "form_subtitle": "Enter your email to be notified first",
+        "success_title": "You're on the list!",
+        "success_subtitle": "We'll notify you when we launch",
+        "success_message": "Thanks for signing up!",
+        "success_button_color": "bg-black"
       }
     },
     "index-section-1": {
-      "type": "index-section-1"
+      "type": "index-section-1",
+      "settings": {
+        "title": "Welcome to Kestrel Knives",
+        "subtitle": "Every knife we build starts with a simple idea: create tools that perform in the field and stand the test of time.",
+        "description": "Our community drives everything we do, from design to refinement. Each knife is crafted with 100% American made materials, built by hand in Pennsylvania, and trusted by those who live for the hunt, thrive in the backcountry, or just love a solid EDC.",
+        "image": "shopify://shop_images/5DM49812-EDIT.webp",
+        "button_text": "Learn More",
+        "button_url": ""
+      }
     }
   },
   "order": [
