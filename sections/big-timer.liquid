@@ -65,14 +65,14 @@
         {% if section.settings.button_action == 'link' and section.settings.button_url != blank %}
           <a
             href='{{ section.settings.button_url }}'
-            class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+            class='inline-block font-semibold py-4 px-8 transition-colors duration-300'
             style='background-color: {{ section.settings.button_color | default: "#2563eb" }}; color: {{ section.settings.button_text_color | default: "#ffffff" }};'
           >
             {{ section.settings.button_text }}
           </a>
         {% else %}
           <button
-            class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300 klaviyo_form_trigger'
+            class='inline-block font-semibold py-4 px-8 transition-colors duration-300 klaviyo_form_trigger'
             style='background-color: {{ section.settings.button_color | default: "#2563eb" }}; color: {{ section.settings.button_text_color | default: "#ffffff" }};'
           >
             {{ section.settings.button_text | default: "NOTIFY ME" }}
