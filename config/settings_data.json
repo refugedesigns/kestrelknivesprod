@@ -47,7 +47,7 @@
           "countdown_text_color": "#ffffff",
           "notify_button_text": "Order Now",
           "notify_button_action": "link",
-          "notify_button_link": "shopify://products/ovis-hunter-early-access",
+          "notify_button_link": "shopify://products/ovis-hunter",
           "notify_button_bg_color": "#ffffff",
           "notify_button_text_color": "#151313"
         }
