@@ -62,22 +62,35 @@
         x-data='bladeDropForm()'
         class='relative'
       >
-        <button
-          class='{{ section.settings.button_color | default: 'bg-black' }} hover:{{ section.settings.button_color | default: 'bg-gray-900' }} text-white font-bold py-4 px-8 uppercase tracking-wide transition-colors duration-200 cursor-pointer klaviyo_form_trigger'
-        >
-          {{ section.settings.button_text | default: "NOTIFY ME" }}
-        </button>
-
+        {% if section.settings.button_action == 'link' and section.settings.button_url != blank %}
+          <a
+            href='{{ section.settings.button_url }}'
+            class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+            style='background-color: {{ section.settings.button_color | default: "#2563eb" }}; color: {{ section.settings.button_text_color | default: "#ffffff" }};'
+          >
+            {{ section.settings.button_text }}
+          </a>
+        {% else %}
+          <button
+            class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300 klaviyo_form_trigger'
+            style='background-color: {{ section.settings.button_color | default: "#2563eb" }}; color: {{ section.settings.button_text_color | default: "#ffffff" }};'
+          >
+            {{ section.settings.button_text | default: "NOTIFY ME" }}
+          </button>
+        {% endif %}
       </div>
     </div>
   </div>
 {% endif %}
 
 <script type="text/javascript">
-	document.querySelector('.klaviyo_form_trigger').addEventListener('click', function (){
-		window._klOnsite = window._klOnsite || [];
-    window._klOnsite.push(['openForm', 'TRArE7']);
-	});
+  const klaviyoTrigger = document.querySelector('.klaviyo_form_trigger')
+  if (klaviyoTrigger) {
+    klaviyoTrigger.addEventListener('click', function () {
+      window._klOnsite = window._klOnsite || [];
+      window._klOnsite.push(['openForm', 'TRArE7']);
+    })
+  }
 </script>
 
 <!-- Countdown Timer Script -->
@@ -302,6 +315,22 @@
       "id": "button_text",
       "label": "Button Text",
       "default": "NOTIFY ME"
+    },
+    {
+      "type": "select",
+      "id": "button_action",
+      "label": "Button action",
+      "default": "klaviyo",
+      "options": [
+        { "value": "klaviyo", "label": "Open Klaviyo form" },
+        { "value": "link", "label": "Go to link" }
+      ]
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button link",
+      "info": "Used when Button action is set to Go to link"
     },
     {
       "type": "header",
