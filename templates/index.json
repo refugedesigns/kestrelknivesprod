@@ -130,6 +130,8 @@
         "main_title": "Ovis Hunter 2.0 Drop Is Live Now!",
         "slogan": "",
         "button_text": "Order Now",
+        "button_color": "#000000",
+        "button_text_color": "#ffffff",
         "button_action": "link",
         "button_url": "shopify://products/ovis-hunter",
         "target_date": "2026-01-30T19:00:00-05:00",
