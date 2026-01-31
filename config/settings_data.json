@@ -45,9 +45,9 @@
           "countdown_bg_color": "#000000",
           "countdown_border_color": "#dc2626",
           "countdown_text_color": "#ffffff",
-          "notify_button_text": "",
+          "notify_button_text": "Order Now",
           "notify_button_action": "drawer",
-          "notify_button_link": "shopify://collections/knives",
+          "notify_button_link": "shopify://products/ovis-hunter-early-access",
           "notify_button_bg_color": "#ffffff",
           "notify_button_text_color": "#151313"
         }
