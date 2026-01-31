@@ -2354,21 +2354,39 @@
                 (normalized[0] ||
                   complexConfig.defaultPrimaryValue ||
                   '') + '';
+              const primaryMatches = variants.filter(v => {
+                return (
+                  (v.options &&
+                    v.options[0] &&
+                    v.options[0].toString().trim()) === desiredPrimary.trim()
+                );
+              });
+
+              // Prefer variant that matches primary + any other selected options
               variant =
-                variants.find(v => {
-                  return (
-                    (v.options &&
-                      v.options[0] &&
-                      v.options[0].toString().trim()) === desiredPrimary.trim()
-                  );
+                primaryMatches.find(v => {
+                  for (let i = 1; i < normalized.length; i++) {
+                    if (
+                      normalized[i] &&
+                      (v.options[i] || '').toString().trim() !== normalized[i].toString().trim()
+                    ) {
+                      return false;
+                    }
+                  }
+                  return true;
                 }) ||
+                primaryMatches.find(v => v.available) ||
+                primaryMatches[0] ||
                 variants.find(v => v.available) ||
                 variants[0] ||
                 null;
+
               if (variant) {
                 normalized[0] = variant.options[0];
                 for (let i = 1; i < optionCount; i++) {
-                  normalized[i] = variant.options[i];
+                  if (!normalized[i]) {
+                    normalized[i] = variant.options[i];
+                  }
                 }
               }
             } else {
