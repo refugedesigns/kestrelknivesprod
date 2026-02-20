@@ -42,6 +42,8 @@
         "slide_1_title": "Ovis Hunter 2.0",
         "slide_1_subtitle": "Trusted hard. Tested even harder.",
         "slide_1_button_text": "Order Now",
+        "slide_1_button_action": "form",
+        "slide_1_button_form_id": "TRArE7",
         "slide_1_button_url": "shopify://products/ovis-hunter",
         "slide_2_button_enable": true,
         "slide_2_text_bg_enable": false,
@@ -67,6 +69,8 @@
         "slide_2_title": "Ready When You Are",
         "slide_2_subtitle": "Check out in stock knives.",
         "slide_2_button_text": "Explore Knives",
+        "slide_2_button_action": "link",
+        "slide_2_button_form_id": "",
         "slide_2_button_url": "shopify://collections/knives",
         "slide_3_button_enable": true,
         "slide_3_text_bg_enable": false,
@@ -92,6 +96,8 @@
         "slide_3_title": "Free Lifetime Sharpening",
         "slide_3_subtitle": "Your knife keeps its history.\nYour blade gets new life.",
         "slide_3_button_text": "Send Yours In",
+        "slide_3_button_action": "link",
+        "slide_3_button_form_id": "",
         "slide_3_button_url": "shopify://products/knife-sharpening"
       }
     },
