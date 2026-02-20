@@ -173,6 +173,9 @@
               | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
             }}
           {% endif %}
+          {% if section.settings.slide_1_overlay_enable %}
+            <div class='absolute inset-0 bg-black/{{ section.settings.slide_1_overlay_opacity | default: 40 }}'></div>
+          {% endif %}
         {% if slide_1_button_action == "form" %}
           </button>
         {% else %}
@@ -314,6 +317,9 @@
               "lifestyle-1"
               | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
             }}
+          {% endif %}
+          {% if section.settings.slide_2_overlay_enable %}
+            <div class='absolute inset-0 bg-black/{{ section.settings.slide_2_overlay_opacity | default: 40 }}'></div>
           {% endif %}
         {% if slide_2_button_action == "form" %}
           </button>
@@ -531,6 +537,9 @@
               "lifestyle-1"
               | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
             }}
+          {% endif %}
+          {% if section.settings.slide_3_overlay_enable %}
+            <div class='absolute inset-0 bg-black/{{ section.settings.slide_3_overlay_opacity | default: 40 }}'></div>
           {% endif %}
         {% if slide_3_button_action == "form" %}
           </button>
@@ -964,6 +973,21 @@
     },
     {
       "type": "checkbox",
+      "id": "slide_1_overlay_enable",
+      "label": "Slide 1: Enable image overlay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "slide_1_overlay_opacity",
+      "label": "Slide 1: Image overlay opacity (%)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 40
+    },
+    {
+      "type": "checkbox",
       "id": "slide_1_text_bg_enable",
       "label": "Slide 1: Enable text background",
       "default": false
@@ -1191,6 +1215,21 @@
     },
     {
       "type": "checkbox",
+      "id": "slide_2_overlay_enable",
+      "label": "Slide 2: Enable image overlay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "slide_2_overlay_opacity",
+      "label": "Slide 2: Image overlay opacity (%)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 40
+    },
+    {
+      "type": "checkbox",
       "id": "slide_2_text_bg_enable",
       "label": "Slide 2: Enable text background",
       "default": false
@@ -1415,6 +1454,21 @@
       "id": "slide_3_button_enable",
       "label": "Slide 3: Show button",
       "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "slide_3_overlay_enable",
+      "label": "Slide 3: Enable image overlay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "slide_3_overlay_opacity",
+      "label": "Slide 3: Image overlay opacity (%)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 40
     },
     {
       "type": "checkbox",
