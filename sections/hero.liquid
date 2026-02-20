@@ -131,9 +131,18 @@
         class='relative slide-1'
         style='--slide-aspect-desktop: {{ slide_1_ratio_desktop }}; --slide-aspect-tablet: {{ slide_1_ratio_tablet }}; --slide-aspect-mobile: {{ slide_1_ratio_mobile }};'
       >
-        <div
-          class='hero-slide-media block w-full'
-        >
+        {% assign slide_1_button_action = section.settings.slide_1_button_action
+          | default: "link"
+        %}
+        {% if slide_1_button_action == "form" %}
+          <button
+            type='button'
+            class='hero-slide-media hero-slide-media-button hero-slide-1-media block w-full'
+            data-klaviyo-form-id='{{ section.settings.slide_1_button_form_id | escape }}'
+          >
+        {% else %}
+          <div class='hero-slide-media hero-slide-1-media block w-full'>
+        {% endif %}
           {% if slide_1_base_image %}
             <picture class='w-full h-full block'>
               {% if slide_1_image_mobile %}
@@ -164,7 +173,11 @@
               | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
             }}
           {% endif %}
-        </div>
+        {% if slide_1_button_action == "form" %}
+          </button>
+        {% else %}
+          </div>
+        {% endif %}
         {% if section.settings.show_text_overlay %}
           <div class='absolute bottom-4 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
             <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-12 hero-overlay__inner'>
@@ -224,20 +237,27 @@
                 and section.settings.slide_1_button_text != blank
               %}
                 <div class='mt-12 lg:mt-4 mb-8 pointer-events-auto'>
-                  {% comment %} <button
-                    type='button'
-                    class='inline-block font-semibold py-3 px-8 cursor-pointer rounded-lg transition-colors duration-300'
-                    style='background-color: {{ section.settings.slide_1_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_1_button_text_color | default: "#ffffff" }};'
-                  >
-                    {{ section.settings.slide_1_button_text }}
-                  </button> {% endcomment %}
-                   <a
-                    href='{{ section.settings.slide_1_button_url | default: "/collections/professional" }}'
-                    class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                    style='background-color: {{ section.settings.slide_1_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_1_button_text_color | default: "#ffffff" }};'
-                  >
-                    {{ section.settings.slide_1_button_text }}
-                  </a>
+                  {% assign slide_1_button_action = section.settings.slide_1_button_action
+                    | default: "link"
+                  %}
+                  {% if slide_1_button_action == "form" %}
+                    <button
+                      type='button'
+                      class='hero-slide-1-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                      style='background-color: {{ section.settings.slide_1_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_1_button_text_color | default: "#ffffff" }};'
+                      data-klaviyo-form-id='{{ section.settings.slide_1_button_form_id | escape }}'
+                    >
+                      {{ section.settings.slide_1_button_text }}
+                    </button>
+                  {% else %}
+                    <a
+                      href='{{ section.settings.slide_1_button_url | default: "/collections/professional" }}'
+                      class='hero-slide-1-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                      style='background-color: {{ section.settings.slide_1_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_1_button_text_color | default: "#ffffff" }};'
+                    >
+                      {{ section.settings.slide_1_button_text }}
+                    </a>
+                  {% endif %}
                 </div>
               {% endif %}
             </div>
@@ -246,14 +266,25 @@
       </swiper-slide>
 
       <!-- Slide 2 -->
+      {% assign slide_2_button_action = section.settings.slide_2_button_action
+        | default: "link"
+      %}
       <swiper-slide
         class='relative slide-2'
         style='--slide-aspect-desktop: {{ slide_2_ratio_desktop }}; --slide-aspect-tablet: {{ slide_2_ratio_tablet }}; --slide-aspect-mobile: {{ slide_2_ratio_mobile }};'
       >
-        <a
-          href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
-          class='hero-slide-media block w-full'
-        >
+        {% if slide_2_button_action == "form" %}
+          <button
+            type='button'
+            class='hero-slide-media hero-slide-media-button hero-slide-2-media block w-full'
+            data-klaviyo-form-id='{{ section.settings.slide_2_button_form_id | escape }}'
+          >
+        {% else %}
+          <a
+            href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
+            class='hero-slide-media hero-slide-2-media block w-full'
+          >
+        {% endif %}
           {% if slide_2_base_image %}
             <picture class='w-full h-full block'>
               {% if slide_2_image_mobile %}
@@ -284,7 +315,11 @@
               | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
             }}
           {% endif %}
-        </a>
+        {% if slide_2_button_action == "form" %}
+          </button>
+        {% else %}
+          </a>
+        {% endif %}
         {% if section.settings.show_text_overlay %}
           <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
             <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20 hero-overlay__inner'>
@@ -344,13 +379,27 @@
                 and section.settings.slide_2_button_text != blank
               %}
                 <div class='mt-24 lg:mt-4 mb-8 pointer-events-auto'>
-                  <a
-                    href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
-                    class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                    style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
-                  >
-                    {{ section.settings.slide_2_button_text }}
-                  </a>
+                  {% assign slide_2_button_action = section.settings.slide_2_button_action
+                    | default: "link"
+                  %}
+                  {% if slide_2_button_action == "form" %}
+                    <button
+                      type='button'
+                      class='hero-slide-2-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                      style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
+                      data-klaviyo-form-id='{{ section.settings.slide_2_button_form_id | escape }}'
+                    >
+                      {{ section.settings.slide_2_button_text }}
+                    </button>
+                  {% else %}
+                    <a
+                      href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
+                      class='hero-slide-2-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                      style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
+                    >
+                      {{ section.settings.slide_2_button_text }}
+                    </a>
+                  {% endif %}
                 </div>
               {% endif %}
             </div>
@@ -434,14 +483,25 @@
       </swiper-slide>
 
       <!-- Slide 3 -->
+      {% assign slide_3_button_action = section.settings.slide_3_button_action
+        | default: "link"
+      %}
       <swiper-slide
         class='relative slide-3'
         style='--slide-aspect-desktop: {{ slide_3_ratio_desktop }}; --slide-aspect-tablet: {{ slide_3_ratio_tablet }}; --slide-aspect-mobile: {{ slide_3_ratio_mobile }};'
       >
-        <a
-          href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
-          class='hero-slide-media block w-full'
-        >
+        {% if slide_3_button_action == "form" %}
+          <button
+            type='button'
+            class='hero-slide-media hero-slide-media-button hero-slide-3-media block w-full'
+            data-klaviyo-form-id='{{ section.settings.slide_3_button_form_id | escape }}'
+          >
+        {% else %}
+          <a
+            href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
+            class='hero-slide-media hero-slide-3-media block w-full'
+          >
+        {% endif %}
           {% if slide_3_base_image %}
             <picture class='w-full h-full block'>
               {% if slide_3_image_mobile %}
@@ -472,7 +532,11 @@
               | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
             }}
           {% endif %}
-        </a>
+        {% if slide_3_button_action == "form" %}
+          </button>
+        {% else %}
+          </a>
+        {% endif %}
         {% if section.settings.show_text_overlay %}
           <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
             <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20 hero-overlay__inner'>
@@ -532,13 +596,27 @@
                 and section.settings.slide_3_button_text != blank
               %}
                 <div class='mt-12 pointer-events-auto'>
-                  <a
-                    href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
-                    class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                    style='background-color: {{ section.settings.slide_3_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_3_button_text_color | default: "#ffffff" }};'
-                  >
-                    {{ section.settings.slide_3_button_text }}
-                  </a>
+                  {% assign slide_3_button_action = section.settings.slide_3_button_action
+                    | default: "link"
+                  %}
+                  {% if slide_3_button_action == "form" %}
+                    <button
+                      type='button'
+                      class='hero-slide-3-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                      style='background-color: {{ section.settings.slide_3_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_3_button_text_color | default: "#ffffff" }};'
+                      data-klaviyo-form-id='{{ section.settings.slide_3_button_form_id | escape }}'
+                    >
+                      {{ section.settings.slide_3_button_text }}
+                    </button>
+                  {% else %}
+                    <a
+                      href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
+                      class='hero-slide-3-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                      style='background-color: {{ section.settings.slide_3_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_3_button_text_color | default: "#ffffff" }};'
+                    >
+                      {{ section.settings.slide_3_button_text }}
+                    </a>
+                  {% endif %}
                 </div>
               {% endif %}
             </div>
@@ -560,20 +638,26 @@
 </div>
 
 <script type='text/javascript'>
-  document
-    .querySelector('.klaviyo_hero_form_trigger')
-    .addEventListener('click', function () {
-      window._klOnsite = window._klOnsite || []
-      window._klOnsite.push(['openForm', 'TRArE7'])
+  function attachKlaviyoFormTrigger(selector) {
+    var elements = document.querySelectorAll(selector)
+    if (!elements.length) return
+    elements.forEach(function (el) {
+      el.addEventListener('click', function (event) {
+        event.preventDefault()
+        var formId = el.getAttribute('data-klaviyo-form-id')
+        if (!formId) return
+        window._klOnsite = window._klOnsite || []
+        window._klOnsite.push(['openForm', formId])
+      })
     })
-</script>
-<script type='text/javascript'>
-  document
-    .querySelector('.klaviyo_hero_button_form_trigger')
-    .addEventListener('click', function () {
-      window._klOnsite = window._klOnsite || []
-      window._klOnsite.push(['openForm', 'TRArE7'])
-    })
+  }
+
+  attachKlaviyoFormTrigger('.hero-slide-1-button[data-klaviyo-form-id]')
+  attachKlaviyoFormTrigger('.hero-slide-1-media[data-klaviyo-form-id]')
+  attachKlaviyoFormTrigger('.hero-slide-2-button[data-klaviyo-form-id]')
+  attachKlaviyoFormTrigger('.hero-slide-2-media[data-klaviyo-form-id]')
+  attachKlaviyoFormTrigger('.hero-slide-3-button[data-klaviyo-form-id]')
+  attachKlaviyoFormTrigger('.hero-slide-3-media[data-klaviyo-form-id]')
 </script>
 
 <!-- Swiper Styles -->
@@ -619,6 +703,13 @@
     position: relative;
     overflow: hidden;
     border-radius: var(--hero-radius, 0px);
+  }
+  .hero-slide-media-button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    text-align: inherit;
   }
 
   .hero-slide-media picture {
@@ -1068,6 +1159,22 @@
       "default": "Shop Now"
     },
     {
+      "type": "select",
+      "id": "slide_1_button_action",
+      "label": "Slide 1 Button Action",
+      "options": [
+        { "value": "link", "label": "Open link" },
+        { "value": "form", "label": "Open Klaviyo form" }
+      ],
+      "default": "link"
+    },
+    {
+      "type": "text",
+      "id": "slide_1_button_form_id",
+      "label": "Slide 1 Button Form ID",
+      "info": "Used when action is set to Open Klaviyo form."
+    },
+    {
       "type": "url",
       "id": "slide_1_button_url",
       "label": "Slide 1 Button URL"
@@ -1279,6 +1386,22 @@
       "default": "Explore Collection"
     },
     {
+      "type": "select",
+      "id": "slide_2_button_action",
+      "label": "Slide 2 Button Action",
+      "options": [
+        { "value": "link", "label": "Open link" },
+        { "value": "form", "label": "Open Klaviyo form" }
+      ],
+      "default": "link"
+    },
+    {
+      "type": "text",
+      "id": "slide_2_button_form_id",
+      "label": "Slide 2 Button Form ID",
+      "info": "Used when action is set to Open Klaviyo form."
+    },
+    {
       "type": "url",
       "id": "slide_2_button_url",
       "label": "Slide 2 Button URL"
@@ -1488,6 +1611,22 @@
       "id": "slide_3_button_text",
       "label": "Slide 3 Button Text",
       "default": "Learn More"
+    },
+    {
+      "type": "select",
+      "id": "slide_3_button_action",
+      "label": "Slide 3 Button Action",
+      "options": [
+        { "value": "link", "label": "Open link" },
+        { "value": "form", "label": "Open Klaviyo form" }
+      ],
+      "default": "link"
+    },
+    {
+      "type": "text",
+      "id": "slide_3_button_form_id",
+      "label": "Slide 3 Button Form ID",
+      "info": "Used when action is set to Open Klaviyo form."
     },
     {
       "type": "url",
