@@ -45,7 +45,7 @@
           "countdown_bg_color": "#000000",
           "countdown_border_color": "#dc2626",
           "countdown_text_color": "#ffffff",
-          "notify_button_text": "Get Alert First",
+          "notify_button_text": "Get Alerts First",
           "notify_button_action": "drawer",
           "notify_button_link": "shopify://products/ovis-hunter",
           "notify_button_bg_color": "#ffffff",
