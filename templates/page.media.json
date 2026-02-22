@@ -284,7 +284,7 @@
         "hero_image_position": "center",
         "hero_image_position_mobile": "top",
         "hero_image_position_tablet": "top",
-        "hero_image_position_desktop": "top",
+        "hero_image_position_desktop": "bottom",
         "hero_image_zoom": 100,
         "youtube_url": "https://www.youtube.com/@kestrelknives",
         "facebook_url": "https://www.facebook.com/kestrelknives",
