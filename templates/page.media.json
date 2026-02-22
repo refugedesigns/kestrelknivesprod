@@ -270,7 +270,7 @@
       "settings": {
         "hero_image_desktop": "shopify://shop_images/media_1.png",
         "hero_alt": "Hero image",
-        "hero_padding_top": 20,
+        "hero_padding_top": 0,
         "hero_height_mobile_px": 420,
         "hero_max_height_desktop_px": 600,
         "hero_link": "https://instagram.com/kestrelknives",
