@@ -1,8 +1,304 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "template-media": {
-      "type": "template-media"
+      "type": "template-media",
+      "blocks": {
+        "media_image_atRY9T": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/kestrelknives_21985361_1526997824004208_4616696797857841152_n.jpg",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_jn7JMq": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/kestrelknives_39523516_288619301918079_8074851516516663296_n.jpg",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_nYxGVx": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/20231103_155412.webp",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_6Kjp9C": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/618_-_McMillan_Defiance_Hill_Country_Kestrel_Knives_Barnes_Muddy_Proof_Research_Swarovski.jpg",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_TVVK39": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/image-asset_1_abbcbaa4-eb3d-426b-8815-e549fca4eb8b.webp",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_VddxmE": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/image-asset_13_aeb7c5cc-8cec-4534-87a5-610a3b62db46.webp",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_apQjqR": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/DSC_3870.jpg",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_ntmjWg": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/image-asset_5_a8049b84-5cde-4ab5-9113-b568326fbb2d.webp",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_FTcicd": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/422D8ED0-9408-421C-B428-4E53168BC5EF.jpg",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_hxMN9W": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/image-asset_7_55d50ba3-a049-418f-82a1-dee9d9b0319c.webp",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_YqWFhf": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/ovis_lifestyle.jpg",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_qmGgyU": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/image-asset_4_7f54788c-46d4-403b-b733-a30ae4041cee.webp",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_64xJKk": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/kestrelknives_23823865_383081498771560_3853984372151549952_n.jpg",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_UBQWmt": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/image-asset_3_9e943d4b-e13f-4676-91b7-52358f7dc22c.webp",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_HCN9Qr": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/D7598C26-CFE6-4FA8-A6D4-E7DACDECAB09.jpg",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_rVtJka": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/image-asset_2_9e1107c5-98c9-4f24-91e8-0e45d844f258.webp",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_UX8Ggf": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/image-asset_8_612b155a-f483-46c1-942c-1880cf42b094.webp",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_qVfNET": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/kestrelknives_23667900_1963317703936229_8479061132240224256_n.jpg",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_Yd6EVF": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/image-asset_15_f4b6108b-4594-4c7b-a573-0a5cc164c58f.webp",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_WPVX4M": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2025-12-22_at_06.50.44_c1ce1ee8-31c5-40fe-9493-cd37925b47ea.jpg",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_kh8QUA": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/image-asset_16_0eda7004-b90c-4170-9ec6-3a52a4ee1ba0.webp",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_7TUNFa": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/image-asset_17_8aff8397-278a-485d-97ac-25ef5d0207db.webp",
+            "caption": "",
+            "link": ""
+          }
+        },
+        "media_image_kJaEem": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/image-asset_18_81588ffe-5daa-4a83-bf68-7ec452dc15a3.webp",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_LF4ayC": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2025-10-09_at_11.21.42_3faba9ad.jpg",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_T3QVLF": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/image-asset_14_e8732411-762b-4a17-a4e2-66d3bddfe74f.webp",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_fcBhKK": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2025-10-15_at_12.52.21.jpg",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_AFEBUq": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/kestrelknives_26185085_534154173619564_5783745686851813376_n.jpg",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        },
+        "media_image_NBtK9m": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2025-12-22_at_06.50.44_1_9b9335b5-0f23-48b6-a2b8-e1e4d72e6850.jpg",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
+        }
+      },
+      "block_order": [
+        "media_image_atRY9T",
+        "media_image_jn7JMq",
+        "media_image_nYxGVx",
+        "media_image_6Kjp9C",
+        "media_image_TVVK39",
+        "media_image_VddxmE",
+        "media_image_apQjqR",
+        "media_image_ntmjWg",
+        "media_image_FTcicd",
+        "media_image_hxMN9W",
+        "media_image_YqWFhf",
+        "media_image_qmGgyU",
+        "media_image_64xJKk",
+        "media_image_UBQWmt",
+        "media_image_HCN9Qr",
+        "media_image_rVtJka",
+        "media_image_UX8Ggf",
+        "media_image_qVfNET",
+        "media_image_Yd6EVF",
+        "media_image_WPVX4M",
+        "media_image_kh8QUA",
+        "media_image_7TUNFa",
+        "media_image_kJaEem",
+        "media_image_LF4ayC",
+        "media_image_T3QVLF",
+        "media_image_fcBhKK",
+        "media_image_AFEBUq",
+        "media_image_NBtK9m"
+      ],
+      "settings": {
+        "hero_image_desktop": "shopify://shop_images/media_1.png",
+        "hero_alt": "Hero image",
+        "hero_padding_top": 20,
+        "hero_height_mobile_px": 420,
+        "hero_link": "https://instagram.com/kestrelknives",
+        "hero_aspect_ratio_desktop": "1.7778",
+        "hero_aspect_ratio_tablet": "",
+        "hero_aspect_ratio_mobile": "",
+        "hero_image_fit": "cover",
+        "hero_image_fit_mobile": "cover",
+        "hero_image_fit_tablet": "cover",
+        "hero_image_fit_desktop": "cover",
+        "hero_image_position": "center",
+        "hero_image_position_mobile": "top",
+        "hero_image_position_tablet": "top",
+        "hero_image_position_desktop": "top",
+        "hero_image_zoom": 100,
+        "youtube_url": "https://www.youtube.com/@kestrelknives",
+        "facebook_url": "https://www.facebook.com/kestrelknives",
+        "email_url": "mailto:sales@kestrelknives.com",
+        "instagram_url": "https://instagram.com/kestrelknives",
+        "twitter_url": "https://twitter.com/KestrelKnives",
+        "columns_desktop": 4,
+        "columns_tablet": 3,
+        "columns_mobile": 2,
+        "show_captions": false,
+        "gallery_scale": 100
+      }
     }
   },
-  "order": ["template-media"]
+  "order": [
+    "template-media"
+  ]
 }
