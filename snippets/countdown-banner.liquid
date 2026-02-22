@@ -131,9 +131,29 @@
         window.addEventListener('scroll', handleScroll, { passive: true })
       },
 
+      normalizeTargetDate() {
+        let targetDateString =
+          '{{ section.settings.countdown_target_date | default: "2025-12-31T23:59:59" }}'
+        let cleanDateString = targetDateString.trim()
+
+        if (!cleanDateString.includes('T')) {
+          cleanDateString += 'T23:59:59'
+        }
+
+        if (
+          !cleanDateString.includes('Z') &&
+          !cleanDateString.includes('+') &&
+          !cleanDateString.includes('-', 10)
+        ) {
+          cleanDateString += 'Z'
+        }
+
+        return new Date(cleanDateString).getTime()
+      },
+
       startCountdown() {
-        const targetDate = new Date('{{ section.settings.countdown_target_date | default: "2025-12-31T23:59:59" }}').getTime()
         const updateCountdown = () => {
+          const targetDate = this.normalizeTargetDate()
           const now = new Date().getTime()
           const distance = targetDate - now
 
