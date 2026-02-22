@@ -17,7 +17,7 @@
       margin-bottom: var(--hero-mobile-overlay-inner-margin-bottom, 28px) !important;
     }
 
-    .hero-root .hero-overlay .pointer-events-auto {
+    .hero-root .hero-slide-button-wrap {
       margin-top: var(--hero-mobile-button-margin-top, 16px) !important;
       margin-bottom: var(--hero-mobile-button-margin-bottom, 0px) !important;
     }
@@ -244,7 +244,7 @@
               {% if section.settings.slide_1_button_enable
                 and section.settings.slide_1_button_text != blank
               %}
-                <div class='mt-12 lg:mt-4 mb-8 pointer-events-auto'>
+                <div class='hero-slide-button-wrap pointer-events-auto'>
                   {% assign slide_1_button_action = section.settings.slide_1_button_action
                     | default: "link"
                   %}
@@ -389,7 +389,7 @@
               {% if section.settings.slide_2_button_enable
                 and section.settings.slide_2_button_text != blank
               %}
-                <div class='mt-24 lg:mt-4 mb-8 pointer-events-auto'>
+                <div class='hero-slide-button-wrap pointer-events-auto'>
                   {% assign slide_2_button_action = section.settings.slide_2_button_action
                     | default: "link"
                   %}
@@ -609,7 +609,7 @@
               {% if section.settings.slide_3_button_enable
                 and section.settings.slide_3_button_text != blank
               %}
-                <div class='mt-12 pointer-events-auto'>
+                <div class='hero-slide-button-wrap pointer-events-auto'>
                   {% assign slide_3_button_action = section.settings.slide_3_button_action
                     | default: "link"
                   %}
@@ -724,6 +724,16 @@
     background: transparent;
     cursor: pointer;
     text-align: inherit;
+  }
+  .hero-slide-button-wrap {
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    .hero-slide-button-wrap {
+      margin-top: 1rem;
+    }
   }
 
   .hero-slide-media picture {
