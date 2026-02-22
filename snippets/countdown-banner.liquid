@@ -6,7 +6,7 @@
     style='background-color: {{ section.settings.countdown_bg_color | default: "#000000" }};'
   >
     <div class='mx-auto px-4 sm:px-6 max-w-8xl'>
-      <div class='flex flex-col sm:flex-row items-center justify-center py-2 gap-2 sm:space-x-4 text-center'>
+      <div class='flex flex-row flex-wrap items-center justify-center py-2 gap-2 sm:gap-4 text-center'>
         <span
           class='text-white text-xs sm:text-sm font-medium whitespace-nowrap flex items-center space-x-2'
           style='color: {{ section.settings.countdown_text_color | default: "#ffffff" }};'
@@ -26,7 +26,7 @@
         {% if section.settings.notify_button_action == 'link' and section.settings.notify_button_link != blank %}
           <a
             href='{{ section.settings.notify_button_link }}'
-            class='sm:ml-4 px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors hover:opacity-90 inline-block text-center no-underline'
+            class='px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors hover:opacity-90 inline-block text-center no-underline'
             style='background-color: {{ section.settings.notify_button_bg_color | default: "#ea580c" }}; color: {{ section.settings.notify_button_text_color | default: "#ffffff" }};'
           >
             {{ section.settings.notify_button_text | default: "NOTIFY ME" }}
@@ -34,7 +34,7 @@
         {% else %}
           <button
             @click='openDrawer()'
-            class='sm:ml-4 px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors hover:opacity-90'
+            class='px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors hover:opacity-90'
             style='background-color: {{ section.settings.notify_button_bg_color | default: "#ea580c" }}; color: {{ section.settings.notify_button_text_color | default: "#ffffff" }};'
           >
             {{ section.settings.notify_button_text | default: "NOTIFY ME" }}
