@@ -49,6 +49,15 @@
       "default": 420
     },
     {
+      "type": "range",
+      "id": "hero_max_height_desktop_px",
+      "label": "Hero max height - Desktop (px)",
+      "min": 300,
+      "max": 1400,
+      "step": 20,
+      "default": 800
+    },
+    {
       "type": "url",
       "id": "hero_link",
       "label": "Hero Image Link"
@@ -329,6 +338,7 @@
 <style>
   .media-hero-media {
     width: 100%;
+    max-height: var(--media-hero-max-height-desktop, none);
     aspect-ratio: var(--media-hero-aspect-desktop, 1.7778);
     display: block;
     position: relative;
@@ -388,7 +398,7 @@
 
     <div
       class='media-hero-media'
-      style='--media-hero-aspect-desktop: {{ hero_aspect_desktop }}; --media-hero-aspect-tablet: {{ hero_aspect_tablet }}; --media-hero-aspect-mobile: {{ hero_aspect_mobile }}; --media-hero-height-mobile: {{ section.settings.hero_height_mobile_px | default: 420 }}px;'
+      style='--media-hero-aspect-desktop: {{ hero_aspect_desktop }}; --media-hero-aspect-tablet: {{ hero_aspect_tablet }}; --media-hero-aspect-mobile: {{ hero_aspect_mobile }}; --media-hero-height-mobile: {{ section.settings.hero_height_mobile_px | default: 420 }}px; --media-hero-max-height-desktop: {{ section.settings.hero_max_height_desktop_px | default: 800 }}px;'
     >
       <picture class='w-full h-full block'>
         {% if hero_image_mobile %}
