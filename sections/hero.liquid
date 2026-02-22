@@ -14,6 +14,7 @@
     }
 
     .hero-overlay .hero-overlay__inner {
+      padding-top: var(--hero-mobile-text-padding-top, 0px);
       margin-bottom: var(--hero-mobile-overlay-inner-margin-bottom, 28px) !important;
     }
 
@@ -43,11 +44,10 @@
   <!-- Scaled Wrapper -->
   <div
     class='hero-scale-wrap'
-    style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %}; --hero-height-mobile: {{ section.settings.hero_height_mobile_px | default: 420 }}px; --hero-mobile-overlay-padding-bottom: {{ section.settings.hero_mobile_overlay_padding_bottom | default: 40 }}px; --hero-mobile-overlay-inner-margin-bottom: {{ section.settings.hero_mobile_overlay_inner_margin_bottom | default: 28 }}px; --hero-mobile-button-margin-top: {{ section.settings.hero_mobile_button_margin_top | default: 16 }}px; --hero-mobile-button-margin-bottom: {{ section.settings.hero_mobile_button_margin_bottom | default: 0 }}px;'
+    style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %}; --hero-height-mobile: {{ section.settings.hero_height_mobile_px | default: 420 }}px; --hero-mobile-overlay-padding-bottom: {{ section.settings.hero_mobile_overlay_padding_bottom | default: 40 }}px; --hero-mobile-overlay-inner-margin-bottom: {{ section.settings.hero_mobile_overlay_inner_margin_bottom | default: 28 }}px; --hero-mobile-button-margin-top: {{ section.settings.hero_mobile_button_margin_top | default: 16 }}px; --hero-mobile-button-margin-bottom: {{ section.settings.hero_mobile_button_margin_bottom | default: 0 }}px; --hero-mobile-text-padding-top: {{ section.settings.hero_mobile_text_padding_top | default: 0 }}px;'
   >
     {% liquid
       assign default_ratio = 1.7778
-
       assign slide_1_image_desktop = section.settings.slide_1_image
       assign slide_1_image_tablet = section.settings.slide_1_image_tablet
       assign slide_1_image_mobile = section.settings.slide_1_image_mobile
@@ -949,6 +949,15 @@
       "max": 400,
       "step": 4,
       "default": 40
+    },
+    {
+      "type": "range",
+      "id": "hero_mobile_text_padding_top",
+      "label": "Hero text padding-top - Mobile (px)",
+      "min": 0,
+      "max": 400,
+      "step": 4,
+      "default": 0
     },
     {
       "type": "range",

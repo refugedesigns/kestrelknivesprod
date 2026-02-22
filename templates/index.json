@@ -16,7 +16,7 @@
         "hero_height_mobile_px": 500,
         "hero_mobile_overlay_padding_bottom": 40,
         "hero_mobile_overlay_inner_margin_bottom": 200,
-        "hero_mobile_button_margin_top": 232,
+        "hero_mobile_button_margin_top": 200,
         "hero_mobile_button_margin_bottom": 0,
         "autoplay_delay": 5000,
         "scale_percent": 100,
