@@ -68,171 +68,158 @@
   <div class='grid grid-cols-1 lg:grid-cols-4 gap-12 lg:px-0 max-w-7xl mx-4 md:mx-8 xl:mx-auto border border-gray-200 py-12 rounded-lg shadow-sm'>
     <!-- Contact Form (Left Side) -->
     <div class='lg:col-span-2'>
-    
-	<!--pifyform-start-->
-<style>.pifyform.formloading iframe{visibility: hidden !important;} .pifyform.formloading{background-image: url(https://form-builder.pifyapp.com/assets/images/loading.gif?v=4.6);background-position: center 30px;background-size: 30px 30px;background-repeat: no-repeat;}</style>
-<div id="pifyform-35649" class="pifyform" style="margin:5px 0;">
-<script charset="UTF-8" defer>document.getElementById("pifyform-35649").classList.add("formloading");(function(h){function n(a){return null===a?null:a.scrollHeight>a.clientHeight?a:n(a.parentNode)}function t(b){if(b.data && typeof(b.data)=="string"){var f =null;try{f=JSON.parse(b.data);}catch(e){}if(f!=null&&f.height!=undefined){if(f.formId==undefined){d.style.height=f.height+"px"}else if("pifyform-"+f.formId==d.id){d.style.height=f.height+"px"} }if(f!=null&&f.redirect!=undefined&&f.redirect!=""){window.location.href=f.redirect;}if(f!=null&&f.retsetHeight!=undefined&&f.retsetHeight){d.style.height="520px";window.location.href="#pifyform-35649";}if(document.getElementsByClassName('lazyframe').length>0){var lazyframe=document.getElementsByClassName('lazyframe')[0];lazyframe.style.height="100%";lazyframe.removeAttribute("data-ratio");lazyframe.parentNode.style.overflow='hidden'} if(f!=null&&f.getter){b={};var f=[].concat(f.getter),k,h=f.length,m,c,g,e;for(k=0;k<h;k++){m=k;c=f[k]||{};c.n&&(m=c.n);g=null;try{switch(c.t){case "window":e=window;break;case "scrollParent":e=n(a)||window;break;default:e=a}if(c.e)if("rect"===c.v){g={};var l=e.getBoundingClientRect();g={top:l.top,left:l.left,width:l.width,height:l.height} }else g=e[c.v].apply(e,[].concat(c.e))||!0;else c.s?(e[c.v]=c.s,g=!0):g=e[c.v]||!1}catch(u){}b[m]=g}b.innerState=!p&&!q;a.contentWindow.postMessage(JSON.stringify({queryRes:b}),"*")} } }var parentQueryString="";try{var currentParams = new URLSearchParams(window.location.search);parentQueryString=currentParams.size > 0 ? "?"+currentParams.toString() : "";}catch(er){};var d = document.getElementById("pifyform-35649");var a = document.createElement("iframe");d.style.overflowY="visible";d.style.overflowX="hidden";var p=d.style.height&&"auto"!==d.style.height,q="absolute"===d.style.position||window.getComputedStyle&&"absolute"===window.getComputedStyle(d,null).getPropertyValue("position")||d.currentStyle&&"absolute"===d.currentStyle.position;h.addEventListener&&h.addEventListener("message",t,!1);a.src="https://form-builder-en.pifyapp.com/form/s/35649"+parentQueryString;a.id="form-iframe-35649";a.onload=function(){document.getElementById("pifyform-35649").classList.remove("formloading");a.contentWindow.postMessage(JSON.stringify({parentUrl: window.location.href}), "*");};a.frameBorder=0;a.scrolling="no";a.style.display="block";a.style.minWidth="100%";a.style.width="100px";a.style.height="100%";a.style.border="none";a.style.overflow="auto";setTimeout(function(){if(!document.getElementById("form-iframe-35649")){d.appendChild(a);} },50);})(window);</script>
-</div>
-<!--pifyform-end-->
-
-      {% comment %} {% form "contact" %}
-        {% if form.errors %}
-          <div class='border border-red-300 bg-red-50 p-4 mb-6 rounded'>
-            <div class='flex items-center mb-2'>
-              <div class='text-red-500 mr-2'>
-                <svg class='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
-                  <path fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' clip-rule='evenodd'></path>
-                </svg>
-              </div>
-              <div class='text-sm font-medium text-red-800'>
-                Oh no! Your message is not sent
-              </div>
-            </div>
-            <ul class='text-sm text-red-700 ml-7 list-disc'>
-              {% for error in form.errors %}
-                <li>{{ form.errors.messages[error] }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-        {% elsif form.posted_successfully? %}
-          <div class='border border-green-300 bg-green-50 p-4 mb-6 rounded'>
-            <div class='flex items-center'>
-              <div class='text-green-500 mr-2'>
-                <svg class='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
-                  <path fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' clip-rule='evenodd'></path>
-                </svg>
-              </div>
-              <div class='text-sm font-medium text-green-800'>
-                Your message is sent successfully
-              </div>
-            </div>
-          </div>
-          <script>
-            ;(function () {
-              try {
-                var cleanUrl =
-                  window.location.pathname + (window.location.hash || '')
-                if (window.history && window.history.replaceState) {
-                  window.history.replaceState({}, document.title, cleanUrl)
-                }
-              } catch (e) {}
-            })()
-          </script>
-        {% endif %}
-
-        {% if form.errors or form.posted_successfully? %}
-          <script>
-            ;(function () {
-              function runScroll() {
+      <!-- pifyform-start -->
+      <style>
+        .pifyform.formloading iframe {
+          visibility: hidden !important;
+        }
+        .pifyform.formloading {
+          background-image: url(https://form-builder.pifyapp.com/assets/images/loading.gif?v=4.6);
+          background-position: center 30px;
+          background-size: 30px 30px;
+          background-repeat: no-repeat;
+        }
+      </style>
+      <div id='pifyform-35649' class='pifyform' style='margin:5px 0;'>
+        <script charset='UTF-8' defer>
+          document.getElementById('pifyform-35649').classList.add('formloading')
+          ;(function (h) {
+            function n(a) {
+              return null === a
+                ? null
+                : a.scrollHeight > a.clientHeight
+                  ? a
+                  : n(a.parentNode)
+            }
+            function t(b) {
+              if (b.data && typeof b.data == 'string') {
+                var f = null
                 try {
-                  var header = document.getElementById('siteHeader')
-                  var headerHeight = header ? header.offsetHeight : 0
-                  var target = document.getElementById('contact-scroll-target')
-                  if (!target) {
-                    window.scrollTo({ top: 0, behavior: 'smooth' })
-                    return
-                  }
-                  var y =
-                    target.getBoundingClientRect().top +
-                    window.pageYOffset -
-                    headerHeight -
-                    12
-                  window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
+                  f = JSON.parse(b.data)
                 } catch (e) {}
+                if (f != null && f.height != undefined) {
+                  if (f.formId == undefined) {
+                    d.style.height = f.height + 'px'
+                  } else if ('pifyform-' + f.formId == d.id) {
+                    d.style.height = f.height + 'px'
+                  }
+                }
+                if (f != null && f.redirect != undefined && f.redirect != '') {
+                  window.location.href = f.redirect
+                }
+                if (
+                  f != null &&
+                  f.retsetHeight != undefined &&
+                  f.retsetHeight
+                ) {
+                  d.style.height = '520px'
+                  window.location.href = '#pifyform-35649'
+                }
+                if (document.getElementsByClassName('lazyframe').length > 0) {
+                  var lazyframe =
+                    document.getElementsByClassName('lazyframe')[0]
+                  lazyframe.style.height = '100%'
+                  lazyframe.removeAttribute('data-ratio')
+                  lazyframe.parentNode.style.overflow = 'hidden'
+                }
+                if (f != null && f.getter) {
+                  b = {}
+                  var f = [].concat(f.getter),
+                    k,
+                    h = f.length,
+                    m,
+                    c,
+                    g,
+                    e
+                  for (k = 0; k < h; k++) {
+                    m = k
+                    c = f[k] || {}
+                    c.n && (m = c.n)
+                    g = null
+                    try {
+                      switch (c.t) {
+                        case 'window':
+                          e = window
+                          break
+                        case 'scrollParent':
+                          e = n(a) || window
+                          break
+                        default:
+                          e = a
+                      }
+                      if (c.e)
+                        if ('rect' === c.v) {
+                          g = {}
+                          var l = e.getBoundingClientRect()
+                          g = {
+                            top: l.top,
+                            left: l.left,
+                            width: l.width,
+                            height: l.height,
+                          }
+                        } else g = e[c.v].apply(e, [].concat(c.e)) || !0
+                      else c.s ? ((e[c.v] = c.s), (g = !0)) : (g = e[c.v] || !1)
+                    } catch (u) {}
+                    b[m] = g
+                  }
+                  b.innerState = !p && !q
+                  a.contentWindow.postMessage(
+                    JSON.stringify({ queryRes: b }),
+                    '*'
+                  )
+                }
               }
-              if (document.readyState === 'complete') {
-                setTimeout(runScroll, 0)
-              } else {
-                window.addEventListener('load', function () {
-                  setTimeout(runScroll, 0)
-                })
+            }
+            var parentQueryString = ''
+            try {
+              var currentParams = new URLSearchParams(window.location.search)
+              parentQueryString =
+                currentParams.size > 0 ? '?' + currentParams.toString() : ''
+            } catch (er) {}
+            var d = document.getElementById('pifyform-35649')
+            var a = document.createElement('iframe')
+            d.style.overflowY = 'visible'
+            d.style.overflowX = 'hidden'
+            var p = d.style.height && 'auto' !== d.style.height,
+              q =
+                'absolute' === d.style.position ||
+                (window.getComputedStyle &&
+                  'absolute' ===
+                    window
+                      .getComputedStyle(d, null)
+                      .getPropertyValue('position')) ||
+                (d.currentStyle && 'absolute' === d.currentStyle.position)
+            h.addEventListener && h.addEventListener('message', t, !1)
+            a.src =
+              'https://form-builder-en.pifyapp.com/form/s/35649' +
+              parentQueryString
+            a.id = 'form-iframe-35649'
+            a.onload = function () {
+              document
+                .getElementById('pifyform-35649')
+                .classList.remove('formloading')
+              a.contentWindow.postMessage(
+                JSON.stringify({ parentUrl: window.location.href }),
+                '*'
+              )
+            }
+            a.frameBorder = 0
+            a.scrolling = 'no'
+            a.style.display = 'block'
+            a.style.minWidth = '100%'
+            a.style.width = '100px'
+            a.style.height = '100%'
+            a.style.border = 'none'
+            a.style.overflow = 'auto'
+            setTimeout(function () {
+              if (!document.getElementById('form-iframe-35649')) {
+                d.appendChild(a)
               }
-            })()
-          </script>
-        {% endif %}
-
-        <!-- Name Field -->
-        <div class='mb-6'>
-          <label class='block text-sm font-medium text-gray-700 mb-2'>
-            Full Name
-          </label>
-          <input
-            type='text'
-            name='contact[name]'
-            class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500'
-            required
-          >
-        </div>
-
-        <!-- Email Field -->
-        <div class='mb-6'>
-          <label class='block text-sm font-medium text-gray-700 mb-2'>
-            Email Address
-          </label>
-          <input
-            type='email'
-            name='contact[email]'
-            class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500'
-            required
-          >
-        </div>
-
-        <!-- Subject Field -->
-        <div class='mb-6'>
-          <label class='block text-sm font-medium text-gray-700 mb-2'>
-            Subject
-          </label>
-          <select
-            name='contact[subject]'
-            class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white'
-            required
-          >
-            <option value=''>Select a subject</option>
-            <option value='Knife Sharpening'>Knife Sharpening</option>
-            <option value='Product Issue/Warranty'>
-              Product Issue/Warranty
-            </option>
-            <option value='Order Status'>Order Status</option>
-            <option value='Feedback'>Feedback</option>
-            <option value='Product Question'>Product Question</option>
-            <option value='Other'>Other</option>
-          </select>
-        </div>
-
-        <!-- Message Field -->
-        <div class='mb-6'>
-          <label class='block text-sm font-medium text-gray-700 mb-2'>
-            Message
-          </label>
-          <textarea
-            name='contact[body]'
-            rows='6'
-            class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical'
-            required
-          ></textarea>
-        </div>
-
-        <!-- Phone Field -->
-        <div class='mb-8'>
-          <label class='block text-sm font-medium text-gray-700 mb-2'>
-            Phone
-          </label>
-          <input
-            type='tel'
-            name='contact[phone]'
-            class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500'
-          >
-        </div>
-
-        <!-- Submit Button -->
-        <button
-          type='submit'
-          class='w-full rounded-md cursor-pointer bg-black text-white py-3 px-6 border-2 border-black hover:bg-white hover:text-black transition-colors duration-200 font-medium uppercase tracking-wide'
-        >
-          Submit
-        </button>
-      {% endform %} {% endcomment %}
+            }, 50)
+          })(window)
+        </script>
+      </div>
+      <!-- pifyform-end -->
     </div>
 
     <!-- Information Section (Right Side) -->
