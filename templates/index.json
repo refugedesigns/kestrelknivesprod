@@ -13,7 +13,7 @@
       "type": "hero",
       "settings": {
         "hero_height_px": 600,
-        "hero_height_mobile_px": 420,
+        "hero_height_mobile_px": 580,
         "autoplay_delay": 5000,
         "scale_percent": 100,
         "scale_radius": 16,
