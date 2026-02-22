@@ -272,7 +272,7 @@
         "hero_alt": "Hero image",
         "hero_padding_top": 20,
         "hero_height_mobile_px": 420,
-        "hero_max_height_desktop_px": 520,
+        "hero_max_height_desktop_px": 600,
         "hero_link": "https://instagram.com/kestrelknives",
         "hero_aspect_ratio_desktop": "1.7778",
         "hero_aspect_ratio_tablet": "",
