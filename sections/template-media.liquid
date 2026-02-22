@@ -389,8 +389,8 @@
 <!-- Hero Section -->
 {% if hero_base_image %}
   <div
-    class='relative hover:cursor-pointer overflow-hidden'
-    style='padding-top: {{ section.settings.hero_padding_top }}px; width: 100vw; margin-left: 50%; transform: translateX(-50%);'
+    class='relative hover:cursor-pointer overflow-hidden max-w-6xl mx-auto px-4'
+    style='padding-top: {{ section.settings.hero_padding_top }}px;'
   >
     {% if section.settings.hero_link != blank %}
       <a href='{{ section.settings.hero_link }}' class='block'>
