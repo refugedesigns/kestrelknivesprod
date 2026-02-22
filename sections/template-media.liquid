@@ -8,24 +8,26 @@
     },
     {
       "type": "image_picker",
-      "id": "hero_image",
-      "label": "Hero Image"
+      "id": "hero_image_desktop",
+      "label": "Hero Image - Desktop"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_tablet",
+      "label": "Hero Image - Tablet (≤1024px)",
+      "info": "Optional override used on tablet viewports."
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_mobile",
+      "label": "Hero Image - Mobile (≤768px)",
+      "info": "Optional override used on mobile viewports."
     },
     {
       "type": "text",
       "id": "hero_alt",
       "label": "Hero Image Alt Text",
       "default": "Hero image"
-    },
-    {
-      "type": "range",
-      "id": "hero_scale",
-      "label": "Hero Image Scale",
-      "min": 50,
-      "max": 150,
-      "step": 5,
-      "unit": "%",
-      "default": 100
     },
     {
       "type": "range",
@@ -38,9 +40,145 @@
       "default": 80
     },
     {
+      "type": "range",
+      "id": "hero_height_mobile_px",
+      "label": "Hero height - Mobile (px)",
+      "min": 160,
+      "max": 900,
+      "step": 20,
+      "default": 420
+    },
+    {
       "type": "url",
       "id": "hero_link",
       "label": "Hero Image Link"
+    },
+    {
+      "type": "header",
+      "content": "Hero Image Aspect Ratios"
+    },
+    {
+      "type": "text",
+      "id": "hero_aspect_ratio_desktop",
+      "label": "Hero aspect ratio - Desktop",
+      "default": "1.7778",
+      "info": "Width / height, e.g. 1.7778 for 16:9."
+    },
+    {
+      "type": "text",
+      "id": "hero_aspect_ratio_tablet",
+      "label": "Hero aspect ratio - Tablet",
+      "info": "Leave blank to use desktop value."
+    },
+    {
+      "type": "text",
+      "id": "hero_aspect_ratio_mobile",
+      "label": "Hero aspect ratio - Mobile",
+      "info": "Leave blank to use tablet value."
+    },
+    {
+      "type": "header",
+      "content": "Hero Image Fit & Position"
+    },
+    {
+      "type": "select",
+      "id": "hero_image_fit",
+      "label": "Hero image fit [fallback]",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "hero_image_fit_mobile",
+      "label": "Hero image fit - Mobile",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "hero_image_fit_tablet",
+      "label": "Hero image fit - Tablet",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "hero_image_fit_desktop",
+      "label": "Hero image fit - Desktop",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "hero_image_position",
+      "label": "Hero image position [fallback]",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "hero_image_position_mobile",
+      "label": "Hero image position - Mobile",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "hero_image_position_tablet",
+      "label": "Hero image position - Tablet",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "hero_image_position_desktop",
+      "label": "Hero image position - Desktop",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "hero_image_zoom",
+      "label": "Hero image zoom (%)",
+      "info": "Lower values show more of the image. 100 = normal, 80 = zoomed out",
+      "min": 50,
+      "max": 150,
+      "step": 5,
+      "default": 100
     },
     {
       "type": "header",
@@ -164,31 +302,118 @@
 }
 {% endschema %}
 
+{% liquid
+  assign hero_image_desktop = section.settings.hero_image_desktop
+  assign hero_image_tablet = section.settings.hero_image_tablet
+  assign hero_image_mobile = section.settings.hero_image_mobile
+
+  assign hero_aspect_desktop = section.settings.hero_aspect_ratio_desktop | default: "1.7778"
+  assign hero_aspect_tablet = section.settings.hero_aspect_ratio_tablet
+  if hero_aspect_tablet == blank
+    assign hero_aspect_tablet = hero_aspect_desktop
+  endif
+  assign hero_aspect_mobile = section.settings.hero_aspect_ratio_mobile
+  if hero_aspect_mobile == blank
+    assign hero_aspect_mobile = hero_aspect_tablet
+  endif
+
+  assign hero_base_image = hero_image_desktop
+  if hero_base_image == blank
+    assign hero_base_image = hero_image_tablet
+  endif
+  if hero_base_image == blank
+    assign hero_base_image = hero_image_mobile
+  endif
+%}
+
+<style>
+  .media-hero-media {
+    width: 100%;
+    aspect-ratio: var(--media-hero-aspect-desktop, 1.7778);
+    display: block;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0;
+  }
+  .media-hero-media picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .media-hero-media img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    transform-origin: center center;
+    object-fit: {{ section.settings.hero_image_fit_desktop | default: section.settings.hero_image_fit | default: "cover" }};
+    object-position: {{ section.settings.hero_image_position_desktop | default: section.settings.hero_image_position | default: "center" }};
+  }
+
+  @media (max-width: 1024px) {
+    .media-hero-media {
+      aspect-ratio: var(
+        --media-hero-aspect-tablet,
+        var(--media-hero-aspect-desktop, 1.7778)
+      );
+    }
+
+    .media-hero-media img {
+      object-fit: {{ section.settings.hero_image_fit_tablet | default: section.settings.hero_image_fit | default: "cover" }};
+      object-position: {{ section.settings.hero_image_position_tablet | default: section.settings.hero_image_position | default: "center" }};
+    }
+  }
+
+  @media (max-width: 768px) {
+    .media-hero-media {
+      height: var(--media-hero-height-mobile, 420px);
+      aspect-ratio: auto;
+    }
+
+    .media-hero-media img {
+      object-fit: {{ section.settings.hero_image_fit_mobile | default: section.settings.hero_image_fit | default: "cover" }};
+      object-position: {{ section.settings.hero_image_position_mobile | default: section.settings.hero_image_position | default: "center" }};
+    }
+  }
+</style>
+
 <!-- Hero Section -->
-{% if section.settings.hero_image %}
+{% if hero_base_image %}
   <div
-    class='relative max-w-8xl hover:cursor-pointer mx-auto px-2 md:px-0 overflow-hidden'
-    style='padding-top: {{ section.settings.hero_padding_top }}px;'
+    class='relative hover:cursor-pointer overflow-hidden'
+    style='padding-top: {{ section.settings.hero_padding_top }}px; width: 100vw; margin-left: 50%; transform: translateX(-50%);'
   >
     {% if section.settings.hero_link != blank %}
       <a href='{{ section.settings.hero_link }}' class='block'>
     {% endif %}
 
-    {% if section.settings.hero_scale < 100 %}
-      <img
-        src='{{ section.settings.hero_image | image_url: width: 2000 }}'
-        alt='{{ section.settings.hero_alt | escape }}'
-        class='block h-auto object-fit {% if section.settings.hero_link != blank %}cursor-pointer transition-transform duration-300 hover:scale-[1.02]{% endif %}'
-        style='width: {{ section.settings.hero_scale }}%; margin: 0 auto;'
-      >
-    {% else %}
-      <img
-        src='{{ section.settings.hero_image | image_url: width: 2000 }}'
-        alt='{{ section.settings.hero_alt | escape }}'
-        class='w-full h-full object-fit {% if section.settings.hero_link != blank %}cursor-pointer transition-transform duration-300 hover:scale-[1.02]{% endif %}'
-        style='transform: scale({{ section.settings.hero_scale | divided_by: 100.0 }}); transform-origin: center;'
-      >
-    {% endif %}
+    <div
+      class='media-hero-media'
+      style='--media-hero-aspect-desktop: {{ hero_aspect_desktop }}; --media-hero-aspect-tablet: {{ hero_aspect_tablet }}; --media-hero-aspect-mobile: {{ hero_aspect_mobile }}; --media-hero-height-mobile: {{ section.settings.hero_height_mobile_px | default: 420 }}px;'
+    >
+      <picture class='w-full h-full block'>
+        {% if hero_image_mobile %}
+          <source
+            srcset='{{ hero_image_mobile | image_url: width: 1200 }}'
+            media='(max-width: 767px)'
+          >
+        {% endif %}
+        {% if hero_image_tablet %}
+          <source
+            srcset='{{ hero_image_tablet | image_url: width: 1600 }}'
+            media='(max-width: 1024px)'
+          >
+        {% endif %}
+        <img
+          src='{{ hero_base_image | image_url: width: 2000 }}'
+          alt='{{ section.settings.hero_alt | escape }}'
+          class='w-full h-full {% if section.settings.hero_link != blank %}cursor-pointer transition-transform duration-300 hover:scale-[1.02]{% endif %}'
+          width='{{ hero_base_image.width }}'
+          height='{{ hero_base_image.height }}'
+          style='transform: scale({{ section.settings.hero_image_zoom | default: 100 | divided_by: 100.0 }});'
+          loading='lazy'
+        >
+      </picture>
+    </div>
 
     {% if section.settings.hero_link != blank %}
       </a>
@@ -208,7 +433,11 @@
           class='text-gray-600 hover:text-gray-900 transition-colors'
           aria-label='YouTube'
         >
-          <svg class='w-7 h-7 md:w-8 md:h-8' fill='currentColor' viewBox='0 0 24 24'>
+          <svg
+            class='w-7 h-7 md:w-8 md:h-8'
+            fill='currentColor'
+            viewBox='0 0 24 24'
+          >
             <path d='M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z'/>
           </svg>
         </a>
@@ -222,7 +451,11 @@
           class='text-gray-600 hover:text-gray-900 transition-colors'
           aria-label='Facebook'
         >
-          <svg class='w-7 h-7 md:w-8 md:h-8' fill='currentColor' viewBox='0 0 24 24'>
+          <svg
+            class='w-7 h-7 md:w-8 md:h-8'
+            fill='currentColor'
+            viewBox='0 0 24 24'
+          >
             <path d='M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z'/>
           </svg>
         </a>
@@ -236,7 +469,11 @@
           class='text-gray-600 hover:text-gray-900 transition-colors'
           aria-label='Email'
         >
-          <svg class='w-7 h-7 md:w-8 md:h-8' fill='currentColor' viewBox='0 0 24 24'>
+          <svg
+            class='w-7 h-7 md:w-8 md:h-8'
+            fill='currentColor'
+            viewBox='0 0 24 24'
+          >
             <path d='M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z'/>
           </svg>
         </a>
@@ -250,7 +487,11 @@
           class='text-gray-600 hover:text-gray-900 transition-colors'
           aria-label='Instagram'
         >
-          <svg class='w-7 h-7 md:w-8 md:h-8' fill='currentColor' viewBox='0 0 24 24'>
+          <svg
+            class='w-7 h-7 md:w-8 md:h-8'
+            fill='currentColor'
+            viewBox='0 0 24 24'
+          >
             <path d='M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z'/>
           </svg>
         </a>
@@ -264,7 +505,11 @@
           class='text-gray-600 hover:text-gray-900 transition-colors'
           aria-label='Twitter'
         >
-          <svg class='w-7 h-7 md:w-8 md:h-8' fill='currentColor' viewBox='0 0 24 24'>
+          <svg
+            class='w-7 h-7 md:w-8 md:h-8'
+            fill='currentColor'
+            viewBox='0 0 24 24'
+          >
             <path d='M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z'/>
           </svg>
         </a>
