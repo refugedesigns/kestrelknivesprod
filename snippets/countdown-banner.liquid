@@ -6,9 +6,9 @@
     style='background-color: {{ section.settings.countdown_bg_color | default: "#000000" }};'
   >
     <div class='mx-auto px-4 sm:px-6 max-w-8xl'>
-      <div class='flex flex-row flex-wrap items-center justify-center py-2 gap-2 sm:gap-4 text-center'>
-        <span
-          class='text-white text-xs sm:text-sm font-medium whitespace-nowrap flex items-center space-x-2'
+      <div class='flex flex-row items-center justify-center py-2 gap-2 sm:gap-4 text-center'>
+        <div
+          class='text-white flex-1 text-xs sm:text-sm font-medium whitespace-nowrap flex items-center space-x-2'
           style='color: {{ section.settings.countdown_text_color | default: "#ffffff" }};'
         >
           {% if section.settings.countdown_show_timer != false %}
@@ -22,8 +22,9 @@
               {{ section.settings.countdown_title }}
             </span>
           {% endif %}
-        </span>
+        </div>
         {% if section.settings.notify_button_action == 'link' and section.settings.notify_button_link != blank %}
+          <div class="">
           <a
             href='{{ section.settings.notify_button_link }}'
             class='px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors hover:opacity-90 inline-block text-center no-underline'
@@ -39,6 +40,7 @@
           >
             {{ section.settings.notify_button_text | default: "NOTIFY ME" }}
           </button>
+          </div>
         {% endif %}
       </div>
     </div>
