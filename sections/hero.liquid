@@ -38,7 +38,7 @@
   <!-- Scaled Wrapper -->
   <div
     class='hero-scale-wrap'
-    style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %}; --hero-height-mobile: {{ section.settings.hero_height_mobile_px | default: 420 }}px;'
+    style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %}; --hero-height-mobile: {{ section.settings.hero_height_mobile_px | default: 580 }}px;'
   >
     {% liquid
       assign default_ratio = 1.7778
