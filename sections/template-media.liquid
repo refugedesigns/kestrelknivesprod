@@ -358,6 +358,9 @@
     object-fit: {{ section.settings.hero_image_fit_desktop | default: section.settings.hero_image_fit | default: "cover" }};
     object-position: {{ section.settings.hero_image_position_desktop | default: section.settings.hero_image_position | default: "center" }};
   }
+  .media-hero-media.media-hero-media--contain img {
+    object-fit: contain !important;
+  }
 
   @media (max-width: 1024px) {
     .media-hero-media {
@@ -397,7 +400,7 @@
     {% endif %}
 
     <div
-      class='media-hero-media'
+      class='media-hero-media media-hero-media--contain'
       style='--media-hero-aspect-desktop: {{ hero_aspect_desktop }}; --media-hero-aspect-tablet: {{ hero_aspect_tablet }}; --media-hero-aspect-mobile: {{ hero_aspect_mobile }}; --media-hero-height-mobile: {{ section.settings.hero_height_mobile_px | default: 420 }}px; --media-hero-max-height-desktop: {{ section.settings.hero_max_height_desktop_px | default: 800 }}px;'
     >
       <picture class='w-full h-full block'>
