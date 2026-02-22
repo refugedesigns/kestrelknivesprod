@@ -10,11 +10,16 @@
 
   @media (max-width: 768px) {
     .hero-overlay {
-      padding-bottom: 4.5rem;
+      padding-bottom: var(--hero-mobile-overlay-padding-bottom, 40px);
     }
 
     .hero-overlay .hero-overlay__inner {
-      margin-bottom: 3.5rem !important;
+      margin-bottom: var(--hero-mobile-overlay-inner-margin-bottom, 28px) !important;
+    }
+
+    .hero-root .hero-overlay .pointer-events-auto {
+      margin-top: var(--hero-mobile-button-margin-top, 16px) !important;
+      margin-bottom: var(--hero-mobile-button-margin-bottom, 0px) !important;
     }
   }
 
@@ -38,7 +43,7 @@
   <!-- Scaled Wrapper -->
   <div
     class='hero-scale-wrap'
-    style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %}; --hero-height-mobile: {{ section.settings.hero_height_mobile_px | default: 420 }}px;'
+    style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %}; --hero-height-mobile: {{ section.settings.hero_height_mobile_px | default: 420 }}px; --hero-mobile-overlay-padding-bottom: {{ section.settings.hero_mobile_overlay_padding_bottom | default: 40 }}px; --hero-mobile-overlay-inner-margin-bottom: {{ section.settings.hero_mobile_overlay_inner_margin_bottom | default: 28 }}px; --hero-mobile-button-margin-top: {{ section.settings.hero_mobile_button_margin_top | default: 16 }}px; --hero-mobile-button-margin-bottom: {{ section.settings.hero_mobile_button_margin_bottom | default: 0 }}px;'
   >
     {% liquid
       assign default_ratio = 1.7778
@@ -925,6 +930,42 @@
       "max": 900,
       "step": 20,
       "default": 420
+    },
+    {
+      "type": "range",
+      "id": "hero_mobile_overlay_padding_bottom",
+      "label": "Hero overlay padding - Mobile (px)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "hero_mobile_overlay_inner_margin_bottom",
+      "label": "Hero overlay inner margin - Mobile (px)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "hero_mobile_button_margin_top",
+      "label": "Hero button margin-top - Mobile (px)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "hero_mobile_button_margin_bottom",
+      "label": "Hero button margin-bottom - Mobile (px)",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "default": 0
     },
     {
       "type": "header",
