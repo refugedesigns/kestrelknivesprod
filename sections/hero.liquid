@@ -52,6 +52,7 @@
     style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %}; --hero-height-mobile: {{ section.settings.hero_height_mobile_px | default: 420 }}px; --hero-mobile-overlay-padding-bottom: {{ section.settings.hero_mobile_overlay_padding_bottom | default: 40 }}px; --hero-mobile-overlay-inner-margin-bottom: {{ section.settings.hero_mobile_overlay_inner_margin_bottom | default: 28 }}px; --hero-mobile-button-margin-top: {{ section.settings.hero_mobile_button_margin_top | default: 16 }}px; --hero-mobile-button-margin-bottom: {{ section.settings.hero_mobile_button_margin_bottom | default: 0 }}px; --hero-mobile-text-padding-top: {{ section.settings.hero_mobile_text_padding_top | default: 0 }}px;'
   >
     {% liquid
+      assign hero_mode = section.settings.hero_mode | default: "carousel"
       assign default_ratio = 1.7778
       assign slide_1_image_desktop = section.settings.slide_1_image
       assign slide_1_image_tablet = section.settings.slide_1_image_tablet
@@ -121,7 +122,169 @@
       if slide_3_base_image == blank
         assign slide_3_base_image = slide_3_image_mobile
       endif
+
+      assign single_image_desktop = section.settings.single_hero_image
+      assign single_image_tablet = section.settings.single_hero_image_tablet
+      assign single_image_mobile = section.settings.single_hero_image_mobile
+      assign single_ratio_desktop = default_ratio
+      if single_image_desktop
+        assign single_ratio_desktop = single_image_desktop.aspect_ratio | default: default_ratio
+      endif
+      assign single_ratio_tablet = single_ratio_desktop
+      if single_image_tablet
+        assign single_ratio_tablet = single_image_tablet.aspect_ratio | default: single_ratio_desktop
+      endif
+      assign single_ratio_mobile = single_ratio_tablet
+      if single_image_mobile
+        assign single_ratio_mobile = single_image_mobile.aspect_ratio | default: single_ratio_tablet
+      endif
+      assign single_base_image = single_image_desktop
+      if single_base_image == blank
+        assign single_base_image = single_image_tablet
+      endif
+      if single_base_image == blank
+        assign single_base_image = single_image_mobile
+      endif
     %}
+    {% if hero_mode == "single" %}
+      <div
+        class='relative single-hero'
+        style='--slide-aspect-desktop: {{ single_ratio_desktop }}; --slide-aspect-tablet: {{ single_ratio_tablet }}; --slide-aspect-mobile: {{ single_ratio_mobile }};'
+      >
+        {% assign single_button_action = section.settings.single_hero_button_action
+          | default: "link"
+        %}
+        {% if single_button_action == "form" %}
+          <button
+            type='button'
+            class='hero-slide-media hero-slide-media-button hero-single-media block w-full'
+            data-klaviyo-form-id='{{ section.settings.single_hero_button_form_id | escape }}'
+          >
+        {% else %}
+          <div class='hero-slide-media hero-single-media block w-full'>
+        {% endif %}
+        {% if single_base_image %}
+          <picture class='w-full h-full block'>
+            {% if single_image_mobile %}
+              <source
+                srcset='{{ single_image_mobile | image_url: width: 1200 }}'
+                media='(max-width: 767px)'
+              >
+            {% endif %}
+            {% if single_image_tablet %}
+              <source
+                srcset='{{ single_image_tablet | image_url: width: 1600 }}'
+                media='(max-width: 1024px)'
+              >
+            {% endif %}
+            <img
+              src='{{ single_base_image | image_url: width: 1920 }}'
+              alt='{{ section.settings.single_hero_title | default: "Premium Knives" }}'
+              class='w-full h-full'
+              width='{{ single_base_image.width }}'
+              height='{{ single_base_image.height }}'
+              style='transform: scale({{ section.settings.single_hero_image_zoom | default: 100 | divided_by: 100.0 }});'
+              loading='lazy'
+            >
+          </picture>
+        {% else %}
+          {{
+            "lifestyle-1"
+            | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover"
+          }}
+        {% endif %}
+        {% if section.settings.single_hero_overlay_enable %}
+          <div class='absolute inset-0 bg-black/{{ section.settings.single_hero_overlay_opacity | default: 40 }}'></div>
+        {% endif %}
+        {% if single_button_action == "form" %}
+          </button>
+        {% else %}
+          </div>
+        {% endif %}
+        {% if section.settings.show_text_overlay %}
+          <div class='absolute bottom-4 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
+            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-12 hero-overlay__inner'>
+              {% assign s1_shadow = section.settings.single_hero_text_shadow_strength
+                | default: "soft"
+              %}
+              {% assign s1_op = "0.35" %}
+              {% case s1_shadow %}
+                {% when "none" -%}
+                  {%- assign s1_op = "0" %}
+                {% when "soft" -%}
+                  {%- assign s1_op = "0.35" %}
+                {% when "medium" -%}
+                  {%- assign s1_op = "0.6" %}
+                {% when "strong" -%}
+                  {%- assign s1_op = "0.85" %}
+              {% endcase %}
+              <div class='kk-text-wrap inline-block'>
+                {% if section.settings.single_hero_text_bg_enable %}
+                  {% assign s1_bg_op_pct = section.settings.single_hero_text_bg_opacity
+                    | default: 50
+                  %}
+                  {% assign s1_bg_alpha = s1_bg_op_pct | divided_by: 100.0 %}
+                  <div
+                    class='kk-text-bg'
+                    style='background-color: {{ section.settings.single_hero_text_bg_color | default: '#000000' | color_modify: 'alpha', s1_bg_alpha }}'
+                  ></div>
+                {% endif %}
+                <div class='kk-text-content mt-12 lg:mt-0'>
+                  <h1
+                    class='text-4xl md:text-6xl font-bold mb-4'
+                    style='color: {{ section.settings.single_hero_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.single_hero_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'
+                  >
+                    {{
+                      section.settings.single_hero_title
+                      | default: "Premium Knives"
+                    }}
+                  </h1>
+                  {% assign s1_subtitle = section.settings.single_hero_subtitle
+                    | default: "Crafted with precision, designed for perfection"
+                  %}
+                  {% assign s1_sentences = s1_subtitle | split: "." %}
+                  {% for sentence in s1_sentences %}
+                    {% assign trimmed_sentence = sentence | strip %}
+                    {% if trimmed_sentence != blank %}
+                      <p
+                        class='text-lg md:text-xl mb-1'
+                        style='color: {{ section.settings.single_hero_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.single_hero_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'
+                      >
+                        {{ trimmed_sentence }}.
+                      </p>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+              {% if section.settings.single_hero_button_enable
+                and section.settings.single_hero_button_text != blank
+              %}
+                <div class='hero-slide-button-wrap pointer-events-auto'>
+                  {% if single_button_action == "form" %}
+                    <button
+                      type='button'
+                      class='hero-single-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                      style='background-color: {{ section.settings.single_hero_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.single_hero_button_text_color | default: "#ffffff" }};'
+                      data-klaviyo-form-id='{{ section.settings.single_hero_button_form_id | escape }}'
+                    >
+                      {{ section.settings.single_hero_button_text }}
+                    </button>
+                  {% else %}
+                    <a
+                      href='{{ section.settings.single_hero_button_url | default: "/collections/professional" }}'
+                      class='hero-single-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                      style='background-color: {{ section.settings.single_hero_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.single_hero_button_text_color | default: "#ffffff" }};'
+                    >
+                      {{ section.settings.single_hero_button_text }}
+                    </a>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    {% else %}
     <!-- Swiper Container -->
     <swiper-container
       class='hero-swiper'
@@ -653,6 +816,7 @@
         </div>
       {% endcomment %}
     </swiper-container>
+    {% endif %}
   </div>
 </div>
 
@@ -677,6 +841,8 @@
   attachKlaviyoFormTrigger('.hero-slide-2-media[data-klaviyo-form-id]')
   attachKlaviyoFormTrigger('.hero-slide-3-button[data-klaviyo-form-id]')
   attachKlaviyoFormTrigger('.hero-slide-3-media[data-klaviyo-form-id]')
+  attachKlaviyoFormTrigger('.hero-single-button[data-klaviyo-form-id]')
+  attachKlaviyoFormTrigger('.hero-single-media[data-klaviyo-form-id]')
 </script>
 
 <!-- Swiper Styles -->
@@ -807,6 +973,10 @@
     object-fit: {{ section.settings.slide_1_image_fit_desktop | default: section.settings.slide_1_image_fit | default: "cover" }};
     object-position: {{ section.settings.slide_1_image_position_desktop | default: section.settings.slide_1_image_position | default: "center" }};
   }
+  .hero-root .single-hero img {
+    object-fit: {{ section.settings.single_hero_image_fit_desktop | default: section.settings.single_hero_image_fit | default: "cover" }};
+    object-position: {{ section.settings.single_hero_image_position_desktop | default: section.settings.single_hero_image_position | default: "center" }};
+  }
   .hero-root .slide-2 img {
     object-fit: {{ section.settings.slide_2_image_fit_desktop | default: section.settings.slide_2_image_fit | default: "cover" }};
     object-position: {{ section.settings.slide_2_image_position_desktop | default: section.settings.slide_2_image_position | default: "center" }};
@@ -821,6 +991,10 @@
     .hero-root .slide-1 img {
       object-fit: {{ section.settings.slide_1_image_fit_tablet | default: section.settings.slide_1_image_fit | default: "cover" }};
       object-position: {{ section.settings.slide_1_image_position_tablet | default: section.settings.slide_1_image_position | default: "center" }};
+    }
+    .hero-root .single-hero img {
+      object-fit: {{ section.settings.single_hero_image_fit_tablet | default: section.settings.single_hero_image_fit | default: "cover" }};
+      object-position: {{ section.settings.single_hero_image_position_tablet | default: section.settings.single_hero_image_position | default: "center" }};
     }
     .hero-root .slide-2 img {
       object-fit: {{ section.settings.slide_2_image_fit_tablet | default: section.settings.slide_2_image_fit | default: "cover" }};
@@ -837,6 +1011,10 @@
     .hero-root .slide-1 img {
       object-fit: {{ section.settings.slide_1_image_fit_mobile | default: section.settings.slide_1_image_fit | default: "cover" }};
       object-position: {{ section.settings.slide_1_image_position_mobile | default: section.settings.slide_1_image_position | default: "center" }};
+    }
+    .hero-root .single-hero img {
+      object-fit: {{ section.settings.single_hero_image_fit_mobile | default: section.settings.single_hero_image_fit | default: "cover" }};
+      object-position: {{ section.settings.single_hero_image_position_mobile | default: section.settings.single_hero_image_position | default: "center" }};
     }
     .hero-root .slide-2 img {
       object-fit: {{ section.settings.slide_2_image_fit_mobile | default: section.settings.slide_2_image_fit | default: "cover" }};
@@ -924,6 +1102,261 @@
 {
   "name": "Hero Carousel",
   "settings": [
+    {
+      "type": "header",
+      "content": "Hero Mode"
+    },
+    {
+      "type": "select",
+      "id": "hero_mode",
+      "label": "Hero layout",
+      "options": [
+        { "value": "carousel", "label": "Carousel (slides)" },
+        { "value": "single", "label": "Single hero (Slide 1)" }
+      ],
+      "default": "carousel"
+    },
+    {
+      "type": "header",
+      "content": "Single Hero Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "single_hero_image",
+      "label": "Single hero image"
+    },
+    {
+      "type": "image_picker",
+      "id": "single_hero_image_tablet",
+      "label": "Single hero image - Tablet (≤1024px)",
+      "info": "Optional override used on tablet viewports."
+    },
+    {
+      "type": "image_picker",
+      "id": "single_hero_image_mobile",
+      "label": "Single hero image - Mobile (≤768px)",
+      "info": "Optional override used on mobile viewports."
+    },
+    {
+      "type": "checkbox",
+      "id": "single_hero_overlay_enable",
+      "label": "Single hero: Enable image overlay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "single_hero_overlay_opacity",
+      "label": "Single hero: Image overlay opacity (%)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 40
+    },
+    {
+      "type": "select",
+      "id": "single_hero_image_fit",
+      "label": "Single hero image fit [fallback]",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "single_hero_image_fit_mobile",
+      "label": "Single hero image fit - Mobile",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "single_hero_image_fit_tablet",
+      "label": "Single hero image fit - Tablet",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "single_hero_image_fit_desktop",
+      "label": "Single hero image fit - Desktop",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "single_hero_image_position",
+      "label": "Single hero image position [fallback]",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "single_hero_image_position_mobile",
+      "label": "Single hero image position - Mobile",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "single_hero_image_position_tablet",
+      "label": "Single hero image position - Tablet",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "single_hero_image_position_desktop",
+      "label": "Single hero image position - Desktop",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "single_hero_image_zoom",
+      "label": "Single hero image zoom (%)",
+      "info": "Lower values show more of the image. 100 = normal, 80 = zoomed out",
+      "min": 50,
+      "max": 150,
+      "step": 5,
+      "default": 100
+    },
+    {
+      "type": "text",
+      "id": "single_hero_title",
+      "label": "Single hero title",
+      "default": "Premium Knives"
+    },
+    {
+      "type": "textarea",
+      "id": "single_hero_subtitle",
+      "label": "Single hero subtitle",
+      "default": "Crafted with precision, designed for perfection"
+    },
+    {
+      "type": "checkbox",
+      "id": "single_hero_text_bg_enable",
+      "label": "Single hero: Enable text background",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "single_hero_text_bg_color",
+      "label": "Single hero: Text background color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "single_hero_text_bg_opacity",
+      "label": "Single hero: Text background opacity (%)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 50
+    },
+    {
+      "type": "select",
+      "id": "single_hero_text_shadow_strength",
+      "label": "Single hero text shadow strength",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "soft", "label": "Soft" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "strong", "label": "Strong" }
+      ],
+      "default": "soft"
+    },
+    {
+      "type": "range",
+      "id": "single_hero_text_shadow_blur",
+      "label": "Single hero text shadow blur (px)",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "color",
+      "id": "single_hero_text_color",
+      "label": "Single hero text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "single_hero_button_enable",
+      "label": "Single hero: Show button",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "single_hero_button_bg_color",
+      "label": "Single hero button background",
+      "default": "#2563eb"
+    },
+    {
+      "type": "color",
+      "id": "single_hero_button_text_color",
+      "label": "Single hero button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "single_hero_button_text",
+      "label": "Single hero button text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "select",
+      "id": "single_hero_button_action",
+      "label": "Single hero button action",
+      "options": [
+        { "value": "link", "label": "Open link" },
+        { "value": "form", "label": "Open Klaviyo form" }
+      ],
+      "default": "link"
+    },
+    {
+      "type": "text",
+      "id": "single_hero_button_form_id",
+      "label": "Single hero button form ID",
+      "info": "Used when action is set to Open Klaviyo form."
+    },
+    {
+      "type": "url",
+      "id": "single_hero_button_url",
+      "label": "Single hero button URL"
+    },
     {
       "type": "header",
       "content": "Unified Height"
