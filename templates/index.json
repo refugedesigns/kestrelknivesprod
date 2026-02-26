@@ -12,6 +12,8 @@
     "hero-section": {
       "type": "hero",
       "settings": {
+        "hero_mode": "single",
+        "single_hero_slide": "slide_1",
         "hero_height_px": 600,
         "hero_height_mobile_px": 540,
         "hero_mobile_overlay_padding_bottom": 40,
