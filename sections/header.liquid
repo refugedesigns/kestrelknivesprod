@@ -239,27 +239,23 @@
               href='{{ routes.account_url }}'
               class='text-base hover:text-gray-100'
               style='color: {{ section.settings.menu_link_color | default: "#ffffff" }};'
-              >Account</a
-            >
+            >Account</a>
             <a
               href='{{ routes.account_logout_url }}'
               class='text-base hover:text-gray-100'
               style='color: {{ section.settings.menu_link_color | default: "#ffffff" }};'
-              >Log out</a
-            >
+            >Log out</a>
           {% else %}
             <a
               href='{{ routes.account_login_url }}'
               class='text-base hover:text-gray-100'
               style='color: {{ section.settings.menu_link_color | default: "#ffffff" }};'
-              >Log in</a
-            >
+            >Log in</a>
             <a
               href='{{ routes.account_register_url }}'
               class='text-base hover:text-gray-100'
               style='color: {{ section.settings.menu_link_color | default: "#ffffff" }};'
-              >Register</a
-            >
+            >Register</a>
           {% endif %}
         {% endif %}
       </div>
@@ -478,13 +474,13 @@
   function setHeaderHeight() {
     const header = document.getElementById('siteHeader')
     const countdownBanner = document.getElementById('countdownBanner')
-    
+
     let totalHeight = 0
-    
+
     if (countdownBanner) {
       totalHeight += countdownBanner.offsetHeight
     }
-    
+
     if (header) {
       totalHeight += header.offsetHeight
       document.documentElement.style.setProperty(
