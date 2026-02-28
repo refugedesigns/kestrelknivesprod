@@ -45,7 +45,7 @@
           "countdown_bg_color": "#000000",
           "countdown_border_color": "#dc2626",
           "countdown_text_color": "#ffffff",
-          "notify_button_text": "Order Now",
+          "notify_button_text": "Order Now!",
           "notify_button_action": "link",
           "notify_button_link": "shopify://products/mountain-caper",
           "notify_button_bg_color": "#ffffff",
