@@ -42,19 +42,6 @@
   <div class='max-w-6xl mx-auto w-full px-4 py-12'>
     <div class='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-16'>
       <div class='flex items-center gap-3 bg-black px-6 py-3 rounded-full'>
-        {% if section.settings.logo_left_image != blank %}
-          <img
-            src='{{ section.settings.logo_left_image | image_url: width: 80 }}'
-            alt='{{ section.settings.logo_left_text | escape }}'
-            class='h-6 w-6'
-            loading='lazy'
-          >
-        {% endif %}
-        <span class='text-white font-bold text-lg'>
-          {{ section.settings.logo_left_text }}
-        </span>
-      </div>
-      <div class='flex items-center gap-3 bg-black px-6 py-3 rounded-full'>
         {% if section.settings.logo_right_image != blank %}
           <img
             src='{{ section.settings.logo_right_image | image_url: width: 80 }}'
@@ -65,6 +52,19 @@
         {% endif %}
         <span class='text-white font-bold text-lg'>
           {{ section.settings.logo_right_text }}
+        </span>
+      </div>
+      <div class='flex items-center gap-3 bg-black px-6 py-3 rounded-full'>
+        {% if section.settings.logo_left_image != blank %}
+          <img
+            src='{{ section.settings.logo_left_image | image_url: width: 80 }}'
+            alt='{{ section.settings.logo_left_text | escape }}'
+            class='h-6 w-6'
+            loading='lazy'
+          >
+        {% endif %}
+        <span class='text-white font-bold text-lg'>
+          {{ section.settings.logo_left_text }}
         </span>
       </div>
     </div>
