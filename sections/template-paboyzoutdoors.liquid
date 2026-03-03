@@ -41,30 +41,32 @@
 
   <div class='max-w-6xl mx-auto w-full px-4 py-12'>
     <div class='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-16'>
-      <div class='flex items-center bg-black rounded-full'>
+      <div class='flex items-center'>
         {% if section.settings.logo_right_image != blank %}
           <img
-            src='{{ section.settings.logo_right_image | image_url: width: 200 }}'
+            src='{{ section.settings.logo_right_image | image_url: width: 300 }}'
             alt='{{ section.settings.logo_right_text | escape }}'
-            class='h-12 w-12 object-contain p-2'
+            class='object-contain'
+            style='width: {{ section.settings.logo_right_size | default: 72 }}px; height: {{ section.settings.logo_right_size | default: 72 }}px;'
             loading='lazy'
           >
         {% else %}
-          <span class='text-white font-bold text-lg px-6 py-3'>
+          <span class='text-black font-bold text-lg'>
             {{ section.settings.logo_right_text }}
           </span>
         {% endif %}
       </div>
-      <div class='flex items-center bg-black rounded-full'>
+      <div class='flex items-center'>
         {% if section.settings.logo_left_image != blank %}
           <img
-            src='{{ section.settings.logo_left_image | image_url: width: 200 }}'
+            src='{{ section.settings.logo_left_image | image_url: width: 300 }}'
             alt='{{ section.settings.logo_left_text | escape }}'
-            class='h-12 w-12 object-contain p-2'
+            class='object-contain'
+            style='width: {{ section.settings.logo_left_size | default: 72 }}px; height: {{ section.settings.logo_left_size | default: 72 }}px;'
             loading='lazy'
           >
         {% else %}
-          <span class='text-white font-bold text-lg px-6 py-3'>
+          <span class='text-black font-bold text-lg'>
             {{ section.settings.logo_left_text }}
           </span>
         {% endif %}
@@ -200,6 +202,15 @@
       "label": "Left logo image"
     },
     {
+      "type": "range",
+      "id": "logo_left_size",
+      "label": "Left logo size (px)",
+      "min": 32,
+      "max": 160,
+      "step": 4,
+      "default": 72
+    },
+    {
       "type": "text",
       "id": "logo_left_text",
       "label": "Left logo text",
@@ -209,6 +220,15 @@
       "type": "image_picker",
       "id": "logo_right_image",
       "label": "Right logo image"
+    },
+    {
+      "type": "range",
+      "id": "logo_right_size",
+      "label": "Right logo size (px)",
+      "min": 32,
+      "max": 160,
+      "step": 4,
+      "default": 72
     },
     {
       "type": "text",
