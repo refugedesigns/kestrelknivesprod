@@ -12,7 +12,8 @@
     "template-paboyzoutdoors": {
       "type": "template-paboyzoutdoors",
       "settings": {
-        "logo_left_size": 100,
+        "logo_left_image": "shopify://shop_images/square_2ac47cb6-f732-41d3-94bb-27135341aaa9.png",
+        "logo_left_size": 155,
         "logo_left_text": "Kestrel",
         "logo_right_image": "shopify://shop_images/PABZ.jpg",
         "logo_right_size": 210,
