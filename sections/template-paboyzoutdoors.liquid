@@ -55,11 +55,10 @@
 
     <div class='text-center mb-12'>
       <h1 class='text-5xl md:text-7xl font-bold text-black mb-6 leading-tight'>
-        {{ section.settings.hero_heading_line_1 | newline_to_br }}
-        <br>
-        <span class='text-black'>{{ section.settings.hero_heading_line_2 }}</span>
+        <span class='block'>{{ section.settings.hero_heading_line_1 }}</span>
+        <span class='block text-black'>{{ section.settings.hero_heading_line_2 }}</span>
       </h1>
-      <p class='text-xl text-gray-700 max-w-2xl mx-auto'>
+      <p class='text-xl text-gray-700 max-w-2xl mx-auto text-center'>
         {{ section.settings.hero_subheading }}
       </p>
     </div>
