@@ -25,6 +25,12 @@
     .paboyz-hero-text * {
       text-align: center !important;
     }
+    .paboyz-hero-subheading {
+      width: 100% !important;
+      max-width: 42rem !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
   </style>
 
   <div class='max-w-6xl mx-auto w-full px-4 py-12'>
@@ -62,7 +68,7 @@
         <span class='block'>{{ section.settings.hero_heading_line_1 }}</span>
         <span class='block text-black'>{{ section.settings.hero_heading_line_2 }}</span>
       </h1>
-      <p class='text-xl text-gray-700 max-w-2xl mx-auto text-center' style='text-align: center;'>
+      <p class='paboyz-hero-subheading text-xl text-gray-700 text-center' style='text-align: center;'>
         {{ section.settings.hero_subheading }}
       </p>
     </div>
