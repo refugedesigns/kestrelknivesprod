@@ -12,10 +12,8 @@
     "template-paboyzoutdoors": {
       "type": "template-paboyzoutdoors",
       "settings": {
-        "logo_left_size": 72,
         "logo_left_text": "Kestrel",
         "logo_right_image": "shopify://shop_images/PABZ.jpg",
-        "logo_right_size": 160,
         "logo_right_text": "PaBoyz",
         "hero_heading_line_1": "Win 1 of 12",
         "hero_heading_line_2": "Kestrel Knives",
