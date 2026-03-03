@@ -1,0 +1,396 @@
+<section class='paboyz-landing bg-white'>
+  <style>
+    .paboyz-slider {
+      width: 100%;
+      height: var(--paboyz-slider-height, 320px);
+      overflow: hidden;
+      border-radius: 0.75rem;
+    }
+    .paboyz-slider swiper-slide {
+      width: 100%;
+      height: 100%;
+    }
+    .paboyz-slider img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    @media (max-width: 768px) {
+      .paboyz-slider {
+        height: var(--paboyz-slider-height-mobile, 240px);
+      }
+    }
+  </style>
+
+  <div class='max-w-6xl mx-auto w-full px-4 py-12'>
+    <div class='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-16'>
+      <div class='flex items-center gap-3 bg-black px-6 py-3 rounded-full'>
+        {% if section.settings.logo_left_image != blank %}
+          <img
+            src='{{ section.settings.logo_left_image | image_url: width: 80 }}'
+            alt='{{ section.settings.logo_left_text | escape }}'
+            class='h-6 w-6'
+            loading='lazy'
+          >
+        {% endif %}
+        <span class='text-white font-bold text-lg'>
+          {{ section.settings.logo_left_text }}
+        </span>
+      </div>
+      <div class='flex items-center gap-3 bg-black px-6 py-3 rounded-full'>
+        {% if section.settings.logo_right_image != blank %}
+          <img
+            src='{{ section.settings.logo_right_image | image_url: width: 80 }}'
+            alt='{{ section.settings.logo_right_text | escape }}'
+            class='h-6 w-6'
+            loading='lazy'
+          >
+        {% endif %}
+        <span class='text-white font-bold text-lg'>
+          {{ section.settings.logo_right_text }}
+        </span>
+      </div>
+    </div>
+
+    <div class='text-center mb-12'>
+      <h1 class='text-5xl md:text-7xl font-bold text-black mb-6 leading-tight'>
+        {{ section.settings.hero_heading_line_1 | newline_to_br }}
+        <br>
+        <span class='text-black'>{{ section.settings.hero_heading_line_2 }}</span>
+      </h1>
+      <p class='text-xl text-gray-700 max-w-2xl mx-auto'>
+        {{ section.settings.hero_subheading }}
+      </p>
+    </div>
+
+    <div class='max-w-md mx-auto mb-10'>
+      <div class='bg-black rounded-2xl shadow-2xl p-8'>
+        {% form 'customer' %}
+          {% if form.posted_successfully? %}
+            <div class='text-center text-white'>
+              <h2 class='text-2xl font-bold mb-2'>
+                {{ section.settings.form_success_heading }}
+              </h2>
+              <p class='text-sm text-gray-300'>
+                {{ section.settings.form_success_text }}
+              </p>
+            </div>
+          {% else %}
+            <div class='space-y-5'>
+              <div>
+                <label class='block text-sm font-semibold text-white mb-2'>
+                  {{ section.settings.form_name_label }}
+                </label>
+                <input
+                  type='text'
+                  name='contact[name]'
+                  class='w-full px-4 py-3 border border-gray-600 rounded-lg bg-gray-900 text-white focus:ring-2 focus:ring-gray-400 focus:border-transparent outline-none transition-all'
+                  placeholder='{{ section.settings.form_name_placeholder }}'
+                  required
+                >
+              </div>
+              <div>
+                <label class='block text-sm font-semibold text-white mb-2'>
+                  {{ section.settings.form_email_label }}
+                </label>
+                <input
+                  type='email'
+                  name='contact[email]'
+                  class='w-full px-4 py-3 border border-gray-600 rounded-lg bg-gray-900 text-white focus:ring-2 focus:ring-gray-400 focus:border-transparent outline-none transition-all'
+                  placeholder='{{ section.settings.form_email_placeholder }}'
+                  required
+                >
+              </div>
+              <input type='hidden' name='contact[tags]' value='paboyzoutdoors'>
+              <button
+                type='submit'
+                class='w-full bg-white text-black font-bold py-4 px-8 rounded-lg hover:bg-gray-200 transition-all transform hover:scale-105 text-lg shadow-lg'
+              >
+                {{ section.settings.form_button_text }}
+              </button>
+            </div>
+          {% endif %}
+        {% endform %}
+      </div>
+
+      <p class='text-center text-gray-600 text-sm mt-4'>
+        {{ section.settings.form_helper_text }}
+      </p>
+    </div>
+  </div>
+
+  <div class='border-t border-gray-200 bg-gray-50'>
+    <div class='max-w-6xl mx-auto px-4 py-12'>
+      <div class='grid grid-cols-1 md:grid-cols-2 gap-8 items-center'>
+        <div>
+          <h2 class='text-3xl font-bold text-black mb-4'>
+            {{ section.settings.feature_heading }}
+          </h2>
+          <p class='text-gray-700 text-lg leading-relaxed mb-6'>
+            {{ section.settings.feature_text }}
+          </p>
+          <div class='flex gap-8'>
+            <div>
+              <div class='text-4xl font-bold text-black mb-2'>
+                {{ section.settings.feature_stat_1_value }}
+              </div>
+              <div class='text-sm text-gray-600 font-medium'>
+                {{ section.settings.feature_stat_1_label }}
+              </div>
+            </div>
+            <div>
+              <div class='text-4xl font-bold text-black mb-2'>
+                {{ section.settings.feature_stat_2_value }}
+              </div>
+              <div class='text-sm text-gray-600 font-medium'>
+                {{ section.settings.feature_stat_2_label }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <swiper-container
+            class='paboyz-slider'
+            style='--paboyz-slider-height: {{ section.settings.slider_height_desktop }}px; --paboyz-slider-height-mobile: {{ section.settings.slider_height_mobile }}px;'
+            autoplay-delay='{{ section.settings.slider_autoplay_delay | default: 5000 }}'
+            autoplay-disable-on-interaction='false'
+            loop='true'
+            pagination='true'
+            pagination-clickable='true'
+          >
+            {% if section.blocks.size > 0 %}
+              {% for block in section.blocks %}
+                {% if block.type == 'slider_image' %}
+                  <swiper-slide>
+                    {% if block.settings.image != blank %}
+                      <img
+                        src='{{ block.settings.image | image_url: width: 1200 }}'
+                        alt='{{ block.settings.alt_text | escape }}'
+                        loading='lazy'
+                      >
+                    {% else %}
+                      {{ "lifestyle-1" | placeholder_svg_tag: "w-full h-full bg-gray-200" }}
+                    {% endif %}
+                  </swiper-slide>
+                {% endif %}
+              {% endfor %}
+            {% else %}
+              <swiper-slide>
+                {{ "lifestyle-1" | placeholder_svg_tag: "w-full h-full bg-gray-200" }}
+              </swiper-slide>
+            {% endif %}
+          </swiper-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "PaBoyz Outdoors Landing",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo Badges"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_left_image",
+      "label": "Left logo image"
+    },
+    {
+      "type": "text",
+      "id": "logo_left_text",
+      "label": "Left logo text",
+      "default": "Kestrel"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_right_image",
+      "label": "Right logo image"
+    },
+    {
+      "type": "text",
+      "id": "logo_right_text",
+      "label": "Right logo text",
+      "default": "PaBoyz"
+    },
+    {
+      "type": "header",
+      "content": "Hero Text"
+    },
+    {
+      "type": "text",
+      "id": "hero_heading_line_1",
+      "label": "Hero heading line 1",
+      "default": "Win 1 of 12"
+    },
+    {
+      "type": "text",
+      "id": "hero_heading_line_2",
+      "label": "Hero heading line 2",
+      "default": "Kestrel Knives"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subheading",
+      "label": "Hero subheading",
+      "default": "Enter with your name and email for a chance to win 1 of 12 Kestrel Knives."
+    },
+    {
+      "type": "header",
+      "content": "Form"
+    },
+    {
+      "type": "text",
+      "id": "form_name_label",
+      "label": "Name label",
+      "default": "Your Name"
+    },
+    {
+      "type": "text",
+      "id": "form_name_placeholder",
+      "label": "Name placeholder",
+      "default": "John Doe"
+    },
+    {
+      "type": "text",
+      "id": "form_email_label",
+      "label": "Email label",
+      "default": "Email Address"
+    },
+    {
+      "type": "text",
+      "id": "form_email_placeholder",
+      "label": "Email placeholder",
+      "default": "you@example.com"
+    },
+    {
+      "type": "text",
+      "id": "form_button_text",
+      "label": "Button text",
+      "default": "Count Me In"
+    },
+    {
+      "type": "text",
+      "id": "form_helper_text",
+      "label": "Helper text",
+      "default": "Takes 10 seconds. One entry per person."
+    },
+    {
+      "type": "text",
+      "id": "form_success_heading",
+      "label": "Success heading",
+      "default": "You're In!"
+    },
+    {
+      "type": "text",
+      "id": "form_success_text",
+      "label": "Success text",
+      "default": "Your entry has been received. Good luck!"
+    },
+    {
+      "type": "header",
+      "content": "Feature Section"
+    },
+    {
+      "type": "text",
+      "id": "feature_heading",
+      "label": "Feature heading",
+      "default": "Premium Craftsmanship"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_text",
+      "label": "Feature text",
+      "default": "Each Kestrel Knife is expertly crafted with precision engineering and premium materials. Built for performance and durability, these are the tools serious craftspeople depend on."
+    },
+    {
+      "type": "text",
+      "id": "feature_stat_1_value",
+      "label": "Stat 1 value",
+      "default": "12"
+    },
+    {
+      "type": "text",
+      "id": "feature_stat_1_label",
+      "label": "Stat 1 label",
+      "default": "Winners"
+    },
+    {
+      "type": "text",
+      "id": "feature_stat_2_value",
+      "label": "Stat 2 value",
+      "default": "100%"
+    },
+    {
+      "type": "text",
+      "id": "feature_stat_2_label",
+      "label": "Stat 2 label",
+      "default": "Fair Draw"
+    },
+    {
+      "type": "header",
+      "content": "Slider"
+    },
+    {
+      "type": "range",
+      "id": "slider_autoplay_delay",
+      "label": "Slider autoplay delay (ms)",
+      "min": 2000,
+      "max": 8000,
+      "step": 500,
+      "default": 5000
+    },
+    {
+      "type": "range",
+      "id": "slider_height_desktop",
+      "label": "Slider height (desktop px)",
+      "min": 240,
+      "max": 600,
+      "step": 20,
+      "default": 320
+    },
+    {
+      "type": "range",
+      "id": "slider_height_mobile",
+      "label": "Slider height (mobile px)",
+      "min": 200,
+      "max": 480,
+      "step": 20,
+      "default": 240
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slider_image",
+      "name": "Slider image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "alt_text",
+          "label": "Alt text"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "PaBoyz Outdoors Landing",
+      "blocks": [
+        { "type": "slider_image" },
+        { "type": "slider_image" },
+        { "type": "slider_image" }
+      ]
+    }
+  ]
+}
+{% endschema %}
