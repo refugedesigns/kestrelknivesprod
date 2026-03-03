@@ -21,6 +21,10 @@
         height: var(--paboyz-slider-height-mobile, 240px);
       }
     }
+    .paboyz-hero-text,
+    .paboyz-hero-text * {
+      text-align: center !important;
+    }
   </style>
 
   <div class='max-w-6xl mx-auto w-full px-4 py-12'>
@@ -53,7 +57,7 @@
       </div>
     </div>
 
-    <div class='text-center mb-12'>
+    <div class='paboyz-hero-text text-center mb-12'>
       <h1 class='text-5xl md:text-7xl font-bold text-black mb-6 leading-tight'>
         <span class='block'>{{ section.settings.hero_heading_line_1 }}</span>
         <span class='block text-black'>{{ section.settings.hero_heading_line_2 }}</span>
