@@ -15,7 +15,10 @@
 
     .hero-overlay .hero-overlay__inner {
       padding-top: var(--hero-mobile-text-padding-top, 0px);
-      margin-bottom: var(--hero-mobile-overlay-inner-margin-bottom, 28px) !important;
+      margin-bottom: var(
+        --hero-mobile-overlay-inner-margin-bottom,
+        28px
+      ) !important;
     }
 
     .hero-root .hero-slide-button-wrap {
@@ -135,7 +138,7 @@
       space-between='0'
       centered-slides='true'
       {% if hero_mode == "carousel" %}
-        autoplay-delay='{{ section.settings.autoplay_delay | default: 5000 }}'
+        autoplay-delay='{{ section.settings.slider_autoplay_delay | default: 5 | times: 1000 }}'
         autoplay-disable-on-interaction='false'
         loop='true'
       {% else %}
@@ -146,22 +149,22 @@
     >
       <!-- Slide 1 -->
       {% if hero_mode != "single" or single_slide == "slide_1" %}
-      <swiper-slide
-        class='relative slide-1'
-        style='--slide-aspect-desktop: {{ slide_1_ratio_desktop }}; --slide-aspect-tablet: {{ slide_1_ratio_tablet }}; --slide-aspect-mobile: {{ slide_1_ratio_mobile }};'
-      >
-        {% assign slide_1_button_action = section.settings.slide_1_button_action
-          | default: "link"
-        %}
-        {% if slide_1_button_action == "form" %}
-          <button
-            type='button'
-            class='hero-slide-media hero-slide-media-button hero-slide-1-media block w-full'
-            data-klaviyo-form-id='{{ section.settings.slide_1_button_form_id | escape }}'
-          >
-        {% else %}
-          <div class='hero-slide-media hero-slide-1-media block w-full'>
-        {% endif %}
+        <swiper-slide
+          class='relative slide-1'
+          style='--slide-aspect-desktop: {{ slide_1_ratio_desktop }}; --slide-aspect-tablet: {{ slide_1_ratio_tablet }}; --slide-aspect-mobile: {{ slide_1_ratio_mobile }};'
+        >
+          {% assign slide_1_button_action = section.settings.slide_1_button_action
+            | default: "link"
+          %}
+          {% if slide_1_button_action == "form" %}
+            <button
+              type='button'
+              class='hero-slide-media hero-slide-media-button hero-slide-1-media block w-full'
+              data-klaviyo-form-id='{{ section.settings.slide_1_button_form_id | escape }}'
+            >
+          {% else %}
+            <div class='hero-slide-media hero-slide-1-media block w-full'>
+          {% endif %}
           {% if slide_1_base_image %}
             <picture class='w-full h-full block'>
               {% if slide_1_image_mobile %}
@@ -193,99 +196,101 @@
             }}
           {% endif %}
           {% if section.settings.slide_1_overlay_enable %}
-            <div class='absolute inset-0 bg-black/{{ section.settings.slide_1_overlay_opacity | default: 40 }}'></div>
+            <div
+              class='absolute inset-0 bg-black/{{ section.settings.slide_1_overlay_opacity | default: 40 }}'
+            ></div>
           {% endif %}
-        {% if slide_1_button_action == "form" %}
-          </button>
-        {% else %}
-          </div>
-        {% endif %}
-        {% if section.settings.show_text_overlay %}
-          <div class='absolute bottom-4 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
-            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-12 hero-overlay__inner'>
-              {% assign s1_shadow = section.settings.slide_1_text_shadow_strength
-                | default: "soft"
-              %}
-              {% assign s1_op = "0.35" %}
-              {% case s1_shadow %}
-                {% when "none" -%}
-                  {%- assign s1_op = "0" %}
-                {% when "soft" -%}
-                  {%- assign s1_op = "0.35" %}
-                {% when "medium" -%}
-                  {%- assign s1_op = "0.6" %}
-                {% when "strong" -%}
-                  {%- assign s1_op = "0.85" %}
-              {% endcase %}
-              <div class='kk-text-wrap inline-block'>
-                {% if section.settings.slide_1_text_bg_enable %}
-                  {% assign s1_bg_op_pct = section.settings.slide_1_text_bg_opacity
-                    | default: 50
-                  %}
-                  {% assign s1_bg_alpha = s1_bg_op_pct | divided_by: 100.0 %}
-                  <div
-                    class='kk-text-bg'
-                    style='background-color: {{ section.settings.slide_1_text_bg_color | default: '#000000' | color_modify: 'alpha', s1_bg_alpha }}'
-                  ></div>
-                {% endif %}
-                <div class='kk-text-content mt-12 lg:mt-0'>
-                  <h1
-                    class='text-4xl md:text-6xl font-bold mb-4'
-                    style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'
-                  >
-                    {{
-                      section.settings.slide_1_title
-                      | default: "Premium Knives"
-                    }}
-                  </h1>
-                  {% assign s1_subtitle = section.settings.slide_1_subtitle
-                    | default: "Crafted with precision, designed for perfection"
-                  %}
-                  {% assign s1_sentences = s1_subtitle | split: "." %}
-                  {% for sentence in s1_sentences %}
-                    {% assign trimmed_sentence = sentence | strip %}
-                    {% if trimmed_sentence != blank %}
-                      <p
-                        class='text-lg md:text-xl mb-1'
-                        style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'
-                      >
-                        {{ trimmed_sentence }}.
-                      </p>
-                    {% endif %}
-                  {% endfor %}
-                </div>
-              </div>
-              {% if section.settings.slide_1_button_enable
-                and section.settings.slide_1_button_text != blank
-              %}
-                <div class='hero-slide-button-wrap pointer-events-auto'>
-                  {% assign slide_1_button_action = section.settings.slide_1_button_action
-                    | default: "link"
-                  %}
-                  {% if slide_1_button_action == "form" %}
-                    <button
-                      type='button'
-                      class='hero-slide-1-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                      style='background-color: {{ section.settings.slide_1_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_1_button_text_color | default: "#ffffff" }};'
-                      data-klaviyo-form-id='{{ section.settings.slide_1_button_form_id | escape }}'
-                    >
-                      {{ section.settings.slide_1_button_text }}
-                    </button>
-                  {% else %}
-                    <a
-                      href='{{ section.settings.slide_1_button_url | default: "/collections/professional" }}'
-                      class='hero-slide-1-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                      style='background-color: {{ section.settings.slide_1_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_1_button_text_color | default: "#ffffff" }};'
-                    >
-                      {{ section.settings.slide_1_button_text }}
-                    </a>
-                  {% endif %}
-                </div>
-              {% endif %}
+          {% if slide_1_button_action == "form" %}
+            </button>
+          {% else %}
             </div>
-          </div>
-        {% endif %}
-      </swiper-slide>
+          {% endif %}
+          {% if section.settings.show_text_overlay %}
+            <div class='absolute bottom-4 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
+              <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-12 hero-overlay__inner'>
+                {% assign s1_shadow = section.settings.slide_1_text_shadow_strength
+                  | default: "soft"
+                %}
+                {% assign s1_op = "0.35" %}
+                {% case s1_shadow %}
+                  {% when "none" -%}
+                    {%- assign s1_op = "0" %}
+                  {% when "soft" -%}
+                    {%- assign s1_op = "0.35" %}
+                  {% when "medium" -%}
+                    {%- assign s1_op = "0.6" %}
+                  {% when "strong" -%}
+                    {%- assign s1_op = "0.85" %}
+                {% endcase %}
+                <div class='kk-text-wrap inline-block'>
+                  {% if section.settings.slide_1_text_bg_enable %}
+                    {% assign s1_bg_op_pct = section.settings.slide_1_text_bg_opacity
+                      | default: 50
+                    %}
+                    {% assign s1_bg_alpha = s1_bg_op_pct | divided_by: 100.0 %}
+                    <div
+                      class='kk-text-bg'
+                      style='background-color: {{ section.settings.slide_1_text_bg_color | default: '#000000' | color_modify: 'alpha', s1_bg_alpha }}'
+                    ></div>
+                  {% endif %}
+                  <div class='kk-text-content mt-12 lg:mt-0'>
+                    <h1
+                      class='text-4xl md:text-6xl font-bold mb-4'
+                      style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'
+                    >
+                      {{
+                        section.settings.slide_1_title
+                        | default: "Premium Knives"
+                      }}
+                    </h1>
+                    {% assign s1_subtitle = section.settings.slide_1_subtitle
+                      | default: "Crafted with precision, designed for perfection"
+                    %}
+                    {% assign s1_sentences = s1_subtitle | split: "." %}
+                    {% for sentence in s1_sentences %}
+                      {% assign trimmed_sentence = sentence | strip %}
+                      {% if trimmed_sentence != blank %}
+                        <p
+                          class='text-lg md:text-xl mb-1'
+                          style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'
+                        >
+                          {{ trimmed_sentence }}.
+                        </p>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+                {% if section.settings.slide_1_button_enable
+                  and section.settings.slide_1_button_text != blank
+                %}
+                  <div class='hero-slide-button-wrap pointer-events-auto'>
+                    {% assign slide_1_button_action = section.settings.slide_1_button_action
+                      | default: "link"
+                    %}
+                    {% if slide_1_button_action == "form" %}
+                      <button
+                        type='button'
+                        class='hero-slide-1-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                        style='background-color: {{ section.settings.slide_1_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_1_button_text_color | default: "#ffffff" }};'
+                        data-klaviyo-form-id='{{ section.settings.slide_1_button_form_id | escape }}'
+                      >
+                        {{ section.settings.slide_1_button_text }}
+                      </button>
+                    {% else %}
+                      <a
+                        href='{{ section.settings.slide_1_button_url | default: "/collections/professional" }}'
+                        class='hero-slide-1-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                        style='background-color: {{ section.settings.slide_1_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_1_button_text_color | default: "#ffffff" }};'
+                      >
+                        {{ section.settings.slide_1_button_text }}
+                      </a>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+        </swiper-slide>
       {% endif %}
 
       <!-- Slide 2 -->
@@ -293,22 +298,22 @@
         | default: "link"
       %}
       {% if hero_mode != "single" or single_slide == "slide_2" %}
-      <swiper-slide
-        class='relative slide-2'
-        style='--slide-aspect-desktop: {{ slide_2_ratio_desktop }}; --slide-aspect-tablet: {{ slide_2_ratio_tablet }}; --slide-aspect-mobile: {{ slide_2_ratio_mobile }};'
-      >
-        {% if slide_2_button_action == "form" %}
-          <button
-            type='button'
-            class='hero-slide-media hero-slide-media-button hero-slide-2-media block w-full'
-            data-klaviyo-form-id='{{ section.settings.slide_2_button_form_id | escape }}'
-          >
-        {% else %}
-          <a
-            href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
-            class='hero-slide-media hero-slide-2-media block w-full'
-          >
-        {% endif %}
+        <swiper-slide
+          class='relative slide-2'
+          style='--slide-aspect-desktop: {{ slide_2_ratio_desktop }}; --slide-aspect-tablet: {{ slide_2_ratio_tablet }}; --slide-aspect-mobile: {{ slide_2_ratio_mobile }};'
+        >
+          {% if slide_2_button_action == "form" %}
+            <button
+              type='button'
+              class='hero-slide-media hero-slide-media-button hero-slide-2-media block w-full'
+              data-klaviyo-form-id='{{ section.settings.slide_2_button_form_id | escape }}'
+            >
+          {% else %}
+            <a
+              href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
+              class='hero-slide-media hero-slide-2-media block w-full'
+            >
+          {% endif %}
           {% if slide_2_base_image %}
             <picture class='w-full h-full block'>
               {% if slide_2_image_mobile %}
@@ -340,104 +345,18 @@
             }}
           {% endif %}
           {% if section.settings.slide_2_overlay_enable %}
-            <div class='absolute inset-0 bg-black/{{ section.settings.slide_2_overlay_opacity | default: 40 }}'></div>
+            <div
+              class='absolute inset-0 bg-black/{{ section.settings.slide_2_overlay_opacity | default: 40 }}'
+            ></div>
           {% endif %}
-        {% if slide_2_button_action == "form" %}
-          </button>
-        {% else %}
-          </a>
-        {% endif %}
-        {% if section.settings.show_text_overlay %}
-          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
-            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20 hero-overlay__inner'>
-              {% assign s2_shadow = section.settings.slide_2_text_shadow_strength
-                | default: "soft"
-              %}
-              {% assign s2_op = "0.35" %}
-              {% case s2_shadow %}
-                {% when "none" -%}
-                  {%- assign s2_op = "0" %}
-                {% when "soft" -%}
-                  {%- assign s2_op = "0.35" %}
-                {% when "medium" -%}
-                  {%- assign s2_op = "0.6" %}
-                {% when "strong" -%}
-                  {%- assign s2_op = "0.85" %}
-              {% endcase %}
-              <div class='kk-text-wrap inline-block'>
-                {% if section.settings.slide_2_text_bg_enable %}
-                  {% assign s2_bg_op_pct = section.settings.slide_2_text_bg_opacity
-                    | default: 50
-                  %}
-                  {% assign s2_bg_alpha = s2_bg_op_pct | divided_by: 100.0 %}
-                  <div
-                    class='kk-text-bg'
-                    style='background-color: {{ section.settings.slide_2_text_bg_color | default: '#000000' | color_modify: 'alpha', s2_bg_alpha }}'
-                  ></div>
-                {% endif %}
-                <div class='kk-text-content pt-4'>
-                  <h1
-                    class='text-4xl md:text-6xl font-bold mb-4'
-                    style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
-                  >
-                    {{
-                      section.settings.slide_2_title
-                      | default: "Professional Grade"
-                    }}
-                  </h1>
-                  {% assign s2_subtitle = section.settings.slide_2_subtitle
-                    | default: "Tools that professionals trust"
-                  %}
-                  {% assign s2_sentences = s2_subtitle | split: "." %}
-                  {% for sentence in s2_sentences %}
-                    {% assign trimmed_sentence = sentence | strip %}
-                    {% if trimmed_sentence != blank %}
-                      <p
-                        class='text-lg md:text-xl mb-1'
-                        style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
-                      >
-                        {{ trimmed_sentence }}.
-                      </p>
-                    {% endif %}
-                  {% endfor %}
-                </div>
-              </div>
-              {% if section.settings.slide_2_button_enable
-                and section.settings.slide_2_button_text != blank
-              %}
-                <div class='hero-slide-button-wrap pointer-events-auto'>
-                  {% assign slide_2_button_action = section.settings.slide_2_button_action
-                    | default: "link"
-                  %}
-                  {% if slide_2_button_action == "form" %}
-                    <button
-                      type='button'
-                      class='hero-slide-2-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                      style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
-                      data-klaviyo-form-id='{{ section.settings.slide_2_button_form_id | escape }}'
-                    >
-                      {{ section.settings.slide_2_button_text }}
-                    </button>
-                  {% else %}
-                    <a
-                      href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
-                      class='hero-slide-2-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                      style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
-                    >
-                      {{ section.settings.slide_2_button_text }}
-                    </a>
-                  {% endif %}
-                </div>
-              {% endif %}
-            </div>
-          </div>
-        {% endif %}
-
-        <!-- Mobile texts and button -->
-        {% comment %}
+          {% if slide_2_button_action == "form" %}
+            </button>
+          {% else %}
+            </a>
+          {% endif %}
           {% if section.settings.show_text_overlay %}
-            <div class='absolute  md:hidden bottom-8 lg:-bottom-4 inset-0 z-10 pointer-events-none'>
-              <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20 flex flex-col items-center justify-between h-full pt-16 pb-14'>
+            <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
+              <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20 hero-overlay__inner'>
                 {% assign s2_shadow = section.settings.slide_2_text_shadow_strength
                   | default: "soft"
                 %}
@@ -463,7 +382,7 @@
                       style='background-color: {{ section.settings.slide_2_text_bg_color | default: '#000000' | color_modify: 'alpha', s2_bg_alpha }}'
                     ></div>
                   {% endif %}
-                  <div class='kk-text-content'>
+                  <div class='kk-text-content pt-4'>
                     <h1
                       class='text-4xl md:text-6xl font-bold mb-4'
                       style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
@@ -493,21 +412,109 @@
                 {% if section.settings.slide_2_button_enable
                   and section.settings.slide_2_button_text != blank
                 %}
-                  <div class='mt-4 pointer-events-auto'>
-                    <a
-                      href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
-                      class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                      style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
-                    >
-                      {{ section.settings.slide_2_button_text }}
-                    </a>
+                  <div class='hero-slide-button-wrap pointer-events-auto'>
+                    {% assign slide_2_button_action = section.settings.slide_2_button_action
+                      | default: "link"
+                    %}
+                    {% if slide_2_button_action == "form" %}
+                      <button
+                        type='button'
+                        class='hero-slide-2-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                        style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
+                        data-klaviyo-form-id='{{ section.settings.slide_2_button_form_id | escape }}'
+                      >
+                        {{ section.settings.slide_2_button_text }}
+                      </button>
+                    {% else %}
+                      <a
+                        href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
+                        class='hero-slide-2-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                        style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
+                      >
+                        {{ section.settings.slide_2_button_text }}
+                      </a>
+                    {% endif %}
                   </div>
                 {% endif %}
               </div>
             </div>
           {% endif %}
-        {% endcomment %}
-      </swiper-slide>
+
+          <!-- Mobile texts and button -->
+          {% comment %}
+            {% if section.settings.show_text_overlay %}
+              <div class='absolute  md:hidden bottom-8 lg:-bottom-4 inset-0 z-10 pointer-events-none'>
+                <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20 flex flex-col items-center justify-between h-full pt-16 pb-14'>
+                  {% assign s2_shadow = section.settings.slide_2_text_shadow_strength
+                    | default: "soft"
+                  %}
+                  {% assign s2_op = "0.35" %}
+                  {% case s2_shadow %}
+                    {% when "none" -%}
+                      {%- assign s2_op = "0" %}
+                    {% when "soft" -%}
+                      {%- assign s2_op = "0.35" %}
+                    {% when "medium" -%}
+                      {%- assign s2_op = "0.6" %}
+                    {% when "strong" -%}
+                      {%- assign s2_op = "0.85" %}
+                  {% endcase %}
+                  <div class='kk-text-wrap inline-block'>
+                    {% if section.settings.slide_2_text_bg_enable %}
+                      {% assign s2_bg_op_pct = section.settings.slide_2_text_bg_opacity
+                        | default: 50
+                      %}
+                      {% assign s2_bg_alpha = s2_bg_op_pct | divided_by: 100.0 %}
+                      <div
+                        class='kk-text-bg'
+                        style='background-color: {{ section.settings.slide_2_text_bg_color | default: '#000000' | color_modify: 'alpha', s2_bg_alpha }}'
+                      ></div>
+                    {% endif %}
+                    <div class='kk-text-content'>
+                      <h1
+                        class='text-4xl md:text-6xl font-bold mb-4'
+                        style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
+                      >
+                        {{
+                          section.settings.slide_2_title
+                          | default: "Professional Grade"
+                        }}
+                      </h1>
+                      {% assign s2_subtitle = section.settings.slide_2_subtitle
+                        | default: "Tools that professionals trust"
+                      %}
+                      {% assign s2_sentences = s2_subtitle | split: "." %}
+                      {% for sentence in s2_sentences %}
+                        {% assign trimmed_sentence = sentence | strip %}
+                        {% if trimmed_sentence != blank %}
+                          <p
+                            class='text-lg md:text-xl mb-1'
+                            style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
+                          >
+                            {{ trimmed_sentence }}.
+                          </p>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                  {% if section.settings.slide_2_button_enable
+                    and section.settings.slide_2_button_text != blank
+                  %}
+                    <div class='mt-4 pointer-events-auto'>
+                      <a
+                        href='{{ section.settings.slide_2_button_url | default: "/collections/professional" }}'
+                        class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                        style='background-color: {{ section.settings.slide_2_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_2_button_text_color | default: "#ffffff" }};'
+                      >
+                        {{ section.settings.slide_2_button_text }}
+                      </a>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+          {% endcomment %}
+        </swiper-slide>
       {% endif %}
 
       <!-- Slide 3 -->
@@ -515,22 +522,22 @@
         | default: "link"
       %}
       {% if hero_mode != "single" or single_slide == "slide_3" %}
-      <swiper-slide
-        class='relative slide-3'
-        style='--slide-aspect-desktop: {{ slide_3_ratio_desktop }}; --slide-aspect-tablet: {{ slide_3_ratio_tablet }}; --slide-aspect-mobile: {{ slide_3_ratio_mobile }};'
-      >
-        {% if slide_3_button_action == "form" %}
-          <button
-            type='button'
-            class='hero-slide-media hero-slide-media-button hero-slide-3-media block w-full'
-            data-klaviyo-form-id='{{ section.settings.slide_3_button_form_id | escape }}'
-          >
-        {% else %}
-          <a
-            href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
-            class='hero-slide-media hero-slide-3-media block w-full'
-          >
-        {% endif %}
+        <swiper-slide
+          class='relative slide-3'
+          style='--slide-aspect-desktop: {{ slide_3_ratio_desktop }}; --slide-aspect-tablet: {{ slide_3_ratio_tablet }}; --slide-aspect-mobile: {{ slide_3_ratio_mobile }};'
+        >
+          {% if slide_3_button_action == "form" %}
+            <button
+              type='button'
+              class='hero-slide-media hero-slide-media-button hero-slide-3-media block w-full'
+              data-klaviyo-form-id='{{ section.settings.slide_3_button_form_id | escape }}'
+            >
+          {% else %}
+            <a
+              href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
+              class='hero-slide-media hero-slide-3-media block w-full'
+            >
+          {% endif %}
           {% if slide_3_base_image %}
             <picture class='w-full h-full block'>
               {% if slide_3_image_mobile %}
@@ -562,99 +569,101 @@
             }}
           {% endif %}
           {% if section.settings.slide_3_overlay_enable %}
-            <div class='absolute inset-0 bg-black/{{ section.settings.slide_3_overlay_opacity | default: 40 }}'></div>
+            <div
+              class='absolute inset-0 bg-black/{{ section.settings.slide_3_overlay_opacity | default: 40 }}'
+            ></div>
           {% endif %}
-        {% if slide_3_button_action == "form" %}
-          </button>
-        {% else %}
-          </a>
-        {% endif %}
-        {% if section.settings.show_text_overlay %}
-          <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
-            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20 hero-overlay__inner'>
-              {% assign s3_shadow = section.settings.slide_3_text_shadow_strength
-                | default: "soft"
-              %}
-              {% assign s3_op = "0.35" %}
-              {% case s3_shadow %}
-                {% when "none" -%}
-                  {%- assign s3_op = "0" %}
-                {% when "soft" -%}
-                  {%- assign s3_op = "0.35" %}
-                {% when "medium" -%}
-                  {%- assign s3_op = "0.6" %}
-                {% when "strong" -%}
-                  {%- assign s3_op = "0.85" %}
-              {% endcase %}
-              <div class='kk-text-wrap inline-block'>
-                {% if section.settings.slide_3_text_bg_enable %}
-                  {% assign s3_bg_op_pct = section.settings.slide_3_text_bg_opacity
-                    | default: 50
-                  %}
-                  {% assign s3_bg_alpha = s3_bg_op_pct | divided_by: 100.0 %}
-                  <div
-                    class='kk-text-bg'
-                    style='background-color: {{ section.settings.slide_3_text_bg_color | default: '#000000' | color_modify: 'alpha', s3_bg_alpha }}'
-                  ></div>
-                {% endif %}
-                <div class='kk-text-content'>
-                  <h1
-                    class='text-4xl md:text-6xl font-bold mb-4'
-                    style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'
-                  >
-                    {{
-                      section.settings.slide_3_title
-                      | default: "Handcrafted Excellence"
-                    }}
-                  </h1>
-                  {% assign s3_subtitle = section.settings.slide_3_subtitle
-                    | default: "Every piece tells a story of craftsmanship"
-                  %}
-                  {% assign s3_sentences = s3_subtitle | split: "." %}
-                  {% for sentence in s3_sentences %}
-                    {% assign trimmed_sentence = sentence | strip %}
-                    {% if trimmed_sentence != blank %}
-                      <p
-                        class='text-lg md:text-xl mb-1'
-                        style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'
-                      >
-                        {{ trimmed_sentence }}.
-                      </p>
-                    {% endif %}
-                  {% endfor %}
-                </div>
-              </div>
-              {% if section.settings.slide_3_button_enable
-                and section.settings.slide_3_button_text != blank
-              %}
-                <div class='hero-slide-button-wrap pointer-events-auto'>
-                  {% assign slide_3_button_action = section.settings.slide_3_button_action
-                    | default: "link"
-                  %}
-                  {% if slide_3_button_action == "form" %}
-                    <button
-                      type='button'
-                      class='hero-slide-3-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                      style='background-color: {{ section.settings.slide_3_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_3_button_text_color | default: "#ffffff" }};'
-                      data-klaviyo-form-id='{{ section.settings.slide_3_button_form_id | escape }}'
-                    >
-                      {{ section.settings.slide_3_button_text }}
-                    </button>
-                  {% else %}
-                    <a
-                      href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
-                      class='hero-slide-3-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                      style='background-color: {{ section.settings.slide_3_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_3_button_text_color | default: "#ffffff" }};'
-                    >
-                      {{ section.settings.slide_3_button_text }}
-                    </a>
+          {% if slide_3_button_action == "form" %}
+            </button>
+          {% else %}
+            </a>
+          {% endif %}
+          {% if section.settings.show_text_overlay %}
+            <div class='absolute bottom-8 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
+              <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-20 hero-overlay__inner'>
+                {% assign s3_shadow = section.settings.slide_3_text_shadow_strength
+                  | default: "soft"
+                %}
+                {% assign s3_op = "0.35" %}
+                {% case s3_shadow %}
+                  {% when "none" -%}
+                    {%- assign s3_op = "0" %}
+                  {% when "soft" -%}
+                    {%- assign s3_op = "0.35" %}
+                  {% when "medium" -%}
+                    {%- assign s3_op = "0.6" %}
+                  {% when "strong" -%}
+                    {%- assign s3_op = "0.85" %}
+                {% endcase %}
+                <div class='kk-text-wrap inline-block'>
+                  {% if section.settings.slide_3_text_bg_enable %}
+                    {% assign s3_bg_op_pct = section.settings.slide_3_text_bg_opacity
+                      | default: 50
+                    %}
+                    {% assign s3_bg_alpha = s3_bg_op_pct | divided_by: 100.0 %}
+                    <div
+                      class='kk-text-bg'
+                      style='background-color: {{ section.settings.slide_3_text_bg_color | default: '#000000' | color_modify: 'alpha', s3_bg_alpha }}'
+                    ></div>
                   {% endif %}
+                  <div class='kk-text-content'>
+                    <h1
+                      class='text-4xl md:text-6xl font-bold mb-4'
+                      style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'
+                    >
+                      {{
+                        section.settings.slide_3_title
+                        | default: "Handcrafted Excellence"
+                      }}
+                    </h1>
+                    {% assign s3_subtitle = section.settings.slide_3_subtitle
+                      | default: "Every piece tells a story of craftsmanship"
+                    %}
+                    {% assign s3_sentences = s3_subtitle | split: "." %}
+                    {% for sentence in s3_sentences %}
+                      {% assign trimmed_sentence = sentence | strip %}
+                      {% if trimmed_sentence != blank %}
+                        <p
+                          class='text-lg md:text-xl mb-1'
+                          style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'
+                        >
+                          {{ trimmed_sentence }}.
+                        </p>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
                 </div>
-              {% endif %}
+                {% if section.settings.slide_3_button_enable
+                  and section.settings.slide_3_button_text != blank
+                %}
+                  <div class='hero-slide-button-wrap pointer-events-auto'>
+                    {% assign slide_3_button_action = section.settings.slide_3_button_action
+                      | default: "link"
+                    %}
+                    {% if slide_3_button_action == "form" %}
+                      <button
+                        type='button'
+                        class='hero-slide-3-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                        style='background-color: {{ section.settings.slide_3_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_3_button_text_color | default: "#ffffff" }};'
+                        data-klaviyo-form-id='{{ section.settings.slide_3_button_form_id | escape }}'
+                      >
+                        {{ section.settings.slide_3_button_text }}
+                      </button>
+                    {% else %}
+                      <a
+                        href='{{ section.settings.slide_3_button_url | default: "/pages/about" }}'
+                        class='hero-slide-3-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                        style='background-color: {{ section.settings.slide_3_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.slide_3_button_text_color | default: "#ffffff" }};'
+                      >
+                        {{ section.settings.slide_3_button_text }}
+                      </a>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </div>
             </div>
-          </div>
-        {% endif %}
-      </swiper-slide>
+          {% endif %}
+        </swiper-slide>
       {% endif %}
 
       <!-- Autoplay Progress Indicator -->
@@ -1040,12 +1049,12 @@
     },
     {
       "type": "range",
-      "id": "autoplay_delay",
-      "label": "Autoplay Delay (seconds)",
-      "min": 2000,
-      "max": 5000,
-      "step": 500,
-      "default": 5000
+      "id": "slider_autoplay_delay",
+      "label": "Slider autoplay delay (seconds)",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "default": 5
     },
     {
       "type": "range",
