@@ -41,31 +41,33 @@
 
   <div class='max-w-6xl mx-auto w-full px-4 py-12'>
     <div class='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-16'>
-      <div class='flex items-center gap-3 bg-black px-6 py-3 rounded-full'>
+      <div class='flex items-center bg-black rounded-full'>
         {% if section.settings.logo_right_image != blank %}
           <img
-            src='{{ section.settings.logo_right_image | image_url: width: 80 }}'
+            src='{{ section.settings.logo_right_image | image_url: width: 200 }}'
             alt='{{ section.settings.logo_right_text | escape }}'
-            class='h-6 w-6'
+            class='h-12 w-12 object-contain p-2'
             loading='lazy'
           >
+        {% else %}
+          <span class='text-white font-bold text-lg px-6 py-3'>
+            {{ section.settings.logo_right_text }}
+          </span>
         {% endif %}
-        <span class='text-white font-bold text-lg'>
-          {{ section.settings.logo_right_text }}
-        </span>
       </div>
-      <div class='flex items-center gap-3 bg-black px-6 py-3 rounded-full'>
+      <div class='flex items-center bg-black rounded-full'>
         {% if section.settings.logo_left_image != blank %}
           <img
-            src='{{ section.settings.logo_left_image | image_url: width: 80 }}'
+            src='{{ section.settings.logo_left_image | image_url: width: 200 }}'
             alt='{{ section.settings.logo_left_text | escape }}'
-            class='h-6 w-6'
+            class='h-12 w-12 object-contain p-2'
             loading='lazy'
           >
+        {% else %}
+          <span class='text-white font-bold text-lg px-6 py-3'>
+            {{ section.settings.logo_left_text }}
+          </span>
         {% endif %}
-        <span class='text-white font-bold text-lg'>
-          {{ section.settings.logo_left_text }}
-        </span>
       </div>
     </div>
 
@@ -131,7 +133,7 @@
     </div>
   </div>
 
-  <div class='border-t border-gray-200 bg-gray-50'>
+  <div class='border-t border-gray-200 bg-white'>
     <div class='max-w-6xl mx-auto px-4 py-8 paboyz-feature-text'>
       <div class='max-w-3xl mx-auto text-center'>
         <h2 class='text-3xl font-bold text-black mb-3'>
