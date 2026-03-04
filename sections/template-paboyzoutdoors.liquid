@@ -158,11 +158,17 @@
           {% for shared_image in shared_images %}
             <swiper-slide>
               {% if shared_image != blank %}
-                <img
-                  src='{{ shared_image | image_url: width: 1200 }}'
-                  alt=''
-                  loading='lazy'
+                <a
+                  href='https://instagram.com/kestrelknives'
+                  target='_blank'
+                  rel='noopener'
                 >
+                  <img
+                    src='{{ shared_image | image_url: width: 1200 }}'
+                    alt=''
+                    loading='lazy'
+                  >
+                </a>
               {% else %}
                 {{ "lifestyle-1" | placeholder_svg_tag: "w-full h-full bg-gray-200" }}
               {% endif %}
@@ -173,11 +179,17 @@
             {% if block.type == 'slider_image' %}
               <swiper-slide>
                 {% if block.settings.image != blank %}
-                  <img
-                    src='{{ block.settings.image | image_url: width: 1200 }}'
-                    alt='{{ block.settings.alt_text | escape }}'
-                    loading='lazy'
+                  <a
+                    href='https://instagram.com/kestrelknives'
+                    target='_blank'
+                    rel='noopener'
                   >
+                    <img
+                      src='{{ block.settings.image | image_url: width: 1200 }}'
+                      alt='{{ block.settings.alt_text | escape }}'
+                      loading='lazy'
+                    >
+                  </a>
                 {% else %}
                   {{ "lifestyle-1" | placeholder_svg_tag: "w-full h-full bg-gray-200" }}
                 {% endif %}
