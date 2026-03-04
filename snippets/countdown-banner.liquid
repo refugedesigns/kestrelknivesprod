@@ -37,7 +37,7 @@
             </div>
           {% else %}
             <button
-              @click='openDrawer()'
+              @click.stop='openDrawer()'
               class='px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors hover:opacity-90'
               style='background-color: {{ section.settings.notify_button_bg_color | default: "#ea580c" }}; color: {{ section.settings.notify_button_text_color | default: "#ffffff" }};'
             >
