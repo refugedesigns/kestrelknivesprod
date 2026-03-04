@@ -55,7 +55,7 @@
         "slide_1_button_form_id": "TRArE7",
         "slide_1_button_url": "shopify://products/mountain-caper",
         "slide_2_button_enable": true,
-        "slide_2_overlay_enable": true,
+        "slide_2_overlay_enable": false,
         "slide_2_overlay_opacity": 30,
         "slide_2_text_bg_enable": false,
         "slide_2_text_bg_color": "#000000",
