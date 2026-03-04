@@ -223,6 +223,12 @@
       "content": "Gallery Settings"
     },
     {
+      "type": "page",
+      "id": "shared_gallery_page",
+      "label": "Shared gallery page (optional)",
+      "info": "Uses page metafield custom.shared_gallery_images (file list) when set."
+    },
+    {
       "type": "range",
       "id": "columns_desktop",
       "label": "Columns on Desktop",
@@ -531,7 +537,40 @@
 <!-- Media Gallery -->
 <div class='pt-2 pb-12 px-4'>
   <div class='mx-auto'>
-    {% if section.blocks.size > 0 %}
+    {% assign shared_page = section.settings.shared_gallery_page %}
+    {% assign shared_images = blank %}
+    {% if shared_page != blank and shared_page.metafields.custom.shared_gallery_images != blank %}
+      {% assign shared_images = shared_page.metafields.custom.shared_gallery_images.value %}
+    {% endif %}
+    {% if shared_images != blank %}
+      <div style='transform: scale({{ section.settings.gallery_scale | divided_by: 100.0 }}); transform-origin: center;'>
+        <div
+          class='grid gap-3'
+          style='grid-template-columns: repeat({{ section.settings.columns_mobile }}, 1fr);'
+          data-mobile-cols='{{ section.settings.columns_mobile }}'
+          data-tablet-cols='{{ section.settings.columns_tablet }}'
+          data-desktop-cols='{{ section.settings.columns_desktop }}'
+        >
+          {% for item in shared_images %}
+            {% assign shared_image = item.image %}
+            <div class='group relative overflow-hidden rounded-lg aspect-square w-full h-full'>
+              {% if shared_image != blank %}
+                <img
+                  src='{{ shared_image | image_url: width: 800 }}'
+                  alt=''
+                  class='w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300'
+                  loading='lazy'
+                >
+              {% else %}
+                <div class='w-full h-full bg-gray-200 flex items-center justify-center aspect-square'>
+                  <span class='text-gray-500 text-sm'>No image</span>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% elsif section.blocks.size > 0 %}
       <div style='transform: scale({{ section.settings.gallery_scale | divided_by: 100.0 }}); transform-origin: center;'>
         <div
           class='grid gap-3'
