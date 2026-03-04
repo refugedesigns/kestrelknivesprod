@@ -144,6 +144,7 @@
     },
     "big-timer": {
       "type": "big-timer",
+      "disabled": true,
       "settings": {
         "show_timer": true,
         "main_title": "Mountain Caper 2.0 Drop Is Live Now!",
