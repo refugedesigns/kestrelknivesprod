@@ -42,21 +42,6 @@
   <div class='max-w-6xl mx-auto w-full px-4 py-12'>
     <div class='flex flex-row justify-between items-center gap-4 mb-16 flex-wrap'>
       <div class='flex items-center'>
-        {% if section.settings.logo_right_image != blank %}
-          <img
-            src='{{ section.settings.logo_right_image | image_url: width: 300 }}'
-            alt='{{ section.settings.logo_right_text | escape }}'
-            class='object-contain'
-            style='width: {{ section.settings.logo_right_size | default: 72 }}px; height: {{ section.settings.logo_right_size | default: 72 }}px;'
-            loading='lazy'
-          >
-        {% else %}
-          <span class='text-black font-bold text-lg'>
-            {{ section.settings.logo_right_text }}
-          </span>
-        {% endif %}
-      </div>
-      <div class='flex items-center'>
         {% if section.settings.logo_left_image != blank %}
           <img
             src='{{ section.settings.logo_left_image | image_url: width: 300 }}'
@@ -71,12 +56,41 @@
           </span>
         {% endif %}
       </div>
+      <div class='flex items-center'>
+        {% if section.settings.logo_center_image != blank %}
+          <img
+            src='{{ section.settings.logo_center_image | image_url: width: 300 }}'
+            alt='{{ section.settings.logo_center_text | escape }}'
+            class='object-contain'
+            style='width: {{ section.settings.logo_center_size | default: 72 }}px; height: {{ section.settings.logo_center_size | default: 72 }}px;'
+            loading='lazy'
+          >
+        {% else %}
+          <span class='text-black font-bold text-lg'>
+            {{ section.settings.logo_center_text }}
+          </span>
+        {% endif %}
+      </div>
+      <div class='flex items-center'>
+        {% if section.settings.logo_right_image != blank %}
+          <img
+            src='{{ section.settings.logo_right_image | image_url: width: 300 }}'
+            alt='{{ section.settings.logo_right_text | escape }}'
+            class='object-contain'
+            style='width: {{ section.settings.logo_right_size | default: 72 }}px; height: {{ section.settings.logo_right_size | default: 72 }}px;'
+            loading='lazy'
+          >
+        {% else %}
+          <span class='text-black font-bold text-lg'>
+            {{ section.settings.logo_right_text }}
+          </span>
+        {% endif %}
+      </div>
     </div>
 
     <div class='paboyz-hero-text text-center mb-8 space-y-4'>
       <h1 class='text-5xl md:text-7xl font-bold text-black leading-tight'>
-        <span class='block'>{{ section.settings.hero_heading_line_1 }}</span>
-        <span class='block text-black'>{{ section.settings.hero_heading_line_2 }}</span>
+        {{ section.settings.hero_heading }}
       </h1>
       <p class='paboyz-hero-subheading text-xl text-gray-700 text-center' style='text-align: center;'>
         {{ section.settings.hero_subheading }}
@@ -172,6 +186,27 @@
     },
     {
       "type": "image_picker",
+      "id": "logo_center_image",
+      "label": "Center logo image"
+    },
+    {
+      "type": "range",
+      "id": "logo_center_size",
+      "label": "Center logo size (px)",
+      "min": 100,
+      "max": 600,
+      "step": 5,
+      "default": 100,
+      "unit": "px"
+    },
+    {
+      "type": "text",
+      "id": "logo_center_text",
+      "label": "Center logo text",
+      "default": "Kestrel"
+    },
+    {
+      "type": "image_picker",
       "id": "logo_right_image",
       "label": "Right logo image"
     },
@@ -189,7 +224,7 @@
       "type": "text",
       "id": "logo_right_text",
       "label": "Right logo text",
-      "default": "PaBoyz"
+      "default": "Clearfield"
     },
     {
       "type": "header",
@@ -197,15 +232,9 @@
     },
     {
       "type": "text",
-      "id": "hero_heading_line_1",
-      "label": "Hero heading line 1",
-      "default": "Win 1 of 12"
-    },
-    {
-      "type": "text",
-      "id": "hero_heading_line_2",
-      "label": "Hero heading line 2",
-      "default": "Kestrel Knives"
+      "id": "hero_heading",
+      "label": "Hero heading",
+      "default": "Win 1 of 12 Kestrel Knives"
     },
     {
       "type": "textarea",
