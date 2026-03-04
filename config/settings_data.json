@@ -39,7 +39,7 @@
           "cart_badge_bg_color": "#111827",
           "cart_badge_text_color": "#f2f2f2",
           "countdown_enabled": true,
-          "countdown_show_timer": false,
+          "countdown_show_timer": true,
           "countdown_title": "Mountain Caper 2.0 Drop Is Live Now!",
           "countdown_target_date": "2026-02-27T19:00:00-05:00",
           "countdown_bg_color": "#000000",
@@ -47,7 +47,7 @@
           "countdown_text_color": "#ffffff",
           "notify_button_text": "Order Now!",
           "notify_button_action": "link",
-          "notify_button_link": "shopify://products/mountain-caper",
+          "notify_button_link": "shopify://products/ovis-hunter",
           "notify_button_bg_color": "#ffffff",
           "notify_button_text_color": "#151313"
         }
