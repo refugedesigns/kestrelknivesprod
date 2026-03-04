@@ -195,12 +195,21 @@
         openDrawer() {
           this.ensureDrawerInBody()
           this.drawerOpen = true
+          const drawer = document.getElementById('countdownDrawer')
+          if (drawer) {
+            drawer.style.display = 'block'
+            drawer.style.visibility = 'visible'
+          }
           document.body.style.overflow = 'hidden'
         },
 
         closeDrawer() {
           this.drawerOpen = false
           document.body.style.overflow = ''
+          const drawer = document.getElementById('countdownDrawer')
+          if (drawer) {
+            drawer.style.display = 'none'
+          }
         },
         ensureDrawerInBody() {
           const drawer = document.getElementById('countdownDrawer')
