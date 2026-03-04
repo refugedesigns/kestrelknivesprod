@@ -11,26 +11,6 @@
   "sections": {
     "template-paboyzoutdoors": {
       "type": "template-paboyzoutdoors",
-      "blocks": {
-        "slider_image_Q8pCBa": {
-          "type": "slider_image",
-          "settings": {
-            "image": "shopify://shop_images/kestrelknives_26185085_534154173619564_5783745686851813376_n.jpg",
-            "alt_text": ""
-          }
-        },
-        "slider_image_HRmH7q": {
-          "type": "slider_image",
-          "settings": {
-            "image": "shopify://shop_images/kestrelknives_21985361_1526997824004208_4616696797857841152_n.jpg",
-            "alt_text": ""
-          }
-        }
-      },
-      "block_order": [
-        "slider_image_Q8pCBa",
-        "slider_image_HRmH7q"
-      ],
       "settings": {
         "logo_left_image": "shopify://shop_images/Firefly_Gemini_Flash_29.png",
         "logo_left_size": 155,
