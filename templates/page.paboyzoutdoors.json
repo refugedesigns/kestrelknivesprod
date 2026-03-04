@@ -18,10 +18,18 @@
             "image": "shopify://shop_images/kestrelknives_26185085_534154173619564_5783745686851813376_n.jpg",
             "alt_text": ""
           }
+        },
+        "slider_image_HRmH7q": {
+          "type": "slider_image",
+          "settings": {
+            "image": "shopify://shop_images/kestrelknives_21985361_1526997824004208_4616696797857841152_n.jpg",
+            "alt_text": ""
+          }
         }
       },
       "block_order": [
-        "slider_image_Q8pCBa"
+        "slider_image_Q8pCBa",
+        "slider_image_HRmH7q"
       ],
       "settings": {
         "logo_left_image": "shopify://shop_images/Firefly_Gemini_Flash_29.png",
@@ -49,6 +57,7 @@
         "form_success_text": "Your entry has been received. Good luck!",
         "feature_heading": "Premium Craftsmanship",
         "feature_text": "Each Kestrel Knife is expertly crafted with precision engineering and premium materials. Built for performance and durability, these are the tools serious craftspeople depend on.",
+        "shared_gallery_page": "media",
         "slider_autoplay_delay": 5000,
         "slider_height_desktop": 320,
         "slider_height_mobile": 240
