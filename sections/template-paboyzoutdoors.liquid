@@ -31,6 +31,16 @@
       margin-left: auto !important;
       margin-right: auto !important;
     }
+    .paboyz-logo {
+      width: var(--logo-size, 72px);
+      height: var(--logo-size, 72px);
+    }
+    @media (max-width: 768px) {
+      .paboyz-logo {
+        width: var(--logo-size-mobile, 56px);
+        height: var(--logo-size-mobile, 56px);
+      }
+    }
     .paboyz-feature-slider {
       position: relative;
     }
@@ -46,8 +56,8 @@
           <img
             src='{{ section.settings.logo_left_image | image_url: width: 300 }}'
             alt='{{ section.settings.logo_left_text | escape }}'
-            class='object-contain'
-            style='width: {{ section.settings.logo_left_size | default: 72 }}px; height: {{ section.settings.logo_left_size | default: 72 }}px;'
+            class='paboyz-logo object-contain'
+            style='--logo-size: {{ section.settings.logo_left_size | default: 72 }}px; --logo-size-mobile: {{ section.settings.logo_left_size_mobile | default: 56 }}px;'
             loading='lazy'
           >
         {% else %}
@@ -61,8 +71,8 @@
           <img
             src='{{ section.settings.logo_center_image | image_url: width: 300 }}'
             alt='{{ section.settings.logo_center_text | escape }}'
-            class='object-contain'
-            style='width: {{ section.settings.logo_center_size | default: 72 }}px; height: {{ section.settings.logo_center_size | default: 72 }}px;'
+            class='paboyz-logo object-contain'
+            style='--logo-size: {{ section.settings.logo_center_size | default: 72 }}px; --logo-size-mobile: {{ section.settings.logo_center_size_mobile | default: 56 }}px;'
             loading='lazy'
           >
         {% else %}
@@ -76,8 +86,8 @@
           <img
             src='{{ section.settings.logo_right_image | image_url: width: 300 }}'
             alt='{{ section.settings.logo_right_text | escape }}'
-            class='object-contain'
-            style='width: {{ section.settings.logo_right_size | default: 72 }}px; height: {{ section.settings.logo_right_size | default: 72 }}px;'
+            class='paboyz-logo object-contain'
+            style='--logo-size: {{ section.settings.logo_right_size | default: 72 }}px; --logo-size-mobile: {{ section.settings.logo_right_size_mobile | default: 56 }}px;'
             loading='lazy'
           >
         {% else %}
@@ -179,6 +189,16 @@
       "unit": "px"
     },
     {
+      "type": "range",
+      "id": "logo_left_size_mobile",
+      "label": "Left logo size - Mobile (px)",
+      "min": 40,
+      "max": 200,
+      "step": 4,
+      "default": 56,
+      "unit": "px"
+    },
+    {
       "type": "text",
       "id": "logo_left_text",
       "label": "Left logo text",
@@ -200,6 +220,16 @@
       "unit": "px"
     },
     {
+      "type": "range",
+      "id": "logo_center_size_mobile",
+      "label": "Center logo size - Mobile (px)",
+      "min": 40,
+      "max": 200,
+      "step": 4,
+      "default": 56,
+      "unit": "px"
+    },
+    {
       "type": "text",
       "id": "logo_center_text",
       "label": "Center logo text",
@@ -218,6 +248,16 @@
       "max": 600,
       "step": 5,
       "default": 100,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "logo_right_size_mobile",
+      "label": "Right logo size - Mobile (px)",
+      "min": 40,
+      "max": 200,
+      "step": 4,
+      "default": 56,
       "unit": "px"
     },
     {
