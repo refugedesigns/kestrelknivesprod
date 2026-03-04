@@ -149,7 +149,26 @@
         centered-slides='false'
         breakpoints='{"0":{"slidesPerView":1},"640":{"slidesPerView":2},"1024":{"slidesPerView":4}}'
       >
-        {% if section.blocks.size > 0 %}
+        {% assign shared_page = section.settings.shared_gallery_page %}
+        {% assign shared_images = blank %}
+        {% if shared_page != blank and shared_page.metafields.custom.shared_gallery_images != blank %}
+          {% assign shared_images = shared_page.metafields.custom.shared_gallery_images.value %}
+        {% endif %}
+        {% if shared_images != blank %}
+          {% for shared_image in shared_images %}
+            <swiper-slide>
+              {% if shared_image != blank %}
+                <img
+                  src='{{ shared_image | image_url: width: 1200 }}'
+                  alt=''
+                  loading='lazy'
+                >
+              {% else %}
+                {{ "lifestyle-1" | placeholder_svg_tag: "w-full h-full bg-gray-200" }}
+              {% endif %}
+            </swiper-slide>
+          {% endfor %}
+        {% elsif section.blocks.size > 0 %}
           {% for block in section.blocks %}
             {% if block.type == 'slider_image' %}
               <swiper-slide>
@@ -379,6 +398,12 @@
     {
       "type": "header",
       "content": "Slider"
+    },
+    {
+      "type": "page",
+      "id": "shared_gallery_page",
+      "label": "Shared gallery page (optional)",
+      "info": "Uses page metafield custom.shared_gallery_images (file list) when set."
     },
     {
       "type": "range",
