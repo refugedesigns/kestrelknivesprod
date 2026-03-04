@@ -151,7 +151,7 @@
         "button_text": "Order Now!",
         "button_color": "#000000",
         "button_text_color": "#ffffff",
-        "button_action": "klaviyo",
+        "button_action": "link",
         "button_url": "shopify://products/mountain-caper",
         "target_date": "2026-02-27T19:00:00-05:00",
         "form_title": "Get Notified",
