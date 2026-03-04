@@ -25,6 +25,8 @@
         "logo_right_size_mobile": 56,
         "logo_right_text": "PaBoyz",
         "hero_heading": "Free Knife Giveaway!",
+        "hero_heading_size_desktop": 62,
+        "hero_heading_size_mobile": 40,
         "hero_subheading": "Win 1 of 13 Free Knives",
         "form_name_label": "Your Name",
         "form_name_placeholder": "John Doe",
