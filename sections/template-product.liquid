@@ -1172,6 +1172,7 @@
                     and field.type != "file_reference"
                     and field.type != "list.file_reference"
                     and key != "product_status"
+                    and key != "permanent_name"
                   %}
                     {% assign label = key
                       | replace: "_", " "
