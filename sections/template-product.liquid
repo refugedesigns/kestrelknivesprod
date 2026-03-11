@@ -1885,12 +1885,31 @@
           }
           const first = this.variants.find(v => v.available) || this.variants[0]
           this.selectedVariantId = first ? first.id : null
-          this.sel1 = first ? first.option1 : null
-          this.sel2 = first ? first.option2 : null
+
+          // If there are multiple selectors, default each one to its first value.
+          // For option 2, prefer the first value that forms a valid combination
+          // with the selected option 1 value.
+          const option1Values = this.uniqueOptionValues(1)
+          const option2Values = this.uniqueOptionValues(2)
+          this.sel1 = option1Values.length
+            ? option1Values[0]
+            : first
+              ? first.option1
+              : null
+          this.sel2 = option2Values.length
+            ? option2Values.find(val => this.isComboAvailable(this.sel1, val)) ||
+              option2Values[0]
+            : first
+              ? first.option2
+              : null
+
+          this.updateSelectedVariant()
+          const selected =
+            this.variants.find(v => v.id === this.selectedVariantId) || first
           this.image =
-            (first &&
-              first.featured_image &&
-              (first.featured_image.src || first.featured_image)) ||
+            (selected &&
+              selected.featured_image &&
+              (selected.featured_image.src || selected.featured_image)) ||
             data.featured_image ||
             (data.images && data.images[0]) ||
             null
