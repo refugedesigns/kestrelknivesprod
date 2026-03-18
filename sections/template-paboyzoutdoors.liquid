@@ -63,12 +63,15 @@
     }
   </style>
 
-  {%- assign bg_img = section.settings.hero_bg_image -%}
-  {%- assign bg_pos  = section.settings.hero_bg_position | default: 'center center' -%}
+  {%- assign bg_img          = section.settings.hero_bg_image -%}
+  {%- assign bg_pos          = section.settings.hero_bg_position | default: 'center center' -%}
+  {%- assign overlay_color   = section.settings.hero_overlay_color | default: '#000000' -%}
+  {%- assign overlay_opacity = section.settings.hero_overlay_opacity | default: 0 | times: 0.01 -%}
+  {%- assign overlay_rgba    = overlay_color | color_modify: 'alpha', overlay_opacity -%}
   <div
     class='paboyz-top-bg'
     {% if bg_img != blank %}
-      style='background-image: url({{ bg_img | image_url: width: 2400 }}); background-position: {{ bg_pos }};'
+      style='background-image: linear-gradient({{ overlay_rgba }}, {{ overlay_rgba }}), url({{ bg_img | image_url: width: 2400 }}); background-position: {{ bg_pos }};'
     {% endif %}
   >
     <div class='max-w-6xl mx-auto w-full px-4 py-12'>
@@ -256,6 +259,23 @@
         { "value": "bottom left",   "label": "Bottom left" },
         { "value": "bottom right",  "label": "Bottom right" }
       ]
+    },
+    {
+      "type": "color",
+      "id": "hero_overlay_color",
+      "label": "Overlay color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "hero_overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 0,
+      "unit": "%",
+      "info": "0 = no overlay, 100 = fully opaque. Only applies when a background image is set."
     },
     {
       "type": "header",
