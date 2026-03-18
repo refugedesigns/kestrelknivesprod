@@ -125,12 +125,12 @@
 
       <div class='paboyz-hero-text text-center mb-8 space-y-4'>
         <h1
-          class='paboyz-hero-heading font-bold text-black leading-tight'
-          style='--paboyz-heading-size: {{ section.settings.hero_heading_size_desktop | default: 72 }}px; --paboyz-heading-size-mobile: {{ section.settings.hero_heading_size_mobile | default: 40 }}px; margin-bottom: 12px;'
+          class='paboyz-hero-heading font-bold leading-tight'
+          style='--paboyz-heading-size: {{ section.settings.hero_heading_size_desktop | default: 72 }}px; --paboyz-heading-size-mobile: {{ section.settings.hero_heading_size_mobile | default: 40 }}px; margin-bottom: 12px; color: {{ section.settings.hero_heading_color | default: "#ffffff" }};'
         >
           {{ section.settings.hero_heading }}
         </h1>
-        <p class='paboyz-hero-subheading text-xl text-gray-700 text-center' style='text-align: center;'>
+        <p class='paboyz-hero-subheading text-xl text-center' style='text-align: center; color: {{ section.settings.hero_subheading_color | default: "#ffffff" }};'>
           {{ section.settings.hero_subheading }}
         </p>
       </div>
@@ -143,10 +143,10 @@
     <div>
       <div class='max-w-6xl mx-auto px-4 py-8 paboyz-feature-text'>
         <div class='max-w-3xl mx-auto text-center'>
-          <h2 class='text-3xl font-bold text-black mb-3'>
+          <h2 class='text-3xl font-bold mb-3' style='color: {{ section.settings.feature_heading_color | default: "#ffffff" }};'>
             {{ section.settings.feature_heading }}
           </h2>
-          <p class='text-gray-700 text-lg leading-relaxed mb-4'>
+          <p class='text-lg leading-relaxed mb-4' style='color: {{ section.settings.feature_text_color | default: "#ffffff" }};'>
             {{ section.settings.feature_text }}
           </p>
         </div>
@@ -411,6 +411,18 @@
       "default": "Enter with your name and email for a chance to win 1 of 12 Kestrel Knives."
     },
     {
+      "type": "color",
+      "id": "hero_heading_color",
+      "label": "Hero heading color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "hero_subheading_color",
+      "label": "Hero subheading color",
+      "default": "#ffffff"
+    },
+    {
       "type": "header",
       "content": "Form"
     },
@@ -471,6 +483,18 @@
       "id": "feature_text",
       "label": "Feature text",
       "default": "Each Kestrel Knife is expertly crafted with precision engineering and premium materials. Built for performance and durability, these are the tools serious craftspeople depend on."
+    },
+    {
+      "type": "color",
+      "id": "feature_heading_color",
+      "label": "Feature heading color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "feature_text_color",
+      "label": "Feature text color",
+      "default": "#ffffff"
     },
     {
       "type": "header",
