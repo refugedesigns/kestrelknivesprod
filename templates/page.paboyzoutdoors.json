@@ -14,6 +14,8 @@
       "settings": {
         "hero_bg_image": "shopify://shop_images/background.png",
         "hero_bg_position": "center center",
+        "hero_overlay_color": "#000000",
+        "hero_overlay_opacity": 30,
         "logo_left_image": "shopify://shop_images/Firefly_Gemini_Flash_29.png",
         "logo_left_size": 155,
         "logo_left_size_mobile": 80,
