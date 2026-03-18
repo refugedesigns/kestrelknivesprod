@@ -15,7 +15,7 @@
         "hero_bg_image": "shopify://shop_images/background.png",
         "hero_bg_position": "center center",
         "hero_overlay_color": "#000000",
-        "hero_overlay_opacity": 50,
+        "hero_overlay_opacity": 35,
         "logo_left_image": "shopify://shop_images/square_paboyz_white.png",
         "logo_left_size": 190,
         "logo_left_size_mobile": 80,
