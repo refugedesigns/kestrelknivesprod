@@ -12,6 +12,8 @@
     "template-paboyzoutdoors": {
       "type": "template-paboyzoutdoors",
       "settings": {
+        "hero_bg_image": "shopify://shop_images/background.png",
+        "hero_bg_position": "center center",
         "logo_left_image": "shopify://shop_images/Firefly_Gemini_Flash_29.png",
         "logo_left_size": 155,
         "logo_left_size_mobile": 80,
