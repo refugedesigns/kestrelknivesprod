@@ -6,9 +6,9 @@
   It is also used to display the product images and their images.
   It is also used to display the product images and their images.
 {% endcomment %}
-{% assign product_tags_lower = product_product.tags | join: '||' | downcase %}
+{% assign product_tags_lower = product_product.tags | join: "||" | downcase %}
 {% assign has_complex_tag = false %}
-{% if product_tags_lower contains 'use_complex_options' %}
+{% if product_tags_lower contains "use_complex_options" %}
   {% assign has_complex_tag = true %}
 {% endif %}
 
@@ -108,7 +108,7 @@
           <!-- Price -->
           {% unless is_custom %}
             <div
-              class='text-lg md:text-2xl font-bold text-gray-900 mb-4 text-center'
+              class='text-lg md:text-2xl font-bold text-gray-900 mb-1 text-center'
               x-text='formattedPrice'
             >
               {{ product_product.price | money }}
@@ -121,8 +121,11 @@
           or is_apparel
           or is_accessory
         %}
-          {% assign handle_option_name = product_product.options | first | default: 'Handle Color' %}
-          <div class='mb-4'>
+          {% assign handle_option_name = product_product.options
+            | first
+            | default: "Handle Color"
+          %}
+          <div class='mb-1'>
             <div class='flex flex-wrap gap-1 md:gap-2 justify-center'>
               {% assign unique_handle_colors = "" %}
               {% for variant in product_product.variants %}
@@ -165,13 +168,15 @@
                         | replace: "__", "_"
                         | replace: "__", "_"
                       %}
-                      {% assign cmp_asset_filename = ''
+                      {% assign cmp_asset_filename = ""
                         | append: cmp_option_token
-                        | append: '_'
+                        | append: "_"
                         | append: cmp_value_token
-                        | append: '.png'
+                        | append: ".png"
                       %}
-                      {% assign cmp_asset_thumb = cmp_asset_filename | asset_img_url: '64x64' %}
+                      {% assign cmp_asset_thumb = cmp_asset_filename
+                        | asset_img_url: "64x64"
+                      %}
 
                       {%- comment -%}
                         Priority for swatch image:
@@ -271,10 +276,7 @@
         {% endunless %}
       </div>
 
-      {% unless is_apparel
-        or is_custom
-        or is_accessory
-      %}
+      {% unless is_apparel or is_custom or is_accessory %}
         <!-- Add to Cart Button (only show when available and not apparels) -->
         <div x-show='isAvailable'>
           <button
@@ -493,7 +495,12 @@
   document.addEventListener('alpine:init', () => {
     Alpine.data(
       'productCard',
-      (selectedVariantId, productTitle, currentImage, hasComplexOptionsTag) => ({
+      (
+        selectedVariantId,
+        productTitle,
+        currentImage,
+        hasComplexOptionsTag
+      ) => ({
         selectedVariant: selectedVariantId,
         currentImage: currentImage,
         productData: {},
