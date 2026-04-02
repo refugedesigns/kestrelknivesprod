@@ -112,6 +112,11 @@
         "type": "shopify://apps/uppromote-affiliate/blocks/core-script/64c32457-930d-4cb9-9641-e24c0d9cf1f4",
         "disabled": false,
         "settings": {}
+      },
+      "1884528899478270862": {
+        "type": "shopify://apps/shortly/blocks/app-embed/f8b85b17-5c26-444a-abdf-6ce2b3d1bdb0",
+        "disabled": false,
+        "settings": {}
       }
     }
   },
