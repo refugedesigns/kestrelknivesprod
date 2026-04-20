@@ -632,9 +632,7 @@
             const variant = this.getVariantById(this.selectedVariant)
             if (variant) {
               let primary = variant.option1 || variant.title || ''
-              primary = String(primary || '')
-                .split('/')[0]
-                .trim()
+              primary = String(primary || '').trim()
               if (
                 primary &&
                 primary !== 'Default Title' &&
