@@ -26,6 +26,40 @@
   {% assign is_custom = true %}
 {% endif %}
 
+{%- comment -%}
+  Card hero: use product featured image only when it is not tied to an unavailable variant.
+  If the featured image belongs to an OOS variant, use the first in-stock variant's image.
+{%- endcomment -%}
+{% assign card_initial_image = nil %}
+{% if product_product.featured_image %}
+  {% assign replace_featured_image = false %}
+  {% for variant in product_product.variants %}
+    {% if variant.featured_image
+      and variant.featured_image.id == product_product.featured_image.id
+    %}
+      {% unless variant.available %}
+        {% assign replace_featured_image = true %}
+      {% endunless %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+  {% if replace_featured_image %}
+    {% for variant in product_product.variants %}
+      {% if variant.available and variant.featured_image %}
+        {% assign card_initial_image = variant.featured_image %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+    {% if card_initial_image == blank and product_product.images.size > 0 %}
+      {% assign card_initial_image = product_product.images[0] %}
+    {% endif %}
+  {% else %}
+    {% assign card_initial_image = product_product.featured_image %}
+  {% endif %}
+{% elsif product_product.images.size > 0 %}
+  {% assign card_initial_image = product_product.images[0] %}
+{% endif %}
+
 <div
   class='py-2 md:py-3 px-3 hover:cursor-pointer product-card w-full'
   data-product='{{ product_product | json | escape }}'
@@ -35,10 +69,8 @@
     productCard(
       {{ product_product.selected_or_first_available_variant.id }},
       {{ product_product.title | json }},
-      {% if product_product.featured_image %}
-        {{ product_product.featured_image | image_url: width: 400 | json }}
-      {% elsif product_product.images.size > 0 %}
-        {{ product_product.images[0] | image_url: width: 400 | json }}
+      {% if card_initial_image %}
+        {{ card_initial_image | image_url: width: 400 | json }}
       {% else %}
         null
       {% endif %},
