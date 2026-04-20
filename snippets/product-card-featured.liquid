@@ -631,8 +631,15 @@
           ) {
             const variant = this.getVariantById(this.selectedVariant)
             if (variant) {
-              let primary = variant.option1 || variant.title || ''
-              primary = String(primary || '').trim()
+              const raw = String(
+                variant.option1 || variant.title || ''
+              ).trim()
+              const parts = raw.split('/')
+              let primary = (parts[0] || '').trim()
+              const hadMoreAfterSlash = parts
+                .slice(1)
+                .some(p => p.trim().length > 0)
+              if (primary && hadMoreAfterSlash) primary += '...'
               if (
                 primary &&
                 primary !== 'Default Title' &&
