@@ -126,6 +126,15 @@
   ;(() => {
     try {
       sessionStorage.setItem('kk_gated_cart_discount', '1')
+      const eastmansCode = {{ section.settings.discount_code | default: "" | json }}
+      if (eastmansCode && String(eastmansCode).trim()) {
+        sessionStorage.setItem(
+          'kk_gated_cart_discount_code',
+          String(eastmansCode).trim()
+        )
+      } else {
+        sessionStorage.removeItem('kk_gated_cart_discount_code')
+      }
       const normalizedPath = String(window.location.pathname || '')
         .toLowerCase()
         .trim()
