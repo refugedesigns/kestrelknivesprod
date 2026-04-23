@@ -107,7 +107,7 @@
           </h2>
           {% assign product_type_lower = product_obj.type | default: "" | downcase %}
           {% unless product_type_lower contains "custom" %}
-            <div class='mb-4 text-center'>
+            <div class='mb-4 text-center flex items-baseline justify-center gap-2'>
               <div
                 class='text-lg md:text-2xl font-bold text-gray-900'
                 x-text='formattedDiscountedPrice'
@@ -332,8 +332,10 @@
                   <p class='text-gray-900 uppercase text-lg whitespace-normal break-words'>
                     {{ product_obj.title }}
                   </p>
-                  <p class='text-base mt-2' x-text='formattedDiscountedPrice'></p>
-                  <p class='text-sm text-gray-500 line-through' x-text='formattedOriginalPrice'></p>
+                  <div class='mt-2 flex items-baseline gap-2'>
+                    <p class='text-base' x-text='formattedDiscountedPrice'></p>
+                    <p class='text-sm text-gray-500 line-through' x-text='formattedOriginalPrice'></p>
+                  </div>
                 </div>
               </div>
               {% unless product_obj.has_only_default_variant %}
