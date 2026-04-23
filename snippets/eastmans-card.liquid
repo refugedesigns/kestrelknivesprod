@@ -1,0 +1,799 @@
+{% assign product_obj = product_product %}
+{% assign eastmans_discount_code_value = eastmans_discount_code | default: "" | strip %}
+{% assign eastmans_discount_percent_value = eastmans_discount_percent | default: 15 %}
+{% if eastmans_discount_percent_value < 0 %}
+  {% assign eastmans_discount_percent_value = 0 %}
+{% endif %}
+{% if eastmans_discount_percent_value > 100 %}
+  {% assign eastmans_discount_percent_value = 100 %}
+{% endif %}
+{% assign eastmans_price_multiplier = 100 | minus: eastmans_discount_percent_value | divided_by: 100.0 %}
+
+<div
+  class='w-full box-border py-4 px-2 sm:py-6 sm:px-3'
+  data-product='{{ product_obj | json | escape }}'
+  data-variants='{{ product_obj.variants | json | escape }}'
+  data-images='{{ product_obj.images | json | escape }}'
+  data-discount-code='{{ eastmans_discount_code_value | escape }}'
+  data-discount-percent='{{ eastmans_discount_percent_value }}'
+  x-data='eastmansCard()'
+>
+  <div class='bg-white overflow-hidden w-full flex flex-col'>
+    <div class='relative h-[180px] md:h-[300px] lg:h-[300px] bg-white overflow-hidden flex items-center justify-center'>
+      {% assign kk_status = product_obj.metafields.custom.product_status
+        | default: product_obj.metafields.custom_fields.product_status
+        | default: product_obj.metafields.global.product_status
+      %}
+      {% if kk_status != blank %}
+        <div class='absolute top-4 left-4 bg-black text-white font-bold px-3 py-1 text-sm uppercase z-10'>
+          {{ kk_status }}
+        </div>
+      {% else %}
+        <div
+          x-show='!isAvailable'
+          class='absolute top-4 left-4 bg-black text-white font-bold px-3 py-1 text-sm uppercase z-10'
+        >
+          SOLD OUT
+        </div>
+      {% endif %}
+
+      {% assign product_type_lower = product_obj.type | default: "" | downcase %}
+      {% assign image_wrapper_classes = "relative h-full w-full mx-auto block" %}
+      {% if product_type_lower contains "apparel"
+        or product_type_lower contains "hoodie"
+        or product_type_lower contains "sweatshirt"
+      %}
+        {% assign image_wrapper_classes = image_wrapper_classes
+          | append: " max-w-[280px] sm:max-w-[320px] md:max-w-[360px]"
+        %}
+      {% else %}
+        {% assign image_wrapper_classes = image_wrapper_classes
+          | append: " max-w-[240px] sm:max-w-[280px] md:max-w-[320px]"
+        %}
+      {% endif %}
+      <a
+        href='{{ product_obj.url }}'
+        class='{{ image_wrapper_classes }}'
+        @mouseenter='handleImageHover(true)'
+        @mouseleave='handleImageHover(false)'
+      >
+        <img
+          width='400'
+          height='400'
+          src='{{ product_obj.featured_image | default: product_obj.images.first | image_url: width: 400 }}'
+          :src='currentImage'
+          alt='{{ product_obj.title | escape }}'
+          :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
+        >
+        <img
+          width='400'
+          height='400'
+          x-cloak
+          x-show='secondImageSrc'
+          :src='secondImageSrc'
+          alt='{{ product_obj.title | escape }}'
+          :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 pointer-events-none ' + ((isHovering && hoverImageLoaded) ? 'opacity-100' : 'opacity-0')"
+          loading='lazy'
+        >
+      </a>
+    </div>
+
+    <div class='p-4 md:p-6 flex flex-col justify-between'>
+      <div>
+        <a href='{{ product_obj.url }}'>
+          <h2
+            class='text-sm md:text-lg uppercase font-semibold text-gray-900 mb-2 text-center whitespace-normal break-words'
+            x-text='baseTitle'
+          >
+            {{ product_obj.title }}
+          </h2>
+          {% assign product_type_lower = product_obj.type | default: "" | downcase %}
+          {% unless product_type_lower contains "custom" %}
+            <div class='mb-4 text-center'>
+              <div
+                class='text-lg md:text-2xl font-bold text-gray-900'
+                x-text='formattedDiscountedPrice'
+              >
+                {{ product_obj.price | times: eastmans_price_multiplier | money }}
+              </div>
+              <div
+                class='text-sm md:text-base text-gray-500 line-through'
+                x-text='formattedOriginalPrice'
+              >
+                {{ product_obj.price | money }}
+              </div>
+            </div>
+          {% endunless %}
+        </a>
+
+        {% assign type_lower = product_obj.type | default: "" | downcase %}
+        {% unless product_obj.has_only_default_variant
+          or type_lower contains "apparel"
+          or type_lower contains "accessories"
+        %}
+          {% assign handle_option_name = product_obj.options
+            | first
+            | default: "Handle Color"
+          %}
+          <div class='mb-2'>
+            <div class='flex gap-2 justify-center flex-wrap max-w-[260px] sm:max-w-none md:max-w-full mx-auto'>
+              {% assign unique_handle_colors = "" %}
+              {% for variant in product_obj.variants %}
+                {% if variant.option1 and variant.title != "Default Title" %}
+                  {% assign color_token = "|"
+                    | append: variant.option1
+                    | downcase
+                    | append: "|"
+                  %}
+                  {% unless unique_handle_colors contains color_token %}
+                    {% assign unique_handle_colors = unique_handle_colors
+                      | append: color_token
+                    %}
+                    <button
+                      type='button'
+                      class='w-6 h-6 rounded-full border-2 border-gray-300 overflow-hidden focus:outline-none focus:ring-2 focus:ring-black'
+                      @click='selectByHandle({{ variant.option1 | json }})'
+                      :class="$el.dataset.handleLc && selectedOption1Lc === $el.dataset.handleLc ? 'ring-2 ring-black' : ''"
+                      title='{{ variant.option1 }}'
+                      data-handle-lc='{{ variant.option1 | strip | downcase }}'
+                    >
+                      {% assign option_lower = variant.option1 | downcase %}
+                      {% assign cmp_option_token = handle_option_name
+                        | strip
+                        | downcase
+                        | replace: " ", "_"
+                        | replace: "-", "_"
+                        | replace: "/", "_"
+                        | replace: ".", "_"
+                        | replace: "__", "_"
+                        | replace: "__", "_"
+                      %}
+                      {% assign cmp_value_token = variant.option1
+                        | strip
+                        | downcase
+                        | replace: " ", "_"
+                        | replace: "-", "_"
+                        | replace: "/", "_"
+                        | replace: ".", "_"
+                        | replace: "__", "_"
+                        | replace: "__", "_"
+                      %}
+                      {% assign cmp_asset_filename = ""
+                        | append: cmp_option_token
+                        | append: "_"
+                        | append: cmp_value_token
+                        | append: ".png"
+                      %}
+                      {% assign cmp_asset_thumb = cmp_asset_filename
+                        | asset_img_url: "64x64"
+                      %}
+                      {% assign color_image = "" %}
+                      {% if cmp_asset_thumb != blank %}
+                        <img
+                          src='{{ cmp_asset_thumb }}'
+                          width='48'
+                          height='48'
+                          alt='{{ variant.option1 }}'
+                          class='w-full h-full object-contain'
+                        >
+                      {% else %}
+                        {% if option_lower contains "black"
+                          and option_lower contains "orange"
+                        %}
+                          {% if section.settings.black_orange_image %}
+                            {% assign color_image = section.settings.black_orange_image
+                              | image_url: width: 48
+                            %}
+                          {% else %}
+                            {% assign color_image = "black_w_orange_liner.png" %}
+                          {% endif %}
+                        {% elsif option_lower contains "orange" %}
+                          {% if section.settings.orange_image %}
+                            {% assign color_image = section.settings.orange_image
+                              | image_url: width: 48
+                            %}
+                          {% else %}
+                            {% assign color_image = "orange.png" %}
+                          {% endif %}
+                        {% elsif option_lower contains "black" %}
+                          {% if section.settings.black_image %}
+                            {% assign color_image = section.settings.black_image
+                              | image_url: width: 48
+                            %}
+                          {% else %}
+                            {% assign color_image = "black_w_orange_liner.png" %}
+                          {% endif %}
+                        {% elsif option_lower contains "green" %}
+                          {% if section.settings.green_image %}
+                            {% assign color_image = section.settings.green_image
+                              | image_url: width: 48
+                            %}
+                          {% else %}
+                            {% assign color_image = "od_green.png" %}
+                          {% endif %}
+                        {% elsif option_lower contains "camo"
+                          or option_lower contains "earth"
+                        %}
+                          {% if section.settings.camo_image %}
+                            {% assign color_image = section.settings.camo_image
+                              | image_url: width: 48
+                            %}
+                          {% else %}
+                            {% assign color_image = "earth_camo.png" %}
+                          {% endif %}
+                        {% endif %}
+
+                        {% if color_image != "" %}
+                          {% if color_image contains "//" %}
+                            <img
+                              src='{{ color_image }}'
+                              width='48'
+                              height='48'
+                              alt='{{ variant.option1 }}'
+                              class='w-full h-full object-cover'
+                            >
+                          {% else %}
+                            <img
+                              src='{{ color_image | asset_url }}'
+                              width='48'
+                              height='48'
+                              alt='{{ variant.option1 }}'
+                              class='w-full h-full object-cover'
+                            >
+                          {% endif %}
+                        {% else %}
+                          <div
+                            class='w-full h-full rounded-full'
+                            style='background-color: {{ variant.option1 | downcase | replace: ' ', '' }}'
+                          ></div>
+                        {% endif %}
+                      {% endif %}
+                    </button>
+                  {% endunless %}
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endunless %}
+      </div>
+    </div>
+
+    {% assign type_lower = product_obj.type | default: "" | downcase %}
+    {% unless type_lower contains "apparel" or type_lower contains "accessories" %}
+      <div class='px-4'>
+        <button
+          x-cloak
+          x-show='isAvailable'
+          @click='addToCart'
+          :disabled='isAddingToCart'
+          class='w-full bg-black hover:bg-gray-900 text-white font-semibold py-2 md:py-3 px-3 md:px-4 text-xs md:text-base transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+        >
+          <span x-text="isAddingToCart ? 'Adding...' : '+ ADD TO CART'"></span>
+        </button>
+      </div>
+    {% else %}
+      <div class='px-4'>
+        <button
+          type='button'
+          @click='openQuickView()'
+          class='w-full bg-black text-white uppercase font-semibold py-2 md:py-3 px-3 md:px-4 text-xs md:text-base hover:bg-gray-900'
+        >
+          Quick View
+        </button>
+      </div>
+    {% endunless %}
+
+    {% if type_lower contains "apparel" or type_lower contains "accessories" %}
+      <template x-if='isQuickViewOpen'>
+        <div class='fixed inset-0 z-50' x-cloak>
+          <div class='absolute inset-0 bg-black/50' @click='closeQuickView()'></div>
+          <div
+            x-ref='qvPanel'
+            class='absolute right-0 top-0 h-full w-full max-w-lg bg-white shadow-xl flex flex-col transform transition-transform duration-300 translate-x-full'
+            x-init='requestAnimationFrame(()=> $el.classList.remove("translate-x-full"))'
+          >
+            <div class='flex items-center justify-between p-5 border-b border-gray-200'>
+              <h3 class='text-lg font-semibold'>Select options</h3>
+              <button
+                @click='closeQuickView()'
+                class='text-gray-500 hover:text-gray-700 text-2xl leading-none'
+              >
+                ×
+              </button>
+            </div>
+            <div class='p-6 flex-1 overflow-y-auto'>
+              <div class='flex items-start space-x-6'>
+                <img
+                  :src='qvImage || currentImage'
+                  alt=''
+                  width='160'
+                  height='160'
+                  class='w-40 h-40 object-cover'
+                >
+                <div class='min-w-0'>
+                  <p class='text-gray-900 uppercase text-lg whitespace-normal break-words'>
+                    {{ product_obj.title }}
+                  </p>
+                  <p class='text-base mt-2' x-text='formattedDiscountedPrice'></p>
+                  <p class='text-sm text-gray-500 line-through' x-text='formattedOriginalPrice'></p>
+                </div>
+              </div>
+              {% unless product_obj.has_only_default_variant %}
+                <template x-if='(optionNames && optionNames.length) || (variantsData && variantsData.length)'>
+                  <div>
+                    <div class='mt-6' x-show='uniqueOptionValues(1).length'>
+                      <p
+                        class='text-xs font-semibold text-gray-700 mb-2 uppercase'
+                        x-text='(optionNames[0] || "Option 1") + ":"'
+                      ></p>
+                      <div class='flex flex-wrap gap-3' x-show='isColorOption(1)'>
+                        <template x-for='val in uniqueOptionValues(1)' :key='`c1-${val}`'>
+                          <button
+                            @click='qvOption1 = val; updateQVSelectedVariant()'
+                            :title='val'
+                            :class="'w-12 h-12 rounded-md border overflow-hidden ' + (qvOption1 === val ? 'ring-2 ring-black' : '')"
+                          >
+                            <img
+                              :src='imageForOptionValue(1,val)'
+                              alt=''
+                              width='48'
+                              height='48'
+                              class='w-full h-full object-contain'
+                            >
+                          </button>
+                        </template>
+                      </div>
+                      <div class='flex flex-wrap gap-2' x-show='!isColorOption(1)'>
+                        <template x-for='val in uniqueOptionValues(1)' :key='`t1-${val}`'>
+                          <button
+                            @click='qvOption1 = val; updateQVSelectedVariant()'
+                            :class="(qvOption1 === val ? 'ring-2 ring-black ' : '') + 'px-4 py-3 border rounded-md text-sm'"
+                          >
+                            <span x-text='val'></span>
+                          </button>
+                        </template>
+                      </div>
+                    </div>
+                    <div class='mt-6' x-show='uniqueOptionValues(2).length'>
+                      <p
+                        class='text-xs font-semibold text-gray-700 mb-2 uppercase'
+                        x-text='(optionNames[1] || "Option 2") + ":"'
+                      ></p>
+                      <div class='flex flex-wrap gap-3' x-show='isColorOption(2)'>
+                        <template x-for='val in uniqueOptionValues(2)' :key='`c2-${val}`'>
+                          <button
+                            @click='qvOption2 = val; updateQVSelectedVariant()'
+                            :disabled='!isComboAvailable(qvOption1, val)'
+                            :title='val'
+                            :class="'w-12 h-12 rounded-md border overflow-hidden ' + (qvOption2 === val ? 'ring-2 ring-black' : '') + (!isComboAvailable(qvOption1,val) ? ' opacity-40 cursor-not-allowed' : '')"
+                          >
+                            <img
+                              :src='imageForOptionValue(2,val)'
+                              alt=''
+                              width='48'
+                              height='48'
+                              class='w-full h-full object-contain'
+                            >
+                          </button>
+                        </template>
+                      </div>
+                      <div class='flex flex-wrap gap-2' x-show='!isColorOption(2)'>
+                        <template x-for='val in uniqueOptionValues(2)' :key='`t2-${val}`'>
+                          <button
+                            @click='qvOption2 = val; updateQVSelectedVariant()'
+                            :disabled='!isComboAvailable(qvOption1, val)'
+                            :class="((qvOption2 === val ? 'ring-2 ring-black ' : '') + 'px-4 py-3 border rounded-md text-sm ') + (!isComboAvailable(qvOption1, val) ? 'opacity-40 cursor-not-allowed' : '')"
+                          >
+                            <span x-text='val'></span>
+                          </button>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              {% endunless %}
+              <div class='mt-8'>
+                <p class='text-xs font-semibold text-gray-700 mb-2 uppercase'>
+                  Quantity
+                </p>
+                <div class='inline-flex items-center border'>
+                  <button
+                    class='w-10 h-10 text-lg'
+                    @click='qvQuantity = Math.max(1, (qvQuantity||1) - 1)'
+                  >
+                    −
+                  </button>
+                  <input
+                    type='number'
+                    min='1'
+                    x-model.number='qvQuantity'
+                    class='w-14 h-10 text-center outline-none border-none'
+                  >
+                  <button
+                    class='w-10 h-10 text-lg'
+                    @click='qvQuantity = (qvQuantity||1) + 1'
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              <div class='mt-6 space-y-3'>
+                <button
+                  @click='qvAddToCart()'
+                  class='w-full cursor-pointer bg-black text-white font-bold py-4 text-base hover:bg-gray-900'
+                >
+                  Add to Cart
+                </button>
+                <a
+                  href='{{ product_obj.url }}'
+                  class='block text-center underline text-gray-700 hover:text-gray-900'
+                  >View details</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    {% endif %}
+  </div>
+
+  <script>
+    function eastmansCard() {
+      return {
+        discountPercent: 15,
+        discountCode: '',
+        currentImage: '',
+        productImageSrc: '',
+        baseTitle: '',
+        productData: {},
+        variantsData: [],
+        imagesData: null,
+        selectedVariant: null,
+        isAvailable: true,
+        isAddingToCart: false,
+        isHovering: false,
+        hoverImageLoaded: false,
+        isQuickViewOpen: false,
+        qvSelectedVariantId: null,
+        qvQuantity: 1,
+        qvOption1: null,
+        qvOption2: null,
+        optionNames: [],
+        qvImage: null,
+
+        init() {
+          try {
+            const el = this.$el
+            this.discountCode = String(
+              el.getAttribute('data-discount-code') || ''
+            ).trim()
+            const parsedDiscountPercent = Number(
+              el.getAttribute('data-discount-percent') || 15
+            )
+            this.discountPercent = Number.isFinite(parsedDiscountPercent)
+              ? Math.max(0, Math.min(100, parsedDiscountPercent))
+              : 15
+            this.productData = JSON.parse(
+              eastmansDecode(el.getAttribute('data-product') || '{}')
+            )
+            this.variantsData = JSON.parse(
+              eastmansDecode(el.getAttribute('data-variants') || '[]')
+            )
+            this.imagesData = JSON.parse(
+              eastmansDecode(el.getAttribute('data-images') || '[]')
+            )
+            const featured = this.productData
+              ? this.productData.featured_image
+              : null
+            const firstGallery =
+              this.imagesData && this.imagesData.length ? this.imagesData[0] : null
+            this.productImageSrc =
+              this.resolveImageSrc(featured) ||
+              this.resolveImageSrc(firstGallery) ||
+              ''
+            if (this.productImageSrc) this.currentImage = this.productImageSrc
+          } catch (e) {}
+
+          if (!this.selectedVariant) {
+            const initialVariant =
+              (this.variantsData || []).find(v => !!v.available) ||
+              (this.variantsData || [])[0] ||
+              null
+            this.selectedVariant = initialVariant ? initialVariant.id : null
+          }
+
+          this.updateImage()
+          this.updateTitle()
+          this.checkAvailability()
+        },
+
+        get selectedPriceCents() {
+          const v = this.getVariantById(this.selectedVariant)
+          if (v && v.price != null) return Number(v.price)
+          return Number(this.productData.price || 0)
+        },
+        get discountedPriceCents() {
+          const cents = this.selectedPriceCents
+          return Math.round(cents * ((100 - this.discountPercent) / 100))
+        },
+        get formattedDiscountedPrice() {
+          return this.formatMoney(this.discountedPriceCents)
+        },
+        get formattedOriginalPrice() {
+          return this.formatMoney(this.selectedPriceCents)
+        },
+
+        get secondImageSrc() {
+          if (!this.imagesData || this.imagesData.length < 2) return null
+          const img = this.imagesData[1]
+          if (!img) return null
+          if (typeof img === 'string') return img
+          return img.src || null
+        },
+
+        formatMoney(cents) {
+          if (!cents || typeof cents !== 'number') return ''
+          try {
+            return new Intl.NumberFormat('{{ shop.locale }}', {
+              style: 'currency',
+              currency: '{{ shop.currency }}',
+            }).format(cents / 100)
+          } catch (e) {
+            return '$' + (cents / 100).toFixed(2)
+          }
+        },
+        checkAvailability() {
+          if (this.variantsData && this.variantsData.length > 0) {
+            const v = this.getVariantById(this.selectedVariant)
+            this.isAvailable = v ? !!v.available : !!this.productData.available
+          } else {
+            this.isAvailable = !!this.productData.available
+          }
+        },
+        get selectedOption1() {
+          const v = (this.variantsData || []).find(
+            v => v.id === this.selectedVariant
+          )
+          return v && v.option1 ? String(v.option1) : null
+        },
+        get selectedOption1Lc() {
+          return String(this.selectedOption1 || '')
+            .trim()
+            .toLowerCase()
+        },
+        selectByHandle(handleValue) {
+          const hv = String(handleValue || '').trim()
+          const matches = (this.variantsData || []).filter(
+            v => String(v.option1 || '') === hv
+          )
+          if (!matches.length) return
+          const available = matches.find(v => !!v.available)
+          const chosen = available || matches[0]
+          this.selectedVariant = chosen.id
+          this.updateTitle()
+          this.checkAvailability()
+          this.updateImage()
+        },
+        getVariantById(id) {
+          if (!id) return null
+          return (this.variantsData || []).find(v => v.id === id) || null
+        },
+        updateTitle() {
+          const productTitleUpper = (this.productData.title || '').toUpperCase()
+          const typeLower = (this.productData.type || '').toLowerCase()
+          const shouldAppend = !(
+            typeLower.includes('apparel') || typeLower.includes('accessories')
+          )
+          let variantLabel = null
+          if (shouldAppend && this.variantsData && this.variantsData.length > 0) {
+            const variant = this.getVariantById(this.selectedVariant)
+            if (variant) {
+              const raw = String(variant.option1 || variant.title || '').trim()
+              if (raw && raw !== 'Default Title') variantLabel = raw.toUpperCase()
+            }
+          }
+          this.baseTitle = variantLabel
+            ? `${productTitleUpper} - ${variantLabel}`
+            : productTitleUpper
+        },
+        updateImage() {
+          const typeLower = (this.productData.type || '').toLowerCase()
+          if (
+            typeLower.includes('apparel') ||
+            typeLower.includes('accessories')
+          ) {
+            return
+          }
+          const variant = this.getVariantById(this.selectedVariant)
+          const variantImage = variant
+            ? this.resolveImageSrc(variant.featured_image || variant.image || null)
+            : null
+          this.currentImage =
+            variantImage || this.productImageSrc || this.currentImage || ''
+        },
+        resolveImageSrc(image) {
+          if (!image) return null
+          if (typeof image === 'string') return image
+          if (Array.isArray(image) && image.length) return this.resolveImageSrc(image[0])
+          if (typeof image === 'object') {
+            return (
+              image.src ||
+              image.url ||
+              image.originalSrc ||
+              image.original_url ||
+              null
+            )
+          }
+          return null
+        },
+        handleImageHover(isEntering) {
+          if (this.imagesData && this.imagesData.length > 1) {
+            if (isEntering) this.preloadSecondImage()
+            this.isHovering = isEntering
+          }
+        },
+        preloadSecondImage() {
+          if (this.hoverImageLoaded) return
+          const src = this.secondImageSrc
+          if (!src) return
+          const img = new Image()
+          img.onload = () => {
+            this.hoverImageLoaded = true
+          }
+          img.src = src
+        },
+        async applyDiscountCode() {
+          if (!this.discountCode) return
+          try {
+            await fetch(
+              `/discount/${encodeURIComponent(this.discountCode)}?redirect=/cart`,
+              { credentials: 'same-origin' }
+            )
+          } catch (e) {
+            console.error('Discount code apply failed', e)
+          }
+        },
+        async addToCart() {
+          if (!this.isAvailable || !this.selectedVariant || this.isAddingToCart) return
+          this.isAddingToCart = true
+          try {
+            const cartSheet = document.querySelector('[x-data*="cartSheet"]')
+            if (cartSheet && cartSheet._x_dataStack && cartSheet._x_dataStack[0]) {
+              await cartSheet._x_dataStack[0].addToCart(this.selectedVariant, 1)
+            } else {
+              const formData = new FormData()
+              formData.append('id', this.selectedVariant)
+              formData.append('quantity', '1')
+              const res = await fetch('/cart/add.js', { method: 'POST', body: formData })
+              if (!res.ok) throw new Error('Add to cart failed')
+            }
+            await this.applyDiscountCode()
+            window.dispatchEvent(new CustomEvent('open-cart'))
+          } catch (e) {
+            console.error('Eastmans addToCart error', e)
+          } finally {
+            this.isAddingToCart = false
+          }
+        },
+        openQuickView() {
+          this.qvSelectedVariantId = this.selectedVariant
+          this.qvQuantity = 1
+          try {
+            const opts = Array.isArray(this.productData.options)
+              ? this.productData.options
+              : []
+            this.optionNames = opts
+              .map(o => (typeof o === 'string' ? o : (o && o.name) || ''))
+              .filter(Boolean)
+          } catch (e) {
+            this.optionNames = []
+          }
+          const currentVariant = this.getVariantById(this.selectedVariant)
+          const selectedImage = currentVariant
+            ? this.resolveImageSrc(currentVariant.featured_image || currentVariant.image)
+            : null
+          this.qvImage = selectedImage || this.currentImage || this.productImageSrc || ''
+          this.updateQVSelectedVariant()
+          this.isQuickViewOpen = true
+          document.body.style.overflow = 'hidden'
+        },
+        closeQuickView() {
+          this.isQuickViewOpen = false
+          document.body.style.overflow = ''
+        },
+        uniqueOptionValues(index) {
+          const key = index === 1 ? 'option1' : 'option2'
+          const values = new Set()
+          ;(this.variantsData || []).forEach(v => {
+            const val = v[key]
+            if (val) values.add(String(val))
+          })
+          return Array.from(values)
+        },
+        isColorOption(index) {
+          try {
+            const name = String(
+              (this.optionNames && this.optionNames[index - 1]) || ''
+            ).toLowerCase()
+            return ['color', 'colour', 'shade', 'finish'].some(k =>
+              name.includes(k)
+            )
+          } catch (e) {
+            return false
+          }
+        },
+        imageForOptionValue(index, val) {
+          const key = index === 1 ? 'option1' : 'option2'
+          const variantWithImage = (this.variantsData || []).find(
+            v => String(v[key] || '') === String(val)
+          )
+          if (variantWithImage) {
+            const src = this.resolveImageSrc(
+              variantWithImage.featured_image || variantWithImage.image || null
+            )
+            if (src) return src
+          }
+          return this.qvImage || this.currentImage || this.productImageSrc || ''
+        },
+        isComboAvailable(val1, val2) {
+          return !!(this.variantsData || []).find(v => {
+            const ok1 = val1 ? String(v.option1 || '') === String(val1) : true
+            const ok2 = val2 ? String(v.option2 || '') === String(val2) : true
+            return ok1 && ok2
+          })
+        },
+        updateQVSelectedVariant() {
+          let chosen = null
+          if (this.qvOption1 || this.qvOption2) {
+            chosen = (this.variantsData || []).find(v => {
+              const ok1 = this.qvOption1
+                ? String(v.option1 || '') === String(this.qvOption1)
+                : true
+              const ok2 = this.qvOption2
+                ? String(v.option2 || '') === String(this.qvOption2)
+                : true
+              return ok1 && ok2
+            })
+          }
+          if (chosen) {
+            this.qvSelectedVariantId = chosen.id
+            const chosenImage = this.resolveImageSrc(
+              chosen.featured_image || chosen.image || null
+            )
+            if (chosenImage) this.qvImage = chosenImage
+          } else {
+            this.qvSelectedVariantId = this.selectedVariant
+          }
+          if (!this.qvImage) {
+            this.qvImage = this.currentImage || this.productImageSrc || ''
+          }
+        },
+        async qvAddToCart() {
+          try {
+            const variantId = this.qvSelectedVariantId || this.selectedVariant
+            const quantity = this.qvQuantity || 1
+            const cartSheet = document.querySelector('[x-data*="cartSheet"]')
+            if (cartSheet && cartSheet._x_dataStack && cartSheet._x_dataStack[0]) {
+              await cartSheet._x_dataStack[0].addToCart(variantId, quantity)
+            } else {
+              const formData = new FormData()
+              formData.append('id', variantId)
+              formData.append('quantity', String(quantity))
+              await fetch('/cart/add.js', { method: 'POST', body: formData })
+            }
+            await this.applyDiscountCode()
+            this.closeQuickView()
+            window.dispatchEvent(new CustomEvent('open-cart'))
+          } catch (e) {
+            console.error('Eastmans qv addToCart failed', e)
+          }
+        },
+      }
+    }
+    function eastmansDecode(str) {
+      const t = document.createElement('textarea')
+      t.innerHTML = str
+      return t.value
+    }
+  </script>
+</div>
