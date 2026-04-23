@@ -2297,6 +2297,14 @@
     return 0;
   };
   window.__categoryDiscountPercent = window.__resolveCategoryDiscountPercent();
+  (function () {
+    try {
+      const p = Number(window.__categoryDiscountPercent || 0);
+      sessionStorage.setItem('kk_gated_cart_discount', p > 0 ? '1' : '0');
+    } catch (e) {
+      /* ignore */
+    }
+  })();
   window.addEventListener('pagehide', () => {
     try {
       sessionStorage.removeItem('kk_collection_origin_token');
@@ -2719,9 +2727,7 @@
             const saleEl = document.getElementById('saleBadge');
             const stickyPriceEl = document.getElementById('stickyPrice');
             const categoryDiscountPercent = Number(
-              (typeof window.__resolveCategoryDiscountPercent === 'function'
-                ? window.__resolveCategoryDiscountPercent()
-                : window.__categoryDiscountPercent) || 0
+              window.__categoryDiscountPercent || 0
             );
             const hasCategoryDiscount = categoryDiscountPercent > 0;
 
