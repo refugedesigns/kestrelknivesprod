@@ -117,6 +117,11 @@
         "type": "shopify://apps/shortly/blocks/app-embed/f8b85b17-5c26-444a-abdf-6ce2b3d1bdb0",
         "disabled": false,
         "settings": {}
+      },
+      "1987381849243170004": {
+        "type": "shopify://apps/apphero-free-gift/blocks/app-embed/775538df-2a18-473b-ada3-d731b074c1a3",
+        "disabled": false,
+        "settings": {}
       }
     }
   },
