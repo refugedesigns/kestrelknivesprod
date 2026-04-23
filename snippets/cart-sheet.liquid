@@ -1,4 +1,7 @@
 <!-- Cart Sheet -->
+<script>
+  window.__gatedRemoveCartDiscountWhenIneligible = {{ settings.gated_remove_cart_discount_when_ineligible | default: true, allow_false: true | json }};
+</script>
 <div
   x-data='cartSheet()'
   x-show='isOpen'
@@ -205,7 +208,6 @@
       totalDiscountCents: 0,
 
       init() {
-        // Load cart from localStorage on init
         this.loadCart()
 
         // Listen for cart updates from other components
@@ -304,8 +306,39 @@
         document.body.style.overflow = ''
       },
 
+      async ensureOriginGatedCartDiscounts() {
+        try {
+          if (!window.__gatedRemoveCartDiscountWhenIneligible) return
+          const ok =
+            (() => {
+              try {
+                return sessionStorage.getItem('kk_gated_cart_discount') === '1'
+              } catch (e) {
+                return false
+              }
+            })()
+          if (ok) return
+          const r = await fetch('/cart.js')
+          const c = await r.json()
+          const hasDisc =
+            Number(c.total_discount || 0) > 0 ||
+            (Array.isArray(c.cart_level_discount_applications) &&
+              c.cart_level_discount_applications.length > 0)
+          if (!hasDisc) return
+          await fetch('/cart/update.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ discount: '' }),
+            credentials: 'same-origin',
+          })
+        } catch (e) {
+          console.error('Origin-gated discount clear failed', e)
+        }
+      },
+
       async loadCart() {
         try {
+          await this.ensureOriginGatedCartDiscounts()
           const response = await fetch('/cart.js')
           const cart = await response.json()
 
@@ -347,6 +380,7 @@
         propsOverride = null
       ) {
         this.isLoading = true
+        await this.ensureOriginGatedCartDiscounts()
 
         // Set specific button loading state based on source
         if (source === 'main-button') {
