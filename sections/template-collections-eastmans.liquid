@@ -30,6 +30,30 @@
     {% endif %}
   </header>
 
+  {% paginate collection.products by section.settings.number_of_products_per_page | default: 18 %}
+    <div class='max-w-6xl mx-auto'>
+      <div class='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6'>
+        {% for product in collection.products %}
+          {% render "eastmans-card",
+            product_product: product,
+            eastmans_discount_code: section.settings.discount_code,
+            eastmans_discount_percent: section.settings.discount_percent
+          %}
+        {% else %}
+          <div class='col-span-full text-center py-12'>
+            <p class='text-gray-500 text-lg'>There are no products in this collection</p>
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if paginate.pages > 1 %}
+        <div class='mt-12'>
+          {% render "pagination", pagination: paginate %}
+        </div>
+      {% endif %}
+    </div>
+  {% endpaginate %}
+
   {% if section.settings.show_gallery %}
     {% assign shared_images = blank %}
     {% if collection.metafields.custom.shared_gallery_images != blank %}
@@ -42,7 +66,7 @@
       {% assign shared_images = section.settings.shared_gallery_page.metafields.custom.shared_gallery_images.value %}
     {% endif %}
 
-    <div class='bg-white mb-8'>
+    <div class='bg-white mt-10'>
       <swiper-container
         class='eastmans-slider'
         style='--eastmans-slider-height: {{ section.settings.slider_height_desktop }}px; --eastmans-slider-height-mobile: {{ section.settings.slider_height_mobile }}px;'
@@ -88,33 +112,16 @@
               </swiper-slide>
             {% endif %}
           {% endfor %}
+        {% else %}
+          {% for i in (1..6) %}
+            <swiper-slide>
+              {{ "lifestyle-1" | placeholder_svg_tag: "w-full h-full bg-gray-200" }}
+            </swiper-slide>
+          {% endfor %}
         {% endif %}
       </swiper-container>
     </div>
   {% endif %}
-  {% paginate collection.products by section.settings.number_of_products_per_page | default: 18 %}
-    <div class='max-w-6xl mx-auto'>
-      <div class='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6'>
-        {% for product in collection.products %}
-          {% render "eastmans-card",
-            product_product: product,
-            eastmans_discount_code: section.settings.discount_code,
-            eastmans_discount_percent: section.settings.discount_percent
-          %}
-        {% else %}
-          <div class='col-span-full text-center py-12'>
-            <p class='text-gray-500 text-lg'>There are no products in this collection</p>
-          </div>
-        {% endfor %}
-      </div>
-
-      {% if paginate.pages > 1 %}
-        <div class='mt-12'>
-          {% render "pagination", pagination: paginate %}
-        </div>
-      {% endif %}
-    </div>
-  {% endpaginate %}
 </div>
 
 <script>
