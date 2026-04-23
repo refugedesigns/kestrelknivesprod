@@ -670,13 +670,22 @@
           }
         },
         async applyDiscountCode() {
-          if (!this.discountCode) return
           if (!this.isGatedOriginEligible()) return
+          const code = String(this.discountCode || '').trim()
+          if (!code) return
           try {
-            await fetch(
-              `/discount/${encodeURIComponent(this.discountCode)}?redirect=/cart`,
-              { credentials: 'same-origin' }
-            )
+            const res = await fetch('/cart/update.js', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ discount: code }),
+              credentials: 'same-origin',
+            })
+            if (!res.ok) {
+              const t = await res.text()
+              console.error('Cart discount update failed', res.status, t)
+              return
+            }
+            window.dispatchEvent(new CustomEvent('cart-updated'))
           } catch (e) {
             console.error('Discount code apply failed', e)
           }
