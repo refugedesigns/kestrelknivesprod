@@ -116,7 +116,7 @@
             | default: "Handle Color"
           %}
           <div class='mb-2'>
-            <div class='flex gap-2 justify-center flex-wrap max-w-[280px] sm:max-w-none mx-auto'>
+            <div class='flex gap-2 justify-center flex-wrap max-w-[280px] sm:max-w-none md:max-w-[200px] mx-auto'>
               {% assign unique_handle_colors = "" %}
               {% for variant in product_obj.variants %}
                 {% if variant.option1 and variant.title != "Default Title" %}
