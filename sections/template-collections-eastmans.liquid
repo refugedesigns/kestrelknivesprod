@@ -1,15 +1,99 @@
 {% assign section_title = section.settings.title | default: "Eastmans Offer" %}
 {% assign section_subtitle = section.settings.subtitle %}
 
+<style>
+  .eastmans-slider {
+    width: 100%;
+    height: var(--eastmans-slider-height, 420px);
+  }
+  .eastmans-slider swiper-slide {
+    height: 100%;
+  }
+  .eastmans-slider img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  @media (max-width: 767px) {
+    .eastmans-slider {
+      height: var(--eastmans-slider-height-mobile, 280px);
+    }
+  }
+</style>
+
 <div class='px-4 py-6 lg:py-10 mx-auto'>
-     <header class='text-center mb-8'>
-        <h1 class='text-3xl font-bold'>{{ section_title }}</h1>
-        {% if section_subtitle != blank %}
-          <p class='text-gray-600 mt-2'>{{ section_subtitle }}</p>
+  <header class='text-center mb-8'>
+    <h1 class='text-3xl font-bold'>{{ section_title }}</h1>
+    {% if section_subtitle != blank %}
+      <p class='text-gray-600 mt-2'>{{ section_subtitle }}</p>
+    {% endif %}
+  </header>
+
+  {% if section.settings.show_gallery %}
+    {% assign shared_images = blank %}
+    {% if collection.metafields.custom.shared_gallery_images != blank %}
+      {% assign shared_images = collection.metafields.custom.shared_gallery_images.value %}
+    {% endif %}
+    {% if shared_images == blank
+      and section.settings.shared_gallery_page != blank
+      and section.settings.shared_gallery_page.metafields.custom.shared_gallery_images != blank
+    %}
+      {% assign shared_images = section.settings.shared_gallery_page.metafields.custom.shared_gallery_images.value %}
+    {% endif %}
+
+    <div class='bg-white mb-8'>
+      <swiper-container
+        class='eastmans-slider'
+        style='--eastmans-slider-height: {{ section.settings.slider_height_desktop }}px; --eastmans-slider-height-mobile: {{ section.settings.slider_height_mobile }}px;'
+        autoplay-delay='{{ section.settings.slider_autoplay_delay | default: 5000 }}'
+        autoplay-disable-on-interaction='false'
+        loop='true'
+        pagination='true'
+        pagination-clickable='true'
+        slides-per-view='3'
+        space-between='12'
+        centered-slides='false'
+        breakpoints='{"0":{"slidesPerView":1},"640":{"slidesPerView":2},"1024":{"slidesPerView":4}}'
+      >
+        {% if shared_images != blank %}
+          {% for shared_image in shared_images %}
+            <swiper-slide>
+              {% if shared_image != blank %}
+                {% if section.settings.gallery_link != blank %}<a href='{{ section.settings.gallery_link }}' target='_blank' rel='noopener'>{% endif %}
+                <img
+                  src='{{ shared_image | image_url: width: 1200 }}'
+                  alt=''
+                  loading='lazy'
+                >
+                {% if section.settings.gallery_link != blank %}</a>{% endif %}
+              {% endif %}
+            </swiper-slide>
+          {% endfor %}
+        {% elsif section.blocks.size > 0 %}
+          {% for block in section.blocks %}
+            {% if block.type == 'slider_image' %}
+              <swiper-slide {{ block.shopify_attributes }}>
+                {% if block.settings.image != blank %}
+                  {% if section.settings.gallery_link != blank %}<a href='{{ section.settings.gallery_link }}' target='_blank' rel='noopener'>{% endif %}
+                  <img
+                    src='{{ block.settings.image | image_url: width: 1200 }}'
+                    alt='{{ block.settings.alt_text | escape }}'
+                    loading='lazy'
+                  >
+                  {% if section.settings.gallery_link != blank %}</a>{% endif %}
+                {% else %}
+                  {{ "lifestyle-1" | placeholder_svg_tag: "w-full h-full bg-gray-200" }}
+                {% endif %}
+              </swiper-slide>
+            {% endif %}
+          {% endfor %}
         {% endif %}
-      </header>
+      </swiper-container>
+    </div>
+  {% endif %}
   {% paginate collection.products by section.settings.number_of_products_per_page | default: 18 %}
-    <div class='max-w-4xl mx-auto'>
+    <div class='max-w-6xl mx-auto'>
       <div class='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6'>
         {% for product in collection.products %}
           {% render "eastmans-card",
@@ -89,6 +173,54 @@
       "info": "Applied when customers add an item to cart from this section."
     },
     {
+      "type": "header",
+      "content": "Gallery Slider"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gallery",
+      "label": "Show gallery slider",
+      "default": true
+    },
+    {
+      "type": "page",
+      "id": "shared_gallery_page",
+      "label": "Shared gallery page (fallback)",
+      "info": "Used only when collection metafield custom.shared_gallery_images is empty."
+    },
+    {
+      "type": "url",
+      "id": "gallery_link",
+      "label": "Gallery slide link (optional)"
+    },
+    {
+      "type": "range",
+      "id": "slider_autoplay_delay",
+      "label": "Slider autoplay delay (ms)",
+      "min": 2000,
+      "max": 8000,
+      "step": 500,
+      "default": 5000
+    },
+    {
+      "type": "range",
+      "id": "slider_height_desktop",
+      "label": "Slider height (desktop px)",
+      "min": 240,
+      "max": 700,
+      "step": 20,
+      "default": 420
+    },
+    {
+      "type": "range",
+      "id": "slider_height_mobile",
+      "label": "Slider height (mobile px)",
+      "min": 180,
+      "max": 520,
+      "step": 20,
+      "default": 280
+    },
+    {
       "type": "number",
       "id": "number_of_products_per_page",
       "default": 18,
@@ -137,6 +269,24 @@
       "type": "image_picker",
       "id": "high_vis_green_image",
       "label": "High Vis Green Image"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slider_image",
+      "name": "Slider image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "alt_text",
+          "label": "Alt text"
+        }
+      ]
     }
   ]
 }
