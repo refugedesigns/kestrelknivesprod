@@ -11,7 +11,13 @@
   "sections": {
     "template-collection-eastmans": {
       "type": "template-collections-eastmans",
-      "settings": {}
+      "settings": {
+        "title": "Eastmans Offer",
+        "subtitle": "Save 15% on eligible items.",
+        "discount_percent": 15,
+        "discount_code": "EASTMANS15",
+        "number_of_products_per_page": 18
+      }
     }
   },
   "order": [
