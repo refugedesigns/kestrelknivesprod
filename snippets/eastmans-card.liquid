@@ -662,8 +662,16 @@
           }
           img.src = src
         },
+        isGatedOriginEligible() {
+          try {
+            return sessionStorage.getItem('kk_gated_cart_discount') === '1'
+          } catch (e) {
+            return false
+          }
+        },
         async applyDiscountCode() {
           if (!this.discountCode) return
+          if (!this.isGatedOriginEligible()) return
           try {
             await fetch(
               `/discount/${encodeURIComponent(this.discountCode)}?redirect=/cart`,
