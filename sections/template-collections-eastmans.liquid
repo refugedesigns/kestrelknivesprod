@@ -34,6 +34,23 @@
   {% endpaginate %}
 </div>
 
+<script>
+  ;(() => {
+    try {
+      const normalizedPath = String(window.location.pathname || '')
+        .toLowerCase()
+        .trim()
+        .replace(/^\/+/, '')
+        .replace(/\/+$/, '')
+      if (normalizedPath) {
+        sessionStorage.setItem('kk_last_collection_path', normalizedPath)
+      }
+    } catch (e) {
+      // ignore storage errors
+    }
+  })()
+</script>
+
 {% schema %}
 {
   "name": "Eastmans Collection",
