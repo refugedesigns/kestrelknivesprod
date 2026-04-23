@@ -43,7 +43,13 @@
         .replace(/^\/+/, '')
         .replace(/\/+$/, '')
       if (normalizedPath) {
-        sessionStorage.setItem('kk_last_collection_path', normalizedPath)
+        sessionStorage.setItem(
+          'kk_collection_origin_token',
+          JSON.stringify({
+            path: normalizedPath,
+            ts: Date.now(),
+          })
+        )
       }
     } catch (e) {
       // ignore storage errors
