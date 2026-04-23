@@ -306,6 +306,42 @@
         document.body.style.overflow = ''
       },
 
+      async applyGatedDiscountCode() {
+        try {
+          const eligible =
+            sessionStorage.getItem('kk_gated_cart_discount') === '1'
+          if (!eligible) return false
+          const code = String(
+            sessionStorage.getItem('kk_gated_cart_discount_code') || ''
+          ).trim()
+          if (!code) return false
+          const cartRes = await fetch('/cart.js', { credentials: 'same-origin' })
+          const currentCart = await cartRes.json()
+          const alreadyHas =
+            Array.isArray(currentCart.cart_level_discount_applications) &&
+            currentCart.cart_level_discount_applications.some(
+              d =>
+                String((d && d.title) || '').toLowerCase() === code.toLowerCase()
+            )
+          if (alreadyHas) return true
+          const res = await fetch('/cart/update.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ discount: code }),
+            credentials: 'same-origin',
+          })
+          if (!res.ok) {
+            const t = await res.text()
+            console.error('Gated discount apply failed', res.status, t)
+            return false
+          }
+          return true
+        } catch (e) {
+          console.error('applyGatedDiscountCode error', e)
+          return false
+        }
+      },
+
       async ensureOriginGatedCartDiscounts() {
         try {
           if (!window.__gatedRemoveCartDiscountWhenIneligible) return
@@ -331,6 +367,11 @@
             body: JSON.stringify({ discount: '' }),
             credentials: 'same-origin',
           })
+          try {
+            sessionStorage.removeItem('kk_gated_cart_discount_code')
+          } catch (e) {
+            /* ignore */
+          }
         } catch (e) {
           console.error('Origin-gated discount clear failed', e)
         }
@@ -434,10 +475,10 @@
           })
 
           if (response.ok) {
+            await this.applyGatedDiscountCode()
             await this.loadCart()
             this.openCart()
 
-            // Dispatch event for other components
             window.dispatchEvent(new CustomEvent('cart-updated'))
           } else {
             throw new Error('Failed to add to cart')
