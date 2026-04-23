@@ -22,7 +22,7 @@
   }
 </style>
 
-<div class='px-4 py-6 lg:py-10 mx-auto'>
+<div class='px-4 pt-6 lg:pt-10 pb-0 mx-auto'>
   <header class='text-center mb-8'>
     <h1 class='text-3xl font-bold'>{{ section_title }}</h1>
     {% if section_subtitle != blank %}
@@ -66,7 +66,7 @@
       {% assign shared_images = section.settings.shared_gallery_page.metafields.custom.shared_gallery_images.value %}
     {% endif %}
 
-    <div class='bg-white mt-10'>
+    <div class='bg-white mt-10 mb-0'>
       <swiper-container
         class='eastmans-slider'
         style='--eastmans-slider-height: {{ section.settings.slider_height_desktop }}px; --eastmans-slider-height-mobile: {{ section.settings.slider_height_mobile }}px;'
