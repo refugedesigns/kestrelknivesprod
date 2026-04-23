@@ -2235,13 +2235,6 @@
 
     if (!origins.length) return basePercent;
 
-    const storageKey = `kk_origin_discount_allowed:${origins.join('|')}`;
-    try {
-      if (sessionStorage.getItem(storageKey) === '1') return basePercent;
-    } catch (e) {
-      /* ignore */
-    }
-
     const escapeRegex = value =>
       String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const wildcardToRegex = pattern => {
@@ -2278,26 +2271,39 @@
     }
     if (!isMatch) {
       try {
-        const lastCollectionPath = sessionStorage.getItem(
-          'kk_last_collection_path'
-        )
-        isMatch = matchesOrigin(lastCollectionPath)
+        const tokenRaw = sessionStorage.getItem('kk_collection_origin_token')
+        if (tokenRaw) {
+          const token = JSON.parse(tokenRaw)
+          const tokenPath = token && token.path ? token.path : ''
+          const tokenTs = Number(token && token.ts ? token.ts : 0)
+          const isFresh = tokenTs > 0 && Date.now() - tokenTs <= 10 * 60 * 1000
+          if (isFresh) {
+            isMatch = matchesOrigin(tokenPath)
+          }
+        }
       } catch (e) {
         /* ignore */
+      } finally {
+        try {
+          // One-time token: remove after evaluation so it does not linger.
+          sessionStorage.removeItem('kk_collection_origin_token')
+        } catch (e) {
+          /* ignore */
+        }
       }
     }
 
-    if (isMatch) {
-      try {
-        sessionStorage.setItem(storageKey, '1');
-      } catch (e) {
-        /* ignore */
-      }
-      return basePercent;
-    }
+    if (isMatch) return basePercent;
     return 0;
   };
   window.__categoryDiscountPercent = window.__resolveCategoryDiscountPercent();
+  window.addEventListener('pagehide', () => {
+    try {
+      sessionStorage.removeItem('kk_collection_origin_token');
+    } catch (e) {
+      /* ignore */
+    }
+  });
 </script>
 
 {% if use_complex_options %}
