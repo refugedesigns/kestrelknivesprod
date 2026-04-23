@@ -1,28 +1,40 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "template-product": {
       "type": "template-product",
-      "settings": {
-        "show_reviews": true
-      },
       "blocks": {
         "vendor": {
-          "type": "vendor"
+          "type": "vendor",
+          "settings": {}
         },
         "title": {
-          "type": "title"
+          "type": "title",
+          "settings": {}
         },
         "price": {
-          "type": "price"
+          "type": "price",
+          "settings": {}
         },
         "description": {
-          "type": "description"
+          "type": "description",
+          "settings": {}
         },
         "variant_selector": {
-          "type": "variant_selector"
+          "type": "variant_selector",
+          "settings": {}
         },
         "checkout_buttons": {
-          "type": "checkout_buttons"
+          "type": "checkout_buttons",
+          "settings": {}
         },
         "review_1": {
           "type": "review",
@@ -50,6 +62,160 @@
             "customer_name": "Chris C.",
             "customer_title": "Verified Customer"
           }
+        },
+        "review_Hz4efJ": {
+          "type": "review",
+          "settings": {
+            "review_text": "The trip was amazing, man. I live in northern BC, Fort Nelson, a couple hours’ drive and 5 of our horses. 20 km trip into base camp, and day rides from there. 9 days on horses, 180+ km between boots and horseback. On the 7th day I shot my ram.The knife was amazing. My dad had his Havalon and I had my Kestrel. His Havalon handle snapped on him, and we finished the caping with my Kestrel",
+            "rating": 5,
+            "customer_name": "Matt Parker",
+            "customer_title": "Verified Customer"
+          }
+        },
+        "review_9XcefN": {
+          "type": "review",
+          "settings": {
+            "review_text": "Putting up some fur is where the rounded tip Ovis Scalpel really shines",
+            "rating": 5,
+            "customer_name": "Ruben Uruutia",
+            "customer_title": "Lost Trail Outfitters"
+          }
+        },
+        "review_9tkTMh": {
+          "type": "review",
+          "settings": {
+            "review_text": "My personal “kudos” on designing an ultralight knife that will meet the needs of Mountain Hunters. Great job. I recommend that serious Mountain Hunters purchase this very innovative knife to “take their game to another level",
+            "rating": 5,
+            "customer_name": "Randy Johnson",
+            "customer_title": "Full Curl Society Hall of Fame"
+          }
+        },
+        "review_Tq3QWh": {
+          "type": "review",
+          "settings": {
+            "review_text": "Love the precision of this scalpel.",
+            "rating": 5,
+            "customer_name": "Darren Hill",
+            "customer_title": "Verified Customer"
+          }
+        },
+        "review_iW7Vgm": {
+          "type": "review",
+          "settings": {
+            "review_text": "Kodiak ended with a billy goat, two Sitka Blacktail deer and a caribou. All dressed with the kestrel ultralighter in my hands. It does take some getting used to but once you understand how the knife works it cuts like butter and stays sharp... I only touched up the knife once with a field sharpening kit from Nathan after three animals and only because I wanted to try the sharpening kit. To my surprise I worked well fleshing out hides as well as cutting through meat.I use this knife all the time now, from cutting rope, meat, hides, vegetables, cardboard and whatever else happens to need severing.This is a great knife that's extremely light and stays sharp and will stay on my pack on all my future hunts.",
+            "rating": 5,
+            "customer_name": "John C.",
+            "customer_title": "Verified Customer"
+          }
+        },
+        "review_GLYP9E": {
+          "type": "review",
+          "settings": {
+            "review_text": "I’ve carried the Kestrel Mountain Scalpel for years on every hunt from New Mexico antelope to Colorado high country mule deer and it’s never let me down. The replaceable blade design keeps it razor sharp when I need it most, and the lightweight build makes it a must have that earned its place in my pack. It's tough, reliable and purpose built for the mountain. This knife is made for serious hunters.",
+            "rating": 5,
+            "customer_name": "Chad Ryker",
+            "customer_title": "Out of State Hunter"
+          }
+        },
+        "review_tjdFnN": {
+          "type": "review",
+          "settings": {
+            "review_text": "Just a quick note of thanks and to rave about my experience using your knives.  We’ve gone through sheep, caribou and countless whitetails using various models all with outstanding results.  The design and function are flawless and the emphasis on weight has made them a big hit as gifts for several guides along my travels.  And scary sharp, got a few scars to attest to this fact. Can’t tell you how much I appreciate the craftsmanship and service.",
+            "rating": 5,
+            "customer_name": "Customer for life",
+            "customer_title": ""
+          }
+        },
+        "review_wMAfXM": {
+          "type": "review",
+          "settings": {
+            "review_text": "Used my Kestrel knife on my antelope buck. This is the third animal that I’ve used the knife on and it works awesome. It’s so light and thin you don’t even know it’s in your pack. The other thing I really like is that it’s so simple…no folding mechanism or blades to cut yourself on while changing them out (Havalon!) but enough mass behind the blade to really carve against bone, pry with, or whatever. Kestrel has it figured out…simple, effective, light, and cutting edge (pun intended).",
+            "rating": 5,
+            "customer_name": "David Hamilton",
+            "customer_title": "Vortex Optics"
+          }
+        },
+        "review_JXjg3k": {
+          "type": "review",
+          "disabled": true,
+          "settings": {
+            "review_text": "I’ve had these knives forever and they’re perfect to carry along in the mountains.",
+            "rating": 5,
+            "customer_name": "Kyle Brundage",
+            "customer_title": "Verified Customer"
+          }
+        },
+        "review_PzfQPw": {
+          "type": "review",
+          "settings": {
+            "review_text": "I heard about Kestrel knives from Jason @ Kuiu and called him to see what he had to offer. After he sent me a titanium ultra light knife to look at, I immediately ordered several of them. I used it on a recent Stone sheep hunt in BC and it was wonderful and unbelievably lightweight. It retained its edge through the dressing and full body caping and is still sharp enough for several more. I had taken a couple of other kestrels with me and gave them to my guide and wrangler. They loved the feel and weight and the way the knife kept its edge.I've since ordered several more and will be passing them out around the world. Thanks Nate for a great knife and great customer interaction!!!!",
+            "rating": 5,
+            "customer_name": "Tom",
+            "customer_title": "Verified Customer"
+          }
+        },
+        "review_e3GEU4": {
+          "type": "review",
+          "settings": {
+            "review_text": "I’ve owned an Ovis Hunter for years (10+ I think) and it’s a great knife. It holds an edge and sharpens easily, it’s bombproof, and it fits so well in my hand even when it’s covered in blood, dirt, and guts. It’s been with me on all my elk, deer, bear, and moose hunts all over North America and even on fishing trips. It’s gutted, skinned, butchered, deboned, and quartered many animals and has been my general go-to knife for life in the backcountry.",
+            "rating": 5,
+            "customer_name": "Doug Asano",
+            "customer_title": "Verified Customer"
+          }
+        },
+        "review_AgbMt4": {
+          "type": "review",
+          "settings": {
+            "review_text": "Dig my Kestrel knife. You never notice that you are even carrying it. At G3 Outfitters, we do some backpack hunting and we endorse this fine product. From Alaska to New Mexico's Gila Wilderness, I pack a Kestrel.",
+            "rating": 5,
+            "customer_name": "H Jay Platt",
+            "customer_title": "G3 Outfitters"
+          }
+        },
+        "review_RdVeCX": {
+          "type": "review",
+          "settings": {
+            "review_text": "I’ve been using my fixed blade mountain caper for years. I processed an entire mule deer buck with it this year",
+            "rating": 5,
+            "customer_name": "Andrew Giesler",
+            "customer_title": "Verified Customer"
+          }
+        },
+        "review_nNVPbG": {
+          "type": "review",
+          "settings": {
+            "review_text": "I wanted to share a photo of my 11 1/2 year old warrior NWT ram. Absolutely fantastic hunt in beautiful country. I used my Kestrel knife to cape for a life sized mount. Your knife stayed sharp and is a joy to carry, perfect for sheep hunting. Thanks!",
+            "rating": 5,
+            "customer_name": "Tom Oregon",
+            "customer_title": "Verified Customer"
+          }
+        },
+        "review_3nLatU": {
+          "type": "review",
+          "settings": {
+            "review_text": "I have a pretty fair assortment of premium backpacking knives and the short Ovis is my absolute favorite and go to for 90% of my hunts. The only time I use another knife is just to try something else, but always end up disappointed in other knives and go back to my Ovis. Since getting it I have used it on every continent except Africa and Antartica to skin and process animals. It holds an edge and is by far the easiest knife to touch up in the field that I have ever used.",
+            "rating": 5,
+            "customer_name": "Chase Newton",
+            "customer_title": "Verified Customer"
+          }
+        },
+        "review_M7LpYa": {
+          "type": "review",
+          "settings": {
+            "review_text": "A knife should feel like an extension of your hand and that’s exactly what the Ovis Hunter is. The balance, the size, the Nitro-V steel, everything just works. It slices effortlessly and makes butchering game in the field a dream. I’ve owned plenty of high-end knives, but I always come back to this one. The Ovis Hunter is the knife I trust in the field, at camp, and everywhere in between",
+            "rating": 5,
+            "customer_name": "Matt Riley",
+            "customer_title": "British Columbia Outdoorsman"
+          }
+        },
+        "review_MxPKaG": {
+          "type": "review",
+          "settings": {
+            "review_text": "I purchased your mountain scalpel and I believe your Ovis hunter without the handle and wrapped in paracord. Just got back from a mountain goat trip on Kodiak Island and used both knives to skin and debone the goat on the mountain. They worked excellent and both the guide and the packer were very impressed.",
+            "rating": 5,
+            "customer_name": "Josh",
+            "customer_title": "Big Sky Wood Works"
+          }
         }
       },
       "block_order": [
@@ -61,9 +227,39 @@
         "checkout_buttons",
         "review_1",
         "review_2",
-        "review_3"
-      ]
+        "review_3",
+        "review_Hz4efJ",
+        "review_9XcefN",
+        "review_9tkTMh",
+        "review_Tq3QWh",
+        "review_iW7Vgm",
+        "review_GLYP9E",
+        "review_tjdFnN",
+        "review_wMAfXM",
+        "review_JXjg3k",
+        "review_PzfQPw",
+        "review_e3GEU4",
+        "review_AgbMt4",
+        "review_RdVeCX",
+        "review_nNVPbG",
+        "review_3nLatU",
+        "review_M7LpYa",
+        "review_MxPKaG"
+      ],
+      "settings": {
+        "hidden_offer_title": "Guide & Outfitter Early Access",
+        "hidden_offer_title_color": "#000000",
+        "hidden_offer_title_bg_color": "#ffffff",
+        "discount_collection_origins": "collections/eastmans-offer",
+        "related_heading": "Members Also Bought",
+        "show_reviews": true,
+        "reviews_heading": "What Kestrel customers are saying...",
+        "star_size_desktop": 20,
+        "star_size_mobile": 16
+      }
     }
   },
-  "order": ["template-product"]
+  "order": [
+    "template-product"
+  ]
 }
