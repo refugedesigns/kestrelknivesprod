@@ -125,6 +125,7 @@
 <script>
   ;(() => {
     try {
+      sessionStorage.setItem('kk_gated_cart_discount', '1')
       const normalizedPath = String(window.location.pathname || '')
         .toLowerCase()
         .trim()
