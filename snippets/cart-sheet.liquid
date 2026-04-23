@@ -153,6 +153,32 @@
       <span class='text-lg font-bold text-gray-900' x-text='subtotal'></span>
     </div>
 
+    <template x-if='hasDiscount'>
+      <div class='space-y-2'>
+        <template x-for='discount in cartLevelDiscounts' :key='discount.title'>
+          <div class='flex justify-between items-center text-sm'>
+            <span class='text-green-700' x-text='discount.title'></span>
+            <span
+              class='font-semibold text-green-700'
+              x-text='`-${formatMoney(discount.total_allocated_amount)}`'
+            ></span>
+          </div>
+        </template>
+        <div class='flex justify-between items-center text-sm'>
+          <span class='text-green-700 font-medium uppercase tracking-wide'>
+            Discount
+          </span>
+          <span class='font-semibold text-green-700' x-text='discountTotal'></span>
+        </div>
+        <div class='flex justify-between items-center'>
+          <span class='text-sm font-medium text-gray-900 uppercase tracking-wide'>
+            Total
+          </span>
+          <span class='text-lg font-bold text-gray-900' x-text='total'></span>
+        </div>
+      </div>
+    </template>
+
     <!-- Checkout Button -->
     <button
       @click='checkout'
@@ -173,6 +199,10 @@
       isAddingMainButton: false,
       isAddingStickyButton: false,
       justOpened: false,
+      cartLevelDiscounts: [],
+      originalTotalPriceCents: 0,
+      totalPriceCents: 0,
+      totalDiscountCents: 0,
 
       init() {
         // Load cart from localStorage on init
@@ -290,6 +320,19 @@
             properties: item.properties,
             line_price: item.line_price,
           }))
+
+          this.cartLevelDiscounts = Array.isArray(
+            cart.cart_level_discount_applications
+          )
+            ? cart.cart_level_discount_applications
+            : []
+          this.originalTotalPriceCents = Number(
+            cart.original_total_price != null ? cart.original_total_price : 0
+          )
+          this.totalPriceCents = Number(cart.total_price != null ? cart.total_price : 0)
+          this.totalDiscountCents = Number(
+            cart.total_discount != null ? cart.total_discount : 0
+          )
 
           this.updateTotals()
         } catch (error) {
@@ -430,10 +473,20 @@
       },
 
       get subtotal() {
-        const total = this.cartItems.reduce((total, item) => {
-          return total + item.line_price / 100 // Convert from cents
-        }, 0)
-        return this.formatMoney(total * 100)
+        if (this.hasDiscount) return this.formatMoney(this.originalTotalPriceCents)
+        return this.formatMoney(this.totalPriceCents)
+      },
+
+      get total() {
+        return this.formatMoney(this.totalPriceCents)
+      },
+
+      get hasDiscount() {
+        return this.totalDiscountCents > 0 || this.cartLevelDiscounts.length > 0
+      },
+
+      get discountTotal() {
+        return `-${this.formatMoney(this.totalDiscountCents)}`
       },
 
       formatMoney(cents) {
