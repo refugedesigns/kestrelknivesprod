@@ -3,10 +3,57 @@
 {% assign product_status_text = kk_status_raw.value | default: kk_status_raw %}
 {% assign kk_product_type_lower = product.type | default: "" | downcase %}
 {% assign kk_force_first_option_defaults = false %}
+{% assign kk_category_discount_percent = 0 %}
 {% if kk_product_type_lower contains "accessor"
   or kk_product_type_lower contains "sheath"
 %}
   {% assign kk_force_first_option_defaults = true %}
+{% endif %}
+{% for block in section.blocks %}
+  {% if block.type == "category_discount" %}
+    {% assign kk_block_categories = block.settings.categories
+      | default: ""
+      | downcase
+      | replace: ", ", ","
+      | replace: " ,", ","
+      | split: ","
+    %}
+    {% for kk_category in kk_block_categories %}
+      {% assign kk_category_norm = kk_category | strip %}
+      {% if kk_category_norm != blank and kk_product_type_lower == kk_category_norm %}
+        {% if block.settings.discount_percent > kk_category_discount_percent %}
+          {% assign kk_category_discount_percent = block.settings.discount_percent %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endfor %}
+{% assign kk_discount_multiplier = 100
+  | minus: kk_category_discount_percent
+  | divided_by: 100.0
+%}
+{% assign kk_discount_collection_origins_raw = section.settings.discount_collection_origins
+  | default: ""
+  | strip
+%}
+{% assign kk_has_discount_collection_origins = false %}
+{% if kk_discount_collection_origins_raw != blank %}
+  {% assign kk_has_discount_collection_origins = true %}
+{% endif %}
+{% assign kk_effective_initial_discount_percent = kk_category_discount_percent %}
+{% if kk_has_discount_collection_origins and kk_category_discount_percent > 0 %}
+  {% assign kk_effective_initial_discount_percent = 0 %}
+{% endif %}
+{% assign kk_initial_discounted_price = selected_variant.price %}
+{% if kk_effective_initial_discount_percent > 0 %}
+  {% assign kk_effective_discount_multiplier = 100
+    | minus: kk_effective_initial_discount_percent
+    | divided_by: 100.0
+  %}
+  {% assign kk_initial_discounted_price = selected_variant.price
+    | times: kk_effective_discount_multiplier
+    | round
+  %}
 {% endif %}
 
 <style>
@@ -452,20 +499,24 @@
               <!-- Price -->
               <div class='mb-8'>
                 <span id='price' class='text-3xl font-bold text-gray-900'>
-                  {{- selected_variant.price | money -}}
+                  {{- kk_initial_discounted_price | money -}}
                 </span>
                 <span
                   id='comparePrice'
                   class='text-lg text-gray-500 line-through ml-2'
-                  style='display: {% if selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
+                  style='display: {% if kk_effective_initial_discount_percent > 0 or selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
                 >
-                  {{- selected_variant.compare_at_price | money -}}
+                  {% if kk_effective_initial_discount_percent > 0 %}
+                    {{- selected_variant.price | money -}}
+                  {% else %}
+                    {{- selected_variant.compare_at_price | money -}}
+                  {% endif %}
                 </span>
                 <span
                   id='saleBadge'
                   class='px-3 py-1 text-sm font-bold bg-red-500 rounded-full text-white ml-4'
-                  style='display: {% if selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
-                  >Sale</span
+                  style='display: {% if kk_effective_initial_discount_percent > 0 or selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
+                  >{% if kk_effective_initial_discount_percent > 0 %}Save {{ kk_effective_initial_discount_percent }}%{% else %}Sale{% endif %}</span
                 >
                 <div id='availability' class='mt-1 text-sm text-gray-600'></div>
               </div>
@@ -1114,7 +1165,7 @@
             id='stickyPrice'
             class='text-sm md:text-lg font-bold text-black'
           >
-            {{- selected_variant.price | money -}}
+            {{- kk_initial_discounted_price | money -}}
           </span>
         {% endif %}
       </div>
@@ -2141,6 +2192,87 @@
       {% endif %}
     {% endfor %}
   };
+  window.__categoryDiscountBasePercent = {{ kk_category_discount_percent | default: 0 | json }};
+  window.__categoryDiscountPercent = {{ kk_effective_initial_discount_percent | default: 0 | json }};
+  window.__discountCollectionOriginsRaw = {{ kk_discount_collection_origins_raw | json }};
+  window.__formattedDiscountedPrices = {
+    {% for variant in product.variants %}
+      {% assign kk_variant_discounted_price = variant.price %}
+      {% if kk_category_discount_percent > 0 %}
+        {% assign kk_variant_discounted_price = variant.price
+          | times: kk_discount_multiplier
+          | round
+        %}
+      {% endif %}
+      {{ variant.id }}: "{{ kk_variant_discounted_price | money }}"{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  };
+  window.__resolveCategoryDiscountPercent = function () {
+    const basePercent = Number(window.__categoryDiscountBasePercent || 0);
+    if (basePercent <= 0) return 0;
+
+    const normalizePath = value =>
+      String(value || '')
+        .toLowerCase()
+        .trim()
+        .replace(/^\/+/, '')
+        .replace(/\/+$/, '');
+
+    const rawOrigins = String(window.__discountCollectionOriginsRaw || '');
+    const origins = rawOrigins
+      .split(',')
+      .map(normalizePath)
+      .filter(Boolean);
+
+    if (!origins.length) return basePercent;
+
+    const storageKey = `kk_origin_discount_allowed:${origins.join('|')}`;
+    try {
+      if (sessionStorage.getItem(storageKey) === '1') return basePercent;
+    } catch (e) {
+      /* ignore */
+    }
+
+    let referrerPath = '';
+    try {
+      if (document.referrer) {
+        referrerPath = normalizePath(
+          new URL(document.referrer, window.location.origin).pathname
+        );
+      }
+    } catch (e) {
+      referrerPath = '';
+    }
+
+    if (!referrerPath) return 0;
+
+    const escapeRegex = value =>
+      String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const wildcardToRegex = pattern => {
+      const normalized = normalizePath(pattern);
+      const parts = normalized.split('*').map(escapeRegex);
+      return new RegExp(`^${parts.join('.*')}$`);
+    };
+
+    const isMatch = origins.some(origin => {
+      if (!origin) return false;
+      if (origin.includes('*')) {
+        return wildcardToRegex(origin).test(referrerPath);
+      }
+      return referrerPath === origin || referrerPath.startsWith(`${origin}/`);
+    });
+
+    if (isMatch) {
+      try {
+        sessionStorage.setItem(storageKey, '1');
+      } catch (e) {
+        /* ignore */
+      }
+      return basePercent;
+    }
+    return 0;
+  };
+  window.__categoryDiscountPercent = window.__resolveCategoryDiscountPercent();
 </script>
 
 {% if use_complex_options %}
@@ -2555,6 +2687,12 @@
             const compareEl = document.getElementById('comparePrice');
             const saleEl = document.getElementById('saleBadge');
             const stickyPriceEl = document.getElementById('stickyPrice');
+            const categoryDiscountPercent = Number(
+              (typeof window.__resolveCategoryDiscountPercent === 'function'
+                ? window.__resolveCategoryDiscountPercent()
+                : window.__categoryDiscountPercent) || 0
+            );
+            const hasCategoryDiscount = categoryDiscountPercent > 0;
 
              // Use Shopify's pre-formatted prices
              function formatMoney(cents) {
@@ -2578,16 +2716,41 @@
                // Fallback to basic formatting
                return (cents / 100).toFixed(2);
              }
+             function formatDiscountedPrice(variantObj) {
+               if (!variantObj) return '';
+               if (
+                 window.__formattedDiscountedPrices &&
+                 window.__formattedDiscountedPrices[variantObj.id]
+               ) {
+                 return window.__formattedDiscountedPrices[variantObj.id];
+               }
+               const discounted = Math.round(
+                 Number(variantObj.price || 0) * ((100 - categoryDiscountPercent) / 100)
+               );
+               return formatMoney(discounted);
+             }
 
-            const formattedPrice = formatMoney(variant.price);
+            const formattedPrice = hasCategoryDiscount
+              ? formatDiscountedPrice(variant)
+              : formatMoney(variant.price);
             if (priceEl) priceEl.innerText = formattedPrice;
             if (stickyPriceEl) stickyPriceEl.innerText = formattedPrice;
 
             if (compareEl) {
-              if (variant.compare_at_price && Number(variant.compare_at_price) > Number(variant.price)) {
+              if (hasCategoryDiscount) {
+                compareEl.style.display = 'inline-block';
+                compareEl.innerText = formatMoney(variant.price);
+                if (saleEl) {
+                  saleEl.style.display = 'inline-block';
+                  saleEl.innerText = `Save ${categoryDiscountPercent}%`;
+                }
+              } else if (variant.compare_at_price && Number(variant.compare_at_price) > Number(variant.price)) {
                 compareEl.style.display = 'inline-block';
                 compareEl.innerText = formatComparePrice(variant.compare_at_price);
-                if (saleEl) saleEl.style.display = 'inline-block';
+                if (saleEl) {
+                  saleEl.style.display = 'inline-block';
+                  saleEl.innerText = 'Sale';
+                }
               } else {
                 if (compareEl) compareEl.style.display = 'none';
                 if (saleEl) saleEl.style.display = 'none';
@@ -3679,6 +3842,12 @@
     },
     {
       "type": "text",
+      "id": "discount_collection_origins",
+      "label": "Discount collection origins",
+      "info": "Comma-separated paths. Example: collections/eastmans-offer, collections/special-deals"
+    },
+    {
+      "type": "text",
       "id": "related_heading",
       "label": "Related products heading",
       "default": "Members Also Bought"
@@ -3746,6 +3915,28 @@
       "type": "checkout_buttons",
       "name": "Checkout Buttons",
       "limit": 1
+    },
+    {
+      "type": "category_discount",
+      "name": "Category Discount Rule",
+      "settings": [
+        {
+          "type": "text",
+          "id": "categories",
+          "label": "Categories (product types)",
+          "info": "Comma-separated product types to match exactly, e.g. Knives, Apparel"
+        },
+        {
+          "type": "range",
+          "id": "discount_percent",
+          "label": "Discount percent",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 15,
+          "unit": "%"
+        }
+      ]
     },
     {
       "type": "review",
