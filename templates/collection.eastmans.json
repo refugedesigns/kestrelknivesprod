@@ -9,12 +9,12 @@
  */
 {
   "sections": {
-    "collection-list": {
-      "type": "template-collection",
+    "template-collection-eastmans": {
+      "type": "template-collections-eastmans",
       "settings": {}
     }
   },
   "order": [
-    "collection-list"
+    "template-collection-eastmans"
   ]
 }
