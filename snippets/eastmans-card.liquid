@@ -674,6 +674,11 @@
           const code = String(this.discountCode || '').trim()
           if (!code) return
           try {
+            sessionStorage.setItem('kk_gated_cart_discount_code', code)
+          } catch (e) {
+            /* ignore */
+          }
+          try {
             const res = await fetch('/cart/update.js', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
