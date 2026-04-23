@@ -24,9 +24,27 @@
         | default: product_obj.metafields.custom_fields.product_status
         | default: product_obj.metafields.global.product_status
       %}
+      {% assign is_ovis_hunter = false %}
+      {% assign product_title_lower = product_obj.title | default: "" | downcase %}
+      {% if product_title_lower contains "ovis hunter" %}
+        {% assign is_ovis_hunter = true %}
+      {% endif %}
       {% if kk_status != blank %}
         <div class='absolute top-4 left-4 bg-black text-white font-bold px-3 py-1 text-sm uppercase z-10'>
           {{ kk_status }}
+        </div>
+      {% elsif is_ovis_hunter %}
+        <div
+          x-show='isAvailable'
+          class='absolute top-4 left-4 bg-black text-white font-bold px-3 py-1 text-sm uppercase z-10'
+        >
+          MOST POPULAR
+        </div>
+        <div
+          x-show='!isAvailable'
+          class='absolute top-4 left-4 bg-black text-white font-bold px-3 py-1 text-sm uppercase z-10'
+        >
+          SOLD OUT
         </div>
       {% else %}
         <div
