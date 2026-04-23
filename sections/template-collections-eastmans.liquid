@@ -31,7 +31,7 @@
   </header>
 
   {% paginate collection.products by section.settings.number_of_products_per_page | default: 18 %}
-    <div class='max-w-4xl mx-auto'>
+    <div class='max-w-6xl mx-auto'>
       <div class='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6'>
         {% for product in collection.products %}
           {% render "eastmans-card",
@@ -73,8 +73,6 @@
         autoplay-delay='{{ section.settings.slider_autoplay_delay | default: 5000 }}'
         autoplay-disable-on-interaction='false'
         loop='true'
-        pagination='true'
-        pagination-clickable='true'
         slides-per-view='3'
         space-between='12'
         centered-slides='false'
