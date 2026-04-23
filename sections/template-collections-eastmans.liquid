@@ -1,0 +1,121 @@
+{% assign section_title = section.settings.title | default: "Eastmans Offer" %}
+{% assign section_subtitle = section.settings.subtitle %}
+
+<div class='px-4 py-6 lg:py-10 mx-auto'>
+  {% paginate collection.products by section.settings.number_of_products_per_page | default: 18 %}
+    <div class='max-w-7xl mx-auto'>
+      <header class='text-center mb-8'>
+        <h1 class='text-3xl font-bold'>{{ section_title }}</h1>
+        {% if section_subtitle != blank %}
+          <p class='text-gray-600 mt-2'>{{ section_subtitle }}</p>
+        {% endif %}
+      </header>
+
+      <div class='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6'>
+        {% for product in collection.products %}
+          {% render "eastmans-card",
+            product_product: product,
+            eastmans_discount_code: section.settings.discount_code,
+            eastmans_discount_percent: section.settings.discount_percent
+          %}
+        {% else %}
+          <div class='col-span-full text-center py-12'>
+            <p class='text-gray-500 text-lg'>There are no products in this collection</p>
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if paginate.pages > 1 %}
+        <div class='mt-12'>
+          {% render "pagination", pagination: paginate %}
+        </div>
+      {% endif %}
+    </div>
+  {% endpaginate %}
+</div>
+
+{% schema %}
+{
+  "name": "Eastmans Collection",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Eastmans Offer"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Save 15% on eligible items."
+    },
+    {
+      "type": "range",
+      "id": "discount_percent",
+      "label": "Discount percent",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 15,
+      "unit": "%"
+    },
+    {
+      "type": "text",
+      "id": "discount_code",
+      "label": "Discount code",
+      "info": "Applied when customers add an item to cart from this section."
+    },
+    {
+      "type": "number",
+      "id": "number_of_products_per_page",
+      "default": 18,
+      "label": "Number of products per page"
+    },
+    {
+      "type": "header",
+      "content": "Color Variant Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "orange_image",
+      "label": "Orange Color Image",
+      "info": "Upload an image for orange color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "black_orange_image",
+      "label": "Black w/Orange Liner Image",
+      "info": "Upload an image for black with orange liner variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "black_image",
+      "label": "Black Color Image",
+      "info": "Upload an image for black color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "green_image",
+      "label": "Green Color Image",
+      "info": "Upload an image for green color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "camo_image",
+      "label": "Camo/Earth Color Image",
+      "info": "Upload an image for camo or earth color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "high_vis_orange_image",
+      "label": "High Vis Orange Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "high_vis_green_image",
+      "label": "High Vis Green Image"
+    }
+  ]
+}
+{% endschema %}
