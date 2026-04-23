@@ -32,6 +32,15 @@
   | minus: kk_category_discount_percent
   | divided_by: 100.0
 %}
+{% assign kk_settings_discount_percent = section.settings.discount_percent | default: 0 %}
+{% assign kk_base_discount_percent = kk_category_discount_percent %}
+{% if kk_settings_discount_percent > kk_base_discount_percent %}
+  {% assign kk_base_discount_percent = kk_settings_discount_percent %}
+{% endif %}
+{% assign kk_discount_multiplier = 100
+  | minus: kk_base_discount_percent
+  | divided_by: 100.0
+%}
 {% assign kk_discount_collection_origins_raw = section.settings.discount_collection_origins
   | default: ""
   | strip
@@ -40,8 +49,8 @@
 {% if kk_discount_collection_origins_raw != blank %}
   {% assign kk_has_discount_collection_origins = true %}
 {% endif %}
-{% assign kk_effective_initial_discount_percent = kk_category_discount_percent %}
-{% if kk_has_discount_collection_origins and kk_category_discount_percent > 0 %}
+{% assign kk_effective_initial_discount_percent = kk_base_discount_percent %}
+{% if kk_has_discount_collection_origins and kk_base_discount_percent > 0 %}
   {% assign kk_effective_initial_discount_percent = 0 %}
 {% endif %}
 {% assign kk_initial_discounted_price = selected_variant.price %}
@@ -2192,13 +2201,13 @@
       {% endif %}
     {% endfor %}
   };
-  window.__categoryDiscountBasePercent = {{ kk_category_discount_percent | default: 0 | json }};
+  window.__categoryDiscountBasePercent = {{ kk_base_discount_percent | default: 0 | json }};
   window.__categoryDiscountPercent = {{ kk_effective_initial_discount_percent | default: 0 | json }};
   window.__discountCollectionOriginsRaw = {{ kk_discount_collection_origins_raw | json }};
   window.__formattedDiscountedPrices = {
     {% for variant in product.variants %}
       {% assign kk_variant_discounted_price = variant.price %}
-      {% if kk_category_discount_percent > 0 %}
+      {% if kk_base_discount_percent > 0 %}
         {% assign kk_variant_discounted_price = variant.price
           | times: kk_discount_multiplier
           | round
@@ -2233,6 +2242,25 @@
       /* ignore */
     }
 
+    const escapeRegex = value =>
+      String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const wildcardToRegex = pattern => {
+      const normalized = normalizePath(pattern);
+      const parts = normalized.split('*').map(escapeRegex);
+      return new RegExp(`^${parts.join('.*')}$`);
+    };
+    const matchesOrigin = pathValue => {
+      const path = normalizePath(pathValue);
+      if (!path) return false;
+      return origins.some(origin => {
+        if (!origin) return false;
+        if (origin.includes('*')) {
+          return wildcardToRegex(origin).test(path);
+        }
+        return path === origin || path.startsWith(`${origin}/`);
+      });
+    };
+
     let referrerPath = '';
     try {
       if (document.referrer) {
@@ -2244,23 +2272,20 @@
       referrerPath = '';
     }
 
-    if (!referrerPath) return 0;
-
-    const escapeRegex = value =>
-      String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const wildcardToRegex = pattern => {
-      const normalized = normalizePath(pattern);
-      const parts = normalized.split('*').map(escapeRegex);
-      return new RegExp(`^${parts.join('.*')}$`);
-    };
-
-    const isMatch = origins.some(origin => {
-      if (!origin) return false;
-      if (origin.includes('*')) {
-        return wildcardToRegex(origin).test(referrerPath);
+    let isMatch = false;
+    if (referrerPath) {
+      isMatch = matchesOrigin(referrerPath);
+    }
+    if (!isMatch) {
+      try {
+        const lastCollectionPath = sessionStorage.getItem(
+          'kk_last_collection_path'
+        )
+        isMatch = matchesOrigin(lastCollectionPath)
+      } catch (e) {
+        /* ignore */
       }
-      return referrerPath === origin || referrerPath.startsWith(`${origin}/`);
-    });
+    }
 
     if (isMatch) {
       try {
@@ -3845,6 +3870,16 @@
       "id": "discount_collection_origins",
       "label": "Discount collection origins",
       "info": "Comma-separated paths. Example: collections/eastmans-offer, collections/special-deals"
+    },
+    {
+      "type": "range",
+      "id": "discount_percent",
+      "label": "Discount percent for collection origins",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 15,
+      "unit": "%"
     },
     {
       "type": "text",
