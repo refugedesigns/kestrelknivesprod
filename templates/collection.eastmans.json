@@ -46,6 +46,8 @@
         "banner_button_bg_color": "#2563eb",
         "banner_button_text_color": "#ffffff",
         "banner_image": "shopify://shop_images/eastmans.png",
+        "banner_image_tablet": "shopify://shop_images/eastmans_mobile.png",
+        "banner_image_mobile": "shopify://shop_images/eastmans_mobile.png",
         "banner_image_fit": "cover",
         "banner_image_fit_mobile": "cover",
         "banner_image_fit_tablet": "cover",
