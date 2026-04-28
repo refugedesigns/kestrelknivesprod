@@ -50,7 +50,8 @@
   }
   .eastmans-hero-media {
     width: 100%;
-    aspect-ratio: var(--eastmans-slide-aspect-desktop, 1.7778);
+    height: var(--eastmans-hero-height-desktop, 520px);
+    aspect-ratio: auto;
     display: block;
     position: relative;
     overflow: hidden;
@@ -93,7 +94,7 @@
       text-align: center !important;
     }
     .eastmans-hero-media {
-      aspect-ratio: var(--eastmans-slide-aspect-tablet, var(--eastmans-slide-aspect-desktop, 1.7778));
+      height: var(--eastmans-hero-height-desktop, 520px);
     }
     .eastmans-hero-root .eastmans-hero-media img {
       object-fit: {{ section.settings.banner_image_fit_tablet | default: section.settings.banner_image_fit | default: "cover" }};
@@ -139,7 +140,7 @@
   <div class='relative eastmans-hero-root mb-8 lg:mb-12'>
     <div
       class='eastmans-hero-scale-wrap'
-      style='--eastmans-hero-scale: {{ section.settings.banner_scale_percent | default: 100 }}; --eastmans-hero-scale-inv: {{ 10000 | divided_by: section.settings.banner_scale_percent | times: 0.01 }}; --eastmans-hero-radius: {% if section.settings.banner_scale_percent and section.settings.banner_scale_percent < 100 %}{{ section.settings.banner_scale_radius | default: 16 }}px{% else %}0px{% endif %}; --eastmans-hero-height-mobile: {{ section.settings.banner_height_mobile_px | default: 320 }}px; --eastmans-hero-mobile-overlay-padding-bottom: {{ section.settings.banner_mobile_overlay_padding_bottom | default: 40 }}px; --eastmans-hero-mobile-overlay-inner-margin-bottom: {{ section.settings.banner_mobile_overlay_inner_margin_bottom | default: 28 }}px; --eastmans-hero-mobile-button-margin-top: {{ section.settings.banner_mobile_button_margin_top | default: 16 }}px; --eastmans-hero-mobile-button-margin-bottom: {{ section.settings.banner_mobile_button_margin_bottom | default: 0 }}px; --eastmans-hero-mobile-text-padding-top: {{ section.settings.banner_mobile_text_padding_top | default: 0 }}px;'
+      style='--eastmans-hero-scale: {{ section.settings.banner_scale_percent | default: 100 }}; --eastmans-hero-scale-inv: {{ 10000 | divided_by: section.settings.banner_scale_percent | times: 0.01 }}; --eastmans-hero-radius: {% if section.settings.banner_scale_percent and section.settings.banner_scale_percent < 100 %}{{ section.settings.banner_scale_radius | default: 16 }}px{% else %}0px{% endif %}; --eastmans-hero-height-desktop: {{ section.settings.banner_height_desktop_px | default: 520 }}px; --eastmans-hero-height-mobile: {{ section.settings.banner_height_mobile_px | default: 320 }}px; --eastmans-hero-mobile-overlay-padding-bottom: {{ section.settings.banner_mobile_overlay_padding_bottom | default: 40 }}px; --eastmans-hero-mobile-overlay-inner-margin-bottom: {{ section.settings.banner_mobile_overlay_inner_margin_bottom | default: 28 }}px; --eastmans-hero-mobile-button-margin-top: {{ section.settings.banner_mobile_button_margin_top | default: 16 }}px; --eastmans-hero-mobile-button-margin-bottom: {{ section.settings.banner_mobile_button_margin_bottom | default: 0 }}px; --eastmans-hero-mobile-text-padding-top: {{ section.settings.banner_mobile_text_padding_top | default: 0 }}px;'
     >
       <div
         class='relative'
@@ -546,6 +547,15 @@
       "max": 48,
       "step": 2,
       "default": 16
+    },
+    {
+      "type": "range",
+      "id": "banner_height_desktop_px",
+      "label": "Banner height - Desktop (px)",
+      "min": 240,
+      "max": 900,
+      "step": 20,
+      "default": 520
     },
     {
       "type": "range",
