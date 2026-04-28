@@ -53,7 +53,7 @@
         "banner_image_position": "top",
         "banner_image_position_mobile": "top",
         "banner_image_position_tablet": "top",
-        "banner_image_position_desktop": "top",
+        "banner_image_position_desktop": "bottom",
         "banner_image_zoom": 100,
         "banner_title": "Eastmans Offer",
         "banner_subtitle": "Save 15% on eligible items.",
