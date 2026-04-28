@@ -50,7 +50,7 @@
         "banner_image_fit_mobile": "cover",
         "banner_image_fit_tablet": "cover",
         "banner_image_fit_desktop": "cover",
-        "banner_image_position": "center",
+        "banner_image_position": "top",
         "banner_image_position_mobile": "top",
         "banner_image_position_tablet": "top",
         "banner_image_position_desktop": "top",
