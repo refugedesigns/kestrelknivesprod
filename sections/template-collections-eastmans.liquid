@@ -107,7 +107,7 @@
       transform-origin: center center;
     }
     .eastmans-hero-media {
-      height: var(--eastmans-hero-height-mobile, 420px);
+      height: var(--eastmans-hero-height-mobile, 320px);
       aspect-ratio: auto;
     }
     .eastmans-hero-root .eastmans-hero-media img {
@@ -139,7 +139,7 @@
   <div class='relative eastmans-hero-root mb-8 lg:mb-12'>
     <div
       class='eastmans-hero-scale-wrap'
-      style='--eastmans-hero-scale: {{ section.settings.banner_scale_percent | default: 100 }}; --eastmans-hero-scale-inv: {{ 10000 | divided_by: section.settings.banner_scale_percent | times: 0.01 }}; --eastmans-hero-radius: {% if section.settings.banner_scale_percent and section.settings.banner_scale_percent < 100 %}{{ section.settings.banner_scale_radius | default: 16 }}px{% else %}0px{% endif %}; --eastmans-hero-height-mobile: {{ section.settings.banner_height_mobile_px | default: 420 }}px; --eastmans-hero-mobile-overlay-padding-bottom: {{ section.settings.banner_mobile_overlay_padding_bottom | default: 40 }}px; --eastmans-hero-mobile-overlay-inner-margin-bottom: {{ section.settings.banner_mobile_overlay_inner_margin_bottom | default: 28 }}px; --eastmans-hero-mobile-button-margin-top: {{ section.settings.banner_mobile_button_margin_top | default: 16 }}px; --eastmans-hero-mobile-button-margin-bottom: {{ section.settings.banner_mobile_button_margin_bottom | default: 0 }}px; --eastmans-hero-mobile-text-padding-top: {{ section.settings.banner_mobile_text_padding_top | default: 0 }}px;'
+      style='--eastmans-hero-scale: {{ section.settings.banner_scale_percent | default: 100 }}; --eastmans-hero-scale-inv: {{ 10000 | divided_by: section.settings.banner_scale_percent | times: 0.01 }}; --eastmans-hero-radius: {% if section.settings.banner_scale_percent and section.settings.banner_scale_percent < 100 %}{{ section.settings.banner_scale_radius | default: 16 }}px{% else %}0px{% endif %}; --eastmans-hero-height-mobile: {{ section.settings.banner_height_mobile_px | default: 320 }}px; --eastmans-hero-mobile-overlay-padding-bottom: {{ section.settings.banner_mobile_overlay_padding_bottom | default: 40 }}px; --eastmans-hero-mobile-overlay-inner-margin-bottom: {{ section.settings.banner_mobile_overlay_inner_margin_bottom | default: 28 }}px; --eastmans-hero-mobile-button-margin-top: {{ section.settings.banner_mobile_button_margin_top | default: 16 }}px; --eastmans-hero-mobile-button-margin-bottom: {{ section.settings.banner_mobile_button_margin_bottom | default: 0 }}px; --eastmans-hero-mobile-text-padding-top: {{ section.settings.banner_mobile_text_padding_top | default: 0 }}px;'
     >
       <div
         class='relative'
@@ -496,7 +496,7 @@
       "min": 240,
       "max": 700,
       "step": 20,
-      "default": 420
+      "default": 320
     },
     {
       "type": "range",
