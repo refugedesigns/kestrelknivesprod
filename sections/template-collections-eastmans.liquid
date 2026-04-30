@@ -1,5 +1,4 @@
-{% assign section_title = section.settings.title | default: "Eastmans Offer" %}
-{% assign section_subtitle = section.settings.subtitle %}
+{% assign banner_default_heading = "Eastmans VIP's Only Access - Save 15%" %}
 {% assign default_ratio = 1.7778 %}
 {% assign banner_image_desktop = section.settings.banner_image %}
 {% assign banner_image_tablet = section.settings.banner_image_tablet %}
@@ -30,10 +29,6 @@
   }
   .eastmans-hero .eastmans-hero-overlay__inner {
     margin-bottom: var(--eastmans-hero-mobile-overlay-inner-margin-bottom, 28px);
-  }
-  .eastmans-hero-root .eastmans-hero-button-wrap {
-    margin-top: var(--eastmans-hero-mobile-button-margin-top, 16px);
-    margin-bottom: var(--eastmans-hero-mobile-button-margin-bottom, 0px);
   }
   .eastmans-hero-root .eastmans-hero-text-content {
     margin-top: 0;
@@ -77,9 +72,6 @@
     inset: -0.5rem;
     border-radius: 0.5rem;
     z-index: -1;
-  }
-  .eastmans-hero-button-wrap {
-    margin-top: 1rem;
   }
   @media (max-width: 1024px) {
     .eastmans-hero {
@@ -140,27 +132,13 @@
   <div class='relative eastmans-hero-root mb-8 lg:mb-12'>
     <div
       class='eastmans-hero-scale-wrap'
-      style='--eastmans-hero-scale: {{ section.settings.banner_scale_percent | default: 100 }}; --eastmans-hero-scale-inv: {{ 10000 | divided_by: section.settings.banner_scale_percent | times: 0.01 }}; --eastmans-hero-radius: {% if section.settings.banner_scale_percent and section.settings.banner_scale_percent < 100 %}{{ section.settings.banner_scale_radius | default: 16 }}px{% else %}0px{% endif %}; --eastmans-hero-height-desktop: {{ section.settings.banner_height_desktop_px | default: 520 }}px; --eastmans-hero-height-mobile: {{ section.settings.banner_height_mobile_px | default: 320 }}px; --eastmans-hero-mobile-overlay-padding-bottom: {{ section.settings.banner_mobile_overlay_padding_bottom | default: 40 }}px; --eastmans-hero-mobile-overlay-inner-margin-bottom: {{ section.settings.banner_mobile_overlay_inner_margin_bottom | default: 28 }}px; --eastmans-hero-mobile-button-margin-top: {{ section.settings.banner_mobile_button_margin_top | default: 16 }}px; --eastmans-hero-mobile-button-margin-bottom: {{ section.settings.banner_mobile_button_margin_bottom | default: 0 }}px; --eastmans-hero-mobile-text-padding-top: {{ section.settings.banner_mobile_text_padding_top | default: 0 }}px;'
+      style='--eastmans-hero-scale: {{ section.settings.banner_scale_percent | default: 100 }}; --eastmans-hero-scale-inv: {{ 10000 | divided_by: section.settings.banner_scale_percent | times: 0.01 }}; --eastmans-hero-radius: {% if section.settings.banner_scale_percent and section.settings.banner_scale_percent < 100 %}{{ section.settings.banner_scale_radius | default: 16 }}px{% else %}0px{% endif %}; --eastmans-hero-height-desktop: {{ section.settings.banner_height_desktop_px | default: 520 }}px; --eastmans-hero-height-mobile: {{ section.settings.banner_height_mobile_px | default: 320 }}px; --eastmans-hero-mobile-overlay-padding-bottom: {{ section.settings.banner_mobile_overlay_padding_bottom | default: 40 }}px; --eastmans-hero-mobile-overlay-inner-margin-bottom: {{ section.settings.banner_mobile_overlay_inner_margin_bottom | default: 28 }}px; --eastmans-hero-mobile-text-padding-top: {{ section.settings.banner_mobile_text_padding_top | default: 0 }}px;'
     >
       <div
         class='relative'
         style='width: 100%; transform: scale(calc(var(--eastmans-hero-scale, 100) / 100)); transform-origin: center center; --eastmans-slide-aspect-desktop: {{ banner_ratio_desktop }}; --eastmans-slide-aspect-tablet: {{ banner_ratio_tablet }}; --eastmans-slide-aspect-mobile: {{ banner_ratio_mobile }};'
       >
-        {% assign banner_button_action = section.settings.banner_button_action | default: "link" %}
-        {% if banner_button_action == "form" %}
-          <button
-            type='button'
-            class='eastmans-hero-media block w-full'
-            data-klaviyo-form-id='{{ section.settings.banner_button_form_id | escape }}'
-          >
-        {% elsif section.settings.banner_button_enable and section.settings.banner_button_url != blank %}
-          <a
-            href='{{ section.settings.banner_button_url }}'
-            class='eastmans-hero-media block w-full'
-          >
-        {% else %}
-          <div class='eastmans-hero-media block w-full'>
-        {% endif %}
+        <div class='eastmans-hero-media block w-full'>
         {% if banner_base_image %}
           <picture class='w-full h-full block'>
             {% if banner_image_mobile %}
@@ -177,7 +155,7 @@
             {% endif %}
             <img
               src='{{ banner_base_image | image_url: width: 1920 }}'
-              alt='{{ section.settings.banner_title | default: section_title | escape }}'
+              alt='{{ section.settings.banner_title | default: banner_default_heading | escape }}'
               width='{{ banner_base_image.width }}'
               height='{{ banner_base_image.height }}'
               style='transform: scale({{ section.settings.banner_image_zoom | default: 100 | divided_by: 100.0 }});'
@@ -192,13 +170,7 @@
             class='absolute inset-0 bg-black/{{ section.settings.banner_overlay_opacity | default: 40 }}'
           ></div>
         {% endif %}
-        {% if banner_button_action == "form" %}
-          </button>
-        {% elsif section.settings.banner_button_enable and section.settings.banner_button_url != blank %}
-          </a>
-        {% else %}
-          </div>
-        {% endif %}
+        </div>
 
         {% if section.settings.banner_show_text_overlay %}
           {% assign banner_shadow = section.settings.banner_text_shadow_strength | default: "soft" %}
@@ -211,8 +183,8 @@
             {% when "strong" %}
               {% assign banner_shadow_opacity = "0.85" %}
           {% endcase %}
-          <div class='absolute bottom-4 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none eastmans-hero'>
-            <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-12 eastmans-hero-overlay__inner'>
+          <div class='absolute inset-0 flex items-end justify-center z-10 pointer-events-none eastmans-hero'>
+            <div class='text-center max-w-5xl px-4 mb-6 lg:mb-10 eastmans-hero-overlay__inner'>
               <div class='eastmans-hero-text-wrap'>
                 {% if section.settings.banner_text_bg_enable %}
                   {% assign banner_text_bg_alpha = section.settings.banner_text_bg_opacity | default: 50 | divided_by: 100.0 %}
@@ -223,50 +195,13 @@
                 {% endif %}
                 <div class='eastmans-hero-text-content'>
                   <h2
-                    class='text-4xl md:text-6xl font-bold mb-4'
+                    class='text-5xl md:text-7xl font-bold mb-0'
                     style='color: {{ section.settings.banner_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.banner_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ banner_shadow_opacity }});'
                   >
-                    {{ section.settings.banner_title | default: section_title }}
+                    {{ section.settings.banner_title | default: banner_default_heading }}
                   </h2>
-                  {% assign banner_subtitle = section.settings.banner_subtitle | default: section_subtitle %}
-                  {% if banner_subtitle != blank %}
-                    {% assign banner_sentences = banner_subtitle | split: "." %}
-                    {% for sentence in banner_sentences %}
-                      {% assign trimmed_sentence = sentence | strip %}
-                      {% if trimmed_sentence != blank %}
-                        <p
-                          class='text-lg md:text-xl mb-1'
-                          style='color: {{ section.settings.banner_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.banner_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ banner_shadow_opacity }});'
-                        >
-                          {{ trimmed_sentence }}.
-                        </p>
-                      {% endif %}
-                    {% endfor %}
-                  {% endif %}
                 </div>
               </div>
-              {% if section.settings.banner_button_enable and section.settings.banner_button_text != blank %}
-                <div class='eastmans-hero-button-wrap pointer-events-auto'>
-                  {% if banner_button_action == "form" %}
-                    <button
-                      type='button'
-                      class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300 eastmans-banner-cta'
-                      style='background-color: {{ section.settings.banner_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.banner_button_text_color | default: "#ffffff" }};'
-                      data-klaviyo-form-id='{{ section.settings.banner_button_form_id | escape }}'
-                    >
-                      {{ section.settings.banner_button_text }}
-                    </button>
-                  {% else %}
-                    <a
-                      href='{{ section.settings.banner_button_url | default: collection.url }}'
-                      class='inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
-                      style='background-color: {{ section.settings.banner_button_bg_color | default: "#2563eb" }}; color: {{ section.settings.banner_button_text_color | default: "#ffffff" }};'
-                    >
-                      {{ section.settings.banner_button_text }}
-                    </a>
-                  {% endif %}
-                </div>
-              {% endif %}
             </div>
           </div>
         {% endif %}
@@ -276,13 +211,6 @@
 {% endif %}
 
 <div class='px-4 pt-6 lg:pt-10 pb-0 mx-auto'>
-  <header class='text-center mb-8'>
-    <h1 class='text-3xl font-bold'>{{ section_title }}</h1>
-    {% if section_subtitle != blank %}
-      <p class='text-gray-600 mt-2'>{{ section_subtitle }}</p>
-    {% endif %}
-  </header>
-
   {% paginate collection.products by section.settings.number_of_products_per_page | default: 18 %}
     <div class='max-w-4xl mx-auto'>
       <div class='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6'>
@@ -408,42 +336,10 @@
   })()
 </script>
 
-<script type='text/javascript'>
-  function attachEastmansKlaviyoFormTrigger(selector) {
-    var elements = document.querySelectorAll(selector)
-    if (!elements.length) return
-    elements.forEach(function (el) {
-      el.addEventListener('click', function (event) {
-        event.preventDefault()
-        var formId = el.getAttribute('data-klaviyo-form-id')
-        if (!formId) return
-        window._klOnsite = window._klOnsite || []
-        window._klOnsite.push(['openForm', formId])
-      })
-    })
-  }
-
-  attachEastmansKlaviyoFormTrigger(
-    '.eastmans-hero-media[data-klaviyo-form-id], .eastmans-banner-cta[data-klaviyo-form-id]'
-  )
-</script>
-
 {% schema %}
 {
   "name": "Eastmans Collection",
   "settings": [
-    {
-      "type": "text",
-      "id": "title",
-      "label": "Title",
-      "default": "Eastmans Offer"
-    },
-    {
-      "type": "textarea",
-      "id": "subtitle",
-      "label": "Subtitle",
-      "default": "Save 15% on eligible items."
-    },
     {
       "type": "range",
       "id": "discount_percent",
@@ -594,30 +490,6 @@
       "default": 28
     },
     {
-      "type": "range",
-      "id": "banner_mobile_button_margin_top",
-      "label": "Button margin-top - Mobile (px)",
-      "min": 0,
-      "max": 400,
-      "step": 4,
-      "default": 16
-    },
-    {
-      "type": "range",
-      "id": "banner_mobile_button_margin_bottom",
-      "label": "Button margin-bottom - Mobile (px)",
-      "min": 0,
-      "max": 400,
-      "step": 4,
-      "default": 0
-    },
-    {
-      "type": "checkbox",
-      "id": "banner_button_enable",
-      "label": "Show button",
-      "default": false
-    },
-    {
       "type": "checkbox",
       "id": "banner_overlay_enable",
       "label": "Enable image overlay",
@@ -678,18 +550,6 @@
       "type": "color",
       "id": "banner_text_color",
       "label": "Text color",
-      "default": "#ffffff"
-    },
-    {
-      "type": "color",
-      "id": "banner_button_bg_color",
-      "label": "Button background",
-      "default": "#2563eb"
-    },
-    {
-      "type": "color",
-      "id": "banner_button_text_color",
-      "label": "Button text color",
       "default": "#ffffff"
     },
     {
@@ -817,40 +677,7 @@
       "type": "text",
       "id": "banner_title",
       "label": "Banner title",
-      "default": "Eastmans Offer"
-    },
-    {
-      "type": "textarea",
-      "id": "banner_subtitle",
-      "label": "Banner subtitle",
-      "default": "Save 15% on eligible items."
-    },
-    {
-      "type": "text",
-      "id": "banner_button_text",
-      "label": "Banner button text",
-      "default": "Shop Now"
-    },
-    {
-      "type": "select",
-      "id": "banner_button_action",
-      "label": "Banner button action",
-      "options": [
-        { "value": "link", "label": "Open link" },
-        { "value": "form", "label": "Open Klaviyo form" }
-      ],
-      "default": "link"
-    },
-    {
-      "type": "text",
-      "id": "banner_button_form_id",
-      "label": "Banner button form ID",
-      "info": "Used when action is set to Open Klaviyo form."
-    },
-    {
-      "type": "url",
-      "id": "banner_button_url",
-      "label": "Banner button URL"
+      "default": "Eastmans VIP's Only Access - Save 15%"
     },
     {
       "type": "header",
