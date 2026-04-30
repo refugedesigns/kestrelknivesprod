@@ -12,8 +12,6 @@
     "template-collection-eastmans": {
       "type": "template-collections-eastmans",
       "settings": {
-        "title": "Eastmans Offer",
-        "subtitle": "Save 15% on eligible items.",
         "discount_percent": 15,
         "discount_code": "EASTMANS15",
         "show_gallery": true,
@@ -24,7 +22,7 @@
         "slider_height_mobile": 280,
         "number_of_products_per_page": 18,
         "show_banner": true,
-        "banner_show_text_overlay": false,
+        "banner_show_text_overlay": true,
         "banner_scale_percent": 100,
         "banner_scale_radius": 16,
         "banner_height_desktop_px": 520,
@@ -32,9 +30,6 @@
         "banner_mobile_overlay_padding_bottom": 40,
         "banner_mobile_text_padding_top": 0,
         "banner_mobile_overlay_inner_margin_bottom": 28,
-        "banner_mobile_button_margin_top": 16,
-        "banner_mobile_button_margin_bottom": 0,
-        "banner_button_enable": false,
         "banner_overlay_enable": false,
         "banner_overlay_opacity": 40,
         "banner_text_bg_enable": false,
@@ -43,8 +38,6 @@
         "banner_text_shadow_strength": "soft",
         "banner_text_shadow_blur": 6,
         "banner_text_color": "#ffffff",
-        "banner_button_bg_color": "#2563eb",
-        "banner_button_text_color": "#ffffff",
         "banner_image": "shopify://shop_images/banner_3.png",
         "banner_image_fit": "cover",
         "banner_image_fit_mobile": "cover",
@@ -55,12 +48,7 @@
         "banner_image_position_tablet": "bottom",
         "banner_image_position_desktop": "bottom",
         "banner_image_zoom": 100,
-        "banner_title": "Eastmans Offer",
-        "banner_subtitle": "Save 15% on eligible items.",
-        "banner_button_text": "Shop Now",
-        "banner_button_action": "link",
-        "banner_button_form_id": "",
-        "banner_button_url": ""
+        "banner_title": "Eastmans VIP’s Only Access - Save 15%"
       }
     }
   },
