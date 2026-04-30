@@ -48,7 +48,9 @@
         "banner_image_position_tablet": "bottom",
         "banner_image_position_desktop": "bottom",
         "banner_image_zoom": 100,
-        "banner_title": "Eastmans VIP’s Only Access - Save 15%"
+        "banner_title": "Eastmans VIP’s Only Access - Save 15%",
+        "banner_title_size_desktop": 50,
+        "banner_title_size_mobile": 40
       }
     }
   },
