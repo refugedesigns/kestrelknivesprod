@@ -67,6 +67,10 @@
     position: relative;
     display: inline-block;
   }
+  .eastmans-banner-title {
+    font-size: var(--eastmans-banner-title-size-desktop, 72px);
+    line-height: 1.05;
+  }
   .eastmans-hero-text-bg {
     position: absolute;
     inset: -0.5rem;
@@ -107,6 +111,9 @@
       object-fit: {{ section.settings.banner_image_fit_mobile | default: section.settings.banner_image_fit | default: "cover" }};
       object-position: {{ section.settings.banner_image_position_mobile | default: section.settings.banner_image_position | default: "center" }};
     }
+    .eastmans-banner-title {
+      font-size: var(--eastmans-banner-title-size-mobile, 40px);
+    }
   }
   .eastmans-slider {
     width: 100%;
@@ -129,7 +136,7 @@
 </style>
 
 {% if section.settings.show_banner %}
-  <div class='relative eastmans-hero-root mb-8 lg:mb-12'>
+  <div class='relative eastmans-hero-root mb-8 lg:mb-6'>
     <div
       class='eastmans-hero-scale-wrap'
       style='--eastmans-hero-scale: {{ section.settings.banner_scale_percent | default: 100 }}; --eastmans-hero-scale-inv: {{ 10000 | divided_by: section.settings.banner_scale_percent | times: 0.01 }}; --eastmans-hero-radius: {% if section.settings.banner_scale_percent and section.settings.banner_scale_percent < 100 %}{{ section.settings.banner_scale_radius | default: 16 }}px{% else %}0px{% endif %}; --eastmans-hero-height-desktop: {{ section.settings.banner_height_desktop_px | default: 520 }}px; --eastmans-hero-height-mobile: {{ section.settings.banner_height_mobile_px | default: 320 }}px; --eastmans-hero-mobile-overlay-padding-bottom: {{ section.settings.banner_mobile_overlay_padding_bottom | default: 40 }}px; --eastmans-hero-mobile-overlay-inner-margin-bottom: {{ section.settings.banner_mobile_overlay_inner_margin_bottom | default: 28 }}px; --eastmans-hero-mobile-text-padding-top: {{ section.settings.banner_mobile_text_padding_top | default: 0 }}px;'
@@ -195,8 +202,8 @@
                 {% endif %}
                 <div class='eastmans-hero-text-content'>
                   <h2
-                    class='text-5xl md:text-7xl font-bold mb-0'
-                    style='color: {{ section.settings.banner_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.banner_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ banner_shadow_opacity }});'
+                    class='eastmans-banner-title font-bold mb-0'
+                    style='--eastmans-banner-title-size-desktop: {{ section.settings.banner_title_size_desktop | default: 72 }}px; --eastmans-banner-title-size-mobile: {{ section.settings.banner_title_size_mobile | default: 40 }}px; color: {{ section.settings.banner_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.banner_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ banner_shadow_opacity }});'
                   >
                     {{ section.settings.banner_title | default: banner_default_heading }}
                   </h2>
@@ -678,6 +685,24 @@
       "id": "banner_title",
       "label": "Banner title",
       "default": "Eastmans VIP's Only Access - Save 15%"
+    },
+    {
+      "type": "range",
+      "id": "banner_title_size_desktop",
+      "label": "Banner title size - Desktop (px)",
+      "min": 24,
+      "max": 160,
+      "step": 2,
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "banner_title_size_mobile",
+      "label": "Banner title size - Mobile (px)",
+      "min": 20,
+      "max": 100,
+      "step": 2,
+      "default": 40
     },
     {
       "type": "header",
