@@ -235,6 +235,14 @@
             "caption": "",
             "link": "https://instagram.com/kestrelknives"
           }
+        },
+        "media_image_6yxCwj": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2026-04-29_at_11.20.08_PM.jpg",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
         }
       },
       "block_order": [
@@ -265,7 +273,8 @@
         "media_image_T3QVLF",
         "media_image_fcBhKK",
         "media_image_AFEBUq",
-        "media_image_NBtK9m"
+        "media_image_NBtK9m",
+        "media_image_6yxCwj"
       ],
       "settings": {
         "hero_image_desktop": "shopify://shop_images/media_1.png",
@@ -291,6 +300,7 @@
         "email_url": "mailto:sales@kestrelknives.com",
         "instagram_url": "https://instagram.com/kestrelknives",
         "twitter_url": "https://twitter.com/KestrelKnives",
+        "shared_gallery_page": "",
         "columns_desktop": 4,
         "columns_tablet": 3,
         "columns_mobile": 2,
