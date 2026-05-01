@@ -275,6 +275,14 @@
             "caption": "",
             "link": "https://instagram.com/kestrelknives"
           }
+        },
+        "media_image_4yKLzh": {
+          "type": "media_image",
+          "settings": {
+            "image": "shopify://shop_images/WhatsApp_Image_2026-04-29_at_11.20.07_PM_1.png",
+            "caption": "",
+            "link": "https://instagram.com/kestrelknives"
+          }
         }
       },
       "block_order": [
@@ -310,7 +318,8 @@
         "media_image_A8djji",
         "media_image_HH8aKK",
         "media_image_QBAKdz",
-        "media_image_TPKWx6"
+        "media_image_TPKWx6",
+        "media_image_4yKLzh"
       ],
       "settings": {
         "hero_image_desktop": "shopify://shop_images/media_1.png",
