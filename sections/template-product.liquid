@@ -1571,8 +1571,9 @@
   document.addEventListener('DOMContentLoaded', function() {
 
     const productId = {{ product.id }};
+    const relatedProductsLimit = 10;
     
-    fetch(`${window.Shopify.routes.root}recommendations/products.json?product_id=${productId}&limit=6&intent=related`)
+    fetch(`${window.Shopify.routes.root}recommendations/products.json?product_id=${productId}&limit=${relatedProductsLimit}&intent=related`)
       .then(response => response.json())
       .then(({ products }) => {
         if (products && products.length > 0) {
