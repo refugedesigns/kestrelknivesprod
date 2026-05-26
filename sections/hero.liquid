@@ -261,10 +261,20 @@
                       class='text-4xl md:text-6xl font-bold mb-4'
                       style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'
                     >
-                      {{
-                        section.settings.slide_1_title
+                      {% assign s1_title = section.settings.slide_1_title
                         | default: "Premium Knives"
-                      }}
+                      %}
+                      {% if s1_title contains "." %}
+                        {% assign s1_title_lines = s1_title | split: "." %}
+                        {% for title_line in s1_title_lines %}
+                          {% assign trimmed_title_line = title_line | strip %}
+                          {% if trimmed_title_line != blank %}
+                            <span class='block'>{{ trimmed_title_line }}.</span>
+                          {% endif %}
+                        {% endfor %}
+                      {% else %}
+                        {{ s1_title }}
+                      {% endif %}
                     </h1>
                     {% assign s1_subtitle = section.settings.slide_1_subtitle
                       | default: "Crafted with precision, designed for perfection"
@@ -410,10 +420,20 @@
                       class='text-4xl md:text-6xl font-bold mb-4'
                       style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
                     >
-                      {{
-                        section.settings.slide_2_title
+                      {% assign s2_title = section.settings.slide_2_title
                         | default: "Professional Grade"
-                      }}
+                      %}
+                      {% if s2_title contains "." %}
+                        {% assign s2_title_lines = s2_title | split: "." %}
+                        {% for title_line in s2_title_lines %}
+                          {% assign trimmed_title_line = title_line | strip %}
+                          {% if trimmed_title_line != blank %}
+                            <span class='block'>{{ trimmed_title_line }}.</span>
+                          {% endif %}
+                        {% endfor %}
+                      {% else %}
+                        {{ s2_title }}
+                      {% endif %}
                     </h1>
                     {% assign s2_subtitle = section.settings.slide_2_subtitle
                       | default: "Tools that professionals trust"
@@ -634,10 +654,20 @@
                       class='text-4xl md:text-6xl font-bold mb-4'
                       style='color: {{ section.settings.slide_3_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_3_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s3_op }});'
                     >
-                      {{
-                        section.settings.slide_3_title
+                      {% assign s3_title = section.settings.slide_3_title
                         | default: "Handcrafted Excellence"
-                      }}
+                      %}
+                      {% if s3_title contains "." %}
+                        {% assign s3_title_lines = s3_title | split: "." %}
+                        {% for title_line in s3_title_lines %}
+                          {% assign trimmed_title_line = title_line | strip %}
+                          {% if trimmed_title_line != blank %}
+                            <span class='block'>{{ trimmed_title_line }}.</span>
+                          {% endif %}
+                        {% endfor %}
+                      {% else %}
+                        {{ s3_title }}
+                      {% endif %}
                     </h1>
                     {% assign s3_subtitle = section.settings.slide_3_subtitle
                       | default: "Every piece tells a story of craftsmanship"
@@ -783,10 +813,20 @@
                       class='text-4xl md:text-6xl font-bold mb-4'
                       style='color: {{ section.settings.slide_4_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_4_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s4_op }});'
                     >
-                      {{
-                        section.settings.slide_4_title
+                      {% assign s4_title = section.settings.slide_4_title
                         | default: "Featured Collection"
-                      }}
+                      %}
+                      {% if s4_title contains "." %}
+                        {% assign s4_title_lines = s4_title | split: "." %}
+                        {% for title_line in s4_title_lines %}
+                          {% assign trimmed_title_line = title_line | strip %}
+                          {% if trimmed_title_line != blank %}
+                            <span class='block'>{{ trimmed_title_line }}.</span>
+                          {% endif %}
+                        {% endfor %}
+                      {% else %}
+                        {{ s4_title }}
+                      {% endif %}
                     </h1>
                     {% assign s4_subtitle = section.settings.slide_4_subtitle
                       | default: "Discover our latest knives and gear"
