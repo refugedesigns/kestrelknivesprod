@@ -131,7 +131,7 @@
 }
 {% endschema %}
 
-<div class='py-4 px-4 bg-gray-50 min-h-screen'>
+<div class='py-4 px-4 min-h-screen'>
   <div class='mx-auto'>
     <!-- Section Header -->
     <div class='text-center mb-12'>
@@ -1004,7 +1004,8 @@
         -webkit-line-clamp: unset;
         overflow: visible;
       }
-      .carousel-review-text.is-truncated:not(.is-expanded) .carousel-review-quote::after {
+      .carousel-review-text.is-truncated:not(.is-expanded)
+        .carousel-review-quote::after {
         position: absolute;
         right: 0;
         bottom: 0;
@@ -1222,8 +1223,12 @@
         reviewBlocks.forEach(block => {
           const quote = block.querySelector('.carousel-review-quote')
           const content = block.closest('.carousel-review-content')
-          const toggle = content ? content.querySelector('.carousel-review-toggle') : null
-          const closeBtn = content ? content.querySelector('.carousel-review-close') : null
+          const toggle = content
+            ? content.querySelector('.carousel-review-toggle')
+            : null
+          const closeBtn = content
+            ? content.querySelector('.carousel-review-close')
+            : null
           if (!quote || !toggle) return
 
           const setCollapsed = () => {
@@ -1700,7 +1705,10 @@
               x-text='modalExpanded ? modalFullTextDisplay : modalCollapsedText'
             ></span>
           </blockquote>
-          <div x-show='modalToggleVisible && !modalExpanded' class='mt-[2px] mb-1'>
+          <div
+            x-show='modalToggleVisible && !modalExpanded'
+            class='mt-[2px] mb-1'
+          >
             <button
               type='button'
               class='text-white underline text-[11px] md:text-sm focus:outline-none testimonial-modal-toggle leading-none'
@@ -1756,7 +1764,10 @@
         this.isOpen = true
         document.body.style.overflow = 'hidden'
 
-        const fullRaw = testimonial && testimonial.quote ? String(testimonial.quote).trim() : ''
+        const fullRaw =
+          testimonial && testimonial.quote
+            ? String(testimonial.quote).trim()
+            : ''
         const { collapsed, full, needsToggle } = this.truncateQuote(fullRaw)
         this.modalCollapsedText = collapsed
         this.modalFullTextDisplay = full
@@ -1784,9 +1795,14 @@
         }
 
         const words = safe.split(/\s+/)
-        const needsTruncate = words.length > MAX_WORDS || safe.length > MAX_CHARS
+        const needsTruncate =
+          words.length > MAX_WORDS || safe.length > MAX_CHARS
         if (!needsTruncate) {
-          return { collapsed: fullDisplay, full: fullDisplay, needsToggle: false }
+          return {
+            collapsed: fullDisplay,
+            full: fullDisplay,
+            needsToggle: false,
+          }
         }
 
         let truncated = words.slice(0, MAX_WORDS).join(' ')

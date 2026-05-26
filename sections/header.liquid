@@ -67,7 +67,7 @@
 
 <div
   id='siteHeader'
-  class='fixed w-full z-20 start-0'
+  class='fixed w-full z-40 start-0'
   x-data='{ mobileMenuOpen: false, searchBarOpen: false }'
   x-cloak
   style='background-color: {{ section.settings.header_bg_color | default: "#000000" }}; {% if section.settings.header_border_bottom %}border-bottom: 1px solid {{ section.settings.header_border_color | default: "#ffffff" }};{% endif %} {% if section.settings.countdown_enabled %}top: var(--countdown-banner-height, 0px);{% else %}top: 0;{% endif %}'
@@ -239,27 +239,23 @@
               href='{{ routes.account_url }}'
               class='text-base hover:text-gray-100'
               style='color: {{ section.settings.menu_link_color | default: "#ffffff" }};'
-              >Account</a
-            >
+            >Account</a>
             <a
               href='{{ routes.account_logout_url }}'
               class='text-base hover:text-gray-100'
               style='color: {{ section.settings.menu_link_color | default: "#ffffff" }};'
-              >Log out</a
-            >
+            >Log out</a>
           {% else %}
             <a
               href='{{ routes.account_login_url }}'
               class='text-base hover:text-gray-100'
               style='color: {{ section.settings.menu_link_color | default: "#ffffff" }};'
-              >Log in</a
-            >
+            >Log in</a>
             <a
               href='{{ routes.account_register_url }}'
               class='text-base hover:text-gray-100'
               style='color: {{ section.settings.menu_link_color | default: "#ffffff" }};'
-              >Register</a
-            >
+            >Register</a>
           {% endif %}
         {% endif %}
       </div>
@@ -268,7 +264,7 @@
       <div
         x-show='mobileMenuOpen'
         @click.away='mobileMenuOpen = false'
-        class='fixed z-30 inset-0 p-2 transform origin-top-left lg:hidden mobile-menu-panel max-h-screen overflow-y-auto w-screen'
+        class='fixed z-50 inset-0 p-2 transform origin-top-left lg:hidden mobile-menu-panel max-h-screen overflow-y-auto w-screen'
         style='top: 0; left: 0; right: 0; bottom: 0; padding-top: 20px;'
       >
         <div
@@ -478,13 +474,13 @@
   function setHeaderHeight() {
     const header = document.getElementById('siteHeader')
     const countdownBanner = document.getElementById('countdownBanner')
-    
+
     let totalHeight = 0
-    
+
     if (countdownBanner) {
       totalHeight += countdownBanner.offsetHeight
     }
-    
+
     if (header) {
       totalHeight += header.offsetHeight
       document.documentElement.style.setProperty(
@@ -720,8 +716,8 @@
       "type": "text",
       "id": "countdown_target_date",
       "label": "Target date (YYYY-MM-DDTHH:mm:ss)",
-      "default": "2025-12-31T23:59:59",
-      "info": "Format: YYYY-MM-DDTHH:mm:ss (e.g., 2025-12-31T23:59:59)"
+      "default": "2026-01-30T19:00:00-05:00",
+      "info": "Format: YYYY-MM-DDTHH:mm:ss±HH:MM (e.g., 2026-01-30T19:00:00-05:00)"
     },
     {
       "type": "color",

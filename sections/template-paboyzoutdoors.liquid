@@ -1,0 +1,566 @@
+<section class='paboyz-landing'>
+  <style>
+    .paboyz-slider {
+      width: 100%;
+      height: var(--paboyz-slider-height, 320px);
+      overflow: hidden;
+      border-radius: 0;
+    }
+    .paboyz-slider swiper-slide {
+      width: 100%;
+      height: 100%;
+    }
+    .paboyz-slider img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    @media (max-width: 768px) {
+      .paboyz-slider {
+        height: var(--paboyz-slider-height-mobile, 240px);
+      }
+    }
+    .paboyz-hero-text,
+    .paboyz-hero-text * {
+      text-align: center !important;
+    }
+    .paboyz-hero-subheading {
+      width: 100% !important;
+      max-width: 42rem !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+    .paboyz-hero-heading {
+      font-size: var(--paboyz-heading-size, 3rem);
+      line-height: 1.1;
+    }
+    @media (max-width: 768px) {
+      .paboyz-hero-heading {
+        font-size: var(--paboyz-heading-size-mobile, 2rem);
+      }
+    }
+    .paboyz-logo {
+      width: var(--logo-size, 72px);
+      height: var(--logo-size, 72px);
+    }
+    @media (max-width: 768px) {
+      .paboyz-logo {
+        width: var(--logo-size-mobile, 56px);
+        height: var(--logo-size-mobile, 56px);
+      }
+    }
+    .paboyz-feature-slider {
+      position: relative;
+    }
+    .paboyz-feature-text {
+      background: transparent;
+    }
+    .paboyz-top-bg {
+      background-color: #fff;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+  </style>
+
+  {%- assign bg_img          = section.settings.hero_bg_image -%}
+  {%- assign bg_pos          = section.settings.hero_bg_position | default: 'center center' -%}
+  {%- assign overlay_color   = section.settings.hero_overlay_color | default: '#000000' -%}
+  {%- assign overlay_opacity = section.settings.hero_overlay_opacity | default: 0 | times: 0.01 -%}
+  {%- assign overlay_rgba    = overlay_color | color_modify: 'alpha', overlay_opacity -%}
+  <div
+    class='paboyz-top-bg'
+    {% if bg_img != blank %}
+      style='background-image: linear-gradient({{ overlay_rgba }}, {{ overlay_rgba }}), url({{ bg_img | image_url: width: 2400 }}); background-position: {{ bg_pos }};'
+    {% endif %}
+  >
+    <div class='max-w-6xl mx-auto w-full px-4 py-12'>
+      <div class='flex flex-row justify-between items-center gap-4 mb-16 flex-nowrap'>
+        <div class='flex items-center'>
+          {% if section.settings.logo_left_image != blank %}
+            <img
+              src='{{ section.settings.logo_left_image | image_url: width: 300 }}'
+              alt='{{ section.settings.logo_left_text | escape }}'
+              class='paboyz-logo object-contain'
+              style='--logo-size: {{ section.settings.logo_left_size | default: 72 }}px; --logo-size-mobile: {{ section.settings.logo_left_size_mobile | default: 56 }}px;'
+              loading='lazy'
+            >
+          {% else %}
+            <span class='text-black font-bold text-lg'>
+              {{ section.settings.logo_left_text }}
+            </span>
+          {% endif %}
+        </div>
+        <div class='flex items-center'>
+          {% if section.settings.logo_center_image != blank %}
+            <img
+              src='{{ section.settings.logo_center_image | image_url: width: 300 }}'
+              alt='{{ section.settings.logo_center_text | escape }}'
+              class='paboyz-logo object-contain'
+              style='--logo-size: {{ section.settings.logo_center_size | default: 72 }}px; --logo-size-mobile: {{ section.settings.logo_center_size_mobile | default: 56 }}px;'
+              loading='lazy'
+            >
+          {% else %}
+            <span class='text-black font-bold text-lg'>
+              {{ section.settings.logo_center_text }}
+            </span>
+          {% endif %}
+        </div>
+        <div class='flex items-center'>
+          {% if section.settings.logo_right_image != blank %}
+            <img
+              src='{{ section.settings.logo_right_image | image_url: width: 300 }}'
+              alt='{{ section.settings.logo_right_text | escape }}'
+              class='paboyz-logo object-contain'
+              style='--logo-size: {{ section.settings.logo_right_size | default: 72 }}px; --logo-size-mobile: {{ section.settings.logo_right_size_mobile | default: 56 }}px;'
+              loading='lazy'
+            >
+          {% else %}
+            <span class='text-black font-bold text-lg'>
+              {{ section.settings.logo_right_text }}
+            </span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class='paboyz-hero-text text-center mb-8 space-y-4'>
+        <h1
+          class='paboyz-hero-heading font-bold leading-tight'
+          style='--paboyz-heading-size: {{ section.settings.hero_heading_size_desktop | default: 72 }}px; --paboyz-heading-size-mobile: {{ section.settings.hero_heading_size_mobile | default: 40 }}px; margin-bottom: 12px; color: {{ section.settings.hero_heading_color | default: "#ffffff" }};'
+        >
+          {{ section.settings.hero_heading }}
+        </h1>
+        <p class='paboyz-hero-subheading text-xl text-center' style='text-align: center; color: {{ section.settings.hero_subheading_color | default: "#ffffff" }};'>
+          {{ section.settings.hero_subheading }}
+        </p>
+      </div>
+
+      <div class='max-w-md mx-auto mb-10'>
+        <div class="klaviyo-form-RyAX8C"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class='max-w-6xl mx-auto px-4 py-8 paboyz-feature-text'>
+        <div class='max-w-3xl mx-auto text-center'>
+          <h2 class='text-3xl font-bold mb-3' style='color: {{ section.settings.feature_heading_color | default: "#ffffff" }};'>
+            {{ section.settings.feature_heading }}
+          </h2>
+          <p class='text-lg leading-relaxed mb-4' style='color: {{ section.settings.feature_text_color | default: "#ffffff" }};'>
+            {{ section.settings.feature_text }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class='bg-white'>
+    <div class='paboyz-feature-slider'>
+      <swiper-container
+        class='paboyz-slider'
+        style='--paboyz-slider-height: {{ section.settings.slider_height_desktop }}px; --paboyz-slider-height-mobile: {{ section.settings.slider_height_mobile }}px;'
+        autoplay-delay='{{ section.settings.slider_autoplay_delay | default: 5000 }}'
+        autoplay-disable-on-interaction='false'
+        loop='true'
+        pagination='true'
+        pagination-clickable='true'
+        slides-per-view='3'
+        space-between='12'
+        centered-slides='false'
+        breakpoints='{"0":{"slidesPerView":1},"640":{"slidesPerView":2},"1024":{"slidesPerView":4}}'
+      >
+        {% assign shared_page = section.settings.shared_gallery_page %}
+        {% assign shared_images = blank %}
+        {% if shared_page != blank and shared_page.metafields.custom.shared_gallery_images != blank %}
+          {% assign shared_images = shared_page.metafields.custom.shared_gallery_images.value %}
+        {% endif %}
+        {% if shared_images != blank %}
+          {% for shared_image in shared_images %}
+            <swiper-slide>
+              {% if shared_image != blank %}
+                <a
+                  href='https://instagram.com/kestrelknives'
+                  target='_blank'
+                  rel='noopener'
+                >
+                  <img
+                    src='{{ shared_image | image_url: width: 1200 }}'
+                    alt=''
+                    loading='lazy'
+                  >
+                </a>
+              {% else %}
+                {{ "lifestyle-1" | placeholder_svg_tag: "w-full h-full bg-gray-200" }}
+              {% endif %}
+            </swiper-slide>
+          {% endfor %}
+        {% elsif section.blocks.size > 0 %}
+          {% for block in section.blocks %}
+            {% if block.type == 'slider_image' %}
+              <swiper-slide>
+                {% if block.settings.image != blank %}
+                  <a
+                    href='https://instagram.com/kestrelknives'
+                    target='_blank'
+                    rel='noopener'
+                  >
+                    <img
+                      src='{{ block.settings.image | image_url: width: 1200 }}'
+                      alt='{{ block.settings.alt_text | escape }}'
+                      loading='lazy'
+                    >
+                  </a>
+                {% else %}
+                  {{ "lifestyle-1" | placeholder_svg_tag: "w-full h-full bg-gray-200" }}
+                {% endif %}
+              </swiper-slide>
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          {% for i in (1..6) %}
+            <swiper-slide>
+              {{ "lifestyle-1" | placeholder_svg_tag: "w-full h-full bg-gray-200" }}
+            </swiper-slide>
+          {% endfor %}
+        {% endif %}
+      </swiper-container>
+    </div>
+  </div>
+</section>
+
+
+{% schema %}
+{
+  "name": "PaBoyz Outdoors Landing",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Background Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_bg_image",
+      "label": "Background image",
+      "info": "Covers from the top of the page through the feature section. Leave blank for a solid white background."
+    },
+    {
+      "type": "select",
+      "id": "hero_bg_position",
+      "label": "Background position",
+      "default": "center center",
+      "options": [
+        { "value": "center center", "label": "Center" },
+        { "value": "top center",    "label": "Top" },
+        { "value": "bottom center", "label": "Bottom" },
+        { "value": "center left",   "label": "Left" },
+        { "value": "center right",  "label": "Right" },
+        { "value": "top left",      "label": "Top left" },
+        { "value": "top right",     "label": "Top right" },
+        { "value": "bottom left",   "label": "Bottom left" },
+        { "value": "bottom right",  "label": "Bottom right" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "hero_overlay_color",
+      "label": "Overlay color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "hero_overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 0,
+      "unit": "%",
+      "info": "0 = no overlay, 100 = fully opaque. Only applies when a background image is set."
+    },
+    {
+      "type": "header",
+      "content": "Logo Badges"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_left_image",
+      "label": "Left logo image"
+    },
+    {
+      "type": "range",
+      "id": "logo_left_size",
+      "label": "Left logo size (px)",
+      "min": 100,
+      "max": 600,
+      "step": 5,
+      "default": 100,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "logo_left_size_mobile",
+      "label": "Left logo size - Mobile (px)",
+      "min": 40,
+      "max": 200,
+      "step": 4,
+      "default": 56,
+      "unit": "px"
+    },
+    {
+      "type": "text",
+      "id": "logo_left_text",
+      "label": "Left logo text",
+      "default": "Kestrel"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_center_image",
+      "label": "Center logo image"
+    },
+    {
+      "type": "range",
+      "id": "logo_center_size",
+      "label": "Center logo size (px)",
+      "min": 100,
+      "max": 600,
+      "step": 5,
+      "default": 100,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "logo_center_size_mobile",
+      "label": "Center logo size - Mobile (px)",
+      "min": 40,
+      "max": 200,
+      "step": 4,
+      "default": 56,
+      "unit": "px"
+    },
+    {
+      "type": "text",
+      "id": "logo_center_text",
+      "label": "Center logo text",
+      "default": "Kestrel"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_right_image",
+      "label": "Right logo image"
+    },
+    {
+      "type": "range",
+      "id": "logo_right_size",
+      "label": "Right logo size (px)",
+      "min": 100,
+      "max": 600,
+      "step": 5,
+      "default": 100,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "logo_right_size_mobile",
+      "label": "Right logo size - Mobile (px)",
+      "min": 40,
+      "max": 200,
+      "step": 4,
+      "default": 56,
+      "unit": "px"
+    },
+    {
+      "type": "text",
+      "id": "logo_right_text",
+      "label": "Right logo text",
+      "default": "Clearfield"
+    },
+    {
+      "type": "header",
+      "content": "Hero Text"
+    },
+    {
+      "type": "text",
+      "id": "hero_heading",
+      "label": "Hero heading",
+      "default": "Win 1 of 12 Kestrel Knives"
+    },
+    {
+      "type": "range",
+      "id": "hero_heading_size_desktop",
+      "label": "Hero heading size - Desktop (px)",
+      "min": 32,
+      "max": 120,
+      "step": 2,
+      "default": 72,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "hero_heading_size_mobile",
+      "label": "Hero heading size - Mobile (px)",
+      "min": 24,
+      "max": 72,
+      "step": 2,
+      "default": 40,
+      "unit": "px"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_subheading",
+      "label": "Hero subheading",
+      "default": "Enter with your name and email for a chance to win 1 of 12 Kestrel Knives."
+    },
+    {
+      "type": "color",
+      "id": "hero_heading_color",
+      "label": "Hero heading color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "hero_subheading_color",
+      "label": "Hero subheading color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Form"
+    },
+    {
+      "type": "text",
+      "id": "form_name_label",
+      "label": "Name label",
+      "default": "Your Name"
+    },
+    {
+      "type": "text",
+      "id": "form_name_placeholder",
+      "label": "Name placeholder",
+      "default": "John Doe"
+    },
+    {
+      "type": "text",
+      "id": "form_email_label",
+      "label": "Email label",
+      "default": "Email Address"
+    },
+    {
+      "type": "text",
+      "id": "form_email_placeholder",
+      "label": "Email placeholder",
+      "default": "you@example.com"
+    },
+    {
+      "type": "text",
+      "id": "form_button_text",
+      "label": "Button text",
+      "default": "Count Me In"
+    },
+    {
+      "type": "text",
+      "id": "form_success_heading",
+      "label": "Success heading",
+      "default": "You're In!"
+    },
+    {
+      "type": "text",
+      "id": "form_success_text",
+      "label": "Success text",
+      "default": "Your entry has been received. Good luck!"
+    },
+    {
+      "type": "header",
+      "content": "Feature Section"
+    },
+    {
+      "type": "text",
+      "id": "feature_heading",
+      "label": "Feature heading",
+      "default": "Premium Craftsmanship"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_text",
+      "label": "Feature text",
+      "default": "Each Kestrel Knife is expertly crafted with precision engineering and premium materials. Built for performance and durability, these are the tools serious craftspeople depend on."
+    },
+    {
+      "type": "color",
+      "id": "feature_heading_color",
+      "label": "Feature heading color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "feature_text_color",
+      "label": "Feature text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Slider"
+    },
+    {
+      "type": "page",
+      "id": "shared_gallery_page",
+      "label": "Shared gallery page (optional)",
+      "info": "Uses page metafield custom.shared_gallery_images (file list) when set."
+    },
+    {
+      "type": "range",
+      "id": "slider_autoplay_delay",
+      "label": "Slider autoplay delay (ms)",
+      "min": 2000,
+      "max": 8000,
+      "step": 500,
+      "default": 5000
+    },
+    {
+      "type": "range",
+      "id": "slider_height_desktop",
+      "label": "Slider height (desktop px)",
+      "min": 240,
+      "max": 600,
+      "step": 20,
+      "default": 320
+    },
+    {
+      "type": "range",
+      "id": "slider_height_mobile",
+      "label": "Slider height (mobile px)",
+      "min": 200,
+      "max": 480,
+      "step": 20,
+      "default": 240
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slider_image",
+      "name": "Slider image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "alt_text",
+          "label": "Alt text"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "PaBoyz Outdoors Landing",
+      "blocks": [
+        { "type": "slider_image" },
+        { "type": "slider_image" },
+        { "type": "slider_image" }
+      ]
+    }
+  ]
+}
+{% endschema %}

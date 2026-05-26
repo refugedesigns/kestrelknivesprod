@@ -55,7 +55,10 @@
                       @change='toggleApparelTag(tag.handle, $event.target.checked)'
                       class='border-gray-300 text-black focus:ring-gray-900'
                     >
-                    <span class='text-sm text-gray-700' x-text='tag.label'></span>
+                    <span
+                      class='text-sm text-gray-700'
+                      x-text='tag.label'
+                    ></span>
                   </label>
                 </template>
               </div>
@@ -199,7 +202,10 @@
       apparelTags: [],
       get apparelTagsTop() {
         return (this.apparelTags || []).filter(
-          t => String(t.handle || '').toLowerCase().indexOf('position') === -1
+          t =>
+            String(t.handle || '')
+              .toLowerCase()
+              .indexOf('position') === -1
         )
       },
       isInitializing: true,
@@ -246,7 +252,7 @@
               }))
               .filter(it => {
                 const val = String(it.value || '').toLowerCase()
-                return it.value && !val.includes('hidden') && val !== 'custom'
+                return it.value && !this.isExcludedProductType(val)
               })
           }
           // Fallback: fetch list of collections and map to product types heuristically
@@ -271,14 +277,15 @@
             'home-page',
             'homepage',
             'hidden-offer',
-            'featured-mobile'
+            'featured-mobile',
           ]
           const HIDE_TITLES = [
             'featured',
             'home page',
             'products',
             'hidden offer',
-            'featured mobile'
+            'featured mobile',
+            'eastmans offer',
           ]
           return colls
             .filter(c => {
@@ -307,7 +314,7 @@
             // Filter out hidden offer from cached types
             return cachedTypes.filter(t => {
               const val = String(t.value || '').toLowerCase()
-              return !val.includes('hidden') && val !== 'custom'
+              return !this.isExcludedProductType(val)
             })
           }
           const fetched = await this.fetchAllProductTypesFromAllCollection()
@@ -315,7 +322,7 @@
             // Filter out hidden offer from fetched types
             const filtered = fetched.filter(t => {
               const val = String(t.value || '').toLowerCase()
-              return !val.includes('hidden') && val !== 'custom'
+              return !this.isExcludedProductType(val)
             })
             sessionStorage.setItem(
               'kk_allProductTypes',
@@ -433,13 +440,17 @@
           }
 
           // Apparel tag from path /collections/all/{tag}
-          const pathMatch = (url.pathname || '').match(/\/collections\/all\/([^\/]+)/)
+          const pathMatch = (url.pathname || '').match(
+            /\/collections\/all\/([^\/]+)/
+          )
           if (
             pathMatch &&
             pathMatch[1] &&
             this.selectedFilters.productTypeSelected.toLowerCase() === 'apparel'
           ) {
-            this.selectedFilters.apparelTagSelected = decodeURIComponent(pathMatch[1])
+            this.selectedFilters.apparelTagSelected = decodeURIComponent(
+              pathMatch[1]
+            )
           }
         } catch (e) {
           // ignore
@@ -532,6 +543,16 @@
         }
       },
 
+      isExcludedProductType(val) {
+        const t = String(val || '').toLowerCase().trim()
+        return (
+          !t ||
+          t.includes('hidden') ||
+          t === 'custom' ||
+          t === 'eastmans offer'
+        )
+      },
+
       async buildProductTypes() {
         try {
           // Prefer server-provided facet metadata when available
@@ -541,7 +562,7 @@
           const metaTypes = (meta.productTypes || [])
             .filter(t => {
               const val = String(t.value || '').toLowerCase()
-              return !val.includes('hidden') && val !== 'custom'
+              return !this.isExcludedProductType(val)
             })
             .map(t => ({
               value: String(t.value || ''),
@@ -566,8 +587,7 @@
           const counts = {}
           products.forEach(p => {
             const t = (p.product_type || p.type || '').toString().trim()
-            const tLower = t.toLowerCase()
-            if (!t || tLower.includes('hidden') || tLower === 'custom') return
+            if (this.isExcludedProductType(t)) return
             counts[t] = (counts[t] || 0) + 1
           })
           this.productTypes = Object.keys(counts).map(k => ({

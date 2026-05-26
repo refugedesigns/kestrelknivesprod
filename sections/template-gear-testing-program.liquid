@@ -18,25 +18,227 @@
   .gear-testing-subtitle p:last-child {
     margin-bottom: 0;
   }
+
+  .gear-testing-form-section {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    width: 100%;
+  }
+  .gear-testing-form-section__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .gear-testing-form-section__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+  }
+  .gear-testing-form-section__content {
+    position: relative;
+    z-index: 2;
+    max-width: 56rem;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    overflow: visible;
+    pointer-events: auto;
+  }
+  .gear-testing-form-section__content::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    background: rgba(255, 255, 255, 0.4);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    pointer-events: none;
+  }
+  .gear-testing-form-section__form {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    pointer-events: auto;
+  }
+  .gear-testing-form-section__form.pifyform,
+  .gear-testing-form-section__form.pifyform iframe {
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
+  }
+  .gear-testing-form-section__form.pifyform.formloading iframe {
+    visibility: hidden !important;
+  }
+  .gear-testing-form-section__form.pifyform.formloading {
+    background-image: url(https://form-builder.pifyapp.com/assets/images/loading.gif?v=4.6);
+    background-position: center 30px;
+    background-size: 30px 30px;
+    background-repeat: no-repeat;
+  }
 </style>
 
+<div class='gear-testing-form-section'>
+  <img
+    class='gear-testing-form-section__bg'
+    src='{{ 'field_tester_program.jpg' | asset_url }}'
+    alt=''
+    loading='eager'
+    fetchpriority='high'
+  >
+  <div class='gear-testing-form-section__overlay' aria-hidden='true'></div>
 
-<section class='relative px-4 sm:px-6 lg:px-8 py-2' style='background-image: url({{ "field_tester_program.jpg" | asset_url }}); background-size: cover; background-position: center; background-repeat: no-repeat;'>
-  <!-- Optional overlay for better text readability -->
-  <div class='absolute inset-0 bg-black/30'></div>
-  
-  <div class='relative max-w-4xl mx-auto rounded-lg shadow-lg bg-white/30 backdrop-blur-sm p-2'>
-    
-   
-	
-
-    <div class="klaviyo-form-T9eiNG"></div>
-
-
-
+  <div class='gear-testing-form-section__content py-10 px-4 sm:px-6 lg:px-8'>
+    <div
+      id='pifyform-36391'
+      class='gear-testing-form-section__form pifyform'
+      style='margin: 10px 0;'
+    >
+      <script charset='UTF-8' defer>
+        document.getElementById('pifyform-36391').classList.add('formloading')
+        ;(function (h) {
+          function n(a) {
+            return null === a
+              ? null
+              : a.scrollHeight > a.clientHeight
+                ? a
+                : n(a.parentNode)
+          }
+          function t(b) {
+            if (b.data && typeof b.data == 'string') {
+              var f = null
+              try {
+                f = JSON.parse(b.data)
+              } catch (e) {}
+              if (f != null && f.height != undefined) {
+                if (f.formId == undefined) {
+                  d.style.height = f.height + 'px'
+                } else if ('pifyform-' + f.formId == d.id) {
+                  d.style.height = f.height + 'px'
+                }
+              }
+              if (f != null && f.redirect != undefined && f.redirect != '') {
+                window.location.href = f.redirect
+              }
+              if (f != null && f.retsetHeight != undefined && f.retsetHeight) {
+                d.style.height = '520px'
+                window.location.href = '#pifyform-36391'
+              }
+              if (document.getElementsByClassName('lazyframe').length > 0) {
+                var lazyframe = document.getElementsByClassName('lazyframe')[0]
+                lazyframe.style.height = '100%'
+                lazyframe.removeAttribute('data-ratio')
+                lazyframe.parentNode.style.overflow = 'hidden'
+              }
+              if (f != null && f.getter) {
+                b = {}
+                var f = [].concat(f.getter),
+                  k,
+                  h = f.length,
+                  m,
+                  c,
+                  g,
+                  e
+                for (k = 0; k < h; k++) {
+                  m = k
+                  c = f[k] || {}
+                  c.n && (m = c.n)
+                  g = null
+                  try {
+                    switch (c.t) {
+                      case 'window':
+                        e = window
+                        break
+                      case 'scrollParent':
+                        e = n(a) || window
+                        break
+                      default:
+                        e = a
+                    }
+                    if (c.e)
+                      if ('rect' === c.v) {
+                        g = {}
+                        var l = e.getBoundingClientRect()
+                        g = {
+                          top: l.top,
+                          left: l.left,
+                          width: l.width,
+                          height: l.height,
+                        }
+                      } else g = e[c.v].apply(e, [].concat(c.e)) || !0
+                    else c.s ? ((e[c.v] = c.s), (g = !0)) : (g = e[c.v] || !1)
+                  } catch (u) {}
+                  b[m] = g
+                }
+                b.innerState = !p && !q
+                a.contentWindow.postMessage(
+                  JSON.stringify({ queryRes: b }),
+                  '*'
+                )
+              }
+            }
+          }
+          var parentQueryString = ''
+          try {
+            var currentParams = new URLSearchParams(window.location.search)
+            parentQueryString =
+              currentParams.size > 0 ? '?' + currentParams.toString() : ''
+          } catch (er) {}
+          var d = document.getElementById('pifyform-36391')
+          var a = document.createElement('iframe')
+          var p = d.style.height && 'auto' !== d.style.height,
+            q =
+              'absolute' === d.style.position ||
+              (window.getComputedStyle &&
+                'absolute' ===
+                  window
+                    .getComputedStyle(d, null)
+                    .getPropertyValue('position')) ||
+              (d.currentStyle && 'absolute' === d.currentStyle.position)
+          h.addEventListener && h.addEventListener('message', t, !1)
+          a.src =
+            'https://form-builder-en.pifyapp.com/form/s/36391' +
+            parentQueryString
+          a.id = 'form-iframe-36391'
+          a.onload = function () {
+            document
+              .getElementById('pifyform-36391')
+              .classList.remove('formloading')
+            a.contentWindow.postMessage(
+              JSON.stringify({ parentUrl: window.location.href }),
+              '*'
+            )
+          }
+          a.frameBorder = 0
+          a.scrolling = 'no'
+          a.style.display = 'block'
+          a.style.minWidth = '100%'
+          a.style.width = '100px'
+          a.style.height = '100%'
+          a.style.border = 'none'
+          a.style.overflow = 'auto'
+          setTimeout(function () {
+            if (!document.getElementById('form-iframe-36391')) {
+              d.appendChild(a)
+            }
+          }, 50)
+        })(window)
+      </script>
+    </div>
   </div>
-</section>
-
+</div>
 
 {% schema %}
 {
@@ -61,4 +263,4 @@
     }
   ]
 }
-{% endschema %} 
+{% endschema %}

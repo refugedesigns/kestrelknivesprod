@@ -1,20 +1,113 @@
 <!doctype html>
-<html>
+<html lang='{{ request.locale.iso_code | default: shop.locale }}'>
   <head>
-    <title>{{ page_title }}</title>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
-    <meta name='description' content='{{ page_description | escape }}'>
-    <link rel='canonical' href='{{ canonical_url }}'>
-    <!-- Flowbite CDN -->
-    <link
-      href='https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css'
-      rel='stylesheet'
-    >
     <meta
       name='viewport'
       content='width=device-width,initial-scale=1,shrink-to-fit=no'
     >
+
+    <title>
+      {%- if template.name == 'index' -%}
+        {{ shop.name }}{% if page_description != blank %} — {{ page_description | truncate: 70, '' }}{% endif %}
+      {%- else -%}
+        {{ page_title }}{% unless page_title contains shop.name %} — {{ shop.name }}{% endunless %}
+      {%- endif -%}
+    </title>
+    <meta
+      name='description'
+      content='{{ page_description | default: shop.description | default: shop.name | escape }}'
+    >
+    <link rel='canonical' href='{{ canonical_url }}'>
+
+    {%- comment -%} Noindex utility / private pages {%- endcomment -%}
+    {%- if template.name == 'search'
+        or template.name == 'cart'
+        or template.name == 'gift_card'
+        or template contains 'customers'
+    -%}
+      <meta name='robots' content='noindex,nofollow'>
+    {%- endif -%}
+
+    {%- comment -%} Speed up first byte from third-party origins {%- endcomment -%}
+    <link rel='preconnect' href='https://cdn.shopify.com' crossorigin>
+    <link rel='preconnect' href='https://cdn.jsdelivr.net' crossorigin>
+    <link rel='preconnect' href='https://unpkg.com' crossorigin>
+    <link rel='dns-prefetch' href='https://cdn.shopify.com'>
+
+    {%- comment -%} Open Graph + Twitter Card (page-aware fallbacks) {%- endcomment -%}
+    {%- assign og_type = 'website' -%}
+    {%- assign og_title = page_title | default: shop.name | escape -%}
+    {%- assign og_description = page_description
+      | default: shop.description
+      | default: shop.name
+      | strip_html
+      | escape
+    -%}
+    {%- assign og_image = '' -%}
+    {%- if template.name == 'product' and product -%}
+      {%- assign og_type = 'product' -%}
+      {%- assign og_title = product.title | escape -%}
+      {%- assign og_description = product.description
+        | strip_html
+        | truncate: 200
+        | escape
+      -%}
+      {%- if product.featured_image -%}
+        {%- assign og_image = product.featured_image | image_url: width: 1200 -%}
+      {%- endif -%}
+    {%- elsif template.name == 'article' and article -%}
+      {%- assign og_type = 'article' -%}
+      {%- assign og_title = article.title | escape -%}
+      {%- assign og_description = article.excerpt_or_content
+        | strip_html
+        | truncate: 200
+        | escape
+      -%}
+      {%- if article.image -%}
+        {%- assign og_image = article.image | image_url: width: 1200 -%}
+      {%- endif -%}
+    {%- elsif template.name == 'collection' and collection -%}
+      {%- assign og_title = collection.title | escape -%}
+      {%- if collection.description != blank -%}
+        {%- assign og_description = collection.description
+          | strip_html
+          | truncate: 200
+          | escape
+        -%}
+      {%- endif -%}
+      {%- if collection.image -%}
+        {%- assign og_image = collection.image | image_url: width: 1200 -%}
+      {%- endif -%}
+    {%- endif -%}
+    {%- if og_image == '' -%}
+      {%- if shop.brand.square_logo -%}
+        {%- assign og_image = shop.brand.square_logo | image_url: width: 1200 -%}
+      {%- elsif shop.brand.logo -%}
+        {%- assign og_image = shop.brand.logo | image_url: width: 1200 -%}
+      {%- endif -%}
+    {%- endif -%}
+
+    <meta property='og:site_name' content='{{ shop.name | escape }}'>
+    <meta property='og:type' content='{{ og_type }}'>
+    <meta property='og:url' content='{{ canonical_url }}'>
+    <meta property='og:title' content='{{ og_title }}'>
+    {%- if og_description != blank -%}
+      <meta property='og:description' content='{{ og_description }}'>
+    {%- endif -%}
+    {%- if og_image != '' -%}
+      <meta property='og:image' content='{{ og_image }}'>
+    {%- endif -%}
+    <meta name='twitter:card' content='summary_large_image'>
+    <meta name='twitter:title' content='{{ og_title }}'>
+    {%- if og_description != blank -%}
+      <meta name='twitter:description' content='{{ og_description }}'>
+    {%- endif -%}
+    {%- if og_image != '' -%}
+      <meta name='twitter:image' content='{{ og_image }}'>
+    {%- endif -%}
+
     <link
       rel='icon'
       type='image/png'
@@ -25,6 +118,23 @@
       href='{{ "favicon.png" | asset_url }}'
     >
     {{ content_for_header }}
+
+    <script type='application/ld+json'>
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": {{ shop.name | json }},
+        "url": "{{ shop.url }}/",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "{{ shop.url }}/search?q={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
     <!-- Header hook for plugins -->
     {%- comment -%} {{ "application.css" | asset_url | stylesheet_tag }} {%- endcomment -%}
     <script src='{{ application.js | asset_url }}' defer></script>
@@ -76,10 +186,25 @@
     </style>
   </head>
   <body class='min-h-screen flex flex-col'>
+    <script>
+      try {
+        {% if template.name == 'collection' %}
+          {% if collection.handle == 'eastmans-offer' or template.suffix == 'eastmans' %}
+            sessionStorage.setItem('kk_gated_cart_discount', '1');
+          {% else %}
+            sessionStorage.setItem('kk_gated_cart_discount', '0');
+          {% endif %}
+        {% elsif template.name != 'product' %}
+          sessionStorage.setItem('kk_gated_cart_discount', '0');
+        {% endif %}
+      } catch (e) {
+        /* ignore */
+      }
+    </script>
     {% section "header" %}
     <main
       role='main'
-      class='flex-1'
+      class='flex-1 relative z-0'
       style='padding-top: var(--header-height, 64px);'
     >
       {{ content_for_layout }}
@@ -94,11 +219,5 @@
     {% section "footer" %}
 
     {% render "mw_PO_objects" %}
-
-    <!-- Flowbite CDN -->
-    <script
-      src='https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js'
-      defer
-    ></script>
   </body>
 </html>

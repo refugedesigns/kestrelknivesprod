@@ -1,0 +1,8 @@
+{
+    "sections": {
+        "template-collection-eastmans": {
+            "type": "template-collections-eastmans"
+        }
+    },
+    "order": ["template-collection-eastmans"]
+}

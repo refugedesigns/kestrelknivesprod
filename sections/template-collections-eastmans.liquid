@@ -1,0 +1,771 @@
+{% assign banner_default_heading = "Eastmans VIP's Only Access - Save 15%" %}
+{% assign default_ratio = 1.7778 %}
+{% assign banner_image_desktop = section.settings.banner_image %}
+{% assign banner_image_tablet = section.settings.banner_image_tablet %}
+{% assign banner_image_mobile = section.settings.banner_image_mobile %}
+{% assign banner_ratio_desktop = default_ratio %}
+{% if banner_image_desktop %}
+  {% assign banner_ratio_desktop = banner_image_desktop.aspect_ratio | default: default_ratio %}
+{% endif %}
+{% assign banner_ratio_tablet = banner_ratio_desktop %}
+{% if banner_image_tablet %}
+  {% assign banner_ratio_tablet = banner_image_tablet.aspect_ratio | default: banner_ratio_desktop %}
+{% endif %}
+{% assign banner_ratio_mobile = banner_ratio_tablet %}
+{% if banner_image_mobile %}
+  {% assign banner_ratio_mobile = banner_image_mobile.aspect_ratio | default: banner_ratio_tablet %}
+{% endif %}
+{% assign banner_base_image = banner_image_desktop %}
+{% if banner_base_image == blank %}
+  {% assign banner_base_image = banner_image_tablet %}
+{% endif %}
+{% if banner_base_image == blank %}
+  {% assign banner_base_image = banner_image_mobile %}
+{% endif %}
+
+<style>
+  .eastmans-hero {
+    padding-bottom: var(--eastmans-hero-mobile-overlay-padding-bottom, 40px);
+  }
+  .eastmans-hero .eastmans-hero-overlay__inner {
+    margin-bottom: var(--eastmans-hero-mobile-overlay-inner-margin-bottom, 28px);
+  }
+  .eastmans-hero-root .eastmans-hero-text-content {
+    margin-top: 0;
+    padding-top: var(--eastmans-hero-mobile-text-padding-top, 0px);
+    position: relative;
+    z-index: 1;
+  }
+  .eastmans-hero-scale-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: var(--eastmans-hero-radius, 0px);
+  }
+  .eastmans-hero-media {
+    width: 100%;
+    height: var(--eastmans-hero-height-desktop, 520px);
+    aspect-ratio: auto;
+    display: block;
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--eastmans-hero-radius, 0px);
+  }
+  .eastmans-hero-media picture,
+  .eastmans-hero-media img {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .eastmans-hero-media img {
+    transform-origin: center center;
+    object-fit: {{ section.settings.banner_image_fit_desktop | default: section.settings.banner_image_fit | default: "cover" }};
+    object-position: {{ section.settings.banner_image_position_desktop | default: section.settings.banner_image_position | default: "center" }};
+  }
+  .eastmans-hero-text-wrap {
+    position: relative;
+    display: inline-block;
+  }
+  .eastmans-banner-title {
+    font-size: var(--eastmans-banner-title-size-desktop, 72px);
+    line-height: 1.05;
+  }
+  .eastmans-hero-text-bg {
+    position: absolute;
+    inset: -0.5rem;
+    border-radius: 0.5rem;
+    z-index: -1;
+  }
+  @media (max-width: 1024px) {
+    .eastmans-hero {
+      padding-top: calc(var(--header-height, 64px) + 16px);
+      align-items: center !important;
+      justify-content: center !important;
+      top: 0 !important;
+      bottom: 0 !important;
+    }
+    .eastmans-hero .eastmans-hero-overlay__inner {
+      margin-left: 0 !important;
+      text-align: center !important;
+    }
+    .eastmans-hero-media {
+      height: var(--eastmans-hero-height-desktop, 520px);
+    }
+    .eastmans-hero-root .eastmans-hero-media img {
+      object-fit: {{ section.settings.banner_image_fit_tablet | default: section.settings.banner_image_fit | default: "cover" }};
+      object-position: {{ section.settings.banner_image_position_tablet | default: section.settings.banner_image_position | default: "center" }};
+    }
+  }
+  @media (max-width: 768px) {
+    .eastmans-hero-scale-wrap {
+      width: calc(100% * var(--eastmans-hero-scale-inv, 1));
+      transform: scale(calc(var(--eastmans-hero-scale, 100) / 100));
+      transform-origin: center center;
+    }
+    .eastmans-hero-media {
+      height: var(--eastmans-hero-height-mobile, 320px);
+      aspect-ratio: auto;
+    }
+    .eastmans-hero-root .eastmans-hero-media img {
+      object-fit: {{ section.settings.banner_image_fit_mobile | default: section.settings.banner_image_fit | default: "cover" }};
+      object-position: {{ section.settings.banner_image_position_mobile | default: section.settings.banner_image_position | default: "center" }};
+    }
+    .eastmans-banner-title {
+      font-size: var(--eastmans-banner-title-size-mobile, 40px);
+    }
+  }
+  .eastmans-slider {
+    width: 100%;
+    height: var(--eastmans-slider-height, 420px);
+  }
+  .eastmans-slider swiper-slide {
+    height: 100%;
+  }
+  .eastmans-slider img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  @media (max-width: 767px) {
+    .eastmans-slider {
+      height: var(--eastmans-slider-height-mobile, 280px);
+    }
+  }
+</style>
+
+{% if section.settings.show_banner %}
+  <div class='relative eastmans-hero-root mb-8 lg:mb-6'>
+    <div
+      class='eastmans-hero-scale-wrap'
+      style='--eastmans-hero-scale: {{ section.settings.banner_scale_percent | default: 100 }}; --eastmans-hero-scale-inv: {{ 10000 | divided_by: section.settings.banner_scale_percent | times: 0.01 }}; --eastmans-hero-radius: {% if section.settings.banner_scale_percent and section.settings.banner_scale_percent < 100 %}{{ section.settings.banner_scale_radius | default: 16 }}px{% else %}0px{% endif %}; --eastmans-hero-height-desktop: {{ section.settings.banner_height_desktop_px | default: 520 }}px; --eastmans-hero-height-mobile: {{ section.settings.banner_height_mobile_px | default: 320 }}px; --eastmans-hero-mobile-overlay-padding-bottom: {{ section.settings.banner_mobile_overlay_padding_bottom | default: 40 }}px; --eastmans-hero-mobile-overlay-inner-margin-bottom: {{ section.settings.banner_mobile_overlay_inner_margin_bottom | default: 28 }}px; --eastmans-hero-mobile-text-padding-top: {{ section.settings.banner_mobile_text_padding_top | default: 0 }}px;'
+    >
+      <div
+        class='relative'
+        style='width: 100%; transform: scale(calc(var(--eastmans-hero-scale, 100) / 100)); transform-origin: center center; --eastmans-slide-aspect-desktop: {{ banner_ratio_desktop }}; --eastmans-slide-aspect-tablet: {{ banner_ratio_tablet }}; --eastmans-slide-aspect-mobile: {{ banner_ratio_mobile }};'
+      >
+        <div class='eastmans-hero-media block w-full'>
+        {% if banner_base_image %}
+          <picture class='w-full h-full block'>
+            {% if banner_image_mobile %}
+              <source
+                srcset='{{ banner_image_mobile | image_url: width: 1200 }}'
+                media='(max-width: 767px)'
+              >
+            {% endif %}
+            {% if banner_image_tablet %}
+              <source
+                srcset='{{ banner_image_tablet | image_url: width: 1600 }}'
+                media='(max-width: 1024px)'
+              >
+            {% endif %}
+            <img
+              src='{{ banner_base_image | image_url: width: 1920 }}'
+              alt='{{ section.settings.banner_title | default: banner_default_heading | escape }}'
+              width='{{ banner_base_image.width }}'
+              height='{{ banner_base_image.height }}'
+              style='transform: scale({{ section.settings.banner_image_zoom | default: 100 | divided_by: 100.0 }});'
+              loading='lazy'
+            >
+          </picture>
+        {% else %}
+          {{ "lifestyle-1" | placeholder_svg_tag: "w-full h-full bg-gray-800 object-cover" }}
+        {% endif %}
+        {% if section.settings.banner_overlay_enable %}
+          <div
+            class='absolute inset-0 bg-black/{{ section.settings.banner_overlay_opacity | default: 40 }}'
+          ></div>
+        {% endif %}
+        </div>
+
+        {% if section.settings.banner_show_text_overlay %}
+          {% assign banner_shadow = section.settings.banner_text_shadow_strength | default: "soft" %}
+          {% assign banner_shadow_opacity = "0.35" %}
+          {% case banner_shadow %}
+            {% when "none" %}
+              {% assign banner_shadow_opacity = "0" %}
+            {% when "medium" %}
+              {% assign banner_shadow_opacity = "0.6" %}
+            {% when "strong" %}
+              {% assign banner_shadow_opacity = "0.85" %}
+          {% endcase %}
+          <div class='absolute inset-0 flex items-end justify-center z-10 pointer-events-none eastmans-hero'>
+            <div class='text-center max-w-5xl px-4 mb-6 lg:mb-10 eastmans-hero-overlay__inner'>
+              <div class='eastmans-hero-text-wrap'>
+                {% if section.settings.banner_text_bg_enable %}
+                  {% assign banner_text_bg_alpha = section.settings.banner_text_bg_opacity | default: 50 | divided_by: 100.0 %}
+                  <div
+                    class='eastmans-hero-text-bg'
+                    style='background-color: {{ section.settings.banner_text_bg_color | default: '#000000' | color_modify: 'alpha', banner_text_bg_alpha }}'
+                  ></div>
+                {% endif %}
+                <div class='eastmans-hero-text-content'>
+                  <h2
+                    class='eastmans-banner-title font-bold mb-0'
+                    style='--eastmans-banner-title-size-desktop: {{ section.settings.banner_title_size_desktop | default: 72 }}px; --eastmans-banner-title-size-mobile: {{ section.settings.banner_title_size_mobile | default: 40 }}px; color: {{ section.settings.banner_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.banner_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ banner_shadow_opacity }});'
+                  >
+                    {{ section.settings.banner_title | default: banner_default_heading }}
+                  </h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<div class='px-4 pt-6 lg:pt-10 pb-0 mx-auto'>
+  {% paginate collection.products by section.settings.number_of_products_per_page | default: 18 %}
+    <div class='max-w-4xl mx-auto'>
+      <div class='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6'>
+        {% for product in collection.products %}
+          {% render "eastmans-card",
+            product_product: product,
+            eastmans_discount_code: section.settings.discount_code,
+            eastmans_discount_percent: section.settings.discount_percent
+          %}
+        {% else %}
+          <div class='col-span-full text-center py-12'>
+            <p class='text-gray-500 text-lg'>There are no products in this collection</p>
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if paginate.pages > 1 %}
+        <div class='mt-12'>
+          {% render "pagination", pagination: paginate %}
+        </div>
+      {% endif %}
+    </div>
+  {% endpaginate %}
+
+  {% if section.settings.show_gallery %}
+    {% assign shared_images = blank %}
+    {% if collection.metafields.custom.shared_gallery_images != blank %}
+      {% assign shared_images = collection.metafields.custom.shared_gallery_images.value %}
+    {% endif %}
+    {% if shared_images == blank
+      and section.settings.shared_gallery_page != blank
+      and section.settings.shared_gallery_page.metafields.custom.shared_gallery_images != blank
+    %}
+      {% assign shared_images = section.settings.shared_gallery_page.metafields.custom.shared_gallery_images.value %}
+    {% endif %}
+
+    <div class='bg-white mt-10 mb-0'>
+      <swiper-container
+        class='eastmans-slider'
+        style='--eastmans-slider-height: {{ section.settings.slider_height_desktop }}px; --eastmans-slider-height-mobile: {{ section.settings.slider_height_mobile }}px;'
+        autoplay-delay='{{ section.settings.slider_autoplay_delay | default: 5000 }}'
+        autoplay-disable-on-interaction='false'
+        loop='true'
+        slides-per-view='3'
+        space-between='12'
+        centered-slides='false'
+        breakpoints='{"0":{"slidesPerView":1},"640":{"slidesPerView":2},"1024":{"slidesPerView":4}}'
+      >
+        {% if shared_images != blank %}
+          {% for shared_image in shared_images %}
+            <swiper-slide>
+              {% if shared_image != blank %}
+                {% if section.settings.gallery_link != blank %}<a href='{{ section.settings.gallery_link }}' target='_blank' rel='noopener'>{% endif %}
+                <img
+                  src='{{ shared_image | image_url: width: 1200 }}'
+                  alt=''
+                  loading='lazy'
+                >
+                {% if section.settings.gallery_link != blank %}</a>{% endif %}
+              {% endif %}
+            </swiper-slide>
+          {% endfor %}
+        {% elsif section.blocks.size > 0 %}
+          {% for block in section.blocks %}
+            {% if block.type == 'slider_image' %}
+              <swiper-slide {{ block.shopify_attributes }}>
+                {% if block.settings.image != blank %}
+                  {% if section.settings.gallery_link != blank %}<a href='{{ section.settings.gallery_link }}' target='_blank' rel='noopener'>{% endif %}
+                  <img
+                    src='{{ block.settings.image | image_url: width: 1200 }}'
+                    alt='{{ block.settings.alt_text | escape }}'
+                    loading='lazy'
+                  >
+                  {% if section.settings.gallery_link != blank %}</a>{% endif %}
+                {% else %}
+                  {{ "lifestyle-1" | placeholder_svg_tag: "w-full h-full bg-gray-200" }}
+                {% endif %}
+              </swiper-slide>
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          {% for i in (1..6) %}
+            <swiper-slide>
+              {{ "lifestyle-1" | placeholder_svg_tag: "w-full h-full bg-gray-200" }}
+            </swiper-slide>
+          {% endfor %}
+        {% endif %}
+      </swiper-container>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+  ;(() => {
+    try {
+      sessionStorage.setItem('kk_gated_cart_discount', '1')
+      const eastmansCode = {{ section.settings.discount_code | default: "" | json }}
+      if (eastmansCode && String(eastmansCode).trim()) {
+        sessionStorage.setItem(
+          'kk_gated_cart_discount_code',
+          String(eastmansCode).trim()
+        )
+      } else {
+        sessionStorage.removeItem('kk_gated_cart_discount_code')
+      }
+      const normalizedPath = String(window.location.pathname || '')
+        .toLowerCase()
+        .trim()
+        .replace(/^\/+/, '')
+        .replace(/\/+$/, '')
+      if (normalizedPath) {
+        sessionStorage.setItem(
+          'kk_collection_origin_token',
+          JSON.stringify({
+            path: normalizedPath,
+            ts: Date.now(),
+          })
+        )
+      }
+    } catch (e) {
+      // ignore storage errors
+    }
+  })()
+</script>
+
+{% schema %}
+{
+  "name": "Eastmans Collection",
+  "settings": [
+    {
+      "type": "range",
+      "id": "discount_percent",
+      "label": "Discount percent",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 15,
+      "unit": "%"
+    },
+    {
+      "type": "text",
+      "id": "discount_code",
+      "label": "Discount code",
+      "info": "Applied when customers add an item to cart from this section."
+    },
+    {
+      "type": "header",
+      "content": "Gallery Slider"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gallery",
+      "label": "Show gallery slider",
+      "default": true
+    },
+    {
+      "type": "page",
+      "id": "shared_gallery_page",
+      "label": "Shared gallery page (fallback)",
+      "info": "Used only when collection metafield custom.shared_gallery_images is empty."
+    },
+    {
+      "type": "url",
+      "id": "gallery_link",
+      "label": "Gallery slide link (optional)"
+    },
+    {
+      "type": "range",
+      "id": "slider_autoplay_delay",
+      "label": "Slider autoplay delay (ms)",
+      "min": 2000,
+      "max": 8000,
+      "step": 500,
+      "default": 5000
+    },
+    {
+      "type": "range",
+      "id": "slider_height_desktop",
+      "label": "Slider height (desktop px)",
+      "min": 240,
+      "max": 700,
+      "step": 20,
+      "default": 320
+    },
+    {
+      "type": "range",
+      "id": "slider_height_mobile",
+      "label": "Slider height (mobile px)",
+      "min": 180,
+      "max": 520,
+      "step": 20,
+      "default": 280
+    },
+    {
+      "type": "number",
+      "id": "number_of_products_per_page",
+      "default": 18,
+      "label": "Number of products per page"
+    },
+    {
+      "type": "header",
+      "content": "Top Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner",
+      "label": "Show top banner",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "banner_show_text_overlay",
+      "label": "Show text overlay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "banner_scale_percent",
+      "label": "Scale (%)",
+      "min": 50,
+      "max": 120,
+      "step": 5,
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "banner_scale_radius",
+      "label": "Scaled border radius (px)",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "banner_height_desktop_px",
+      "label": "Banner height - Desktop (px)",
+      "min": 240,
+      "max": 900,
+      "step": 20,
+      "default": 520
+    },
+    {
+      "type": "range",
+      "id": "banner_height_mobile_px",
+      "label": "Banner height - Mobile (px)",
+      "min": 160,
+      "max": 900,
+      "step": 20,
+      "default": 420
+    },
+    {
+      "type": "range",
+      "id": "banner_mobile_overlay_padding_bottom",
+      "label": "Overlay padding - Mobile (px)",
+      "min": 0,
+      "max": 400,
+      "step": 4,
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "banner_mobile_text_padding_top",
+      "label": "Text padding-top - Mobile (px)",
+      "min": 0,
+      "max": 400,
+      "step": 4,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "banner_mobile_overlay_inner_margin_bottom",
+      "label": "Overlay inner margin - Mobile (px)",
+      "min": 0,
+      "max": 400,
+      "step": 4,
+      "default": 28
+    },
+    {
+      "type": "checkbox",
+      "id": "banner_overlay_enable",
+      "label": "Enable image overlay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "banner_overlay_opacity",
+      "label": "Image overlay opacity (%)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 40
+    },
+    {
+      "type": "checkbox",
+      "id": "banner_text_bg_enable",
+      "label": "Enable text background",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "banner_text_bg_color",
+      "label": "Text background color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "banner_text_bg_opacity",
+      "label": "Text background opacity (%)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 50
+    },
+    {
+      "type": "select",
+      "id": "banner_text_shadow_strength",
+      "label": "Text shadow strength",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "soft", "label": "Soft" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "strong", "label": "Strong" }
+      ],
+      "default": "soft"
+    },
+    {
+      "type": "range",
+      "id": "banner_text_shadow_blur",
+      "label": "Text shadow blur (px)",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "color",
+      "id": "banner_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner image"
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image_tablet",
+      "label": "Banner image - Tablet (<=1024px)",
+      "info": "Optional override used on tablet viewports."
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image_mobile",
+      "label": "Banner image - Mobile (<=768px)",
+      "info": "Optional override used on mobile viewports."
+    },
+    {
+      "type": "header",
+      "content": "Top Banner Responsive Image"
+    },
+    {
+      "type": "select",
+      "id": "banner_image_fit",
+      "label": "Image fit [fallback]",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "banner_image_fit_mobile",
+      "label": "Image fit - Mobile",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "banner_image_fit_tablet",
+      "label": "Image fit - Tablet",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "banner_image_fit_desktop",
+      "label": "Image fit - Desktop",
+      "options": [
+        { "value": "cover", "label": "Cover" },
+        { "value": "contain", "label": "Contain" },
+        { "value": "fill", "label": "Fill" },
+        { "value": "scale-down", "label": "Scale Down" },
+        { "value": "none", "label": "None" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "banner_image_position",
+      "label": "Image position [fallback]",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "banner_image_position_mobile",
+      "label": "Image position - Mobile",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "banner_image_position_tablet",
+      "label": "Image position - Tablet",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "banner_image_position_desktop",
+      "label": "Image position - Desktop",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "center", "label": "Center" },
+        { "value": "bottom", "label": "Bottom" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "banner_image_zoom",
+      "label": "Image zoom (%)",
+      "info": "Lower values show more of the image. 100 = normal, 80 = zoomed out",
+      "min": 50,
+      "max": 150,
+      "step": 5,
+      "default": 100
+    },
+    {
+      "type": "text",
+      "id": "banner_title",
+      "label": "Banner title",
+      "default": "Eastmans VIP's Only Access - Save 15%"
+    },
+    {
+      "type": "range",
+      "id": "banner_title_size_desktop",
+      "label": "Banner title size - Desktop (px)",
+      "min": 24,
+      "max": 160,
+      "step": 2,
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "banner_title_size_mobile",
+      "label": "Banner title size - Mobile (px)",
+      "min": 20,
+      "max": 100,
+      "step": 2,
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Color Variant Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "orange_image",
+      "label": "Orange Color Image",
+      "info": "Upload an image for orange color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "black_orange_image",
+      "label": "Black w/Orange Liner Image",
+      "info": "Upload an image for black with orange liner variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "black_image",
+      "label": "Black Color Image",
+      "info": "Upload an image for black color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "green_image",
+      "label": "Green Color Image",
+      "info": "Upload an image for green color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "camo_image",
+      "label": "Camo/Earth Color Image",
+      "info": "Upload an image for camo or earth color variants"
+    },
+    {
+      "type": "image_picker",
+      "id": "high_vis_orange_image",
+      "label": "High Vis Orange Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "high_vis_green_image",
+      "label": "High Vis Green Image"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slider_image",
+      "name": "Slider image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "alt_text",
+          "label": "Alt text"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

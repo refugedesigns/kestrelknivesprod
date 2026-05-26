@@ -1,0 +1,8 @@
+{
+    "sections": {
+        "template-paboyzoutdoors": {
+            "type": "template-paboyzoutdoors"
+        }
+    },
+    "order": ["template-paboyzoutdoors"]
+}

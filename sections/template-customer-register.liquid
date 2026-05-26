@@ -12,7 +12,12 @@
 
         <!-- Why Join Section -->
         <div class='mt-4 text-xs text-gray-600'>
-          <h3 class='font-semibold text-gray-700 text-left' style='margin-bottom: 0.4rem !important;'>Members Come First</h3>
+          <h3
+            class='font-semibold text-gray-700 text-left'
+            style='margin-bottom: 0.4rem !important;'
+          >
+            Members Come First
+          </h3>
           <ul class='space-y-1.5 list-none pl-0'>
             <li class='flex items-start font-semibold'>
               <span class='mr-2 text-gray-400'>•</span>
@@ -46,9 +51,7 @@
         {% if form.errors %}
           {% comment %} Check if it's a verification message (success) or actual errors {% endcomment %}
           {% assign error_text = form.errors | default_errors | downcase %}
-          {% if error_text contains "email"
-            and error_text contains "verify"
-          %}
+          {% if error_text contains "email" and error_text contains "verify" %}
             {% comment %} This is a verification message - show as success {% endcomment %}
             <div class='mb-6 p-4 bg-green-50 border border-green-200 rounded-lg'>
               <div class='flex'>

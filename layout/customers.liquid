@@ -1,20 +1,22 @@
 <!doctype html>
-<html>
+<html lang='{{ request.locale.iso_code | default: shop.locale }}'>
   <head>
-    <title>{{ page_title }}</title>
+    <title>{{ page_title }}{% unless page_title contains shop.name %} — {{ shop.name }}{% endunless %}</title>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
-    <meta name='description' content='{{ page_description | escape }}'>
-    <link rel='canonical' href='{{ canonical_url }}'>
-    <!-- Flowbite CDN -->
-    <link
-      href='https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css'
-      rel='stylesheet'
-    >
     <meta
       name='viewport'
       content='width=device-width,initial-scale=1,shrink-to-fit=no'
     >
+    <meta name='description' content='{{ page_description | default: shop.name | escape }}'>
+    <meta name='robots' content='noindex,nofollow'>
+    <link rel='canonical' href='{{ canonical_url }}'>
+
+    <link rel='preconnect' href='https://cdn.shopify.com' crossorigin>
+    <link rel='preconnect' href='https://cdn.jsdelivr.net' crossorigin>
+    <link rel='preconnect' href='https://unpkg.com' crossorigin>
+    <link rel='dns-prefetch' href='https://cdn.shopify.com'>
+
     {{ content_for_header }}
     <!-- Header hook for plugins -->
     {{ "application.css" | asset_url | stylesheet_tag }}
@@ -41,8 +43,5 @@
     <main role='main'>
       {{ content_for_layout }}
     </main>
-    <script
-      src='https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js'
-    ></script>
   </body>
 </html>

@@ -18,7 +18,6 @@ module.exports = {
     },
   },
   plugins: [
-    // No plugins needed for CDN-based Flowbite
     '@tailwindcss/typography',
   ],
   // Enable purging in production
@@ -33,40 +32,13 @@ module.exports = {
       './assets/**/*.js',
       './locales/**/*.json',
     ],
-    // Safelist any classes that might be dynamically generated
     safelist: [
-      // Add any classes that are dynamically generated and might be missed
       'bg-red-500',
       'bg-green-500',
       'text-red-500',
       'text-green-500',
       'bg-black',
       'bg-[#000000]',
-      // Flowbite classes that might be dynamically generated (CDN version)
-      'flowbite',
-      'flowbite-*',
-      // Common Flowbite component classes
-      'dropdown',
-      'modal',
-      'tooltip',
-      'popover',
-      'accordion',
-      'carousel',
-      'tabs',
-      'sidebar',
-      'navbar',
-      'footer',
-      // Flowbite data attributes and classes
-      'data-dropdown-toggle',
-      'data-modal-toggle',
-      'data-tooltip-target',
-      'data-popover-target',
-      'data-accordion-target',
-      'data-carousel-target',
-      'data-tabs-target',
-      'data-sidebar-toggle',
-      'data-navbar-toggle',
-      // Flowbite utility classes
       'hidden',
       'block',
       'flex',

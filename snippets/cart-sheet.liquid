@@ -1,4 +1,7 @@
 <!-- Cart Sheet -->
+<script>
+  window.__gatedRemoveCartDiscountWhenIneligible = {{ settings.gated_remove_cart_discount_when_ineligible | default: true, allow_false: true | json }};
+</script>
 <div
   x-data='cartSheet()'
   x-show='isOpen'
@@ -153,6 +156,32 @@
       <span class='text-lg font-bold text-gray-900' x-text='subtotal'></span>
     </div>
 
+    <template x-if='hasDiscount'>
+      <div class='space-y-2'>
+        <template x-for='discount in cartLevelDiscounts' :key='discount.title'>
+          <div class='flex justify-between items-center text-sm'>
+            <span class='text-green-700' x-text='discount.title'></span>
+            <span
+              class='font-semibold text-green-700'
+              x-text='`-${formatMoney(discount.total_allocated_amount)}`'
+            ></span>
+          </div>
+        </template>
+        <div class='flex justify-between items-center text-sm'>
+          <span class='text-green-700 font-medium uppercase tracking-wide'>
+            Discount
+          </span>
+          <span class='font-semibold text-green-700' x-text='discountTotal'></span>
+        </div>
+        <div class='flex justify-between items-center'>
+          <span class='text-sm font-medium text-gray-900 uppercase tracking-wide'>
+            Total
+          </span>
+          <span class='text-lg font-bold text-gray-900' x-text='total'></span>
+        </div>
+      </div>
+    </template>
+
     <!-- Checkout Button -->
     <button
       @click='checkout'
@@ -173,9 +202,12 @@
       isAddingMainButton: false,
       isAddingStickyButton: false,
       justOpened: false,
+      cartLevelDiscounts: [],
+      originalTotalPriceCents: 0,
+      totalPriceCents: 0,
+      totalDiscountCents: 0,
 
       init() {
-        // Load cart from localStorage on init
         this.loadCart()
 
         // Listen for cart updates from other components
@@ -274,8 +306,80 @@
         document.body.style.overflow = ''
       },
 
+      async applyGatedDiscountCode() {
+        try {
+          const eligible =
+            sessionStorage.getItem('kk_gated_cart_discount') === '1'
+          if (!eligible) return false
+          const code = String(
+            sessionStorage.getItem('kk_gated_cart_discount_code') || ''
+          ).trim()
+          if (!code) return false
+          const cartRes = await fetch('/cart.js', { credentials: 'same-origin' })
+          const currentCart = await cartRes.json()
+          const alreadyHas =
+            Array.isArray(currentCart.cart_level_discount_applications) &&
+            currentCart.cart_level_discount_applications.some(
+              d =>
+                String((d && d.title) || '').toLowerCase() === code.toLowerCase()
+            )
+          if (alreadyHas) return true
+          const res = await fetch('/cart/update.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ discount: code }),
+            credentials: 'same-origin',
+          })
+          if (!res.ok) {
+            const t = await res.text()
+            console.error('Gated discount apply failed', res.status, t)
+            return false
+          }
+          return true
+        } catch (e) {
+          console.error('applyGatedDiscountCode error', e)
+          return false
+        }
+      },
+
+      async ensureOriginGatedCartDiscounts() {
+        try {
+          if (!window.__gatedRemoveCartDiscountWhenIneligible) return
+          const ok =
+            (() => {
+              try {
+                return sessionStorage.getItem('kk_gated_cart_discount') === '1'
+              } catch (e) {
+                return false
+              }
+            })()
+          if (ok) return
+          const r = await fetch('/cart.js')
+          const c = await r.json()
+          const hasDisc =
+            Number(c.total_discount || 0) > 0 ||
+            (Array.isArray(c.cart_level_discount_applications) &&
+              c.cart_level_discount_applications.length > 0)
+          if (!hasDisc) return
+          await fetch('/cart/update.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ discount: '' }),
+            credentials: 'same-origin',
+          })
+          try {
+            sessionStorage.removeItem('kk_gated_cart_discount_code')
+          } catch (e) {
+            /* ignore */
+          }
+        } catch (e) {
+          console.error('Origin-gated discount clear failed', e)
+        }
+      },
+
       async loadCart() {
         try {
+          await this.ensureOriginGatedCartDiscounts()
           const response = await fetch('/cart.js')
           const cart = await response.json()
 
@@ -291,6 +395,19 @@
             line_price: item.line_price,
           }))
 
+          this.cartLevelDiscounts = Array.isArray(
+            cart.cart_level_discount_applications
+          )
+            ? cart.cart_level_discount_applications
+            : []
+          this.originalTotalPriceCents = Number(
+            cart.original_total_price != null ? cart.original_total_price : 0
+          )
+          this.totalPriceCents = Number(cart.total_price != null ? cart.total_price : 0)
+          this.totalDiscountCents = Number(
+            cart.total_discount != null ? cart.total_discount : 0
+          )
+
           this.updateTotals()
         } catch (error) {
           console.error('Error loading cart:', error)
@@ -304,6 +421,7 @@
         propsOverride = null
       ) {
         this.isLoading = true
+        await this.ensureOriginGatedCartDiscounts()
 
         // Set specific button loading state based on source
         if (source === 'main-button') {
@@ -357,10 +475,10 @@
           })
 
           if (response.ok) {
+            await this.applyGatedDiscountCode()
             await this.loadCart()
             this.openCart()
 
-            // Dispatch event for other components
             window.dispatchEvent(new CustomEvent('cart-updated'))
           } else {
             throw new Error('Failed to add to cart')
@@ -430,10 +548,20 @@
       },
 
       get subtotal() {
-        const total = this.cartItems.reduce((total, item) => {
-          return total + item.line_price / 100 // Convert from cents
-        }, 0)
-        return this.formatMoney(total * 100)
+        if (this.hasDiscount) return this.formatMoney(this.originalTotalPriceCents)
+        return this.formatMoney(this.totalPriceCents)
+      },
+
+      get total() {
+        return this.formatMoney(this.totalPriceCents)
+      },
+
+      get hasDiscount() {
+        return this.totalDiscountCents > 0 || this.cartLevelDiscounts.length > 0
+      },
+
+      get discountTotal() {
+        return `-${this.formatMoney(this.totalDiscountCents)}`
       },
 
       formatMoney(cents) {

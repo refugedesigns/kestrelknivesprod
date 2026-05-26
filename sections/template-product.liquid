@@ -1,6 +1,69 @@
 {% assign selected_variant = product.selected_or_first_available_variant %}
 {% assign kk_status_raw = product.metafields.custom.product_status %}
 {% assign product_status_text = kk_status_raw.value | default: kk_status_raw %}
+{% assign kk_product_type_lower = product.type | default: "" | downcase %}
+{% assign kk_force_first_option_defaults = false %}
+{% assign kk_category_discount_percent = 0 %}
+{% if kk_product_type_lower contains "accessor"
+  or kk_product_type_lower contains "sheath"
+%}
+  {% assign kk_force_first_option_defaults = true %}
+{% endif %}
+{% for block in section.blocks %}
+  {% if block.type == "category_discount" %}
+    {% assign kk_block_categories = block.settings.categories
+      | default: ""
+      | downcase
+      | replace: ", ", ","
+      | replace: " ,", ","
+      | split: ","
+    %}
+    {% for kk_category in kk_block_categories %}
+      {% assign kk_category_norm = kk_category | strip %}
+      {% if kk_category_norm != blank and kk_product_type_lower == kk_category_norm %}
+        {% if block.settings.discount_percent > kk_category_discount_percent %}
+          {% assign kk_category_discount_percent = block.settings.discount_percent %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endfor %}
+{% assign kk_discount_multiplier = 100
+  | minus: kk_category_discount_percent
+  | divided_by: 100.0
+%}
+{% assign kk_settings_discount_percent = section.settings.discount_percent | default: 0 %}
+{% assign kk_base_discount_percent = kk_category_discount_percent %}
+{% if kk_settings_discount_percent > kk_base_discount_percent %}
+  {% assign kk_base_discount_percent = kk_settings_discount_percent %}
+{% endif %}
+{% assign kk_discount_multiplier = 100
+  | minus: kk_base_discount_percent
+  | divided_by: 100.0
+%}
+{% assign kk_discount_collection_origins_raw = section.settings.discount_collection_origins
+  | default: ""
+  | strip
+%}
+{% assign kk_has_discount_collection_origins = false %}
+{% if kk_discount_collection_origins_raw != blank %}
+  {% assign kk_has_discount_collection_origins = true %}
+{% endif %}
+{% assign kk_effective_initial_discount_percent = kk_base_discount_percent %}
+{% if kk_has_discount_collection_origins and kk_base_discount_percent > 0 %}
+  {% assign kk_effective_initial_discount_percent = 0 %}
+{% endif %}
+{% assign kk_initial_discounted_price = selected_variant.price %}
+{% if kk_effective_initial_discount_percent > 0 %}
+  {% assign kk_effective_discount_multiplier = 100
+    | minus: kk_effective_initial_discount_percent
+    | divided_by: 100.0
+  %}
+  {% assign kk_initial_discounted_price = selected_variant.price
+    | times: kk_effective_discount_multiplier
+    | round
+  %}
+{% endif %}
 
 <style>
   /* Custom styles for enhanced functionality */
@@ -172,6 +235,49 @@
     display: none;
   }
 
+  /* APO layered preview — keep stacking below fixed site header (z-40) */
+  #apoImageRoot {
+    position: relative;
+    z-index: 0;
+    isolation: isolate;
+  }
+  #apoImageRoot #apoOverlayContainer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 120ms ease;
+  }
+  #apoImageRoot #apoOverlayContainer > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  #apoImageRoot.apo-loading #apoOverlayContainer { opacity: 0; }
+  #apoImageRoot:not(.apo-loading) .apo-loading-veil { display: none; }
+  #apoImageRoot .apo-loading-veil {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+  #apoImageRoot .apo-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-top-color: #000;
+    border-radius: 50%;
+    animation: apo-spin 0.9s linear infinite;
+  }
+  @keyframes apo-spin {
+    to { transform: rotate(360deg); }
+  }
+
   @media (min-width: 768px) {
     #thumbFadeLeft,
     #thumbFadeRight {
@@ -259,6 +365,28 @@
         {% endif %}
       {% endif %}
     {% endif %}
+
+    {%- comment -%}
+      APO Layered Preview
+      Auto-enabled for products whose Type or Tag contains `mws_apo_generated`.
+      Asset naming: apo_<option-tokenized>_<value-tokenized>.png in /assets
+      Example: apo_blade_finish_stonewashed.png
+    {%- endcomment -%}
+    {% assign use_apo_layers = false %}
+    {%- assign apo_product_type_lower = product.type | default: '' | downcase -%}
+    {% if apo_product_type_lower contains "mws_apo_generated" %}
+      {% assign use_apo_layers = true %}
+    {% elsif tags_lower contains "mws_apo_generated" %}
+      {% assign use_apo_layers = true %}
+    {% endif %}
+    {%- assign apo_probe_url = 'apo_probe.png' | asset_url -%}
+    {%- assign apo_asset_base = apo_probe_url | split: '?' | first | split: 'apo_probe.png' | first -%}
+    {%- assign apo_asset_ver = '' -%}
+    {%- if apo_probe_url contains '?v=' -%}
+      {%- assign apo_asset_ver = apo_probe_url | split: '?v=' | last -%}
+    {%- endif -%}
+    {%- assign apo_base_image_src = product.featured_image | img_url: '2048x2048' -%}
+
     {% if tags_lower contains "hidden_offer" %}
       <div
         class='text-center mb-4 px-6 py-4 rounded-lg flex items-center justify-center'
@@ -275,12 +403,32 @@
         </h1>
       </div>
     {% endif %}
-    <main class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8 {% unless tags_lower contains 'hidden_offer' %}md:pt-24{% endunless %}'>
+    <main class='product-page-main relative z-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8 {% unless tags_lower contains 'hidden_offer' %}md:pt-24{% endunless %}'>
       <div class='lg:grid lg:grid-cols-12 lg:gap-12'>
         <!-- Left Column - Product Images -->
         <div class='lg:col-span-7'>
           <!-- Main Image -->
-          {% if use_complex_options %}
+          {% if use_apo_layers %}
+            <div
+              id='apoImageRoot'
+              class='aspect-square bg-white rounded-lg overflow-hidden mb-6 relative apo-loading'
+              aria-busy='true'
+            >
+              <img
+                id='apoBaseImage'
+                src='{{ apo_base_image_src }}'
+                alt='{{ product.title | escape }}'
+                width='{{ product.featured_image.width | default: 2048 }}'
+                height='{{ product.featured_image.height | default: 2048 }}'
+                class='w-full h-full object-contain'
+                data-default-src='{{ apo_base_image_src }}'
+              >
+              <div id='apoOverlayContainer'></div>
+              <div class='apo-loading-veil'>
+                <div class='apo-spinner' aria-hidden='true'></div>
+              </div>
+            </div>
+          {% elsif use_complex_options %}
             <div class='aspect-square bg-white rounded-lg overflow-hidden mb-6 complex-image-canvas relative' id='complexImageRoot'>
               <img
                 id='complexBaseImage'
@@ -424,7 +572,7 @@
 
         <!-- Right Column - Product Info -->
         <div class='lg:col-span-5 mt-8 lg:mt-0'>
-          <div class='lg:sticky lg:top-24'>
+          <div class='lg:sticky lg:top-24 z-10'>
             <!-- Product Title -->
             <h1 class='text-4xl font-bold text-gray-900 mb-6'>
               {{ product.title }}
@@ -445,20 +593,24 @@
               <!-- Price -->
               <div class='mb-8'>
                 <span id='price' class='text-3xl font-bold text-gray-900'>
-                  {{- selected_variant.price | money -}}
+                  {{- kk_initial_discounted_price | money -}}
                 </span>
                 <span
                   id='comparePrice'
                   class='text-lg text-gray-500 line-through ml-2'
-                  style='display: {% if selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
+                  style='display: {% if kk_effective_initial_discount_percent > 0 or selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
                 >
-                  {{- selected_variant.compare_at_price | money -}}
+                  {% if kk_effective_initial_discount_percent > 0 %}
+                    {{- selected_variant.price | money -}}
+                  {% else %}
+                    {{- selected_variant.compare_at_price | money -}}
+                  {% endif %}
                 </span>
                 <span
                   id='saleBadge'
                   class='px-3 py-1 text-sm font-bold bg-red-500 rounded-full text-white ml-4'
-                  style='display: {% if selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
-                  >Sale</span
+                  style='display: {% if kk_effective_initial_discount_percent > 0 or selected_variant.compare_at_price > selected_variant.price %}inline-block{% else %}none{% endif %};'
+                  >{% if kk_effective_initial_discount_percent > 0 %}Save {{ kk_effective_initial_discount_percent }}%{% else %}Sale{% endif %}</span
                 >
                 <div id='availability' class='mt-1 text-sm text-gray-600'></div>
               </div>
@@ -603,6 +755,10 @@
                             {% if forloop.first %}
                               {% assign is_selected = true %}
                             {% endif %}
+                          {% elsif kk_force_first_option_defaults %}
+                            {% if forloop.first %}
+                              {% assign is_selected = true %}
+                            {% endif %}
                           {% elsif option.selected_value == value %}
                             {% unless use_complex_options %}
                               {% assign is_selected = true %}
@@ -743,6 +899,10 @@
                             {% if forloop.first %}
                               {% assign is_selected = true %}
                             {% endif %}
+                          {% elsif kk_force_first_option_defaults %}
+                            {% if forloop.first %}
+                              {% assign is_selected = true %}
+                            {% endif %}
                           {% elsif option.selected_value == value %}
                             {% unless use_complex_options %}
                               {% assign is_selected = true %}
@@ -827,6 +987,10 @@
                         {% for value in option.values %}
                           {% assign is_selected = false %}
                           {% if is_complex_primary %}
+                            {% if forloop.first %}
+                              {% assign is_selected = true %}
+                            {% endif %}
+                          {% elsif kk_force_first_option_defaults %}
                             {% if forloop.first %}
                               {% assign is_selected = true %}
                             {% endif %}
@@ -1095,7 +1259,7 @@
             id='stickyPrice'
             class='text-sm md:text-lg font-bold text-black'
           >
-            {{- selected_variant.price | money -}}
+            {{- kk_initial_discounted_price | money -}}
           </span>
         {% endif %}
       </div>
@@ -1172,6 +1336,7 @@
                     and field.type != "file_reference"
                     and field.type != "list.file_reference"
                     and key != "product_status"
+                    and key != "permanent_name"
                   %}
                     {% assign label = key
                       | replace: "_", " "
@@ -1199,8 +1364,6 @@
   {% if has_design_images %}
     <section id='design' class='py-16'>
       <div class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-        <h2 class='text-3xl font-bold text-gray-900 mb-8'>Design</h2>
-
         <div class='grid grid-cols-1 lg:grid-cols-2 gap-6'>
           {% for pair in custom_fields %}
             {% assign key = pair[0] %}
@@ -1514,8 +1677,8 @@
             const productSlide = `
               <swiper-slide style="height: 100%;">
                 <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 h-full flex flex-col">
-                  <div class="aspect-square bg-gray-50 rounded-t-lg overflow-hidden flex-shrink-0">
-                  <a href="${product.url}" class="aspect-square hover:cursor-pointer bg-gray-50 rounded-t-lg overflow-hidden flex-shrink-0 block">
+                  <div class="aspect-square bg-white rounded-t-lg overflow-hidden flex-shrink-0">
+                  <a href="${product.url}" class="aspect-square hover:cursor-pointer bg-white rounded-t-lg overflow-hidden flex-shrink-0 block">
                     <img
                       src="${displayImage}"
                       alt="${displayTitle}"
@@ -1886,12 +2049,30 @@
           }
           const first = this.variants.find(v => v.available) || this.variants[0]
           this.selectedVariantId = first ? first.id : null
-          this.sel1 = first ? first.option1 : null
-          this.sel2 = first ? first.option2 : null
+
+          // If there are multiple selectors, default each one to its first value.
+          // For option 2, prefer the first value that forms a valid combination
+          // with the selected option 1 value.
+          const option1Values = this.uniqueOptionValues(1)
+          const option2Values = this.uniqueOptionValues(2)
+          this.sel1 = option1Values.length
+            ? option1Values[0]
+            : first
+              ? first.option1
+              : null
+          this.sel2 = option2Values.length
+            ? option2Values[0]
+            : first
+              ? first.option2
+              : null
+
+          this.updateSelectedVariant()
+          const selected =
+            this.variants.find(v => v.id === this.selectedVariantId) || first
           this.image =
-            (first &&
-              first.featured_image &&
-              (first.featured_image.src || first.featured_image)) ||
+            (selected &&
+              selected.featured_image &&
+              (selected.featured_image.src || selected.featured_image)) ||
             data.featured_image ||
             (data.images && data.images[0]) ||
             null
@@ -2105,6 +2286,117 @@
       {% endif %}
     {% endfor %}
   };
+  window.__categoryDiscountBasePercent = {{ kk_base_discount_percent | default: 0 | json }};
+  window.__categoryDiscountPercent = {{ kk_effective_initial_discount_percent | default: 0 | json }};
+  window.__discountCollectionOriginsRaw = {{ kk_discount_collection_origins_raw | json }};
+  window.__formattedDiscountedPrices = {
+    {% for variant in product.variants %}
+      {% assign kk_variant_discounted_price = variant.price %}
+      {% if kk_base_discount_percent > 0 %}
+        {% assign kk_variant_discounted_price = variant.price
+          | times: kk_discount_multiplier
+          | round
+        %}
+      {% endif %}
+      {{ variant.id }}: "{{ kk_variant_discounted_price | money }}"{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  };
+  window.__resolveCategoryDiscountPercent = function () {
+    const basePercent = Number(window.__categoryDiscountBasePercent || 0);
+    if (basePercent <= 0) return 0;
+
+    const normalizePath = value =>
+      String(value || '')
+        .toLowerCase()
+        .trim()
+        .replace(/^\/+/, '')
+        .replace(/\/+$/, '');
+
+    const rawOrigins = String(window.__discountCollectionOriginsRaw || '');
+    const origins = rawOrigins
+      .split(',')
+      .map(normalizePath)
+      .filter(Boolean);
+
+    if (!origins.length) return basePercent;
+
+    const escapeRegex = value =>
+      String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const wildcardToRegex = pattern => {
+      const normalized = normalizePath(pattern);
+      const parts = normalized.split('*').map(escapeRegex);
+      return new RegExp(`^${parts.join('.*')}$`);
+    };
+    const matchesOrigin = pathValue => {
+      const path = normalizePath(pathValue);
+      if (!path) return false;
+      return origins.some(origin => {
+        if (!origin) return false;
+        if (origin.includes('*')) {
+          return wildcardToRegex(origin).test(path);
+        }
+        return path === origin || path.startsWith(`${origin}/`);
+      });
+    };
+
+    let referrerPath = '';
+    try {
+      if (document.referrer) {
+        referrerPath = normalizePath(
+          new URL(document.referrer, window.location.origin).pathname
+        );
+      }
+    } catch (e) {
+      referrerPath = '';
+    }
+
+    let isMatch = false;
+    if (referrerPath) {
+      isMatch = matchesOrigin(referrerPath);
+    }
+    if (!isMatch) {
+      try {
+        const tokenRaw = sessionStorage.getItem('kk_collection_origin_token')
+        if (tokenRaw) {
+          const token = JSON.parse(tokenRaw)
+          const tokenPath = token && token.path ? token.path : ''
+          const tokenTs = Number(token && token.ts ? token.ts : 0)
+          const isFresh = tokenTs > 0 && Date.now() - tokenTs <= 10 * 60 * 1000
+          if (isFresh) {
+            isMatch = matchesOrigin(tokenPath)
+          }
+        }
+      } catch (e) {
+        /* ignore */
+      } finally {
+        try {
+          // One-time token: remove after evaluation so it does not linger.
+          sessionStorage.removeItem('kk_collection_origin_token')
+        } catch (e) {
+          /* ignore */
+        }
+      }
+    }
+
+    if (isMatch) return basePercent;
+    return 0;
+  };
+  window.__categoryDiscountPercent = window.__resolveCategoryDiscountPercent();
+  (function () {
+    try {
+      const p = Number(window.__categoryDiscountPercent || 0);
+      sessionStorage.setItem('kk_gated_cart_discount', p > 0 ? '1' : '0');
+    } catch (e) {
+      /* ignore */
+    }
+  })();
+  window.addEventListener('pagehide', () => {
+    try {
+      sessionStorage.removeItem('kk_collection_origin_token');
+    } catch (e) {
+      /* ignore */
+    }
+  });
 </script>
 
 {% if use_complex_options %}
@@ -2222,6 +2514,7 @@
         const key = variantKeyFromOptionsArray(v.options);
         variantsMap[key] = v;
       });
+      const forceFirstOptionDefaults = {{ kk_force_first_option_defaults | json }};
 
       // Initial selected options: read from selected_or_first_available_variant if present
       const initialVariant = (product.selected_or_first_available_variant) ? product.selected_or_first_available_variant : (variants[0] || null);
@@ -2230,6 +2523,17 @@
         if (initialVariant.option1 !== undefined) initialOptions.push(initialVariant.option1);
         if (initialVariant.option2 !== undefined) initialOptions.push(initialVariant.option2);
         if (initialVariant.option3 !== undefined) initialOptions.push(initialVariant.option3);
+      }
+
+      if (forceFirstOptionDefaults && !useComplexOptions) {
+        initialOptions.length = 0;
+        const optionsWithValues = Array.isArray(product.options_with_values)
+          ? product.options_with_values
+          : [];
+        optionsWithValues.forEach(option => {
+          const values = Array.isArray(option && option.values) ? option.values : [];
+          initialOptions.push(values.length ? values[0] : '');
+        });
       }
 
       if (useComplexOptions && initialOptions.length) {
@@ -2356,21 +2660,39 @@
                 (normalized[0] ||
                   complexConfig.defaultPrimaryValue ||
                   '') + '';
+              const primaryMatches = variants.filter(v => {
+                return (
+                  (v.options &&
+                    v.options[0] &&
+                    v.options[0].toString().trim()) === desiredPrimary.trim()
+                );
+              });
+
+              // Prefer variant that matches primary + any other selected options
               variant =
-                variants.find(v => {
-                  return (
-                    (v.options &&
-                      v.options[0] &&
-                      v.options[0].toString().trim()) === desiredPrimary.trim()
-                  );
+                primaryMatches.find(v => {
+                  for (let i = 1; i < normalized.length; i++) {
+                    if (
+                      normalized[i] &&
+                      (v.options[i] || '').toString().trim() !== normalized[i].toString().trim()
+                    ) {
+                      return false;
+                    }
+                  }
+                  return true;
                 }) ||
+                primaryMatches.find(v => v.available) ||
+                primaryMatches[0] ||
                 variants.find(v => v.available) ||
                 variants[0] ||
                 null;
+
               if (variant) {
                 normalized[0] = variant.options[0];
                 for (let i = 1; i < optionCount; i++) {
-                  normalized[i] = variant.options[i];
+                  if (!normalized[i]) {
+                    normalized[i] = variant.options[i];
+                  }
                 }
               }
             } else {
@@ -2489,6 +2811,10 @@
             const compareEl = document.getElementById('comparePrice');
             const saleEl = document.getElementById('saleBadge');
             const stickyPriceEl = document.getElementById('stickyPrice');
+            const categoryDiscountPercent = Number(
+              window.__categoryDiscountPercent || 0
+            );
+            const hasCategoryDiscount = categoryDiscountPercent > 0;
 
              // Use Shopify's pre-formatted prices
              function formatMoney(cents) {
@@ -2512,16 +2838,41 @@
                // Fallback to basic formatting
                return (cents / 100).toFixed(2);
              }
+             function formatDiscountedPrice(variantObj) {
+               if (!variantObj) return '';
+               if (
+                 window.__formattedDiscountedPrices &&
+                 window.__formattedDiscountedPrices[variantObj.id]
+               ) {
+                 return window.__formattedDiscountedPrices[variantObj.id];
+               }
+               const discounted = Math.round(
+                 Number(variantObj.price || 0) * ((100 - categoryDiscountPercent) / 100)
+               );
+               return formatMoney(discounted);
+             }
 
-            const formattedPrice = formatMoney(variant.price);
+            const formattedPrice = hasCategoryDiscount
+              ? formatDiscountedPrice(variant)
+              : formatMoney(variant.price);
             if (priceEl) priceEl.innerText = formattedPrice;
             if (stickyPriceEl) stickyPriceEl.innerText = formattedPrice;
 
             if (compareEl) {
-              if (variant.compare_at_price && Number(variant.compare_at_price) > Number(variant.price)) {
+              if (hasCategoryDiscount) {
+                compareEl.style.display = 'inline-block';
+                compareEl.innerText = formatMoney(variant.price);
+                if (saleEl) {
+                  saleEl.style.display = 'inline-block';
+                  saleEl.innerText = `Save ${categoryDiscountPercent}%`;
+                }
+              } else if (variant.compare_at_price && Number(variant.compare_at_price) > Number(variant.price)) {
                 compareEl.style.display = 'inline-block';
                 compareEl.innerText = formatComparePrice(variant.compare_at_price);
-                if (saleEl) saleEl.style.display = 'inline-block';
+                if (saleEl) {
+                  saleEl.style.display = 'inline-block';
+                  saleEl.innerText = 'Sale';
+                }
               } else {
                 if (compareEl) compareEl.style.display = 'none';
                 if (saleEl) saleEl.style.display = 'none';
@@ -2652,6 +3003,7 @@
               this.updateComplexLayerElement(optionIndex, assetUrl);
               this.setComplexLayerButtonState(optionIndex, optionValue, true);
             }
+            this.updateSelectedVariantByOptions(this.selectedOptions);
           },
 
           handleComplexPrimarySelection(value, assetUrl) {
@@ -3580,6 +3932,16 @@
   </script>
 {% endif %}
 
+{% if use_apo_layers %}
+  {%- comment -%}
+    APO layered preview bootstrap + live updates.
+    All logic (firstPaint, settle, preload, reveal, per-click layer painting)
+    lives in snippets/ms_apo_helper.liquid so the snippet is the single source
+    of truth for APO option/value resolution and layer painting.
+  {%- endcomment -%}
+  {% render 'ms_apo_helper' %}
+{% endif %}
+
 {% schema %}
 {
   "name": "Product",
@@ -3609,6 +3971,22 @@
     {
       "type": "header",
       "content": "Product Settings"
+    },
+    {
+      "type": "text",
+      "id": "discount_collection_origins",
+      "label": "Discount collection origins",
+      "info": "Comma-separated paths. Example: collections/eastmans-offer, collections/special-deals"
+    },
+    {
+      "type": "range",
+      "id": "discount_percent",
+      "label": "Discount percent for collection origins",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 15,
+      "unit": "%"
     },
     {
       "type": "text",
@@ -3679,6 +4057,28 @@
       "type": "checkout_buttons",
       "name": "Checkout Buttons",
       "limit": 1
+    },
+    {
+      "type": "category_discount",
+      "name": "Category Discount Rule",
+      "settings": [
+        {
+          "type": "text",
+          "id": "categories",
+          "label": "Categories (product types)",
+          "info": "Comma-separated product types to match exactly, e.g. Knives, Apparel"
+        },
+        {
+          "type": "range",
+          "id": "discount_percent",
+          "label": "Discount percent",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 15,
+          "unit": "%"
+        }
+      ]
     },
     {
       "type": "review",

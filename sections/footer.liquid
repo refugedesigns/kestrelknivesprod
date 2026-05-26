@@ -14,6 +14,25 @@
       }
     }
 
+  /* Klaviyo footer forms — field spacing */
+  .klaviyo-form-WFPv59 form,
+  .klaviyo-form-WFPv59 > div,
+  .klaviyo-form-Viz953 form,
+  .klaviyo-form-Viz953 > div {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.75rem !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  @media (min-width: 768px) {
+    .klaviyo-form-WFPv59 form,
+    .klaviyo-form-WFPv59 > div {
+      gap: 1rem !important;
+      justify-content: flex-start !important;
+    }
+  }
 
   .klaviyo-form-WFPv59:focus,
   .klaviyo-form-WFPv59 input:focus,
@@ -33,19 +52,19 @@
 </style>
 
 <footer
-  class='py-4'
+  class='py-8 md:py-10'
   style='background-color: {{ section.settings.footer_bg_color | default: "#000000" }};'
 >
-  <div class='mx-auto px-4 max-w-9xl'>
-    <div class='grid grid-cols-1 lg:grid-cols-4 md:mb-4'>
+  <div class='mx-auto px-6 md:px-8 lg:px-10 max-w-9xl'>
+    <div class='grid grid-cols-1 lg:grid-cols-4 gap-y-10 gap-x-6 lg:gap-x-10 xl:gap-x-14 lg:items-start md:mb-6'>
       <!-- Left Column - Logo -->
-      <div class='flex flex-col md:flex-row items-center mb-4 lg:mb-0 justify-center lg:col-span-1'>
+      <div class='flex flex-col md:flex-row items-center mb-4 lg:mb-0 justify-center lg:col-span-1 lg:pr-4'>
         {% assign footer_logo_image = section.settings.logo_image %}
         {% if footer_logo_image == blank and shop.brand_asset_default_logo %}
           {% assign footer_logo_image = shop.brand_asset_default_logo %}
         {% endif %}
         {% if footer_logo_image != blank %}
-          <a href='{{ routes.root_url }}' class='flex items-center mb-4'>
+          <a href='{{ routes.root_url }}' class='flex items-center mb-4 lg:mb-0'>
             <img
               src='{{ footer_logo_image | image_url: width: 400 }}'
               style='height: {{ section.settings.logo_height_mobile | default: 40 }}px;'
@@ -54,7 +73,7 @@
             >
           </a>
         {% else %}
-          <a href='{{ routes.root_url }}' class='flex items-center mb-4'>
+          <a href='{{ routes.root_url }}' class='flex items-center mb-4 lg:mb-0'>
             <img
               src='{{ "logo_white.png" | asset_url }}'
               style='height: {{ section.settings.logo_height_mobile | default: 40 }}px;'
@@ -65,10 +84,10 @@
         {% endif %}
       </div>
       <!-- Middle Column - Newsletter Signup -->
-      <div class='flex  flex-col w-full items-center justify-center lg:col-span-2'>
+      <div class='flex flex-col w-full items-center justify-center lg:col-span-2 lg:px-4'>
         <!-- Email Signup Section -->
         <div
-          class='mb-6 lg:mb-0 relative flex flex-col justify-center items-center lg:space-y-4 px-10 md:px-0 w-full md:w-max'
+          class='mb-6 lg:mb-0 relative flex flex-col justify-center items-center lg:space-y-6 px-10 md:px-0 w-full max-w-2xl lg:max-w-none mx-auto'
         >
           <!-- Klaviyo form desktop -->
           <div class='klaviyo-form-WFPv59 hidden md:block w-full'></div>
@@ -77,9 +96,17 @@
           <div class='klaviyo-form-Viz953 md:hidden w-full'></div>
 
           <!-- Navigation Links -->
-          <div class='flex flex-col w-full mt-10 lg:mt-0 md:px-4 xl:whitespace-nowrap'>
-            <nav class='space-y-2 flex flex-col items-center md:flex-row md:space-y-0 md:space-x-4 lg:space-x-6'>
-              <a
+          <div class='flex flex-col w-full mt-10 lg:mt-8 md:px-2 lg:pr-8 xl:whitespace-nowrap'>
+            <nav class='space-y-2 flex flex-col items-center md:flex-row md:flex-wrap md:justify-center md:gap-x-4 md:gap-y-2 lg:gap-x-5 xl:gap-x-6'>
+            <a
+                href='{{ section.settings.gear_testing_program_url | default: "/pages/gear-testing-program" }}'
+                class='block text-sm hover:opacity-80 transition-colors duration-200 font-medium uppercase tracking-wide'
+                style='color: {{ section.settings.link_color | default: "#ffffff" }};'
+              >
+                GEAR TESTING PROGRAM
+              </a>
+              <div class='hidden md:block w-px h-full bg-white'></div>
+            <a
                 href='{{ section.settings.guide_url | default: "/pages/guide-outfitter" }}'
                 class='block text-sm hover:opacity-80 transition-colors duration-200 font-medium uppercase tracking-wide'
                 style='color: {{ section.settings.link_color | default: "#ffffff" }};'
@@ -124,7 +151,7 @@
       </div>
 
       <!-- American Flag Column -->
-      <div class='lg:col-span-1 w-full mt-10 lg:mt-0 space-y-4 flex flex-col items-center justify-center lg:ml-8'>
+      <div class='lg:col-span-1 w-full mt-10 lg:mt-0 space-y-6 flex flex-col items-center justify-center lg:pl-6 xl:pl-8'>
         <div class='flex flex-col items-center justify-center w-max'>
           <div class='w-28 h-auto mb-1'>
             <img
@@ -141,7 +168,7 @@
         </div>
 
         <!-- Social Media Icons -->
-        <div class='flex justify-center md:justify-end items-center gap-6 mb-12 md:mb-0 md:order-2'>
+        <div class='flex justify-center md:justify-end items-center gap-5 md:gap-6 mb-12 md:mb-0 md:order-2 lg:mt-2'>
           <!-- Twitter -->
           <a
             target='_blank'
@@ -205,7 +232,7 @@
       </div>
     </div>
   </div>
-  <div class='flex items-center justify-center gap-2 uppercase'>
+  <div class='flex items-center justify-center gap-2 uppercase mt-8 md:mt-10 pt-6 border-t border-white/20 px-6'>
     <div>
       <p class='text-center text-white tracking-wide text-sm'>
         &copy; {{ "now" | date: "%Y" }} Kestrel Knives
@@ -301,6 +328,11 @@
       "id": "link_color",
       "label": "Link Color",
       "default": "#ffffff"
+    },
+    {
+      "type": "url",
+      "id": "gear_testing_program_url",
+      "label": "Gear Testing Program URL"
     },
     {
       "type": "url",
