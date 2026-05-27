@@ -26,108 +26,14 @@
         overflow: visible;
       }
 
-      .countdown-banner__inner {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        padding-block: 0.5rem;
-        text-align: center;
-      }
-
-      .countdown-banner__content {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: center;
-        gap: 0.375rem 0.75rem;
-        width: 100%;
-        min-width: 0;
-      }
-
-      .countdown-banner__timer {
-        flex-shrink: 0;
-        font-variant-numeric: tabular-nums;
-        white-space: nowrap;
-      }
-
-      .countdown-banner__title {
-        min-width: 0;
-        line-height: 1.25;
-      }
-
-      .countdown-banner__action {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        max-width: 100%;
-        flex-shrink: 0;
-      }
-
-      .countdown-banner__button {
-        display: inline-block;
-        max-width: 100%;
-        text-align: center;
-        line-height: 1.25;
-        white-space: normal;
-        word-break: break-word;
-      }
-
-      @media (min-width: 640px) and (max-width: 1023px) {
-        .countdown-banner__inner {
-          flex-direction: row;
-          flex-wrap: wrap;
-          justify-content: center;
-          gap: 0.75rem 1rem;
-        }
-
-        .countdown-banner__content {
-          width: auto;
-          flex-wrap: nowrap;
-        }
-
+      @media (max-width: 639px) {
         .countdown-banner__title {
-          white-space: nowrap;
-        }
-
-        .countdown-banner__action {
-          width: auto;
+          line-height: 1.25;
         }
 
         .countdown-banner__button {
-          white-space: nowrap;
-        }
-      }
-
-      @media (min-width: 1024px) {
-        .countdown-banner__inner {
-          display: grid;
-          grid-template-columns: 1fr auto 1fr;
-          align-items: center;
-          column-gap: 1.5rem;
-          padding-block: 0.5rem;
-        }
-
-        .countdown-banner__content {
-          grid-column: 2;
-          justify-self: center;
-          width: auto;
-          flex-wrap: nowrap;
-        }
-
-        .countdown-banner__title {
-          white-space: nowrap;
-        }
-
-        .countdown-banner__action {
-          grid-column: 3;
-          justify-self: end;
-          width: auto;
-        }
-
-        .countdown-banner__button {
-          white-space: nowrap;
+          white-space: normal;
+          word-break: break-word;
         }
       }
     </style>
@@ -136,21 +42,18 @@
       class='fixed top-0 left-0 right-0 z-30 transition-transform duration-300'
       style='background-color: {{ section.settings.countdown_bg_color | default: "#000000" }};'
     >
-      <div class='mx-auto px-2 sm:px-4 lg:px-6 max-w-8xl'>
-        <div class='countdown-banner__inner'>
+      <div class='mx-auto px-2 sm:px-4 max-w-8xl'>
+        <div class='flex flex-col sm:flex-row items-center justify-center py-2 gap-2 sm:gap-4 text-center'>
           <div
-            class='countdown-banner__content'
+            class='flex items-center justify-center flex-wrap gap-x-2 gap-y-1 w-full sm:w-auto sm:flex-nowrap text-[11px] sm:text-sm font-medium tabular-nums'
             style='color: {{ section.settings.countdown_text_color | default: "#ffffff" }};'
           >
             {% if section.settings.countdown_show_timer != false %}
-              <span
-                class='countdown-banner__timer text-[11px] sm:text-sm font-medium'
-                x-text='formattedTime'
-              ></span>
+              <span class='shrink-0 whitespace-nowrap' x-text='formattedTime'></span>
             {% endif %}
             {% if section.settings.countdown_title != blank %}
               <span
-                class='countdown-banner__title text-[11px] sm:text-sm font-bold'
+                class='countdown-banner__title font-bold sm:whitespace-nowrap'
                 style='color: {{ section.settings.countdown_text_color | default: "#ffffff" }};'
               >
                 {{ section.settings.countdown_title }}
@@ -160,26 +63,22 @@
           {% if section.settings.notify_button_action == "link"
             and section.settings.notify_button_link != blank
           %}
-            <div class='countdown-banner__action'>
-              <a
-                href='{{ section.settings.notify_button_link }}'
-                class='countdown-banner__button px-3 sm:px-4 py-1 sm:py-1.5 text-[11px] sm:text-sm font-medium transition-colors hover:opacity-90 no-underline'
-                style='background-color: {{ section.settings.notify_button_bg_color | default: "#ea580c" }}; color: {{ section.settings.notify_button_text_color | default: "#ffffff" }};'
-              >
-                {{ section.settings.notify_button_text | default: "NOTIFY ME" }}
-              </a>
-            </div>
+            <a
+              href='{{ section.settings.notify_button_link }}'
+              class='countdown-banner__button shrink-0 px-3 sm:px-4 py-1 sm:py-1.5 text-[11px] sm:text-sm font-medium whitespace-nowrap transition-colors hover:opacity-90 inline-block text-center no-underline'
+              style='background-color: {{ section.settings.notify_button_bg_color | default: "#ea580c" }}; color: {{ section.settings.notify_button_text_color | default: "#ffffff" }};'
+            >
+              {{ section.settings.notify_button_text | default: "NOTIFY ME" }}
+            </a>
           {% else %}
-            <div class='countdown-banner__action'>
-              <button
-                type='button'
-                onclick='openCountdownDrawer()'
-                class='countdown-banner__button px-3 sm:px-4 py-1 sm:py-1.5 text-[11px] sm:text-sm font-medium transition-colors hover:opacity-90'
-                style='background-color: {{ section.settings.notify_button_bg_color | default: "#ea580c" }}; color: {{ section.settings.notify_button_text_color | default: "#ffffff" }};'
-              >
-                {{ section.settings.notify_button_text | default: "NOTIFY ME" }}
-              </button>
-            </div>
+            <button
+              type='button'
+              onclick='openCountdownDrawer()'
+              class='countdown-banner__button shrink-0 px-3 sm:px-4 py-1 sm:py-1.5 text-[11px] sm:text-sm font-medium whitespace-nowrap transition-colors hover:opacity-90'
+              style='background-color: {{ section.settings.notify_button_bg_color | default: "#ea580c" }}; color: {{ section.settings.notify_button_text_color | default: "#ffffff" }};'
+            >
+              {{ section.settings.notify_button_text | default: "NOTIFY ME" }}
+            </button>
           {% endif %}
         </div>
       </div>
