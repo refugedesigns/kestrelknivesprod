@@ -1,0 +1,573 @@
+{%- comment -%}
+  APO helper — logs the currently-selected APO option/value and paints layered
+  image assets into #apoOverlayContainer.
+
+  Handles four things:
+    1. Initial paint (firstPaint) — once APO has hydrated, reads the
+       currently-enabled value for each option and paints its layer, but
+       ONLY for the options listed in `initialPaintOptions` (others are
+       resolved + logged but not painted).
+    2. User-interaction tracking — a click on any `.mw-option__value`
+       marks that option as "touched"; layers for touched options paint
+       on subsequent selections and are removed on unselect.
+    3. Live updates — re-paints layers whenever APO fires
+       `applyAttributeStateToHtml::price`.
+    4. Loading UX — removes the `apo-loading` class from #apoImageRoot to
+       hide the spinner veil once the first paint is done.
+
+  Asset naming convention (must exist in /assets):
+      apo_<option-tokenized>_<value-tokenized>.png
+  Example: option "Handle Color" + value "Orange" -> apo_handle_color_orange.png
+{%- endcomment -%}
+
+{%- assign _apo_helper_probe = 'apo_probe.png' | asset_url -%}
+{%- assign _apo_helper_base = _apo_helper_probe | split: '?' | first | split: 'apo_probe.png' | first -%}
+{%- assign _apo_helper_ver = '' -%}
+{%- if _apo_helper_probe contains '?v=' -%}
+  {%- assign _apo_helper_ver = _apo_helper_probe | split: '?v=' | last -%}
+{%- endif -%}
+
+<script>
+  window.__msApoHelperConfig = window.__msApoHelperConfig || {
+    assetBase: {{ _apo_helper_base | json }},
+    assetVer: {{ _apo_helper_ver | json }},
+    rootSelector: '#apoImageRoot',
+    baseImageSelector: '#apoBaseImage',
+    overlaySelector: '#apoOverlayContainer',
+    loadingClass: 'apo-loading',
+    initialPaintOptions: ['Handle Color', 'Blade Color'],
+    // When true, fades out #apoBaseImage after firstPaint completes so the
+    // displayed image reflects ONLY the painted layers (prevents the product's
+    // featured-image colors from bleeding through gaps in the overlays).
+    hideBaseAfterFirstPaint: true,
+    settleMs: 250,
+    bootstrapTimeoutMs: 6500,
+    firstPaintTimeoutMs: 4000
+  };
+
+function mwApoCustom() {
+
+    const LOG = '[ms_apo_helper]';
+    const cfg = window.__msApoHelperConfig;
+    const initialPaintLower = (cfg.initialPaintOptions || [])
+      .map(function (n) { return String(n || '').toLowerCase().trim(); })
+      .filter(Boolean);
+    const userTouchedOptions = new Set();
+    // Optional options (Sheath, Screws): first click on the active default
+    // makes APO toggle off before our callback — paint immediately and
+    // restore once in syncUnselectedLayers so the layer stays visible.
+    const optionalFirstClickKeep = Object.create(null);
+    window.__msApoHelperDebug = {
+      cfg: cfg,
+      initialPaintLower: initialPaintLower,
+      userTouchedOptions: userTouchedOptions,
+      optionalFirstClickKeep: optionalFirstClickKeep
+    };
+
+    function tokenize(s) {
+      return String(s || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[\s\-\/.]+/g, '_')
+        .replace(/_+/g, '_')
+        .replace(/^_+|_+$/g, '');
+    }
+
+    function buildLayerAssetUrl(optionName, valueName) {
+      if (!cfg.assetBase || !optionName || !valueName) return '';
+      const ver = cfg.assetVer ? ('?v=' + cfg.assetVer) : '';
+      return cfg.assetBase + 'apo_' + tokenize(optionName) + '_' + tokenize(valueName) + '.png' + ver;
+    }
+
+    function getOverlayContainer() {
+      return document.querySelector(cfg.overlaySelector);
+    }
+
+    function reveal() {
+      const root = document.querySelector(cfg.rootSelector);
+      if (!root) return;
+      root.classList.remove(cfg.loadingClass);
+      root.setAttribute('aria-busy', 'false');
+    }
+
+    function setBaseImageVisible(visible) {
+      const base = document.querySelector(cfg.baseImageSelector || '#apoBaseImage');
+      if (!base) return;
+      base.style.opacity = visible ? '1' : '0';
+      console.log(LOG, 'setBaseImageVisible', { visible });
+    }
+
+    function isInitialPaintOption(optionName) {
+      if (!optionName) return false;
+      return initialPaintLower.indexOf(String(optionName).toLowerCase().trim()) !== -1;
+    }
+
+    function shouldPaintOption(optionName) {
+      if (!optionName) return false;
+      return isInitialPaintOption(optionName)
+        || userTouchedOptions.has(String(optionName).toLowerCase().trim());
+    }
+
+    function snapshotContainer(container) {
+      return Array.from(container.querySelectorAll('img[data-apo-layer]')).map(function (el) {
+        return {
+          label: el.dataset.apoLayer,
+          value: el.dataset.apoValue || '',
+          z: el.style.zIndex,
+          src: el.src
+        };
+      });
+    }
+
+    // Resolve stable layer order from APO sort_order (1–4 only).
+    // Values stay inside #apoImageRoot (isolation: isolate) so they never
+    // compete with the fixed site header (z-40).
+    function getOptionZIndex(optionName) {
+      if (typeof mwApoInit === 'undefined' || typeof mwApoInit.response === 'undefined') return 1;
+      const responses = mwApoInit.response || {};
+      const target = String(optionName || '').toLowerCase().trim();
+      for (const productData of Object.values(responses)) {
+        if (!productData || !productData.options) continue;
+        for (const optionMeta of Object.values(productData.options)) {
+          const name = (optionMeta && (optionMeta.title || optionMeta.name)) || '';
+          if (name.toLowerCase().trim() !== target) continue;
+          const sort = Number(optionMeta.sort_order || 0);
+          if (sort > 0) return sort;
+          return 1;
+        }
+      }
+      return 1;
+    }
+
+    function paintLayer(optionName, valueName) {
+      const container = getOverlayContainer();
+      if (!container) return;
+
+      const labelKey = tokenize(optionName);
+      const selector = '[data-apo-layer="' + labelKey + '"]';
+      const existing = container.querySelectorAll(selector);
+
+      // Pre-compute the target URL so we can no-op when nothing changes.
+      const url = valueName ? buildLayerAssetUrl(optionName, valueName) : '';
+
+      // No-op guard: same option, same value/url already painted.
+      // Prevents an unnecessary remove + re-append cycle when the user
+      // clicks the swatch that's already active (a common case for the
+      // whitelisted Handle Color / Blade Color options).
+      if (existing.length === 1 && url) {
+        const currentVal = existing[0].dataset.apoValue || '';
+        if (currentVal === valueName) {
+          console.log(LOG, 'paintLayer: no-op (already painted with same value)', {
+            optionName,
+            valueName,
+            url
+          });
+          return;
+        }
+      }
+
+      if (existing.length > 0) {
+        console.log(LOG, 'paintLayer: removing existing layer(s) for option', {
+          optionName,
+          labelKey,
+          count: existing.length,
+          srcs: Array.from(existing).map(function (el) { return el.src; })
+        });
+        existing.forEach(function (el) { el.remove(); });
+      }
+
+      if (!valueName) {
+        console.log(LOG, 'paintLayer: unselect path (no value provided)', {
+          optionName,
+          containerAfter: snapshotContainer(container)
+        });
+        return;
+      }
+
+      if (!url) {
+        console.warn(LOG, 'paintLayer: no URL built; existing layer was removed but no replacement appended', { optionName, valueName });
+        return;
+      }
+
+      const z = getOptionZIndex(optionName);
+      const img = document.createElement('img');
+      img.dataset.apoLayer = labelKey;
+      img.dataset.apoValue = valueName;
+      img.alt = '';
+      img.style.position = 'absolute';
+      img.style.inset = '0';
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'contain';
+      img.style.zIndex = String(z);
+      container.appendChild(img);
+
+      img.onerror = function () {
+        console.warn(LOG, 'layer image failed to load (404?)', { optionName, valueName, url });
+        img.remove();
+      };
+      img.src = url;
+      console.log(LOG, 'paintLayer: added new layer', {
+        optionName,
+        valueName,
+        zIndex: z,
+        url,
+        containerAfter: snapshotContainer(container)
+      });
+    }
+
+    // APO toggles optional defaults off on first click — restore swatch UI + state.
+    function restoreOptionalSwatchUi(optionName, valueId) {
+      const optionLower = String(optionName || '').toLowerCase().trim();
+      document.querySelectorAll('.mw-option .mw-option__value').forEach(function (el) {
+        const vid = el.getAttribute('data-value-id');
+        if (!vid) return;
+        const info = resolveSelectionByValueId(vid);
+        if (!info || info.optionName.toLowerCase().trim() !== optionLower) return;
+        const isTarget = vid === valueId;
+        el.classList.toggle('mw-option__value--selected', isTarget);
+        el.setAttribute('aria-pressed', isTarget ? 'true' : 'false');
+      });
+    }
+
+    function restoreOptionalApoState(optionName, valueId) {
+      if (typeof mwApoInit === 'undefined' || typeof mwApoInit.response === 'undefined') return;
+      const optionLower = String(optionName || '').toLowerCase().trim();
+      const responses = mwApoInit.response || {};
+      Object.values(responses).forEach(function (productData) {
+        if (!productData || !productData.options || !productData.values) return;
+        Object.values(productData.options).forEach(function (optionMeta) {
+          const name = (optionMeta.title || optionMeta.name || '').toLowerCase().trim();
+          if (name !== optionLower) return;
+          (optionMeta.values || []).forEach(function (vid) {
+            const entry = productData.values[vid];
+            if (entry) entry.enabled = vid === valueId;
+          });
+        });
+      });
+    }
+
+    function resolveSelectionByValueId(valueId) {
+      if (typeof mwApoInit === 'undefined' || typeof mwApoInit.response === 'undefined') return null;
+      const responses = mwApoInit.response || {};
+      for (const productData of Object.values(responses)) {
+        if (!productData || !productData.values) continue;
+        const entry = productData.values[valueId];
+        if (!entry) continue;
+        const optionId = entry.option_id;
+        const optionMeta = productData.options && productData.options[optionId];
+        return {
+          optionId: optionId,
+          optionName: (optionMeta && (optionMeta.title || optionMeta.name)) || '',
+          valueId: valueId,
+          valueName: (entry.value && entry.value.title) || '',
+          enabled: entry.enabled === true,
+          valueData: entry.value || null
+        };
+      }
+      return null;
+    }
+
+     function getValue(id) {
+      if (typeof mwApoInit.response !== "undefined") {
+        for (const val of Object.values(mwApoInit.response)) {
+          for (const key in val.values) {
+            if (key == id) {
+              console.log('val', val)
+              if (typeof val.values[id]) {
+                let optionId = val.values[id].option_id;
+                let optionName = val.options && val.options[optionId] ? val.options[optionId].title : '';
+                let valueData = val.values[id].value;
+                let valueName = valueData ? valueData.title : '';
+                if (shouldPaintOption(optionName)) {
+                  paintLayer(optionName, valueName);
+                } else {
+                  console.log(LOG, 'getValue: skip paint (not whitelisted, not touched)', { optionName, valueName });
+                }
+                return Object.assign({}, valueData, { option_name: optionName });
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Remove layers for options the user has touched whose current APO state
+    // is "no value enabled" (i.e. user unselected the swatch).
+    // Options in `initialPaintOptions` are treated as always-painted: their
+    // layer is never removed here, even if APO drops the selection when the
+    // user re-clicks the same swatch. Only a click on a *different* value of
+    // those options will swap the layer (via the normal paintLayer path).
+    function syncUnselectedLayers() {
+      if (typeof mwApoInit === 'undefined' || typeof mwApoInit.response === 'undefined') return;
+      const responses = mwApoInit.response || {};
+      Object.values(responses).forEach(function (productData) {
+        if (!productData || !productData.options || !productData.values) return;
+        Object.values(productData.options).forEach(function (optionMeta) {
+          const optionName = optionMeta.title || optionMeta.name || '';
+          if (!optionName) return;
+          if (isInitialPaintOption(optionName)) {
+            return;
+          }
+          const optionLower = String(optionName).toLowerCase().trim();
+          if (!userTouchedOptions.has(optionLower)) return;
+          const valueIds = optionMeta.values || [];
+          const anyEnabled = valueIds.some(function (vid) {
+            const v = productData.values[vid];
+            return v && v.enabled === true;
+          });
+          if (anyEnabled) return;
+
+          const keep = optionalFirstClickKeep[optionLower];
+          if (keep) {
+            paintLayer(keep.optionName, keep.valueName);
+            if (keep.valueId) {
+              restoreOptionalSwatchUi(keep.optionName, keep.valueId);
+              restoreOptionalApoState(keep.optionName, keep.valueId);
+            }
+            delete optionalFirstClickKeep[optionLower];
+            console.log(LOG, 'syncUnselectedLayers: restored layer + selection after first default click', keep);
+            return;
+          }
+
+          console.log(LOG, 'syncUnselectedLayers: removing layer for unselected option', { optionName });
+          paintLayer(optionName, '');
+        });
+      });
+    }
+
+    function selectedOptions() {
+        let selectedOptions = document.querySelectorAll('.mw-option .mw-option__value--selected');
+        console.log(selectedOptions)
+        selectedOptions.forEach(function (selectedOption) {
+            let id = selectedOption.getAttribute('data-value-id');       
+            let value = getValue(id);   
+
+            console.log('selectedOptions- value', value)
+        })
+        syncUnselectedLayers();
+    }
+
+    // --- User interaction tracking ------------------------------------------
+    // Capture phase (before APO): mark option touched; for optional options
+    // (Sheath, Screws) paint on first click when the swatch is already the
+    // active default — APO toggles that off on first click, so we paint early.
+    document.addEventListener('click', function (e) {
+      const target = e.target;
+      if (!target || typeof target.closest !== 'function') return;
+      const valueEl = target.closest('.mw-option__value');
+      if (!valueEl) return;
+      const valueId = valueEl.getAttribute('data-value-id');
+      if (!valueId) return;
+
+      const info = resolveSelectionByValueId(valueId);
+      if (!info || !info.optionName) return;
+
+      const lower = info.optionName.toLowerCase().trim();
+      const isFirstTouch = !userTouchedOptions.has(lower);
+      const wasSelectedInDom = valueEl.classList.contains('mw-option__value--selected');
+      const wasActiveDefault = wasSelectedInDom || info.enabled;
+
+      if (isFirstTouch) {
+        userTouchedOptions.add(lower);
+        console.log(LOG, 'user touched option', { optionName: info.optionName });
+      }
+
+      if (
+        !isInitialPaintOption(info.optionName) &&
+        isFirstTouch &&
+        wasActiveDefault &&
+        info.valueName
+      ) {
+        optionalFirstClickKeep[lower] = {
+          optionName: info.optionName,
+          valueName: info.valueName,
+          valueId: valueId
+        };
+        paintLayer(info.optionName, info.valueName);
+        console.log(LOG, 'optional first click on default — paint layer', {
+          optionName: info.optionName,
+          valueName: info.valueName
+        });
+      }
+    }, true);
+
+    // --- Initial paint -------------------------------------------------------
+    function preloadAll(urls) {
+      return Promise.all(urls.map(function (u) {
+        return new Promise(function (resolve) {
+          if (!u) return resolve({ url: u, ok: false });
+          const img = new Image();
+          img.onload = function () { resolve({ url: u, ok: true }); };
+          img.onerror = function () { resolve({ url: u, ok: false }); };
+          img.src = u;
+        });
+      }));
+    }
+
+    function pickDefaults() {
+      const responses = (window.mwApoInit && window.mwApoInit.response) || {};
+      const picks = [];
+
+      Object.values(responses).forEach(function (productData) {
+        if (!productData || !productData.options || !productData.values) return;
+
+        Object.values(productData.options).forEach(function (optionMeta) {
+          const optionName = optionMeta.title || optionMeta.name || '';
+          if (!optionName) return;
+
+          const valueIds = optionMeta.values || [];
+          let chosenValueId = valueIds.find(function (vid) {
+            const v = productData.values[vid];
+            return v && v.enabled === true;
+          });
+          if (!chosenValueId) {
+            chosenValueId = valueIds.find(function (vid) {
+              const v = productData.values[vid];
+              return v && v.value && v.value.is_default === true;
+            });
+          }
+          if (!chosenValueId) chosenValueId = valueIds[0];
+          if (!chosenValueId) return;
+
+          const entry = productData.values[chosenValueId];
+          const valueName = (entry && entry.value && entry.value.title) || '';
+          if (!valueName) return;
+
+          picks.push({
+            optionName: optionName,
+            valueName: valueName,
+            url: buildLayerAssetUrl(optionName, valueName)
+          });
+        });
+      });
+
+      return picks;
+    }
+
+    async function firstPaint() {
+      console.group(LOG, 'firstPaint()');
+      const picks = pickDefaults();
+      console.log(LOG, 'firstPaint: all resolved picks', picks);
+
+      const initialPicks = picks.filter(function (p) { return isInitialPaintOption(p.optionName); });
+      const skipped = picks.filter(function (p) { return !isInitialPaintOption(p.optionName); });
+      console.log(LOG, 'firstPaint: initial paint picks', initialPicks);
+      console.log(LOG, 'firstPaint: skipped (default known, not painted)', skipped);
+
+      if (initialPicks.length === 0) {
+        console.warn(LOG, 'firstPaint: no initial picks matched initialPaintOptions', cfg.initialPaintOptions);
+        console.groupEnd();
+        return;
+      }
+
+      const preloadResults = await preloadAll(initialPicks.map(function (p) { return p.url; }));
+      console.log(LOG, 'firstPaint: preload results',
+        preloadResults.map(function (r, i) {
+          return { label: initialPicks[i].optionName, url: r.url, ok: r.ok };
+        })
+      );
+
+      initialPicks.forEach(function (p) { paintLayer(p.optionName, p.valueName); });
+      console.groupEnd();
+    }
+
+    function whenApoSettles(cb) {
+      let done = false;
+      const startedAt = (typeof performance !== 'undefined' && performance.now)
+        ? performance.now() : Date.now();
+
+      function ready() {
+        const r = window.mwApoInit && window.mwApoInit.response;
+        if (!r) return false;
+        try { return Object.keys(r).length > 0; } catch (e) { return false; }
+      }
+
+      function finish(reason) {
+        if (done) return;
+        done = true;
+        const now = (typeof performance !== 'undefined' && performance.now)
+          ? performance.now() : Date.now();
+        console.log(LOG, 'APO settled', { reason: reason, elapsedMs: Math.round(now - startedAt) });
+        clearInterval(poll);
+        clearTimeout(safety);
+        cb();
+      }
+
+      if (ready()) { finish('immediate'); return; }
+
+      const poll = setInterval(function () {
+        if (ready()) finish('response-detected');
+      }, cfg.settleMs || 250);
+
+      const safety = setTimeout(function () {
+        finish('hard-timeout');
+      }, cfg.bootstrapTimeoutMs || 6500);
+    }
+
+    // --- APO lifecycle hooks -------------------------------------------------
+
+    window.mwApoInit  = window.mwApoInit  || {};
+    window.mwApoInit.onEvent = function (event, args) {  
+        if (event == "init::finish") {}
+    };
+  
+  
+    window.mwApoInit.onCallback = function (event, data) {
+          
+      if (event === "attachEvents::initAddToCart::clickStart") {
+          setButtonsLoading();
+        }
+
+        if (event === "onClick::validate-failed") {
+          resetButtons();
+        }
+
+        if (event === "attachEvents::initAddToCart::clickFinally") {
+          setTimeout(function () {
+            resetButtons();
+          }, 500);
+        }
+        if (event == "applyAttributeStateToHtml::price") {
+            setTimeout(function () {
+               selectedOptions();
+            }, 100);
+        }
+        return data;
+    };
+
+    // Expose a debugging helper on window so you can toggle the base image
+    // and inspect the overlay container from DevTools without re-deploying.
+    window.__msApoHelper = {
+      setBaseImageVisible: setBaseImageVisible,
+      snapshot: function () {
+        const c = getOverlayContainer();
+        return c ? snapshotContainer(c) : [];
+      },
+      cfg: cfg,
+      touched: userTouchedOptions
+    };
+
+    // --- Bootstrap -----------------------------------------------------------
+    // Wait for APO to hydrate, run firstPaint (with safety timeout), then reveal.
+    whenApoSettles(async function () {
+      try {
+        await Promise.race([
+          firstPaint(),
+          new Promise(function (r) {
+            setTimeout(function () {
+              console.warn(LOG, 'firstPaint hit timeout', cfg.firstPaintTimeoutMs);
+              r();
+            }, cfg.firstPaintTimeoutMs || 4000);
+          })
+        ]);
+      } catch (e) {
+        console.warn(LOG, 'firstPaint error', e);
+      }
+      reveal();
+      if (cfg.hideBaseAfterFirstPaint) {
+        setBaseImageVisible(false);
+      }
+    });
+}
+</script>
