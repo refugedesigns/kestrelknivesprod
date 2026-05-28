@@ -54,6 +54,8 @@ function mwApoCustom() {
   }
 
   function setButtonsLoading() {
+    debugger;
+
     console.log('setButtonsLoading setButtonsLoading - 11111111')
     getApoButtons().forEach(function (btn) {
       btn.dataset.originalText = btn.dataset.originalText || btn.textContent.trim() || "ADD TO CART";
@@ -545,6 +547,8 @@ function mwApoCustom() {
     window.mwApoInit.onCallback = function (event, data) {
           
       if (event === "attachEvents::initAddToCart::clickStart") {
+        debugger;
+
         setButtonsLoading();
       }
 
