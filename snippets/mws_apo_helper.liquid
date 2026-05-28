@@ -47,37 +47,6 @@
 
 function mwApoCustom() {
 
-  function getApoButtons() {
-    return document.querySelectorAll(
-      ".mw-apo-add-to-cart-cloned, #stickyAddToCartBtn"
-    );
-  }
-
-  function setButtonsLoading() {
-    debugger;
-
-    console.log('setButtonsLoading setButtonsLoading - 11111111')
-    getApoButtons().forEach(function (btn) {
-      btn.dataset.originalText = btn.dataset.originalText || btn.textContent.trim() || "ADD TO CART";
-      btn.innerHTML = "";
-      btn.classList.add("mw-apo-in-progress");
-      btn.disabled = true;
-      btn.setAttribute("aria-busy", "true");
-    });
-  }
-
-  function resetButtons() {
-    getApoButtons().forEach(function (btn) {
-      const text = btn.dataset.originalText || "ADD TO CART";
-
-      btn.classList.remove("mw-apo-in-progress");
-      btn.innerHTML = text;
-      btn.disabled = false;
-      btn.setAttribute("aria-busy", "false");
-    });
-  }
-
-
     const LOG = '[ms_apo_helper]';
     const cfg = window.__msApoHelperConfig;
     const initialPaintLower = (cfg.initialPaintOptions || [])
@@ -540,33 +509,17 @@ function mwApoCustom() {
 
     window.mwApoInit  = window.mwApoInit  || {};
     window.mwApoInit.onEvent = function (event, args) {  
-
-       if (event === "attachEvents::initAddToCart::clickStart") {
-         setButtonsLoading();
-        }
-
-        if (event === "onClick::validate-failed") {
-          resetButtons();
-        }
-
-        if (event === "attachEvents::initAddToCart::clickFinally") {
-          setTimeout(function () {
-            resetButtons();
-          }, 500);
-      }
-
+        if (event == "init::finish") {}
+    };
+  
+  
+    window.mwApoInit.onCallback = function (event, data) {
+        
         if (event == "applyAttributeStateToHtml::price") {
             setTimeout(function () {
                selectedOptions();
             }, 100);
         }
-
-        if (event == "init::finish") {
-        }
-    };
-  
-  
-    window.mwApoInit.onCallback = function (event, data) {
         return data;
     };
 
@@ -605,29 +558,3 @@ function mwApoCustom() {
     });
 }
 </script>
-
-<style>
-    #stickyAddToCartBtn {
-        min-width: 155px;
-    }
-  .mw-apo-in-progress {
-    position: relative;
-  }
-
-  .mw-apo-in-progress::after {
-    content: "";
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: white;
-    animation: mwApoSpin 1s ease-in-out infinite;
-  }
-
-  @keyframes mwApoSpin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-</style>
