@@ -1,4 +1,4 @@
-<script>
+{% comment %} <script>
 function mwApoCustom() {
   window.mwApoInit = window.mwApoInit || {};
 
@@ -31,6 +31,7 @@ function mwApoCustom() {
   }
 
   window.mwApoInit.onEvent = function (event, args) {
+
     if (event === "attachEvents::initAddToCart::clickStart") {
       setButtonsLoading();
     }
@@ -44,6 +45,7 @@ function mwApoCustom() {
         resetButtons();
       }, 500);
     }
+
   };
 
   window.mwApoInit.onCallback = function (event, data) {
@@ -76,4 +78,4 @@ function mwApoCustom() {
       transform: rotate(360deg);
     }
   }
-</style>
+</style> {% endcomment %}
