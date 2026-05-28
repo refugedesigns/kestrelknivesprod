@@ -540,26 +540,19 @@ function mwApoCustom() {
 
     window.mwApoInit  = window.mwApoInit  || {};
     window.mwApoInit.onEvent = function (event, args) {  
-        if (event == "init::finish") {}
-    };
-  
-  
-    window.mwApoInit.onCallback = function (event, data) {
-          
-      if (event === "attachEvents::initAddToCart::clickStart") {
-        debugger;
 
-        setButtonsLoading();
-      }
+       if (event === "attachEvents::initAddToCart::clickStart") {
+         setButtonsLoading();
+        }
 
-      if (event === "onClick::validate-failed") {
-        resetButtons();
-      }
-
-      if (event === "attachEvents::initAddToCart::clickFinally") {
-        setTimeout(function () {
+        if (event === "onClick::validate-failed") {
           resetButtons();
-        }, 500);
+        }
+
+        if (event === "attachEvents::initAddToCart::clickFinally") {
+          setTimeout(function () {
+            resetButtons();
+          }, 500);
       }
 
         if (event == "applyAttributeStateToHtml::price") {
@@ -567,6 +560,13 @@ function mwApoCustom() {
                selectedOptions();
             }, 100);
         }
+
+        if (event == "init::finish") {
+        }
+    };
+  
+  
+    window.mwApoInit.onCallback = function (event, data) {
         return data;
     };
 
