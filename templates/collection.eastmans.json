@@ -13,7 +13,7 @@
       "type": "template-collections-eastmans",
       "settings": {
         "discount_percent": 15,
-        "discount_code": "",
+        "discount_code": "EASTMANS15",
         "show_gallery": true,
         "shared_gallery_page": "",
         "gallery_link": "",
