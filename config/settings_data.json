@@ -123,6 +123,14 @@
         "type": "shopify://apps/apphero-free-gift/blocks/app-embed/775538df-2a18-473b-ada3-d731b074c1a3",
         "disabled": false,
         "settings": {}
+      },
+      "6464650315188175684": {
+        "type": "shopify://apps/dibs/blocks/lb-ordereasy-embed/7cc74442-1b61-4b87-afed-944e0def999c",
+        "disabled": false,
+        "settings": {
+          "ordereasy_custom_script": "<script></script>",
+          "disable_form_product_validation": false
+        }
       }
     }
   },
