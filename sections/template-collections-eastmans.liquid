@@ -1,4 +1,4 @@
-{% assign banner_default_heading = "Eastmans VIP's Only Access - Save 15%" %}
+{% assign banner_default_heading = "Eastmans VIP's Only Access. Save 15%" %}
 {% assign default_ratio = 1.7778 %}
 {% assign banner_image_desktop = section.settings.banner_image %}
 {% assign banner_image_tablet = section.settings.banner_image_tablet %}
@@ -66,10 +66,15 @@
   .eastmans-hero-text-wrap {
     position: relative;
     display: inline-block;
+    text-align: center;
   }
   .eastmans-banner-title {
     font-size: var(--eastmans-banner-title-size-desktop, 72px);
     line-height: 1.05;
+    text-align: center;
+  }
+  .eastmans-banner-title-breaks > span {
+    display: block;
   }
   .eastmans-hero-text-bg {
     position: absolute;
@@ -201,11 +206,12 @@
                   ></div>
                 {% endif %}
                 <div class='eastmans-hero-text-content'>
+                  {% assign banner_title_text = section.settings.banner_title | default: banner_default_heading %}
                   <h2
-                    class='eastmans-banner-title font-bold mb-0'
+                    class='eastmans-banner-title eastmans-banner-title-breaks font-bold mb-0'
                     style='--eastmans-banner-title-size-desktop: {{ section.settings.banner_title_size_desktop | default: 72 }}px; --eastmans-banner-title-size-mobile: {{ section.settings.banner_title_size_mobile | default: 40 }}px; color: {{ section.settings.banner_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.banner_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ banner_shadow_opacity }});'
                   >
-                    {{ section.settings.banner_title | default: banner_default_heading }}
+                    {{ banner_title_text }}
                   </h2>
                 </div>
               </div>
@@ -311,6 +317,56 @@
 </div>
 
 <script>
+  ;(() => {
+    const isDigit = value => /^[0-9]$/.test(value)
+    const splitBannerTitle = title => {
+      const lines = []
+      let currentLine = ''
+
+      for (let index = 0; index < title.length; index += 1) {
+        const character = title.charAt(index)
+        const previousCharacter = title.charAt(index - 1)
+        const nextCharacter = title.charAt(index + 1)
+        const isDecimalPoint =
+          character === '.' &&
+          isDigit(previousCharacter) &&
+          isDigit(nextCharacter)
+
+        if (character === '.' && !isDecimalPoint) {
+          const trimmedLine = currentLine.trim()
+          if (trimmedLine) lines.push(trimmedLine)
+          currentLine = ''
+        } else {
+          currentLine += character
+        }
+      }
+
+      const finalLine = currentLine.trim()
+      if (finalLine) lines.push(finalLine)
+
+      return lines
+    }
+
+    document
+      .querySelectorAll('.eastmans-banner-title-breaks')
+      .forEach(titleElement => {
+        const title = titleElement.textContent.trim()
+        const titleLines = splitBannerTitle(title)
+
+        if (titleLines.length <= 1) {
+          titleElement.textContent = title
+          return
+        }
+
+        titleElement.textContent = ''
+        titleLines.forEach(titleLine => {
+          const lineElement = document.createElement('span')
+          lineElement.textContent = titleLine
+          titleElement.appendChild(lineElement)
+        })
+      })
+  })()
+
   ;(() => {
     try {
       sessionStorage.setItem('kk_gated_cart_discount', '1')
@@ -684,7 +740,8 @@
       "type": "text",
       "id": "banner_title",
       "label": "Banner title",
-      "default": "Eastmans VIP's Only Access - Save 15%"
+      "info": "Use a period (.) to split the title onto multiple centered lines.",
+      "default": "Eastmans VIP's Only Access. Save 15%"
     },
     {
       "type": "range",
