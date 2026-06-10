@@ -64,7 +64,10 @@
           {% assign footer_logo_image = shop.brand_asset_default_logo %}
         {% endif %}
         {% if footer_logo_image != blank %}
-          <a href='{{ routes.root_url }}' class='flex items-center mb-4 lg:mb-0'>
+          <a
+            href='{{ routes.root_url }}'
+            class='flex items-center mb-4 lg:mb-0'
+          >
             <img
               src='{{ footer_logo_image | image_url: width: 400 }}'
               style='height: {{ section.settings.logo_height_mobile | default: 40 }}px;'
@@ -73,7 +76,10 @@
             >
           </a>
         {% else %}
-          <a href='{{ routes.root_url }}' class='flex items-center mb-4 lg:mb-0'>
+          <a
+            href='{{ routes.root_url }}'
+            class='flex items-center mb-4 lg:mb-0'
+          >
             <img
               src='{{ "logo_white.png" | asset_url }}'
               style='height: {{ section.settings.logo_height_mobile | default: 40 }}px;'
@@ -98,7 +104,7 @@
           <!-- Navigation Links -->
           <div class='flex flex-col w-full mt-10 lg:mt-8 md:px-2 lg:pr-8 xl:whitespace-nowrap'>
             <nav class='space-y-2 flex flex-col items-center md:flex-row md:flex-wrap md:justify-center md:gap-x-4 md:gap-y-2 lg:gap-x-5 xl:gap-x-6'>
-            <a
+              <a
                 href='{{ section.settings.gear_testing_program_url | default: "/pages/gear-testing-program" }}'
                 class='block text-sm hover:opacity-80 transition-colors duration-200 font-medium uppercase tracking-wide'
                 style='color: {{ section.settings.link_color | default: "#ffffff" }};'
@@ -106,7 +112,7 @@
                 GEAR TESTING PROGRAM
               </a>
               <div class='hidden md:block w-px h-full bg-white'></div>
-            <a
+              <a
                 href='{{ section.settings.guide_url | default: "/pages/guide-outfitter" }}'
                 class='block text-sm hover:opacity-80 transition-colors duration-200 font-medium uppercase tracking-wide'
                 style='color: {{ section.settings.link_color | default: "#ffffff" }};'
@@ -136,6 +142,14 @@
                 style='color: {{ section.settings.link_color | default: "#ffffff" }};'
               >
                 FAQ
+              </a>
+              <div class='hidden md:block w-px h-full bg-white'></div>
+              <a
+                href='{{ section.settings.media_url | default: "/blogs/media" }}'
+                class='block text-sm hover:opacity-80 transition-colors duration-200 font-medium uppercase tracking-wide'
+                style='color: {{ section.settings.link_color | default: "#ffffff" }};'
+              >
+                MEDIA
               </a>
               <div class='hidden md:block w-px h-full bg-white'></div>
               <a
@@ -353,6 +367,11 @@
       "type": "url",
       "id": "faq_url",
       "label": "FAQ URL"
+    },
+    {
+      "type": "url",
+      "id": "media_url",
+      "label": "Media URL"
     },
     {
       "type": "url",
