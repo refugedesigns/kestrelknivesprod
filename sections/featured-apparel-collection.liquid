@@ -1,4 +1,108 @@
-{% render 'featured-collection-grid', section: section %}
+<div class='flex flex-col items-center my-8'>
+  <h1 class='text-center text-3xl'>{{ section.settings.title }}</h1>
+
+  <div class='max-w-8xl mx-auto flex flex-col items-center w-full'>
+    <!-- Mobile Collection -->
+    <div class='block md:hidden'>
+      <div
+        class='grid w-full gap-2 md:gap-6'
+        style='grid-template-columns: repeat({{ section.settings.mobile_columns | default: 2 }}, 1fr);'
+      >
+        {% assign mobile_collection = section.settings.mobile_collection
+          | default: section.settings.featured_collection
+        %}
+        {% if mobile_collection %}
+          {% for product in mobile_collection.products
+            limit: section.settings.mobile_products_to_show
+          %}
+            {%- assign tags_lower = product.tags
+              | join: "||"
+              | downcase
+              | split: "||"
+            -%}
+            {% unless tags_lower contains "hidden_offer" %}
+              {% render "product-card-featured", product_product: product %}
+            {% endunless %}
+          {% else %}
+            {% for item in (1..4) %}
+              {% render "product-card-placeholder" %}
+            {% endfor %}
+          {% endfor %}
+        {% else %}
+          {% for item in (1..4) %}
+            {% render "product-card-placeholder" %}
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Tablet Collection -->
+    <div class='hidden md:block lg:hidden'>
+      <div
+        class='grid w-full gap-2 md:gap-6'
+        style='grid-template-columns: repeat({{ section.settings.tablet_columns | default: 2 }}, 1fr);'
+      >
+        {% assign tablet_collection = section.settings.tablet_collection
+          | default: section.settings.featured_collection
+        %}
+        {% assign tablet_limit = section.settings.tablet_products_to_show
+          | default: section.settings.number_of_products_to_show
+        %}
+        {% if tablet_collection %}
+          {% for product in tablet_collection.products limit: tablet_limit %}
+            {%- assign tags_lower = product.tags
+              | join: "||"
+              | downcase
+              | split: "||"
+            -%}
+            {% unless tags_lower contains "hidden_offer" %}
+              {% render "product-card-featured", product_product: product %}
+            {% endunless %}
+          {% else %}
+            {% for item in (1..4) %}
+              {% render "product-card-placeholder" %}
+            {% endfor %}
+          {% endfor %}
+        {% else %}
+          {% for item in (1..4) %}
+            {% render "product-card-placeholder" %}
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Desktop Collection -->
+    <div class='hidden lg:block'>
+      <div
+        class='grid w-full gap-2 md:gap-6'
+        style='grid-template-columns: repeat({{ section.settings.desktop_columns | default: 4 }}, 1fr);'
+      >
+        {% if section.settings.featured_collection %}
+          {% for product in section.settings.featured_collection.products
+            limit: section.settings.number_of_products_to_show
+          %}
+            {%- assign tags_lower = product.tags
+              | join: "||"
+              | downcase
+              | split: "||"
+            -%}
+            {% unless tags_lower contains "hidden_offer" %}
+              {% render "product-card-featured", product_product: product %}
+            {% endunless %}
+          {% else %}
+            {% for item in (1..4) %}
+              {% render "product-card-placeholder" %}
+            {% endfor %}
+          {% endfor %}
+        {% else %}
+          {% for item in (1..4) %}
+            {% render "product-card-placeholder" %}
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
 
 {% schema %}
 {
@@ -118,10 +222,7 @@
       "id": "camo_image",
       "label": "Camo/Earth Color Image"
     },
-    {
-      "type": "header",
-      "content": "Card color override images"
-    },
+    { "type": "header", "content": "Card color override images" },
     {
       "type": "image_picker",
       "id": "high_vis_orange_image",
