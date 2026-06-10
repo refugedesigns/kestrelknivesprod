@@ -1,0 +1,142 @@
+{% render 'featured-collection-grid', section: section %}
+
+{% schema %}
+{
+  "name": "Featured Apparel",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Apparel",
+      "label": "Title"
+    },
+    {
+      "type": "collection",
+      "id": "featured_collection",
+      "label": "Desktop Collection"
+    },
+    {
+      "type": "range",
+      "id": "number_of_products_to_show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4,
+      "label": "Desktop: Number of products to show"
+    },
+    {
+      "type": "header",
+      "content": "Mobile Settings"
+    },
+    {
+      "type": "collection",
+      "id": "mobile_collection",
+      "label": "Mobile Collection",
+      "info": "Optional: Use a different collection for mobile. If not set, will use the desktop collection."
+    },
+    {
+      "type": "range",
+      "id": "mobile_products_to_show",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4,
+      "label": "Mobile: Number of products to show"
+    },
+    {
+      "type": "range",
+      "id": "mobile_columns",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2,
+      "label": "Mobile: Number of columns"
+    },
+    {
+      "type": "header",
+      "content": "Tablet Settings"
+    },
+    {
+      "type": "collection",
+      "id": "tablet_collection",
+      "label": "Tablet Collection",
+      "info": "Optional: Use a different collection for tablet. If not set, will use the desktop collection."
+    },
+    {
+      "type": "range",
+      "id": "tablet_products_to_show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4,
+      "label": "Tablet: Number of products to show"
+    },
+    {
+      "type": "range",
+      "id": "tablet_columns",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2,
+      "label": "Tablet: Number of columns"
+    },
+    {
+      "type": "range",
+      "id": "desktop_columns",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 4,
+      "label": "Desktop: Number of columns"
+    },
+    {
+      "type": "header",
+      "content": "Color Variant Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "orange_image",
+      "label": "Orange Color Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "black_orange_image",
+      "label": "Black w/Orange Liner Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "black_image",
+      "label": "Black Color Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "green_image",
+      "label": "Green Color Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "camo_image",
+      "label": "Camo/Earth Color Image"
+    },
+    {
+      "type": "header",
+      "content": "Card color override images"
+    },
+    {
+      "type": "image_picker",
+      "id": "high_vis_orange_image",
+      "label": "High Vis Orange Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "high_vis_green_image",
+      "label": "High Vis Green Image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Apparel"
+    }
+  ]
+}
+{% endschema %}
