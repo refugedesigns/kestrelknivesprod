@@ -162,6 +162,7 @@
     },
     "big-timer": {
       "type": "big-timer",
+      "disabled": true,
       "settings": {
         "show_timer": true,
         "main_title": "Ovis Hunter Drop:",
