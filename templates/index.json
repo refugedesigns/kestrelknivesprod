@@ -37,6 +37,7 @@
         "slide_1_button_bg_color": "#ffffff",
         "slide_1_button_text_color": "#000000",
         "slide_1_image": "shopify://shop_images/benner_1.jpg",
+        "slide_1_image_tablet": "shopify://shop_images/benner_1_mobile.png",
         "slide_1_image_fit": "cover",
         "slide_1_image_fit_mobile": "cover",
         "slide_1_image_fit_tablet": "cover",
