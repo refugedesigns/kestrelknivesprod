@@ -123,6 +123,7 @@
         "slide_4_text_color": "#ffffff",
         "slide_4_button_bg_color": "#2563eb",
         "slide_4_button_text_color": "#ffffff",
+        "slide_4_image": "shopify://shop_images/3.png",
         "slide_4_image_fit": "cover",
         "slide_4_image_fit_mobile": "cover",
         "slide_4_image_fit_tablet": "cover",
