@@ -21,7 +21,7 @@
         "hero_mobile_overlay_inner_margin_bottom": 28,
         "hero_mobile_button_margin_top": 16,
         "hero_mobile_button_margin_bottom": 0,
-        "slider_autoplay_delay": 5,
+        "slider_autoplay_delay": 4,
         "scale_percent": 100,
         "scale_radius": 16,
         "show_text_overlay": true,
