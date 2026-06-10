@@ -19,12 +19,6 @@
         "featured_collection": "all"
       }
     },
-    "featured-collection-apparel": {
-      "type": "featured-apparel-collection",
-      "settings": {
-        "title": "Apparel"
-      }
-    },
     "index-section-2": {
       "type": "index-section-2",
       "settings": {}
@@ -43,7 +37,6 @@
   "order": [
     "hero-section",
     "featured-collection",
-    "featured-collection-apparel",
     "index-section-2",
     "big-timer",
     "index-section-1"
