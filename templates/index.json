@@ -146,7 +146,7 @@
     "featured-collection": {
       "type": "featured-collection",
       "settings": {
-        "title": "Featured Collection",
+        "title": "In Stock Knives",
         "featured_collection": "featured",
         "number_of_products_to_show": 4,
         "mobile_collection": "featured-mobile",
@@ -174,7 +174,7 @@
     "featured-collection-apparel": {
       "type": "featured-apparel-collection",
       "settings": {
-        "title": "Apparel",
+        "title": "Most Popular Apparel",
         "featured_collection": "apparels",
         "collection_handle": "apparel",
         "number_of_products_to_show": 4,
