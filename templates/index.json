@@ -137,10 +137,10 @@
         "slide_4_image_zoom": 100,
         "slide_4_title": "Knife Sharpening",
         "slide_4_subtitle": "Discover our latest knives and gear",
-        "slide_4_button_text": "Shop Now",
+        "slide_4_button_text": "Get Your Knife Sharpened",
         "slide_4_button_action": "link",
         "slide_4_button_form_id": "",
-        "slide_4_button_url": ""
+        "slide_4_button_url": "shopify://products/knife-sharpening"
       }
     },
     "featured-collection": {
