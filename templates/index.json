@@ -164,6 +164,7 @@
         "title": "Premium Quality",
         "subtitle": "Crafted with precision and passion",
         "description": "Experience the difference that quality craftsmanship makes. Our products are designed to exceed your expectations and stand the test of time.",
+        "image": "shopify://shop_images/1.1.png",
         "section_height_vh": 70,
         "min_height": 500,
         "button_text": "Explore Collection",
