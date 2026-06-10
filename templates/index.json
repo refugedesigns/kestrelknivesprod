@@ -53,7 +53,7 @@
         "slide_1_button_text": "Buy The Ovis Hunter Now!",
         "slide_1_button_action": "link",
         "slide_1_button_form_id": "",
-        "slide_1_button_url": "",
+        "slide_1_button_url": "shopify://products/ovis-hunter",
         "slide_2_button_enable": true,
         "slide_2_overlay_enable": false,
         "slide_2_overlay_opacity": 40,
