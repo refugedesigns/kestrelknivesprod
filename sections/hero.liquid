@@ -11,7 +11,7 @@
   @media (max-width: 1023px) {
     .hero-overlay {
       padding-top: calc(var(--header-height, 64px) + 16px);
-      padding-bottom: var(--hero-mobile-overlay-padding-bottom, 40px);
+      padding-bottom: var(--hero-mobile-overlay-padding-bottom, 12px);
       flex-direction: column !important;
       align-items: center !important;
       justify-content: flex-start !important;
@@ -20,15 +20,19 @@
     }
 
     .hero-overlay .hero-overlay__inner {
+      position: relative !important;
       display: flex !important;
       flex-direction: column !important;
-      justify-content: space-between !important;
+      justify-content: flex-start !important;
       flex: 1 1 auto !important;
       width: 100% !important;
       min-height: 100% !important;
       margin-left: 0 !important;
       margin-bottom: 0 !important;
       padding-top: var(--hero-mobile-text-padding-top, 0px);
+      padding-bottom: calc(
+        var(--hero-mobile-button-margin-bottom, 12px) + 3.5rem
+      );
       text-align: center !important;
     }
 
@@ -37,8 +41,12 @@
     }
 
     .hero-root .hero-slide-button-wrap {
-      margin-top: auto !important;
-      margin-bottom: var(--hero-mobile-button-margin-bottom, 0px) !important;
+      position: absolute !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: var(--hero-mobile-button-margin-bottom, 12px) !important;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
       flex-shrink: 0;
     }
 
@@ -52,7 +60,7 @@
   <!-- Scaled Wrapper -->
   <div
     class='hero-scale-wrap'
-    style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %}; --hero-height-mobile: {{ section.settings.hero_height_mobile_px | default: 420 }}px; --hero-mobile-overlay-padding-bottom: {{ section.settings.hero_mobile_overlay_padding_bottom | default: 40 }}px; --hero-mobile-overlay-inner-margin-bottom: {{ section.settings.hero_mobile_overlay_inner_margin_bottom | default: 28 }}px; --hero-mobile-button-margin-top: {{ section.settings.hero_mobile_button_margin_top | default: 16 }}px; --hero-mobile-button-margin-bottom: {{ section.settings.hero_mobile_button_margin_bottom | default: 0 }}px; --hero-mobile-text-padding-top: {{ section.settings.hero_mobile_text_padding_top | default: 0 }}px;'
+    style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %}; --hero-height-mobile: {{ section.settings.hero_height_mobile_px | default: 420 }}px; --hero-mobile-overlay-padding-bottom: {{ section.settings.hero_mobile_overlay_padding_bottom | default: 12 }}px; --hero-mobile-overlay-inner-margin-bottom: {{ section.settings.hero_mobile_overlay_inner_margin_bottom | default: 28 }}px; --hero-mobile-button-margin-top: {{ section.settings.hero_mobile_button_margin_top | default: 16 }}px; --hero-mobile-button-margin-bottom: {{ section.settings.hero_mobile_button_margin_bottom | default: 12 }}px; --hero-mobile-text-padding-top: {{ section.settings.hero_mobile_text_padding_top | default: 0 }}px;'
   >
     {% liquid
       assign hero_mode = section.settings.hero_mode | default: "carousel"
@@ -1239,7 +1247,7 @@
       "min": 0,
       "max": 400,
       "step": 4,
-      "default": 40
+      "default": 12
     },
     {
       "type": "range",
@@ -1271,11 +1279,11 @@
     {
       "type": "range",
       "id": "hero_mobile_button_margin_bottom",
-      "label": "Hero button margin-bottom - Mobile (px)",
+      "label": "Hero button offset from bottom - Mobile (px)",
       "min": 0,
       "max": 400,
       "step": 4,
-      "default": 0
+      "default": 12
     },
     {
       "type": "header",
