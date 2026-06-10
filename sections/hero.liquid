@@ -8,43 +8,43 @@
     margin-bottom: 3rem;
   }
 
-  @media (max-width: 768px) {
-    .hero-overlay {
-      padding-bottom: var(--hero-mobile-overlay-padding-bottom, 40px);
-    }
-
-    .hero-overlay .hero-overlay__inner {
-      padding-top: var(--hero-mobile-text-padding-top, 0px);
-      margin-bottom: var(
-        --hero-mobile-overlay-inner-margin-bottom,
-        28px
-      ) !important;
-    }
-
-    .hero-root .hero-slide-button-wrap {
-      margin-top: var(--hero-mobile-button-margin-top, 16px) !important;
-      margin-bottom: var(--hero-mobile-button-margin-bottom, 0px) !important;
-    }
-
-    .hero-root .kk-text-content {
-      margin-top: 0 !important;
-      padding-top: 0 !important;
-    }
-  }
-
   @media (max-width: 1023px) {
     .hero-overlay {
       padding-top: calc(var(--header-height, 64px) + 16px);
-      padding-bottom: 56px;
+      padding-bottom: var(--hero-mobile-overlay-padding-bottom, 40px);
+      flex-direction: column !important;
       align-items: center !important;
-      justify-content: center !important;
+      justify-content: flex-start !important;
       top: 0 !important;
       bottom: 0 !important;
     }
 
     .hero-overlay .hero-overlay__inner {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      flex: 1 1 auto !important;
+      width: 100% !important;
+      min-height: 100% !important;
       margin-left: 0 !important;
+      margin-bottom: 0 !important;
+      padding-top: var(--hero-mobile-text-padding-top, 0px);
       text-align: center !important;
+    }
+
+    .hero-overlay .kk-text-wrap {
+      flex-shrink: 0;
+    }
+
+    .hero-root .hero-slide-button-wrap {
+      margin-top: auto !important;
+      margin-bottom: var(--hero-mobile-button-margin-bottom, 0px) !important;
+      flex-shrink: 0;
+    }
+
+    .hero-root .kk-text-content {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
     }
   }
 </style>
@@ -256,7 +256,7 @@
                       style='background-color: {{ section.settings.slide_1_text_bg_color | default: '#000000' | color_modify: 'alpha', s1_bg_alpha }}'
                     ></div>
                   {% endif %}
-                  <div class='kk-text-content mt-12 lg:mt-0'>
+                  <div class='kk-text-content lg:mt-0'>
                     <h1
                       class='hero-title-breaks text-4xl md:text-6xl font-bold mb-4'
                       style='color: {{ section.settings.slide_1_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_1_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s1_op }});'
@@ -405,7 +405,7 @@
                       style='background-color: {{ section.settings.slide_2_text_bg_color | default: '#000000' | color_modify: 'alpha', s2_bg_alpha }}'
                     ></div>
                   {% endif %}
-                  <div class='kk-text-content pt-4'>
+                  <div class='kk-text-content'>
                     <h1
                       class='hero-title-breaks text-4xl md:text-6xl font-bold mb-4'
                       style='color: {{ section.settings.slide_2_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.slide_2_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ s2_op }});'
