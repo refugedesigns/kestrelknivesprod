@@ -162,7 +162,7 @@
       "type": "featured-apparel-collection",
       "settings": {
         "title": "Apparel",
-        "featured_collection": "",
+        "featured_collection": "apparels",
         "collection_handle": "apparel",
         "number_of_products_to_show": 4,
         "mobile_columns": 2,
