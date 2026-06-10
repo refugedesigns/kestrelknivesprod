@@ -210,6 +210,7 @@
         "title": "Welcome to Kestrel Knives",
         "subtitle": "Every knife we build starts with a simple idea: create tools that perform in the field and stand the test of time.",
         "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "image": "shopify://shop_images/5DM49812-EDIT.webp",
         "button_text": "Learn More",
         "button_url": ""
       }
