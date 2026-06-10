@@ -135,9 +135,9 @@
       "type": "featured-collection",
       "settings": {
         "title": "Featured Collection",
-        "featured_collection": "all",
-        "number_of_products_to_show": 3,
-        "mobile_collection": "",
+        "featured_collection": "featured",
+        "number_of_products_to_show": 4,
+        "mobile_collection": "featured-mobile",
         "mobile_products_to_show": 4,
         "mobile_columns": 2,
         "tablet_collection": "",
