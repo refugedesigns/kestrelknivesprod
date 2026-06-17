@@ -589,11 +589,6 @@
                 id='variantIdInput'
                 value='{{ selected_variant.id }}'
               >
-              <input
-                type='hidden'
-                name='selling_plan'
-                :value='dibsSelectedPlanId || ""'
-              >
 
               <!-- Price -->
               <div class='mb-8'>
@@ -1120,8 +1115,6 @@
                     </button>
                   </div>
                 </div>
-
-                {% render 'dibs-plan-picker', context: 'card' %}
 
                 <!-- Add to Cart Button -->
                 <button
@@ -2592,10 +2585,6 @@
             return this.dibsVariantPlans.length > 0;
           },
 
-          get dibsShowPlanPicker() {
-            return this.dibsVariantPlans.length > 1;
-          },
-
           init() {
             // initial image set
             if (this.useComplexOptions) {
@@ -2618,15 +2607,6 @@
             }, 100);
 
             this.loadDibsPreorder();
-
-            this.$watch('dibsSelectedPlanId', () => {
-              const variant =
-                variants.find((v) => v.id === this.currentVariantId) ||
-                variants.find((v) => v.available) ||
-                variants[0] ||
-                null;
-              if (variant) this.updateAddToCartState(variant);
-            });
 
             // watch for page scroll/resize (you already do this; keep in component)
           },
@@ -2963,8 +2943,15 @@
             const hasStatus = statusText && statusText.trim().length > 0;
             const plans = this.dibsVariantPlans || [];
             const hasPreorder = plans.length > 0;
+            const selectedPlanId =
+              window.KKDibsPreorder && hasPreorder
+                ? window.KKDibsPreorder.resolveSellingPlanId(
+                    plans,
+                    document.getElementById('product-form') || document
+                  )
+                : null;
             const selectedPlan =
-              plans.find((p) => p.id === this.dibsSelectedPlanId) || plans[0];
+              plans.find((p) => p.id === selectedPlanId) || plans[0];
             const preorderLabel = selectedPlan
               ? selectedPlan.submitButton
               : 'Preorder Now!';
@@ -3520,12 +3507,17 @@
               let sellingPlanId = formData.get('selling_plan') || null;
               const productPageEl = document.querySelector('[x-data*="productPage"]');
               if (
+                !sellingPlanId &&
                 productPageEl &&
                 productPageEl._x_dataStack &&
                 productPageEl._x_dataStack[0] &&
-                productPageEl._x_dataStack[0].dibsHasPreorder
+                productPageEl._x_dataStack[0].dibsHasPreorder &&
+                window.KKDibsPreorder
               ) {
-                sellingPlanId = productPageEl._x_dataStack[0].dibsSelectedPlanId;
+                sellingPlanId = window.KKDibsPreorder.resolveSellingPlanId(
+                  productPageEl._x_dataStack[0].dibsVariantPlans,
+                  productForm || document
+                );
               }
 
               // Get the cart sheet component
@@ -3727,13 +3719,22 @@
             }
 
             let sellingPlanId = null
+            const formSellingPlan = form
+              ? new FormData(form).get('selling_plan')
+              : null
+            if (formSellingPlan) sellingPlanId = formSellingPlan
             if (
+              !sellingPlanId &&
               productPage &&
               productPage._x_dataStack &&
               productPage._x_dataStack[0] &&
-              productPage._x_dataStack[0].dibsHasPreorder
+              productPage._x_dataStack[0].dibsHasPreorder &&
+              window.KKDibsPreorder
             ) {
-              sellingPlanId = productPage._x_dataStack[0].dibsSelectedPlanId
+              sellingPlanId = window.KKDibsPreorder.resolveSellingPlanId(
+                productPage._x_dataStack[0].dibsVariantPlans,
+                form || document
+              )
             }
 
             // Use the updated variant ID if available, otherwise use the original
