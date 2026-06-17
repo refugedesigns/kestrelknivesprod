@@ -589,6 +589,11 @@
                 id='variantIdInput'
                 value='{{ selected_variant.id }}'
               >
+              <input
+                type='hidden'
+                name='selling_plan'
+                :value='dibsSelectedPlanId || ""'
+              >
 
               <!-- Price -->
               <div class='mb-8'>
@@ -1116,14 +1121,14 @@
                   </div>
                 </div>
 
+                {% render 'dibs-plan-picker', context: 'card' %}
+
                 <!-- Add to Cart Button -->
                 <button
                   id='addToCartBtn'
                   type='submit'
-                  class='w-full text-sm whitespace-nowrap md:text-base uppercase bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mb-6 {% if product_status_text != blank or selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
-                  {% if product_status_text != blank
-                    or selected_variant.available == false
-                  %}
+                  class='w-full text-sm whitespace-nowrap md:text-base uppercase bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mb-6 {% if product_status_text != blank %}opacity-50 cursor-not-allowed{% elsif selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
+                  {% if product_status_text != blank %}
                     disabled
                   {% endif %}
                 >
@@ -1268,10 +1273,8 @@
         id='stickyAddToCartBtn'
         type='button'
         onclick='stickyAddToCart()'
-        class='bg-black uppercase hover:bg-gray-800 text-white cursor-pointer font-semibold py-2 px-4 md:py-3 md:px-6 text-sm md:text-base transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] {% if product_status_text != blank or selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
-        {% if product_status_text != blank
-          or selected_variant.available == false
-        %}
+        class='bg-black uppercase hover:bg-gray-800 text-white cursor-pointer font-semibold py-2 px-4 md:py-3 md:px-6 text-sm md:text-base transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] {% if product_status_text != blank %}opacity-50 cursor-not-allowed{% elsif selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
+        {% if product_status_text != blank %}
           disabled
         {% endif %}
       >
@@ -2560,6 +2563,9 @@
         return {
           currentImageIndex: 0,
           quantity: 1,
+          dibsProduct: null,
+          dibsSelectedPlanId: null,
+          currentVariantId: {{ selected_variant.id }},
           productImages: [
             {% for media in product.media %}
               '{{ media | img_url: "2048x2048" }}'{% unless forloop.last %},{% endunless %}
@@ -2571,6 +2577,24 @@
 
           // dynamic selected options (kept in array ordered by product.options index)
           selectedOptions: initialOptions.slice(),
+
+          get dibsVariantPlans() {
+            if (!window.KKDibsPreorder || !this.dibsProduct || !this.currentVariantId) {
+              return [];
+            }
+            return window.KKDibsPreorder.getVariantPlans(
+              this.dibsProduct,
+              this.currentVariantId
+            );
+          },
+
+          get dibsHasPreorder() {
+            return this.dibsVariantPlans.length > 0;
+          },
+
+          get dibsShowPlanPicker() {
+            return this.dibsVariantPlans.length > 1;
+          },
 
           init() {
             // initial image set
@@ -2593,7 +2617,40 @@
               }
             }, 100);
 
+            this.loadDibsPreorder();
+
+            this.$watch('dibsSelectedPlanId', () => {
+              const variant =
+                variants.find((v) => v.id === this.currentVariantId) ||
+                variants.find((v) => v.available) ||
+                variants[0] ||
+                null;
+              if (variant) this.updateAddToCartState(variant);
+            });
+
             // watch for page scroll/resize (you already do this; keep in component)
+          },
+
+          async loadDibsPreorder() {
+            if (!window.KKDibsPreorder) return;
+            this.dibsProduct = await window.KKDibsPreorder.fetchProduct(
+              {{ product.handle | json }}
+            );
+            this.syncDibsPlanSelection();
+            const variant =
+              variants.find((v) => v.id === this.currentVariantId) ||
+              variants.find((v) => v.available) ||
+              variants[0] ||
+              null;
+            if (variant) this.updateAddToCartState(variant);
+          },
+
+          syncDibsPlanSelection() {
+            if (!window.KKDibsPreorder) return;
+            this.dibsSelectedPlanId = window.KKDibsPreorder.syncPlanSelection(
+              this.dibsVariantPlans,
+              this.dibsSelectedPlanId
+            );
           },
 
           bindOptionInputs() {
@@ -2723,6 +2780,8 @@
             }
 
              if (variant) {
+               this.currentVariantId = variant.id;
+
                // update hidden input
                const variantInput = document.getElementById('variantIdInput');
                if (variantInput) variantInput.value = variant.id;
@@ -2745,6 +2804,7 @@
                }
 
                // update add to cart button state
+               this.syncDibsPlanSelection();
                this.updateAddToCartState(variant);
                
                // sync sticky size selector if it exists
@@ -2901,6 +2961,14 @@
             if (!btn && !sticky) return;
             const statusText = '{{ product_status_text | escape }}';
             const hasStatus = statusText && statusText.trim().length > 0;
+            const plans = this.dibsVariantPlans || [];
+            const hasPreorder = plans.length > 0;
+            const selectedPlan =
+              plans.find((p) => p.id === this.dibsSelectedPlanId) || plans[0];
+            const preorderLabel = selectedPlan
+              ? selectedPlan.submitButton
+              : 'Preorder Now!';
+
             if (hasStatus) {
               if (btn) {
                 btn.setAttribute('disabled','disabled');
@@ -2912,7 +2980,7 @@
                 sticky.classList.add('opacity-50','cursor-not-allowed');
                 sticky.textContent = statusText;
               }
-            } else if (!variant.available) {
+            } else if (!variant.available && !hasPreorder) {
               if (btn) {
                 btn.setAttribute('disabled','disabled');
                 btn.classList.add('opacity-50','cursor-not-allowed');
@@ -2924,15 +2992,16 @@
                 sticky.textContent = 'SOLD OUT';
               }
             } else {
+              const label = hasPreorder ? preorderLabel : 'ADD TO CART';
               if (btn) {
                 btn.removeAttribute('disabled');
                 btn.classList.remove('opacity-50','cursor-not-allowed');
-                btn.innerText = 'ADD TO CART';
+                btn.innerText = label;
               }
               if (sticky) {
                 sticky.removeAttribute('disabled');
                 sticky.classList.remove('opacity-50','cursor-not-allowed');
-                sticky.textContent = 'ADD TO CART';
+                sticky.textContent = label;
               }
             }
           },
@@ -3448,24 +3517,43 @@
               window.addEventListener('open-cart', restore);
               setTimeout(restore, 6000);
 
+              let sellingPlanId = formData.get('selling_plan') || null;
+              const productPageEl = document.querySelector('[x-data*="productPage"]');
+              if (
+                productPageEl &&
+                productPageEl._x_dataStack &&
+                productPageEl._x_dataStack[0] &&
+                productPageEl._x_dataStack[0].dibsHasPreorder
+              ) {
+                sellingPlanId = productPageEl._x_dataStack[0].dibsSelectedPlanId;
+              }
+
               // Get the cart sheet component
               const cartSheet = document.querySelector('[x-data*="cartSheet"]');
               if (cartSheet && cartSheet._x_dataStack && cartSheet._x_dataStack[0]) {
                 
-                await cartSheet._x_dataStack[0].addToCart(variantId, quantity, 'main-button');
+                await cartSheet._x_dataStack[0].addToCart(
+                  variantId,
+                  quantity,
+                  'main-button',
+                  null,
+                  sellingPlanId
+                );
                 // Ensure button is restored on success as well
                 restore();
               } else {
                 // Fallback: direct API call
+                const payload = {
+                  id: variantId,
+                  quantity: quantity,
+                };
+                if (sellingPlanId) payload.selling_plan = Number(sellingPlanId);
                 const response = await fetch('/cart/add.js', {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
                   },
-                  body: JSON.stringify({
-                    id: variantId,
-                    quantity: quantity,
-                  }),
+                  body: JSON.stringify(payload),
                 });
 
                 if (response.ok) {
@@ -3638,6 +3726,16 @@
               quantity = productPage._x_dataStack[0].quantity || 1
             }
 
+            let sellingPlanId = null
+            if (
+              productPage &&
+              productPage._x_dataStack &&
+              productPage._x_dataStack[0] &&
+              productPage._x_dataStack[0].dibsHasPreorder
+            ) {
+              sellingPlanId = productPage._x_dataStack[0].dibsSelectedPlanId
+            }
+
             // Use the updated variant ID if available, otherwise use the original
             const finalVariantId = sizeSelector && variantInput ? variantInput.value : variantId
             console.log('Final variant ID for cart:', finalVariantId)
@@ -3650,12 +3748,19 @@
               typeof cartSheet._x_dataStack[0].addToCart === 'function' &&
               finalVariantId
             ) {
-              await cartSheet._x_dataStack[0].addToCart(finalVariantId, quantity, 'sticky-button')
+              await cartSheet._x_dataStack[0].addToCart(
+                finalVariantId,
+                quantity,
+                'sticky-button',
+                null,
+                sellingPlanId
+              )
               return
             }
 
             // Fallback
             const payload = { id: finalVariantId, quantity }
+            if (sellingPlanId) payload.selling_plan = Number(sellingPlanId)
             const res = await fetch('/cart/add.js', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
