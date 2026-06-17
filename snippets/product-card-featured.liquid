@@ -271,13 +271,15 @@
     %}
       <!-- Add to Cart for knives/non-apparel -->
       <div class='px-4'>
+        <div x-show='canPurchase' x-cloak>
         <button
           @click='addToCart'
-          :disabled='isAddingToCart || !canPurchase'
+          :disabled='isAddingToCart'
           class='w-full bg-black hover:bg-gray-900 text-white font-semibold py-2 md:py-3 px-3 md:px-4 text-xs md:text-base transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
         >
           <span x-text="isAddingToCart ? 'Adding...' : cardAddToCartLabel"></span>
         </button>
+        </div>
       </div>
     {% else %}
       <!-- Quick View button for apparel/accessories -->
