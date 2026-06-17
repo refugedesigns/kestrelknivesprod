@@ -418,7 +418,8 @@
         variantId,
         quantity = 1,
         source = 'unknown',
-        propsOverride = null
+        propsOverride = null,
+        sellingPlanId = null
       ) {
         this.isLoading = true
         await this.ensureOriginGatedCartDiscounts()
@@ -461,6 +462,14 @@
               }
             }
           }
+          if (!sellingPlanId && form) {
+            const formSellingPlan = formData.get('selling_plan')
+            if (formSellingPlan) sellingPlanId = formSellingPlan
+          }
+          if (sellingPlanId) {
+            payload.selling_plan = Number(sellingPlanId)
+          }
+
           console.log('[cartSheet.addToCart] payload', source, {
             ...payload,
             properties: { ...payload.properties },
