@@ -1,0 +1,64 @@
+{% comment %}
+  Dibs payment plan picker. Expects Alpine state from KKDibsPreorder.createState().
+  Pass context: "card" (default) or "qv" for quick-view drawer.
+{% endcomment %}
+{% assign picker_context = context | default: 'card' %}
+{% if picker_context == 'qv' %}
+  <div
+    x-show='qvDibsShowPlanPicker'
+    x-cloak
+    class='mb-3 space-y-2 text-left'
+  >
+    <p class='text-xs font-semibold text-gray-700 uppercase'>Payment option</p>
+    <template x-for='plan in qvDibsVariantPlans' :key='plan.id'>
+      <label
+        class='flex items-start gap-2 p-2 border rounded-md cursor-pointer hover:border-gray-400'
+        :class="dibsQvSelectedPlanId === plan.id ? 'border-black ring-1 ring-black' : 'border-gray-200'"
+      >
+        <input
+          type='radio'
+          class='mt-1'
+          :value='plan.id'
+          x-model.number='dibsQvSelectedPlanId'
+        >
+        <span class='min-w-0'>
+          <span class='block text-sm font-semibold text-gray-900' x-text='plan.optionLabel'></span>
+          <span
+            class='block text-xs text-gray-600 mt-0.5'
+            x-show='plan.optionDescription'
+            x-text='plan.optionDescription'
+          ></span>
+        </span>
+      </label>
+    </template>
+  </div>
+{% else %}
+  <div
+    x-show='dibsShowPlanPicker'
+    x-cloak
+    class='mb-2 space-y-2 text-left'
+  >
+    <p class='text-xs font-semibold text-gray-700 uppercase'>Payment option</p>
+    <template x-for='plan in dibsVariantPlans' :key='plan.id'>
+      <label
+        class='flex items-start gap-2 p-2 border rounded-md cursor-pointer hover:border-gray-400'
+        :class="dibsSelectedPlanId === plan.id ? 'border-black ring-1 ring-black' : 'border-gray-200'"
+      >
+        <input
+          type='radio'
+          class='mt-0.5'
+          :value='plan.id'
+          x-model.number='dibsSelectedPlanId'
+        >
+        <span class='min-w-0'>
+          <span class='block text-xs font-semibold text-gray-900' x-text='plan.optionLabel'></span>
+          <span
+            class='block text-[11px] text-gray-600 mt-0.5'
+            x-show='plan.optionDescription'
+            x-text='plan.optionDescription'
+          ></span>
+        </span>
+      </label>
+    </template>
+  </div>
+{% endif %}
