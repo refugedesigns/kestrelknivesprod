@@ -54,14 +54,40 @@
 
           <!-- Product Details -->
           <div class='flex-1 min-w-0'>
-            <h3
-              class='text-sm font-medium text-gray-900 truncate'
-              x-text='item.title'
-            ></h3>
-            <p class='text-sm text-gray-500' x-text='item.variant'></p>
+            <div class='flex items-start justify-between gap-3'>
+              <h3
+                class='text-sm font-medium text-gray-900 leading-snug'
+                x-text='item.title'
+              ></h3>
+              <p
+                class='text-sm font-medium text-gray-900 flex-shrink-0'
+                x-text='item.price'
+              ></p>
+            </div>
+
+            <template x-if='item.preorder && item.preorder.isPreorder'>
+              <div class='mt-1 space-y-0.5'>
+                <p
+                  class='text-sm text-gray-500'
+                  x-text='item.preorder.name'
+                ></p>
+                <p
+                  class='text-sm text-gray-500'
+                  x-show='item.preorder.shipsOn'
+                  x-text='item.preorder.shipsOn'
+                ></p>
+                <p
+                  class='text-sm text-gray-500'
+                  x-show='item.preorder.note'
+                  x-text='item.preorder.note'
+                ></p>
+              </div>
+            </template>
+
             <p
-              class='text-sm font-medium text-gray-900'
-              x-text='item.price'
+              class='text-sm text-gray-500 mt-1'
+              x-show='item.variant && item.variant !== "Default Title"'
+              x-text='item.variant'
             ></p>
           </div>
 
@@ -118,28 +144,6 @@
       </template>
     </div>
   </div>
-
-  {%- assign property_size = item.properties | size -%}
-  {% if property_size > 0 %}
-    {% for p in item.properties %}
-      {%- if p.first contains "_mws_" -%}
-        {%- continue -%}
-      {%- endif -%}
-      {% unless p.last == blank %}
-        <p>
-          {{ p.first }}:
-
-          {% if p.last contains "/uploads/" %}
-            <a href='{{ p.last }}'>
-              {{- p.last | split: "/" | last -}}
-            </a>
-          {% else %}
-            {{ p.last }}
-          {% endif %}
-        </p>
-      {% endunless %}
-    {% endfor %}
-  {% endif %}
 
   <!-- Cart Footer -->
   <div
@@ -383,17 +387,26 @@
           const response = await fetch('/cart.js')
           const cart = await response.json()
 
-          this.cartItems = cart.items.map(item => ({
-            key: item.key,
-            id: item.id,
-            title: item.product_title,
-            variant: item.variant_title,
-            price: this.formatMoney(item.price),
-            quantity: item.quantity,
-            image: item.image,
-            properties: item.properties,
-            line_price: item.line_price,
-          }))
+          this.cartItems = cart.items.map(item => {
+            const preorder =
+              window.KKDibsPreorder &&
+              typeof window.KKDibsPreorder.parsePreorderLineItem === 'function'
+                ? window.KKDibsPreorder.parsePreorderLineItem(item)
+                : { isPreorder: false, name: null, shipsOn: null, note: null }
+
+            return {
+              key: item.key,
+              id: item.id,
+              title: item.product_title,
+              variant: item.variant_title,
+              price: this.formatMoney(item.price),
+              quantity: item.quantity,
+              image: item.image,
+              properties: item.properties,
+              line_price: item.line_price,
+              preorder: preorder,
+            }
+          })
 
           this.cartLevelDiscounts = Array.isArray(
             cart.cart_level_discount_applications
