@@ -51,6 +51,7 @@
                           >
                             {{- item.product.title -}}
                           </a>
+                          {% render 'cart-preorder-details', item: item %}
                           {% if item.variant.title
                             and item.variant.title != "Default Title"
                           %}
@@ -71,7 +72,7 @@
                             {%- endif %}
                           </div>
                           {%- assign property_size = item.properties | size -%}
-                          {% if property_size > 0 %}
+                          {% if property_size > 0 and item.selling_plan_allocation == blank %}
                             {% for p in item.properties %}
                               {%- if p.first contains "_mws_" -%}
                                 {%- continue -%}
