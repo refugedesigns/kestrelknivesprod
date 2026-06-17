@@ -29,12 +29,12 @@
         </div>
       {% else %}
         <div
-          x-show='dibsHasPreorder'
+          x-show='cardHasPreorder'
           x-text='dibsBadgeText'
           class='absolute top-4 left-4 bg-black text-white font-bold px-3 py-1 text-sm uppercase z-10'
         ></div>
         <div
-          x-show='!dibsHasPreorder && !isAvailable'
+          x-show='!cardHasPreorder && !isAvailable'
           class='absolute top-4 left-4 bg-black text-white font-bold px-3 py-1 text-sm uppercase z-10'
         >
           SOLD OUT
@@ -271,16 +271,13 @@
     %}
       <!-- Add to Cart for knives/non-apparel -->
       <div class='px-4'>
-        <div x-show='canPurchase'>
-          <button
-            x-cloak
-            @click='addToCart'
-            :disabled='isAddingToCart'
-            class='w-full bg-black hover:bg-gray-900 text-white font-semibold py-2 md:py-3 px-3 md:px-4 text-xs md:text-base transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
-          >
-            <span x-text="isAddingToCart ? 'Adding...' : cardAddToCartLabel"></span>
-          </button>
-        </div>
+        <button
+          @click='addToCart'
+          :disabled='isAddingToCart || !canPurchase'
+          class='w-full bg-black hover:bg-gray-900 text-white font-semibold py-2 md:py-3 px-3 md:px-4 text-xs md:text-base transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
+        >
+          <span x-text="isAddingToCart ? 'Adding...' : cardAddToCartLabel"></span>
+        </button>
       </div>
     {% else %}
       <!-- Quick View button for apparel/accessories -->
@@ -752,6 +749,9 @@
             return
           this.isAddingToCart = true
           try {
+            if (this.cardHasPreorder && !this.getDibsSellingPlanId()) {
+              await this.loadDibsPreorder()
+            }
             const sellingPlanId = this.getDibsSellingPlanId()
             if (window.KKDibsPreorder) {
               await window.KKDibsPreorder.addToCartWithPlan(
