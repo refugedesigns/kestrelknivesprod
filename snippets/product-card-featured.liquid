@@ -29,12 +29,7 @@
         </div>
       {% else %}
         <div
-          x-show='cardHasPreorder && !dibsBadgeDetected'
-          x-text='dibsBadgeText'
-          class='absolute top-4 left-4 bg-black text-white font-bold px-3 py-1 text-sm uppercase z-10'
-        ></div>
-        <div
-          x-show='!cardHasPreorder && !isAvailable'
+          x-show='!isAvailable && !cardHasPreorder'
           class='absolute top-4 left-4 bg-black text-white font-bold px-3 py-1 text-sm uppercase z-10'
         >
           SOLD OUT
@@ -758,12 +753,16 @@
               await this.loadDibsPreorder()
             }
             const sellingPlanId = this.getDibsSellingPlanId()
+            const preorderProps = sellingPlanId
+              ? this.getDibsCartLineProperties()
+              : null
             if (window.KKDibsPreorder) {
               await window.KKDibsPreorder.addToCartWithPlan(
                 this.selectedVariant,
                 1,
                 sellingPlanId,
-                'featured-card'
+                'featured-card',
+                preorderProps
               )
             } else {
               const cartSheet = document.querySelector('[x-data*="cartSheet"]')
@@ -776,7 +775,7 @@
                   this.selectedVariant,
                   1,
                   'featured-card',
-                  null,
+                  preorderProps,
                   sellingPlanId
                 )
               } else {
@@ -904,12 +903,16 @@
           if (!this.qvCanPurchase) return
           try {
             const sellingPlanId = this.getQvDibsSellingPlanId()
+            const preorderProps = sellingPlanId
+              ? this.getQvDibsCartLineProperties()
+              : null
             if (window.KKDibsPreorder) {
               await window.KKDibsPreorder.addToCartWithPlan(
                 this.qvSelectedVariantId || this.selectedVariant,
                 this.qvQuantity,
                 sellingPlanId,
-                'featured-card-qv'
+                'featured-card-qv',
+                preorderProps
               )
             } else {
               const cartSheet = document.querySelector('[x-data*="cartSheet"]')
@@ -922,7 +925,7 @@
                   this.qvSelectedVariantId || this.selectedVariant,
                   this.qvQuantity,
                   'featured-card-qv',
-                  null,
+                  preorderProps,
                   sellingPlanId
                 )
               } else {
