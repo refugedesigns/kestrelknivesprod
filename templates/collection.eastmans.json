@@ -29,7 +29,7 @@
         "banner_height_mobile_px": 320,
         "banner_mobile_overlay_padding_bottom": 52,
         "banner_mobile_text_padding_top": 0,
-        "banner_mobile_overlay_inner_margin_bottom": 28,
+        "banner_mobile_overlay_inner_margin_bottom": 40,
         "banner_overlay_enable": false,
         "banner_overlay_opacity": 40,
         "banner_text_bg_enable": false,
