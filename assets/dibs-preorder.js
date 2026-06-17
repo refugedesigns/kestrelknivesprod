@@ -298,6 +298,144 @@
     return pickDefaultPlanId(plans);
   }
 
+  function findRawSellingPlan(dibsProduct, variantId, planId) {
+    if (!dibsProduct || variantId == null || planId == null) return null;
+    const variants = getProductVariants(dibsProduct);
+    const variant = variants.find(function (v) {
+      return variantIdsMatch(v.id, variantId);
+    });
+    if (!variant || !variant.applicableSellingPlans) return null;
+    return (
+      variant.applicableSellingPlans.find(function (p) {
+        return parseGid(p.id) === Number(planId);
+      }) || null
+    );
+  }
+
+  function getFulfillmentDate(deliveryPolicy) {
+    if (!deliveryPolicy) return null;
+    try {
+      const trigger = deliveryPolicy.fulfillmentTrigger;
+      const exactTime = deliveryPolicy.fulfillmentExactTime;
+      const days = deliveryPolicy.fulfillmentDays;
+      let date = null;
+      if (trigger === 'DAYS_FROM_NOW' && days) {
+        date = new Date(Date.now() + Number(days) * 86400000);
+      } else if (exactTime) {
+        date = new Date(exactTime);
+      }
+      if (!date || Number.isNaN(date.getTime())) return null;
+      return date.toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function getCartLinePropertiesForPlan(rawPlan) {
+    const props = {};
+    if (!rawPlan) return props;
+
+    const shipDate = getFulfillmentDate(
+      rawPlan.sellingPlanGroup && rawPlan.sellingPlanGroup.sellingPlanDeliveryPolicy
+    );
+    if (shipDate) props['Ships on'] = shipDate;
+
+    const terms =
+      rawPlan.sellingPlanGroup &&
+      rawPlan.sellingPlanGroup.contents &&
+      rawPlan.sellingPlanGroup.contents.planSelectorCard &&
+      rawPlan.sellingPlanGroup.contents.planSelectorCard.purchaseTerms;
+    if (terms && String(terms).trim()) {
+      props.Note = String(terms).replace(/^Note:\s*/i, '').trim();
+    } else if (rawPlan.description && String(rawPlan.description).trim()) {
+      props.Note = String(rawPlan.description).replace(/^Note:\s*/i, '').trim();
+    } else {
+      props.Note = 'This is a preorder product.';
+    }
+
+    return props;
+  }
+
+  function isInternalCartProperty(key) {
+    if (!key) return true;
+    const k = String(key).toLowerCase();
+    return (
+      k.startsWith('_') ||
+      k.includes('_mws_') ||
+      k.includes('_apo_') ||
+      k.includes('_build_')
+    );
+  }
+
+  function formatShipsOnLine(value) {
+    if (!value) return null;
+    const text = String(value).trim();
+    if (!text) return null;
+    return /^ships?\s+on:/i.test(text) ? text : 'Ships on: ' + text;
+  }
+
+  function formatNoteLine(value) {
+    if (!value) return null;
+    const text = String(value).trim();
+    if (!text) return null;
+    return /^note:/i.test(text) ? text : 'Note: ' + text;
+  }
+
+  function parsePreorderLineItem(item) {
+    const alloc = item && item.selling_plan_allocation;
+    if (!alloc || !alloc.selling_plan) {
+      return { isPreorder: false, name: null, shipsOn: null, note: null };
+    }
+
+    const name = alloc.selling_plan.name || null;
+    const props = item.properties || {};
+    let shipsOn = null;
+    let note = null;
+
+    Object.keys(props).forEach(function (key) {
+      const value = props[key];
+      if (!value || isInternalCartProperty(key)) return;
+      const val = String(value).trim();
+      if (!val) return;
+      const keyLow = String(key).toLowerCase();
+
+      if (
+        !shipsOn &&
+        (keyLow.includes('ship') || /^ships?\s+on:/i.test(val))
+      ) {
+        shipsOn = formatShipsOnLine(val);
+      }
+      if (
+        !note &&
+        (keyLow === 'note' ||
+          keyLow.includes('preorder') ||
+          /^note:/i.test(val))
+      ) {
+        note = formatNoteLine(val);
+      }
+    });
+
+    const desc = alloc.selling_plan.description || '';
+    if (!shipsOn && desc && /ships?\s+on/i.test(desc)) {
+      const match = desc.match(/ships?\s+on\s*:?\s*[^.]+/i);
+      if (match) shipsOn = formatShipsOnLine(match[0]);
+    }
+    if (!note && desc && String(desc).trim()) {
+      note = formatNoteLine(desc);
+    }
+
+    return {
+      isPreorder: true,
+      name: name,
+      shipsOn: shipsOn,
+      note: note,
+    };
+  }
+
   function createState() {
     return {
       dibsProduct: null,
@@ -544,6 +682,36 @@
         if (!this.qvDibsVariantPlans.length) return null;
         return resolveSellingPlanId(this.qvDibsVariantPlans, this.$el || document);
       },
+
+      getDibsCartLineProperties() {
+        const planId = this.getDibsSellingPlanId();
+        if (!planId || !this.dibsProduct) return {};
+        const variantId =
+          this.selectedVariant != null
+            ? this.selectedVariant
+            : this.qvSelectedVariantId;
+        const rawPlan = findRawSellingPlan(
+          this.dibsProduct,
+          variantId,
+          planId
+        );
+        return getCartLinePropertiesForPlan(rawPlan);
+      },
+
+      getQvDibsCartLineProperties() {
+        const planId = this.getQvDibsSellingPlanId();
+        if (!planId || !this.dibsProduct) return {};
+        const variantId =
+          this.qvSelectedVariantId != null
+            ? this.qvSelectedVariantId
+            : this.selectedVariant;
+        const rawPlan = findRawSellingPlan(
+          this.dibsProduct,
+          variantId,
+          planId
+        );
+        return getCartLinePropertiesForPlan(rawPlan);
+      },
     };
   }
 
@@ -571,7 +739,11 @@
       return true;
     }
 
-    const payload = { id: variantId, quantity: quantity || 1, properties: {} };
+    const payload = {
+      id: variantId,
+      quantity: quantity || 1,
+      properties: propsOverride && typeof propsOverride === 'object' ? { ...propsOverride } : {},
+    };
     if (sellingPlanId) payload.selling_plan = Number(sellingPlanId);
 
     const response = await fetch('/cart/add.js', {
@@ -598,6 +770,9 @@
     createState: createState,
     addToCartWithPlan: addToCartWithPlan,
     refreshCardFromElement: refreshCardFromElement,
+    parsePreorderLineItem: parsePreorderLineItem,
+    getCartLinePropertiesForPlan: getCartLinePropertiesForPlan,
+    findRawSellingPlan: findRawSellingPlan,
   };
 
   function onReady() {
