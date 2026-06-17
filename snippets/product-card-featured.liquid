@@ -10,7 +10,7 @@
 {% assign product_obj = product_product %}
 
 <div
-  class='w-full box-border py-4 px-2 sm:py-6 sm:px-3'
+  class='product-card w-full box-border py-4 px-2 sm:py-6 sm:px-3'
   data-product='{{ product_obj | json | escape }}'
   data-variants='{{ product_obj.variants | json | escape }}'
   data-images='{{ product_obj.images | json | escape }}'
@@ -29,7 +29,7 @@
         </div>
       {% else %}
         <div
-          x-show='cardHasPreorder'
+          x-show='cardHasPreorder && !hasDibsInjectedBadge'
           x-text='dibsBadgeText'
           class='absolute top-4 left-4 bg-black text-white font-bold px-3 py-1 text-sm uppercase z-10'
         ></div>
@@ -545,7 +545,7 @@
           this.updateImage()
           this.updateTitle()
           this.checkAvailability()
-          this.loadDibsPreorder()
+          this.initDibsPreorder()
         },
 
         // Price text
