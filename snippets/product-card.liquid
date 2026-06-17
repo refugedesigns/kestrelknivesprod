@@ -316,15 +316,12 @@
       {% unless is_apparel or is_custom or is_accessory %}
         <!-- Add to Cart Button (only show when available and not apparels) -->
         <div x-show='canPurchase'>
-          {% render 'dibs-plan-picker', context: 'card' %}
           <button
             @click='addToCart'
             :disabled='isAddingToCart'
             class='w-full bg-black cursor-pointer hover:bg-gray-900 text-white font-semibold py-2 md:py-3 px-3 md:px-4 text-xs md:text-base transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
           >
-            <span
-              x-text="isAddingToCart ? 'Adding...' : (dibsHasPreorder ? ('+ ' + dibsButtonText) : '+ ADD TO CART')"
-            ></span>
+            <span x-text="isAddingToCart ? 'Adding...' : cardAddToCartLabel"></span>
           </button>
         </div>
       {% endunless %}
@@ -507,16 +504,13 @@
                 {{ kk_status }}
               </button>
             {% else %}
-              {% render 'dibs-plan-picker', context: 'qv' %}
               <button
                 @click='qvAddToCart()'
                 :disabled='!qvCanPurchase'
                 class='w-full text-white font-bold py-4 text-base transition-colors duration-200'
                 :class="qvCanPurchase ? 'cursor-pointer bg-black hover:bg-gray-900' : 'bg-gray-400 cursor-not-allowed opacity-80'"
               >
-                <span
-                  x-text="!qvCanPurchase ? 'SOLD OUT' : (qvDibsHasPreorder ? qvDibsButtonText : 'Add to Cart')"
-                ></span>
+                <span x-text="qvAddToCartLabel"></span>
               </button>
             {% endif %}
             <a
