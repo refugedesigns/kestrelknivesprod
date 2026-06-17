@@ -1,6 +1,7 @@
 (function () {
   const cache = new Map();
   let apiReadyDispatched = false;
+  let globalBadgeObserverStarted = false;
 
   function parseGid(gid) {
     if (gid == null || gid === '') return null;
@@ -9,6 +10,27 @@
     if (match) return Number(match[1]);
     const num = Number(str);
     return Number.isFinite(num) ? num : null;
+  }
+
+  function variantIdsMatch(a, b) {
+    const idA = parseGid(a);
+    const idB = parseGid(b);
+    if (idA != null && idB != null) return idA === idB;
+    return String(a) === String(b);
+  }
+
+  function getProductVariants(dibsProduct) {
+    if (!dibsProduct) return [];
+    if (Array.isArray(dibsProduct.variants) && dibsProduct.variants.length) {
+      return dibsProduct.variants;
+    }
+    if (
+      Array.isArray(dibsProduct.applicableVariants) &&
+      dibsProduct.applicableVariants.length
+    ) {
+      return dibsProduct.applicableVariants;
+    }
+    return [];
   }
 
   function interpolate(template, plan) {
@@ -55,9 +77,9 @@
 
   function getVariantPlans(dibsProduct, variantId) {
     if (!dibsProduct || variantId == null) return [];
-    const numericId = Number(variantId);
-    const variant = (dibsProduct.variants || []).find(function (v) {
-      return parseGid(v.id) === numericId;
+    const variants = getProductVariants(dibsProduct);
+    const variant = variants.find(function (v) {
+      return variantIdsMatch(v.id, variantId);
     });
     if (!variant || !variant.applicableSellingPlans) return [];
     return (variant.applicableSellingPlans || [])
@@ -131,6 +153,61 @@
     } catch (e) {
       return null;
     }
+  }
+
+  function refreshCardFromElement(cardEl, attempt) {
+    if (!cardEl) return;
+    attempt = attempt || 0;
+
+    if (!cardEl._x_dataStack || !cardEl._x_dataStack[0]) {
+      if (attempt < 30) {
+        setTimeout(function () {
+          refreshCardFromElement(cardEl, attempt + 1);
+        }, 200);
+      }
+      return;
+    }
+
+    const state = cardEl._x_dataStack[0];
+    state.dibsBadgeDetected = true;
+    if (typeof state.refreshPurchaseState === 'function') {
+      state.refreshPurchaseState();
+    }
+    if (typeof state.loadDibsPreorder === 'function') {
+      state.loadDibsPreorder();
+    }
+  }
+
+  function initGlobalBadgeObserver() {
+    if (globalBadgeObserverStarted) return;
+    globalBadgeObserverStarted = true;
+
+    document
+      .querySelectorAll('[data-product] .lb-ordereasy-product-list-badge')
+      .forEach(function (badge) {
+        refreshCardFromElement(badge.closest('[data-product]'));
+      });
+
+    new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        mutation.addedNodes.forEach(function (node) {
+          if (node.nodeType !== 1) return;
+
+          if (node.classList && node.classList.contains('lb-ordereasy-product-list-badge')) {
+            refreshCardFromElement(node.closest('[data-product]'));
+            return;
+          }
+
+          if (node.querySelectorAll) {
+            node
+              .querySelectorAll('.lb-ordereasy-product-list-badge')
+              .forEach(function (badge) {
+                refreshCardFromElement(badge.closest('[data-product]'));
+              });
+          }
+        });
+      });
+    }).observe(document.body, { childList: true, subtree: true });
   }
 
   async function prefetchCardProducts() {
@@ -228,11 +305,16 @@
       dibsQvSelectedPlanId: null,
       dibsLoadAttempts: 0,
       dibsPreorderActive: false,
+      dibsBadgeDetected: false,
       dibsListenersBound: false,
+      canPurchase: false,
+      cardHasPreorder: false,
+      cardAddToCartLabel: '+ ADD TO CART',
+      dibsPollTimer: null,
 
       productHasPreorderPlans(dibsProduct) {
-        if (!dibsProduct || !dibsProduct.variants) return false;
-        return dibsProduct.variants.some(function (variant) {
+        if (!dibsProduct) return false;
+        return getProductVariants(dibsProduct).some(function (variant) {
           return (
             variant.applicableSellingPlans &&
             variant.applicableSellingPlans.length > 0
@@ -264,6 +346,8 @@
 
         const sync = () => {
           if (this.detectDibsBadgeOnCard()) {
+            this.dibsBadgeDetected = true;
+            this.refreshPurchaseState();
             this.loadDibsPreorder();
           }
         };
@@ -275,10 +359,19 @@
           childList: true,
           subtree: true,
         });
+      },
 
-        setTimeout(function () {
-          observer.disconnect();
-        }, 30000);
+      startDibsPolling() {
+        if (this.dibsPollTimer) return;
+        let polls = 0;
+        this.dibsPollTimer = setInterval(() => {
+          polls += 1;
+          this.refreshPurchaseState();
+          if (this.canPurchase || polls >= 120) {
+            clearInterval(this.dibsPollTimer);
+            this.dibsPollTimer = null;
+          }
+        }, 1000);
       },
 
       get dibsVariantPlans() {
@@ -300,11 +393,7 @@
       },
 
       get hasDibsInjectedBadge() {
-        return this.detectDibsBadgeOnCard();
-      },
-
-      get cardHasPreorder() {
-        return this.dibsPreorderActive || this.hasDibsInjectedBadge;
+        return this.dibsBadgeDetected;
       },
 
       get dibsHasPreorder() {
@@ -341,25 +430,10 @@
         return badge ? badge.textContent.trim() : 'Preorder Available';
       },
 
-      get cardAddToCartLabel() {
-        if (this.dibsPreorderActive || this.hasDibsInjectedBadge) {
-          return '+ PRE ORDER';
-        }
-        return '+ ADD TO CART';
-      },
-
       get qvAddToCartLabel() {
         if (!this.qvCanPurchase) return 'SOLD OUT';
         if (this.qvDibsHasPreorder) return 'PRE ORDER';
         return 'Add to Cart';
-      },
-
-      get canPurchase() {
-        return (
-          !!this.isAvailable ||
-          this.dibsPreorderActive ||
-          this.hasDibsInjectedBadge
-        );
       },
 
       get qvCanPurchase() {
@@ -371,17 +445,43 @@
         return !!this.isAvailable || this.qvDibsHasPreorder;
       },
 
-      syncDibsPlanSelection() {
-        this.syncDibsState();
-      },
+      refreshPurchaseState() {
+        if (this.detectDibsBadgeOnCard()) {
+          this.dibsBadgeDetected = true;
+        }
 
-      syncDibsState() {
         const plans = this.dibsVariantPlans;
         this.dibsPreorderActive = plans.length > 0;
         this.dibsSelectedPlanId = syncPlanSelection(
           plans,
           this.dibsSelectedPlanId
         );
+
+        const hasProductPreorder = this.productHasPreorderPlans(this.dibsProduct);
+
+        this.cardHasPreorder =
+          this.dibsPreorderActive ||
+          this.dibsBadgeDetected ||
+          hasProductPreorder;
+
+        this.canPurchase =
+          !!this.isAvailable ||
+          this.dibsPreorderActive ||
+          this.dibsBadgeDetected ||
+          hasProductPreorder;
+
+        this.cardAddToCartLabel =
+          this.dibsPreorderActive || this.dibsBadgeDetected || hasProductPreorder
+            ? '+ PRE ORDER'
+            : '+ ADD TO CART';
+      },
+
+      syncDibsPlanSelection() {
+        this.syncDibsState();
+      },
+
+      syncDibsState() {
+        this.refreshPurchaseState();
       },
 
       syncQvDibsPlanSelection() {
@@ -404,10 +504,10 @@
           this.dibsProduct = await window.KKDibsPreorder.fetchProduct(handle);
         }
 
-        this.syncDibsState();
+        this.refreshPurchaseState();
         this.syncQvDibsPlanSelection();
 
-        if (!this.dibsProduct && this.dibsLoadAttempts < 10) {
+        if (!this.dibsProduct && this.dibsLoadAttempts < 15) {
           this.dibsLoadAttempts += 1;
           setTimeout(() => this.loadDibsPreorder(), 1000);
         }
@@ -416,12 +516,26 @@
       initDibsPreorder() {
         this.observeDibsWidget();
         this.loadDibsPreorder();
+        this.refreshPurchaseState();
+        this.startDibsPolling();
       },
 
       getDibsSellingPlanId() {
-        if (!this.dibsVariantPlans.length) return null;
+        const plans = this.dibsVariantPlans;
+        if (!plans.length && this.dibsProduct) {
+          const variants = getProductVariants(this.dibsProduct);
+          for (let i = 0; i < variants.length; i++) {
+            const fallbackPlans = (variants[i].applicableSellingPlans || [])
+              .map(normalizePlan)
+              .filter(function (p) { return p.id != null; });
+            if (fallbackPlans.length) {
+              return pickDefaultPlanId(fallbackPlans);
+            }
+          }
+        }
+        if (!plans.length) return null;
         return resolveSellingPlanId(
-          this.dibsVariantPlans,
+          plans,
           (this.$el && this.$el.closest('form')) || this.$el || document
         );
       },
@@ -475,6 +589,7 @@
     fetchProduct: fetchProduct,
     prefetchCardProducts: prefetchCardProducts,
     getVariantPlans: getVariantPlans,
+    getProductVariants: getProductVariants,
     normalizePlan: normalizePlan,
     pickDefaultPlanId: pickDefaultPlanId,
     syncPlanSelection: syncPlanSelection,
@@ -482,13 +597,17 @@
     resolveSellingPlanId: resolveSellingPlanId,
     createState: createState,
     addToCartWithPlan: addToCartWithPlan,
+    refreshCardFromElement: refreshCardFromElement,
   };
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-      setTimeout(prefetchCardProducts, 100);
-    });
-  } else {
+  function onReady() {
+    initGlobalBadgeObserver();
     setTimeout(prefetchCardProducts, 100);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', onReady);
+  } else {
+    onReady();
   }
 })();
