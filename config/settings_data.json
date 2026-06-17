@@ -124,10 +124,13 @@
         "disabled": false,
         "settings": {}
       },
-      "7800736727063894098": {
-        "type": "shopify://apps/rez-preorder-notify-me/blocks/rez/0da60196-81b6-4270-afac-c9294e1641ba",
+      "6464650315188175684": {
+        "type": "shopify://apps/dibs/blocks/lb-ordereasy-embed/7cc74442-1b61-4b87-afed-944e0def999c",
         "disabled": false,
-        "settings": {}
+        "settings": {
+          "ordereasy_custom_script": "<script></script>",
+          "disable_form_product_validation": false
+        }
       }
     }
   },
