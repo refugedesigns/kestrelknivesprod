@@ -138,6 +138,7 @@
     <!-- Header hook for plugins -->
     {%- comment -%} {{ "application.css" | asset_url | stylesheet_tag }} {%- endcomment -%}
     <script src='{{ application.js | asset_url }}' defer></script>
+    <script src='{{ 'dibs-preorder.js' | asset_url }}' defer></script>
     <script
       defer
       src='https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js'
@@ -217,8 +218,6 @@
     {% render "search-sheet" %}
 
     {% section "footer" %}
-
-     {% render "dibs-preorder-log" %}
 
   </body>
 </html>
