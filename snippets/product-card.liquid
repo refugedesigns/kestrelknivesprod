@@ -92,7 +92,7 @@
         </div>
       {% else %}
         <div
-          x-show='cardHasPreorder'
+          x-show='cardHasPreorder && !hasDibsInjectedBadge'
           x-text='dibsBadgeText'
           class='absolute top-2 left-2 md:top-4 md:left-4 bg-black text-white font-bold px-2 py-1 text-xs md:text-sm uppercase z-10'
         ></div>
@@ -700,7 +700,7 @@
           this.updateImage()
           // Preload hover image for smooth crossfade
           this.preloadSecondImage()
-          this.loadDibsPreorder()
+          this.initDibsPreorder()
         },
 
         openQuickView() {
