@@ -50,7 +50,7 @@
         "hero-slide-1": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/benner_1.jpg",
+            "image": "shopify://shop_images/8.png",
             "image_tablet": "shopify://shop_images/benner_1_mobile.png",
             "image_mobile": "shopify://shop_images/benner_1_mobile.png",
             "image_fit": "cover",
