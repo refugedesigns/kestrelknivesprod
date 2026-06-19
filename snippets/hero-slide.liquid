@@ -132,7 +132,13 @@
             >
               {{ slide_title }}
             </h1>
-            {% assign sentences = slide_subtitle | split: '.' %}
+            {% assign subtitle_lines = slide_subtitle | split: '
+' %}
+            {% if subtitle_lines.size > 1 %}
+              {% assign sentences = subtitle_lines %}
+            {% else %}
+              {% assign sentences = slide_subtitle | split: '.' %}
+            {% endif %}
             {% for sentence in sentences %}
               {% assign trimmed_sentence = sentence | strip %}
               {% if trimmed_sentence != blank %}
