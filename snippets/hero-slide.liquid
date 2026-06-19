@@ -1,0 +1,174 @@
+{% comment %}
+  Hero carousel slide block.
+  Accepts: block, section
+{% endcomment %}
+
+{% liquid
+  assign default_ratio = 1.7778
+  assign image_desktop = block.settings.image
+  assign image_tablet = block.settings.image_tablet
+  assign image_mobile = block.settings.image_mobile
+
+  assign ratio_desktop = default_ratio
+  if image_desktop
+    assign ratio_desktop = image_desktop.aspect_ratio | default: default_ratio
+  endif
+  assign ratio_tablet = ratio_desktop
+  if image_tablet
+    assign ratio_tablet = image_tablet.aspect_ratio | default: ratio_desktop
+  endif
+  assign ratio_mobile = ratio_tablet
+  if image_mobile
+    assign ratio_mobile = image_mobile.aspect_ratio | default: ratio_tablet
+  endif
+
+  assign base_image = image_desktop
+  if base_image == blank
+    assign base_image = image_tablet
+  endif
+  if base_image == blank
+    assign base_image = image_mobile
+  endif
+
+  assign button_action = block.settings.button_action | default: 'link'
+  assign button_url = block.settings.button_url | default: '/collections/professional'
+  assign slide_title = block.settings.title | default: 'Premium Knives'
+  assign slide_subtitle = block.settings.subtitle | default: ''
+
+  assign shadow_strength = block.settings.text_shadow_strength | default: 'soft'
+  assign text_opacity = '0.35'
+  case shadow_strength
+    when 'none'
+      assign text_opacity = '0'
+    when 'soft'
+      assign text_opacity = '0.35'
+    when 'medium'
+      assign text_opacity = '0.6'
+    when 'strong'
+      assign text_opacity = '0.85'
+  endcase
+%}
+
+<swiper-slide
+  id='Slide-{{ block.id }}'
+  class='relative hero-slide'
+  data-hero-slide='{{ block.id }}'
+  {{ block.shopify_attributes }}
+  style='--slide-aspect-desktop: {{ ratio_desktop }}; --slide-aspect-tablet: {{ ratio_tablet }}; --slide-aspect-mobile: {{ ratio_mobile }};'
+>
+  {% if button_action == 'form' %}
+    <button
+      type='button'
+      class='hero-slide-media hero-slide-media-button block w-full'
+      data-klaviyo-form-id='{{ block.settings.button_form_id | escape }}'
+    >
+  {% elsif button_action == 'link' and block.settings.image_link_enable %}
+    <a href='{{ button_url }}' class='hero-slide-media block w-full'>
+  {% else %}
+    <div class='hero-slide-media block w-full'>
+  {% endif %}
+
+  {% if base_image %}
+    <picture class='w-full h-full block'>
+      {% if image_mobile %}
+        <source
+          srcset='{{ image_mobile | image_url: width: 1200 }}'
+          media='(max-width: 767px)'
+        >
+      {% endif %}
+      {% if image_tablet %}
+        <source
+          srcset='{{ image_tablet | image_url: width: 1600 }}'
+          media='(max-width: 1024px)'
+        >
+      {% endif %}
+      <img
+        src='{{ base_image | image_url: width: 1920 }}'
+        alt='{{ slide_title | escape }}'
+        class='w-full h-full'
+        width='{{ base_image.width }}'
+        height='{{ base_image.height }}'
+        style='transform: scale({{ block.settings.image_zoom | default: 100 | divided_by: 100.0 }});'
+        loading='lazy'
+      >
+    </picture>
+  {% else %}
+    {{
+      'lifestyle-1'
+      | placeholder_svg_tag: 'w-full h-full bg-gray-800 object-cover'
+    }}
+  {% endif %}
+
+  {% if block.settings.overlay_enable %}
+    <div
+      class='absolute inset-0 bg-black/{{ block.settings.overlay_opacity | default: 40 }}'
+    ></div>
+  {% endif %}
+
+  {% if button_action == 'form' %}
+    </button>
+  {% elsif button_action == 'link' and block.settings.image_link_enable %}
+    </a>
+  {% else %}
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_text_overlay %}
+    <div class='absolute bottom-4 lg:-bottom-4 inset-0 flex items-end justify-center lg:justify-start z-10 pointer-events-none hero-overlay'>
+      <div class='text-center lg:text-left max-w-4xl px-4 lg:ml-12 lg:mb-12 hero-overlay__inner'>
+        <div class='kk-text-wrap inline-block'>
+          {% if block.settings.text_bg_enable %}
+            {% assign bg_op_pct = block.settings.text_bg_opacity | default: 50 %}
+            {% assign bg_alpha = bg_op_pct | divided_by: 100.0 %}
+            <div
+              class='kk-text-bg'
+              style='background-color: {{ block.settings.text_bg_color | default: "#000000" | color_modify: "alpha", bg_alpha }}'
+            ></div>
+          {% endif %}
+          <div class='kk-text-content lg:mt-0'>
+            <h1
+              class='hero-title-breaks text-4xl md:text-6xl font-bold mb-4'
+              style='color: {{ block.settings.text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ block.settings.text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ text_opacity }});'
+            >
+              {{ slide_title }}
+            </h1>
+            {% assign sentences = slide_subtitle | split: '.' %}
+            {% for sentence in sentences %}
+              {% assign trimmed_sentence = sentence | strip %}
+              {% if trimmed_sentence != blank %}
+                <p
+                  class='text-lg md:text-xl mb-1'
+                  style='color: {{ block.settings.text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ block.settings.text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ text_opacity }});'
+                >
+                  {{ trimmed_sentence }}
+                </p>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+        {% if block.settings.button_enable and block.settings.button_text != blank %}
+          <div class='hero-slide-button-wrap pointer-events-auto'>
+            {% if button_action == 'form' %}
+              <button
+                type='button'
+                class='hero-slide-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                style='background-color: {{ block.settings.button_bg_color | default: "#2563eb" }}; color: {{ block.settings.button_text_color | default: "#ffffff" }};'
+                data-klaviyo-form-id='{{ block.settings.button_form_id | escape }}'
+              >
+                {{ block.settings.button_text }}
+              </button>
+            {% else %}
+              <a
+                href='{{ button_url }}'
+                class='hero-slide-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
+                style='background-color: {{ block.settings.button_bg_color | default: "#2563eb" }}; color: {{ block.settings.button_text_color | default: "#ffffff" }};'
+              >
+                {{ block.settings.button_text }}
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+</swiper-slide>
