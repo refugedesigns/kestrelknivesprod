@@ -253,13 +253,12 @@
     },
     "big-timer": {
       "type": "big-timer",
-      "disabled": true,
       "settings": {
         "show_timer": true,
         "main_title": "Ovis Hunter Drop:",
         "slogan": "Working Knives For Working People.",
         "button_text": "NOTIFY ME",
-        "button_color": "#2563eb",
+        "button_color": "#000000",
         "button_text_color": "#ffffff",
         "button_action": "klaviyo",
         "button_url": "",
