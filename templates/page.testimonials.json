@@ -12,6 +12,16 @@
     "template-testimonials": {
       "type": "template-testimonials",
       "blocks": {
+        "testimonial_qF4BLM": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "They made easy work on this brute. Seriously toughest skin I’ve ever had to cape out. I was impressed",
+            "author": "Meg “MegsInTheWild” Somers",
+            "author_image": "shopify://shop_images/megsinthewild.png",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
         "testimonial_HyGpCE": {
           "type": "testimonial",
           "settings": {
@@ -224,6 +234,7 @@
         }
       },
       "block_order": [
+        "testimonial_qF4BLM",
         "testimonial_HyGpCE",
         "testimonial_N6iVk9",
         "testimonial_LPHqbg",
