@@ -41,7 +41,7 @@
           "countdown_enabled": true,
           "countdown_show_timer": true,
           "countdown_title": "PRE ORDER IS LIVE",
-          "countdown_target_date": "2026-07-27T23:59:59-04:00",
+          "countdown_target_date": "2026-06-30T23:59:59-04:00",
           "countdown_bg_color": "#000000",
           "countdown_border_color": "#dc2626",
           "countdown_text_color": "#ffffff",
