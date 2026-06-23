@@ -262,7 +262,7 @@
         "button_text_color": "#ffffff",
         "button_action": "klaviyo",
         "button_url": "shopify://products/ovis-scalpel",
-        "target_date": "2026-06-29T18:00:00-04:00",
+        "target_date": "2026-07-27T23:59:59-04:00",
         "form_title": "Get Notified",
         "form_subtitle": "Enter your email to be notified when we launch",
         "success_title": "You're on the list!",
