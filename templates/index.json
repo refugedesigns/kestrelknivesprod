@@ -85,9 +85,9 @@
         "hero-slide-2": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/lifestyle_1_-_25-05-2026_11-26-30.png",
-            "image_tablet": "shopify://shop_images/scalpel_mobile.png",
-            "image_mobile": "shopify://shop_images/scalpel_mobile.png",
+            "image": "shopify://shop_images/9.png",
+            "image_tablet": "shopify://shop_images/mobile_9.png",
+            "image_mobile": "shopify://shop_images/mobile_9.png",
             "image_fit": "cover",
             "image_fit_mobile": "cover",
             "image_fit_tablet": "cover",
