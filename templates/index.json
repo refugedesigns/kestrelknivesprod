@@ -260,7 +260,7 @@
         "button_text": "ORDER NOW",
         "button_color": "#000000",
         "button_text_color": "#ffffff",
-        "button_action": "klaviyo",
+        "button_action": "link",
         "button_url": "shopify://products/skeleton-skinner",
         "target_date": "2026-07-13T23:59:59-04:00",
         "form_title": "Get Notified",
