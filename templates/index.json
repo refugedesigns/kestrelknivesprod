@@ -262,7 +262,7 @@
         "button_text_color": "#ffffff",
         "button_action": "link",
         "button_url": "shopify://products/skeleton-skinner",
-        "target_date": "2026-07-13T23:59:59-04:00",
+        "target_date": "2026-07-14T23:59:59-04:00",
         "form_title": "Get Notified",
         "form_subtitle": "Enter your email to be notified when we launch",
         "success_title": "You're on the list!",
