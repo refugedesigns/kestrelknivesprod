@@ -165,25 +165,31 @@
     ></script>
 
     <style>
-      [x-cloak] {
-        display: none;
-      }
-      html,
-      body {
-        height: 100%;
-      }
-      body {
-        margin: 0;
-        display: flex;
-        min-height: 100vh;
-        flex-direction: column;
-      }
-      :root {
-        --header-height: 64px;
-      }
-      main[role='main'] {
-        flex: 1 0 auto;
-      }
+    [x-cloak] {
+  display: none;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+:root {
+  --header-height: 161px;
+}
+@media (max-width: 1099px) {
+  :root {
+    --header-height: 142px;
+  }
+}
+main[role='main'] {
+  flex: 1 0 auto;
+}
+
     </style>
   </head>
   <body class='min-h-screen flex flex-col'>
