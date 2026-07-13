@@ -436,6 +436,20 @@
     </div>
   </div>
 
+<script>  
+  (function() {
+    var header = document.getElementById('siteHeader');
+    var banner = document.getElementById('countdownBanner');
+    var total = 0;
+    if (banner) total += banner.offsetHeight;
+    if (header) total += header.offsetHeight;
+    if (total > 0) {
+      document.documentElement.style.setProperty('--header-height', total + 'px');
+    }
+  })();
+</script>
+
+
   <!-- Search Sheet -->
   {% render "search-sheet" %}
 </div>
