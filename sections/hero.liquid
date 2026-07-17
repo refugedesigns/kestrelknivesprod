@@ -1,5 +1,14 @@
 <!-- Hero Carousel Section -->
 <style>
+  .hero-root {
+    min-height: {{ section.settings.hero_height_px | default: 600 }}px;
+  }
+
+  .hero-scale-wrap,
+  .hero-swiper {
+    min-height: inherit;
+  }
+
   .hero-overlay {
     padding-bottom: 3rem;
   }
@@ -56,10 +65,10 @@
     }
   }
 </style>
-<div class='relative hero-root' x-data x-cloak>
+<div class='relative hero-root'>
   <div
     class='hero-scale-wrap'
-    style='--hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %}; --hero-height-mobile: {{ section.settings.hero_height_mobile_px | default: 420 }}px; --hero-mobile-overlay-padding-bottom: {{ section.settings.hero_mobile_overlay_padding_bottom | default: 12 }}px; --hero-mobile-overlay-inner-margin-bottom: {{ section.settings.hero_mobile_overlay_inner_margin_bottom | default: 28 }}px; --hero-mobile-button-margin-top: {{ section.settings.hero_mobile_button_margin_top | default: 16 }}px; --hero-mobile-button-margin-bottom: {{ section.settings.hero_mobile_button_margin_bottom | default: 12 }}px; --hero-mobile-text-padding-top: {{ section.settings.hero_mobile_text_padding_top | default: 0 }}px;'
+    style='--hero-height-desktop: {{ section.settings.hero_height_px | default: 600 }}px; --hero-scale: {{ section.settings.scale_percent | default: 100 }}; --hero-scale-inv: {{ 10000 | divided_by: section.settings.scale_percent | times: 0.01 }}; --hero-radius: {% if section.settings.scale_percent and section.settings.scale_percent < 100 %}{{ section.settings.scale_radius | default: 16 }}px{% else %}0px{% endif %}; --hero-height-mobile: {{ section.settings.hero_height_mobile_px | default: 420 }}px; --hero-mobile-overlay-padding-bottom: {{ section.settings.hero_mobile_overlay_padding_bottom | default: 12 }}px; --hero-mobile-overlay-inner-margin-bottom: {{ section.settings.hero_mobile_overlay_inner_margin_bottom | default: 28 }}px; --hero-mobile-button-margin-top: {{ section.settings.hero_mobile_button_margin_top | default: 16 }}px; --hero-mobile-button-margin-bottom: {{ section.settings.hero_mobile_button_margin_bottom | default: 12 }}px; --hero-mobile-text-padding-top: {{ section.settings.hero_mobile_text_padding_top | default: 0 }}px;'
   >
     {% liquid
       assign hero_mode = section.settings.hero_mode | default: 'carousel'
@@ -205,6 +214,10 @@
   }
 
   @media (max-width: 768px) {
+    .hero-root {
+      min-height: {{ section.settings.hero_height_mobile_px | default: 520 }}px;
+    }
+
     .hero-scale-wrap .hero-swiper {
       width: calc(100% * var(--hero-scale-inv, 1));
       transform: scale(calc(var(--hero-scale, 100) / 100));
