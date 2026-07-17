@@ -24,6 +24,13 @@
         width: 100%;
         max-width: 100vw;
         overflow: visible;
+        min-height: 80px;
+      }
+
+      @media (min-width: 640px) {
+        #countdownBanner {
+          min-height: 48px;
+        }
       }
 
       @media (max-width: 639px) {
@@ -123,27 +130,6 @@
         init() {
           this.startCountdown()
           this.setupScrollBehavior()
-          this.updateBannerHeight()
-          window.addEventListener('resize', () => this.updateBannerHeight())
-
-          const banner = document.getElementById('countdownBanner')
-          if (banner && 'ResizeObserver' in window) {
-            const bannerResizeObserver = new ResizeObserver(() =>
-              this.updateBannerHeight()
-            )
-            bannerResizeObserver.observe(banner)
-          }
-        },
-
-        updateBannerHeight() {
-          const banner = document.getElementById('countdownBanner')
-          if (banner) {
-            const height = banner.offsetHeight
-            document.documentElement.style.setProperty(
-              '--countdown-banner-height',
-              height + 'px'
-            )
-          }
         },
 
         setupScrollBehavior() {
@@ -151,13 +137,22 @@
           const header = document.getElementById('siteHeader')
           if (!banner || !header) return
 
+          const getBannerHeight = () => {
+            const cssHeight = parseFloat(
+              getComputedStyle(document.documentElement).getPropertyValue(
+                '--countdown-banner-height'
+              )
+            )
+            return cssHeight || banner.offsetHeight
+          }
+
           let ticking = false
           const handleScroll = () => {
             if (!ticking) {
               window.requestAnimationFrame(() => {
                 const scrollTop =
                   window.pageYOffset || document.documentElement.scrollTop
-                const bannerHeight = banner.offsetHeight
+                const bannerHeight = getBannerHeight()
 
                 if (scrollTop > bannerHeight) {
                   banner.style.transform = 'translateY(-100%)'
