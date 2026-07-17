@@ -198,7 +198,7 @@
       "settings": {
         "hero_mode": "carousel",
         "single_hero_slide_number": 1,
-        "hero_height_px": 600,
+        "hero_height_px": 700,
         "hero_height_mobile_px": 520,
         "hero_mobile_overlay_padding_bottom": 40,
         "hero_mobile_text_padding_top": 0,
