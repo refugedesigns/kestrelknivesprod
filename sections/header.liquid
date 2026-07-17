@@ -9,6 +9,18 @@
       assign countdown_banner_visible = true
     endif
   endif
+
+  assign logo_h_mobile = section.settings.logo_height_mobile | default: 32
+  assign logo_h_desktop = section.settings.logo_height_desktop | default: 80
+  assign header_pad_y = 16
+  assign header_border = 0
+  if section.settings.header_border_bottom
+    assign header_border = 1
+  endif
+  assign header_bar_mobile = logo_h_mobile | plus: header_pad_y | plus: header_border
+  assign header_bar_desktop = logo_h_desktop | plus: header_pad_y | plus: header_border
+  assign countdown_h_mobile = 80
+  assign countdown_h_desktop = 48
 %}
 
 <style>
@@ -75,22 +87,29 @@
     }
   }
 
-  {% if countdown_banner_visible %}
-  /* Reserve countdown banner space before Alpine measures it */
   :root {
-    --countdown-banner-height: 80px;
-    --header-height: calc(142px + 80px);
+    --header-bar-height: {{ header_bar_mobile }}px;
+    --header-height: {{ header_bar_mobile }}px;
+    --countdown-banner-height: 0px;
   }
-  @media (min-width: 640px) and (max-width: 1099px) {
-    :root {
-      --countdown-banner-height: 48px;
-      --header-height: calc(142px + 48px);
-    }
-  }
+
   @media (min-width: 1100px) {
     :root {
-      --countdown-banner-height: 48px;
-      --header-height: calc(161px + 48px);
+      --header-bar-height: {{ header_bar_desktop }}px;
+      --header-height: {{ header_bar_desktop }}px;
+    }
+  }
+
+  {% if countdown_banner_visible %}
+  :root {
+    --countdown-banner-height: {{ countdown_h_mobile }}px;
+    --header-height: calc(var(--header-bar-height) + {{ countdown_h_mobile }}px);
+  }
+
+  @media (min-width: 640px) {
+    :root {
+      --countdown-banner-height: {{ countdown_h_desktop }}px;
+      --header-height: calc(var(--header-bar-height) + {{ countdown_h_desktop }}px);
     }
   }
   {% endif %}
