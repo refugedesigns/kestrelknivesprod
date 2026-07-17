@@ -179,12 +179,14 @@ body {
   flex-direction: column;
 }
 :root {
-  --header-height: 161px;
+  --header-bar-height: 48px;
+  --header-height: 48px;
   --countdown-banner-height: 0px;
 }
-@media (max-width: 1099px) {
+@media (min-width: 1100px) {
   :root {
-    --header-height: 142px;
+    --header-bar-height: 96px;
+    --header-height: 96px;
   }
 }
 main[role='main'] {
