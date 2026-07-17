@@ -1,4 +1,20 @@
-{% if section.settings.countdown_enabled %}
+{% liquid
+  assign countdown_is_visible = countdown_banner_visible
+  if countdown_is_visible == blank
+    assign countdown_is_visible = false
+    if section.settings.countdown_enabled
+      if section.settings.countdown_show_timer != false and section.settings.countdown_target_date != blank
+        assign countdown_is_visible = true
+      elsif section.settings.countdown_title != blank
+        assign countdown_is_visible = true
+      elsif section.settings.notify_button_text != blank
+        assign countdown_is_visible = true
+      endif
+    endif
+  endif
+%}
+
+{% if countdown_is_visible %}
   <div x-data='countdownBanner()' x-init='init()'>
     <style>
       .countdown-drawer {
