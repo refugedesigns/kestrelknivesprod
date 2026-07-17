@@ -1,3 +1,16 @@
+{% liquid
+  assign countdown_banner_visible = false
+  if section.settings.countdown_enabled
+    if section.settings.countdown_show_timer != false and section.settings.countdown_target_date != blank
+      assign countdown_banner_visible = true
+    elsif section.settings.countdown_title != blank
+      assign countdown_banner_visible = true
+    elsif section.settings.notify_button_text != blank
+      assign countdown_banner_visible = true
+    endif
+  endif
+%}
+
 <style>
   /* Responsive logo sizing */
   .header-logo {
@@ -62,7 +75,7 @@
     }
   }
 
-  {% if section.settings.countdown_enabled %}
+  {% if countdown_banner_visible %}
   /* Reserve countdown banner space before Alpine measures it */
   :root {
     --countdown-banner-height: 80px;
@@ -83,13 +96,13 @@
   {% endif %}
 </style>
 
-{% render "countdown-banner", section: section %}
+{% render "countdown-banner", section: section, countdown_banner_visible: countdown_banner_visible %}
 
 <div
   id='siteHeader'
   class='fixed w-full z-40 start-0'
   x-data='{ mobileMenuOpen: false, searchBarOpen: false }'
-  style='background-color: {{ section.settings.header_bg_color | default: "#000000" }}; {% if section.settings.header_border_bottom %}border-bottom: 1px solid {{ section.settings.header_border_color | default: "#ffffff" }};{% endif %} {% if section.settings.countdown_enabled %}top: var(--countdown-banner-height, 0px);{% else %}top: 0;{% endif %}'
+  style='background-color: {{ section.settings.header_bg_color | default: "#000000" }}; {% if section.settings.header_border_bottom %}border-bottom: 1px solid {{ section.settings.header_border_color | default: "#ffffff" }};{% endif %} {% if countdown_banner_visible %}top: var(--countdown-banner-height, 0px);{% else %}top: 0;{% endif %}'
 >
   <div class='mx-auto px-4 sm:px-6 max-w-8xl'>
     <div class='flex justify-between items-center py-2 lg:justify-start lg:space-x-10'>
