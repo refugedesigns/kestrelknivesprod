@@ -77,10 +77,7 @@
     }
   }
 
-  /* Mobile menu panel hidden until Alpine opens it */
-  .mobile-menu-panel {
-    display: none;
-  }
+  /* Hide mobile menu on desktop; Alpine x-show + x-cloak control mobile */
   @media (min-width: 1100px) {
     .mobile-menu-panel {
       display: none !important;
