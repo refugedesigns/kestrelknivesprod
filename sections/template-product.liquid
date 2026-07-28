@@ -64,6 +64,15 @@
     | round
   %}
 {% endif %}
+{% assign product_image_count = 0 %}
+{% assign product_video_count = 0 %}
+{% for media in product.media %}
+  {% if media.media_type == 'image' %}
+    {% assign product_image_count = product_image_count | plus: 1 %}
+  {% elsif media.media_type == 'video' or media.media_type == 'external_video' %}
+    {% assign product_video_count = product_video_count | plus: 1 %}
+  {% endif %}
+{% endfor %}
 
 <style>
   /* Custom styles for enhanced functionality */
@@ -511,15 +520,19 @@
               id='thumbnailStrip'
               class='flex space-x-4 overflow-x-auto pb-2'
             >
+              {% assign image_index = 0 %}
               {% for media in product.media %}
-                <button
-                  @click='changeImage({{ forloop.index0 }})'
-                  data-thumb-index='{{ forloop.index0 }}'
-                  class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 transition-colors border-gray-200 hover:border-black'
-                  :class="currentImageIndex === {{ forloop.index0 }} ? 'border-black' : 'border-gray-200 hover:border-black'"
-                >
-                  {% render "product-media", media: media %}
-                </button>
+                {% if media.media_type == 'image' %}
+                  <button
+                    @click='changeImage({{ image_index }})'
+                    data-thumb-index='{{ image_index }}'
+                    class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 transition-colors border-gray-200 hover:border-black'
+                    :class="currentImageIndex === {{ image_index }} ? 'border-black' : 'border-gray-200 hover:border-black'"
+                  >
+                    {% render "product-media", media: media %}
+                  </button>
+                  {% assign image_index = image_index | plus: 1 %}
+                {% endif %}
               {% endfor %}
             </div>
             <div
@@ -1294,6 +1307,17 @@
           {% if product.description != blank %}
             <div class='prose prose-black max-w-none'>
               {{ product.description }}
+            </div>
+          {% endif %}
+          {% if product_video_count > 0 %}
+            <div class='mt-8 space-y-6'>
+              {% for media in product.media %}
+                {% if media.media_type == 'video' or media.media_type == 'external_video' %}
+                  <div class='bg-black rounded-lg overflow-hidden'>
+                    {{ media | media_tag: class: 'w-full h-auto', controls: true, preload: 'metadata' }}
+                  </div>
+                {% endif %}
+              {% endfor %}
             </div>
           {% endif %}
         </div>
@@ -2254,13 +2278,15 @@
       :initial-slide='currentSlide'
     >
       {% for media in product.media %}
-        <swiper-slide class='flex items-center justify-center'>
-          <img
-            src='{{ media | img_url: 'large' }}'
-            alt='{{ media.preview_image.alt }}'
-            class='w-full h-full object-contain'
-          >
-        </swiper-slide>
+        {% if media.media_type == 'image' %}
+          <swiper-slide class='flex items-center justify-center'>
+            <img
+              src='{{ media | img_url: 'large' }}'
+              alt='{{ media.preview_image.alt }}'
+              class='w-full h-full object-contain'
+            >
+          </swiper-slide>
+        {% endif %}
       {% endfor %}
     </swiper-container>
   </div>
@@ -2560,8 +2586,11 @@
           dibsSelectedPlanId: null,
           currentVariantId: {{ selected_variant.id }},
           productImages: [
+            {% assign first_product_image = true %}
             {% for media in product.media %}
-              '{{ media | img_url: "2048x2048" }}'{% unless forloop.last %},{% endunless %}
+              {% if media.media_type == 'image' %}
+                {% unless first_product_image %},{% endunless %}'{{ media | img_url: "2048x2048" }}'{% assign first_product_image = false %}
+              {% endif %}
             {% endfor %}
           ],
           useComplexOptions,
@@ -3313,7 +3342,7 @@
         const images = state && Array.isArray(state.productImages) ? state.productImages : [];
         let total = images.length;
         if (!total) {
-          total = {{ product.media.size }};
+          total = {{ product_image_count }};
         }
 
         if (!total || total <= 1) {
