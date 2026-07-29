@@ -1367,15 +1367,20 @@
         {% endif %}
       </div>
       {% if product_video_count > 0 %}
+        {% assign video_poster_url = product.featured_image | image_url: width: 1200 %}
         <div class='mt-12'>
           <h3 class='text-2xl md:text-3xl font-bold text-black text-center mb-6'>
             How to Use {{ product.title }}
           </h3>
-          <div class='max-w-3xl mx-auto space-y-6'>
+          <div class='max-w-xl mx-auto space-y-6'>
             {% for media in product.media %}
-              {% if media.media_type == 'video' or media.media_type == 'external_video' %}
+              {% if media.media_type == 'video' %}
                 <div class='bg-black rounded-lg overflow-hidden'>
-                  {{ media | media_tag: class: 'w-full h-auto', controls: true, preload: 'metadata' }}
+                  {{ media | video_tag: class: 'w-full h-auto', controls: true, preload: 'none', poster: video_poster_url }}
+                </div>
+              {% elsif media.media_type == 'external_video' %}
+                <div class='bg-black rounded-lg overflow-hidden aspect-video'>
+                  {{ media | external_video_tag: class: 'w-full h-full' }}
                 </div>
               {% endif %}
             {% endfor %}
