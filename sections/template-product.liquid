@@ -80,6 +80,84 @@
     scroll-behavior: smooth;
   }
 
+  /* Restore Shopify rich-text formatting (Tailwind Preflight strips list styles;
+     prose classes require application.css which is not loaded) */
+  .product-description p {
+    margin: 0 0 1rem;
+    line-height: 1.7;
+  }
+
+  .product-description p:last-child {
+    margin-bottom: 0;
+  }
+
+  .product-description strong,
+  .product-description b {
+    font-weight: 700;
+  }
+
+  .product-description em,
+  .product-description i {
+    font-style: italic;
+  }
+
+  .product-description ul,
+  .product-description ol {
+    margin: 0 0 1rem;
+    padding-left: 1.5rem;
+  }
+
+  .product-description ul {
+    list-style-type: disc;
+  }
+
+  .product-description ol {
+    list-style-type: decimal;
+  }
+
+  .product-description li {
+    margin: 0.35rem 0;
+    line-height: 1.6;
+    display: list-item;
+  }
+
+  .product-description ul ul {
+    list-style-type: circle;
+    margin-top: 0.35rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .product-description h1,
+  .product-description h2,
+  .product-description h3,
+  .product-description h4,
+  .product-description h5,
+  .product-description h6 {
+    color: #111827;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 1.5rem 0 0.75rem;
+  }
+
+  .product-description h1 { font-size: 1.875rem; }
+  .product-description h2 { font-size: 1.5rem; }
+  .product-description h3 { font-size: 1.25rem; }
+  .product-description h4 { font-size: 1.125rem; }
+
+  .product-description a {
+    color: #111827;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .product-description blockquote {
+    margin: 1rem 0;
+    padding-left: 1rem;
+    border-left: 4px solid #d1d5db;
+    font-style: italic;
+    color: #4b5563;
+  }
+
   /* Image transition effects */
   .image-transition {
     transition: opacity 0.3s ease-in-out;
@@ -1305,7 +1383,7 @@
         <!-- Description (Left - 7 columns) -->
         <div class='lg:col-span-7'>
           {% if product.description != blank %}
-            <div class='prose prose-black max-w-none'>
+            <div class='product-description max-w-none'>
               {{ product.description }}
             </div>
           {% endif %}
