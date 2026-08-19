@@ -51,9 +51,9 @@
         "hero-slide-1": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/10.png",
-            "image_tablet": "shopify://shop_images/mobile_10.png",
-            "image_mobile": "shopify://shop_images/mobile_10.png",
+            "image": "shopify://shop_images/11.png",
+            "image_tablet": "shopify://shop_images/mobile_11.png",
+            "image_mobile": "shopify://shop_images/mobile_11.png",
             "image_fit": "cover",
             "image_fit_mobile": "cover",
             "image_fit_tablet": "cover",
