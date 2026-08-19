@@ -74,7 +74,7 @@
             "text_bg_color": "#000000",
             "text_bg_opacity": 50,
             "button_enable": true,
-            "button_text": "Buy The Ovis Hunter Now!",
+            "button_text": "Buy The Ovis Hunter Camo Now!",
             "button_action": "link",
             "button_form_id": "",
             "button_url": "shopify://products/ovis-hunter",
