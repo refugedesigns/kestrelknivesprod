@@ -77,7 +77,7 @@
             "button_text": "Buy The Ovis Hunter Camo Now!",
             "button_action": "link",
             "button_form_id": "",
-            "button_url": "shopify://products/ovis-hunter",
+            "button_url": "shopify://products/ovis-hunter-camo-early-access",
             "image_link_enable": false,
             "button_bg_color": "#ffffff",
             "button_text_color": "#000000"
