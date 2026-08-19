@@ -112,7 +112,7 @@
             "button_text": "Buy the Mountain Scalpel Now!",
             "button_action": "link",
             "button_form_id": "",
-            "button_url": "shopify://products/mountain-scalpel-early-access",
+            "button_url": "shopify://products/mountain-scalpel",
             "image_link_enable": true,
             "button_bg_color": "#ffffff",
             "button_text_color": "#000000"
