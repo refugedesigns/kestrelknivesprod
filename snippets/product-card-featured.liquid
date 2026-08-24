@@ -502,6 +502,26 @@
         optionNames: [],
         qvImage: null,
 
+        get qvSelectedVariantObj() {
+          return this.getVariantById(
+            this.qvSelectedVariantId || this.selectedVariant
+          )
+        },
+        get qvCanPurchase() {
+          if (typeof this.isQvPurchasable === 'function') {
+            return this.isQvPurchasable()
+          }
+          const selected = this.qvSelectedVariantObj
+          if (selected) return !!selected.available
+          return !!this.isAvailable
+        },
+        get qvAddToCartLabel() {
+          if (typeof this.getQvPurchaseLabel === 'function') {
+            return this.getQvPurchaseLabel()
+          }
+          return this.qvCanPurchase ? 'Add to Cart' : 'SOLD OUT'
+        },
+
         init() {
           try {
             const el = this.$el
@@ -620,8 +640,12 @@
         },
 
         getVariantById(id) {
-          if (!id) return null
-          return (this.variantsData || []).find(v => v.id === id) || null
+          if (id == null) return null
+          const target = String(id)
+          return (
+            (this.variantsData || []).find(v => String(v.id) === target) ||
+            null
+          )
         },
 
         updateTitle() {
@@ -815,6 +839,20 @@
             this.optionNames = []
           }
           const currentVariant = this.getVariantById(this.selectedVariant)
+          if (currentVariant) {
+            this.qvOption1 = currentVariant.option1 || null
+            this.qvOption2 = currentVariant.option2 || null
+          } else {
+            const firstAvailable =
+              (this.variantsData || []).find(v => !!v.available) ||
+              (this.variantsData || [])[0] ||
+              null
+            if (firstAvailable) {
+              this.qvSelectedVariantId = firstAvailable.id
+              this.qvOption1 = firstAvailable.option1 || null
+              this.qvOption2 = firstAvailable.option2 || null
+            }
+          }
           const selectedImage = currentVariant
             ? this.resolveImageSrc(
                 currentVariant.featured_image || currentVariant.image
@@ -875,7 +913,7 @@
         updateQVSelectedVariant() {
           let chosen = null
           if (this.qvOption1 || this.qvOption2) {
-            chosen = (this.variantsData || []).find(v => {
+            const matches = (this.variantsData || []).filter(v => {
               const ok1 = this.qvOption1
                 ? String(v.option1 || '') === String(this.qvOption1)
                 : true
@@ -884,6 +922,8 @@
                 : true
               return ok1 && ok2
             })
+            chosen =
+              matches.find(v => !!v.available) || matches[0] || null
           }
           if (chosen) {
             this.qvSelectedVariantId = chosen.id
