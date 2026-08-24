@@ -512,7 +512,7 @@
         }, 1000);
       },
 
-      get dibsVariantPlans() {
+      getDibsVariantPlans() {
         if (!this.dibsProduct) return [];
         const variantId =
           this.selectedVariant != null
@@ -521,7 +521,7 @@
         return getVariantPlans(this.dibsProduct, variantId);
       },
 
-      get qvDibsVariantPlans() {
+      getQvDibsVariantPlans() {
         if (!this.dibsProduct) return [];
         const variantId =
           this.qvSelectedVariantId != null
@@ -530,20 +530,20 @@
         return getVariantPlans(this.dibsProduct, variantId);
       },
 
-      get hasDibsInjectedBadge() {
+      hasDibsInjectedBadge() {
         return this.dibsBadgeDetected;
       },
 
-      get dibsHasPreorder() {
+      hasDibsPreorder() {
         return this.dibsPreorderActive;
       },
 
-      get qvDibsHasPreorder() {
-        return this.qvDibsVariantPlans.length > 0;
+      hasQvDibsPreorder() {
+        return this.getQvDibsVariantPlans().length > 0;
       },
 
-      get dibsSelectedPlan() {
-        const plans = this.dibsVariantPlans;
+      getDibsSelectedPlan() {
+        const plans = this.getDibsVariantPlans();
         if (!plans.length) return null;
         const planId = resolveSellingPlanId(
           plans,
@@ -552,15 +552,15 @@
         return plans.find(function (p) { return p.id === planId; }) || plans[0];
       },
 
-      get qvDibsSelectedPlan() {
-        const plans = this.qvDibsVariantPlans;
+      getQvDibsSelectedPlan() {
+        const plans = this.getQvDibsVariantPlans();
         if (!plans.length) return null;
         const planId = resolveSellingPlanId(plans, this.$el || document);
         return plans.find(function (p) { return p.id === planId; }) || plans[0];
       },
 
-      get dibsBadgeText() {
-        const plan = this.dibsSelectedPlan;
+      getDibsBadgeText() {
+        const plan = this.getDibsSelectedPlan();
         if (plan) return plan.badge;
         const badge = this.$el && this.$el.querySelector(
           '.lb-ordereasy-product-list-badge'
@@ -568,19 +568,21 @@
         return badge ? badge.textContent.trim() : 'Preorder Available';
       },
 
-      get qvAddToCartLabel() {
-        if (!this.qvCanPurchase) return 'SOLD OUT';
-        if (this.qvDibsHasPreorder) return 'PRE ORDER';
-        return 'Add to Cart';
+      // Kept as methods (not getters) so object-spread into Alpine preserves them.
+      isQvPurchasable() {
+        const selected = this.qvSelectedVariantObj
+          ? this.qvSelectedVariantObj
+          : null;
+        if (selected) {
+          return !!selected.available || this.hasQvDibsPreorder();
+        }
+        return !!this.isAvailable || this.hasQvDibsPreorder();
       },
 
-      get qvCanPurchase() {
-        if (this.qvSelectedVariantObj) {
-          return (
-            !!this.qvSelectedVariantObj.available || this.qvDibsHasPreorder
-          );
-        }
-        return !!this.isAvailable || this.qvDibsHasPreorder;
+      getQvPurchaseLabel() {
+        if (!this.isQvPurchasable()) return 'SOLD OUT';
+        if (this.hasQvDibsPreorder()) return 'PRE ORDER';
+        return 'Add to Cart';
       },
 
       refreshPurchaseState() {
@@ -588,7 +590,7 @@
           this.dibsBadgeDetected = true;
         }
 
-        const plans = this.dibsVariantPlans;
+        const plans = this.getDibsVariantPlans();
         this.dibsPreorderActive = plans.length > 0;
         this.dibsSelectedPlanId = syncPlanSelection(
           plans,
@@ -624,7 +626,7 @@
 
       syncQvDibsPlanSelection() {
         this.dibsQvSelectedPlanId = syncPlanSelection(
-          this.qvDibsVariantPlans,
+          this.getQvDibsVariantPlans(),
           this.dibsQvSelectedPlanId
         );
       },
@@ -659,7 +661,7 @@
       },
 
       getDibsSellingPlanId() {
-        const plans = this.dibsVariantPlans;
+        const plans = this.getDibsVariantPlans();
         if (!plans.length && this.dibsProduct) {
           const variants = getProductVariants(this.dibsProduct);
           for (let i = 0; i < variants.length; i++) {
@@ -679,8 +681,9 @@
       },
 
       getQvDibsSellingPlanId() {
-        if (!this.qvDibsVariantPlans.length) return null;
-        return resolveSellingPlanId(this.qvDibsVariantPlans, this.$el || document);
+        const plans = this.getQvDibsVariantPlans();
+        if (!plans.length) return null;
+        return resolveSellingPlanId(plans, this.$el || document);
       },
 
       getDibsCartLineProperties() {
