@@ -606,8 +606,8 @@
               : ''
           }
 
-          const qvSelectedVariant = this.variantsData.find(
-            v => v.id === this.qvSelectedVariantId
+          const qvSelectedVariant = this.getVariantById(
+            this.qvSelectedVariantId
           )
           if (qvSelectedVariant && qvSelectedVariant.price != null) {
             return this.formatMoney(qvSelectedVariant.price)
@@ -617,10 +617,34 @@
             ? this.formatMoney(this.productData.price)
             : ''
         },
+        getVariantById(id) {
+          if (id == null || !this.variantsData || !this.variantsData.length) {
+            return null
+          }
+          const target = String(id)
+          return (
+            this.variantsData.find(v => String(v.id) === target) || null
+          )
+        },
         get qvSelectedVariantObj() {
-          if (!this.variantsData || !this.variantsData.length) return null
-          const targetId = this.qvSelectedVariantId || this.selectedVariant
-          return this.variantsData.find(v => v.id === targetId) || null
+          return this.getVariantById(
+            this.qvSelectedVariantId || this.selectedVariant
+          )
+        },
+        // Must be defined here (not via createState spread) so Alpine keeps live getters.
+        get qvCanPurchase() {
+          if (typeof this.isQvPurchasable === 'function') {
+            return this.isQvPurchasable()
+          }
+          const selected = this.qvSelectedVariantObj
+          if (selected) return !!selected.available
+          return !!this.isAvailable
+        },
+        get qvAddToCartLabel() {
+          if (typeof this.getQvPurchaseLabel === 'function') {
+            return this.getQvPurchaseLabel()
+          }
+          return this.qvCanPurchase ? 'Add to Cart' : 'SOLD OUT'
         },
         // Quick View state
         isQuickViewOpen: false,
@@ -713,12 +737,23 @@
             this.optionNames = []
           }
           // Seed option selections from current variant if available
-          const current = (this.variantsData || []).find(
-            v => v.id === (this.selectedVariant || this.qvSelectedVariantId)
+          const current = this.getVariantById(
+            this.selectedVariant || this.qvSelectedVariantId
           )
           if (current) {
             this.qvOption1 = current.option1 || null
             this.qvOption2 = current.option2 || null
+          } else {
+            // Fall back to first available variant's options
+            const firstAvailable =
+              (this.variantsData || []).find(v => !!v.available) ||
+              (this.variantsData || [])[0] ||
+              null
+            if (firstAvailable) {
+              this.qvSelectedVariantId = firstAvailable.id
+              this.qvOption1 = firstAvailable.option1 || null
+              this.qvOption2 = firstAvailable.option2 || null
+            }
           }
           // Initialize drawer image from current card image
           this.qvImage = this.currentImage
@@ -781,14 +816,12 @@
 
         checkAvailability() {
           if (this.variantsData && this.variantsData.length > 0) {
-            const selectedVariant = this.variantsData.find(
-              v => v.id === this.selectedVariant
-            )
+            const selectedVariant = this.getVariantById(this.selectedVariant)
             this.isAvailable = selectedVariant
-              ? selectedVariant.available
-              : false
+              ? !!selectedVariant.available
+              : !!this.productData.available
           } else {
-            this.isAvailable = this.productData.available
+            this.isAvailable = !!this.productData.available
           }
           if (typeof this.refreshPurchaseState === 'function') {
             this.refreshPurchaseState()
@@ -949,10 +982,10 @@
           })
         },
         updateQVSelectedVariant() {
-          // Find variant matching current option selections
+          // Find variant matching current option selections (prefer available)
           let chosen = null
           if (this.qvOption1 || this.qvOption2) {
-            chosen = (this.variantsData || []).find(v => {
+            const matches = (this.variantsData || []).filter(v => {
               const ok1 = this.qvOption1
                 ? String(v.option1 || '') === String(this.qvOption1)
                 : true
@@ -961,6 +994,8 @@
                 : true
               return ok1 && ok2
             })
+            chosen =
+              matches.find(v => !!v.available) || matches[0] || null
           }
           if (chosen) {
             this.qvSelectedVariantId = chosen.id
