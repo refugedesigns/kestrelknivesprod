@@ -233,7 +233,7 @@
         "hero-slide-4"
       ],
       "settings": {
-        "hero_mode": "carousel",
+        "hero_mode": "single",
         "single_hero_slide_number": 1,
         "hero_height_px": 700,
         "hero_height_mobile_px": 520,
