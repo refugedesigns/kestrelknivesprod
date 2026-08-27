@@ -129,6 +129,14 @@
               </a>
               <div class='hidden md:block w-px h-full bg-white'></div>
               <a
+                href='{{ section.settings.warranty_url | default: "/pages/warranty" }}'
+                class='block text-sm hover:opacity-80 transition-colors duration-200 font-medium uppercase tracking-wide'
+                style='color: {{ section.settings.link_color | default: "#ffffff" }};'
+              >
+                WARRANTY
+              </a>
+              <div class='hidden md:block w-px h-full bg-white'></div>
+              <a
                 href='{{ section.settings.privacy_url | default: "/pages/privacy-policy" }}'
                 class='block text-sm hover:opacity-80 transition-colors duration-200 font-medium uppercase tracking-wide'
                 style='color: {{ section.settings.link_color | default: "#ffffff" }};'
@@ -362,6 +370,11 @@
       "type": "url",
       "id": "shipping_url",
       "label": "Shipping & Returns URL"
+    },
+    {
+      "type": "url",
+      "id": "warranty_url",
+      "label": "Warranty URL"
     },
     {
       "type": "url",
