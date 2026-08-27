@@ -15,9 +15,9 @@
         "slide_xPQKfw": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/11.png",
-            "image_tablet": "shopify://shop_images/mobile_11.png",
-            "image_mobile": "shopify://shop_images/mobile_11.png",
+            "image": "shopify://shop_images/12.png",
+            "image_tablet": "shopify://shop_images/mobile_12.png",
+            "image_mobile": "shopify://shop_images/mobile_12.png",
             "image_fit": "cover",
             "image_fit_mobile": "cover",
             "image_fit_tablet": "cover",
