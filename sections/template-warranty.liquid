@@ -117,19 +117,22 @@
 {% else %}
   <div class='bg-gray-50'>
     <header
-      class='text-white relative overflow-hidden flex items-center justify-center'
-      style='background-color: {{ section.settings.header_bg_color | default: "#000000" }}; min-height: {{ section.settings.header_height | default: 200 }}px; padding-top: {{ section.settings.header_padding_top | default: 4 }}rem; padding-bottom: {{ section.settings.header_padding_bottom | default: 4 }}rem; {% if section.settings.header_border_bottom %}border-bottom: 2px solid {{ section.settings.header_border_color | default: "#ffffff" }};{% endif %}'
+      class='relative overflow-hidden flex items-center justify-center'
+      style='background-color: {{ section.settings.header_bg_color | default: "#ffffff" }}; min-height: {{ section.settings.header_height | default: 200 }}px; padding-top: {{ section.settings.header_padding_top | default: 4 }}rem; padding-bottom: {{ section.settings.header_padding_bottom | default: 4 }}rem; {% if section.settings.header_border_bottom %}border-bottom: 2px solid {{ section.settings.header_border_color | default: "#000000" }};{% endif %}'
     >
       <div class='container mx-auto px-4 relative z-10 flex flex-col items-center justify-center'>
         <div class='text-center'>
           <h1
             class='text-5xl font-bold mb-4'
-            style='color: {{ section.settings.title_color | default: "#ffffff" }};'
+            style='color: {{ section.settings.title_color | default: "#000000" }};'
           >
             {{ page.title }}
           </h1>
           {% if page.excerpt != blank %}
-            <p class='text-xl opacity-90 max-w-2xl mx-auto leading-relaxed'>
+            <p
+              class='text-xl max-w-2xl mx-auto leading-relaxed'
+              style='color: {{ section.settings.title_color | default: "#000000" }}; opacity: 0.8;'
+            >
               {{ page.excerpt }}
             </p>
           {% endif %}
@@ -242,7 +245,7 @@
       "type": "color",
       "id": "header_bg_color",
       "label": "Header background color",
-      "default": "#000000"
+      "default": "#ffffff"
     },
     {
       "type": "range",
@@ -258,7 +261,7 @@
       "type": "color",
       "id": "title_color",
       "label": "Title color",
-      "default": "#ffffff"
+      "default": "#000000"
     },
     {
       "type": "checkbox",
@@ -270,7 +273,7 @@
       "type": "color",
       "id": "header_border_color",
       "label": "Bottom border color",
-      "default": "#ffffff"
+      "default": "#000000"
     },
     {
       "type": "range",
