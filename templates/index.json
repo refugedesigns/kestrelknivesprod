@@ -14,6 +14,7 @@
       "blocks": {
         "slide_xPQKfw": {
           "type": "slide",
+          "disabled": true,
           "settings": {
             "image": "shopify://shop_images/12_d4066e41-2c78-441e-a67c-8afda6b99b58.png",
             "image_tablet": "shopify://shop_images/mobile_12.png",
@@ -233,7 +234,7 @@
         "hero-slide-4"
       ],
       "settings": {
-        "hero_mode": "single",
+        "hero_mode": "carousel",
         "single_hero_slide_number": 1,
         "hero_height_px": 700,
         "hero_height_mobile_px": 520,
