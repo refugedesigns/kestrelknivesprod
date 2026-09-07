@@ -158,9 +158,9 @@
         "hero-slide-3": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/6.png",
-            "image_tablet": "shopify://shop_images/mobile_6.png",
-            "image_mobile": "shopify://shop_images/mobile_6.png",
+            "image": "shopify://shop_images/13.png",
+            "image_tablet": "shopify://shop_images/mobile_13.png",
+            "image_mobile": "shopify://shop_images/mobile_13.png",
             "image_fit": "cover",
             "image_fit_mobile": "cover",
             "image_fit_tablet": "cover",
