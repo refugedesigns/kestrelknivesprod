@@ -156,6 +156,7 @@
         },
         "hero-slide-3": {
           "type": "slide",
+          "disabled": true,
           "settings": {
             "image": "shopify://shop_images/6.png",
             "image_tablet": "shopify://shop_images/mobile_6.png",
