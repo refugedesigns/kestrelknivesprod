@@ -282,7 +282,7 @@
       "type": "featured-apparel-collection",
       "settings": {
         "title": "Most Popular Apparel",
-        "featured_collection": "apparels",
+        "featured_collection": "most-popular-apparel",
         "collection_handle": "apparel",
         "number_of_products_to_show": 4,
         "mobile_columns": 2,
