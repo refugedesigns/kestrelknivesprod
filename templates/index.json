@@ -281,6 +281,18 @@
     "featured-collection-apparel": {
       "type": "featured-apparel-collection",
       "settings": {
+        "title": "Most Popular Sweatshirts",
+        "featured_collection": "most-popular-apparel",
+        "collection_handle": "apparel",
+        "number_of_products_to_show": 4,
+        "mobile_columns": 2,
+        "tablet_columns": 2,
+        "desktop_columns": 4
+      }
+    },
+    "featured_apparel_collection_G38trF": {
+      "type": "featured-apparel-collection",
+      "settings": {
         "title": "Most Popular Apparel",
         "featured_collection": "most-popular-apparel",
         "collection_handle": "apparel",
@@ -328,6 +340,7 @@
     "featured-collection",
     "index-section-2",
     "featured-collection-apparel",
+    "featured_apparel_collection_G38trF",
     "big-timer",
     "index-section-1"
   ]
