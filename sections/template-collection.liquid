@@ -1,6 +1,18 @@
 <script>
-  window.__collectionProducts = {{ collection.products | json }};
+  window.__collectionProducts = [
+    {%- for product in collection.products -%}
+      {
+        "available": {{ product.available | json }},
+        "type": {{ product.type | json }},
+        "product_type": {{ product.type | json }},
+        "tags": {{ product.tags | json }},
+        "price": {{ product.price | json }}
+      }{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  ];
 </script>
+
+{% render 'product-card-js' %}
 
 {% assign collection_title_display = collection.title %}
 {% if collection.title %}
@@ -97,6 +109,7 @@
               {% if has_position_tags %}{% break %}{% endif %}
             {% endfor %}
 
+            {% assign kk_card_n = 0 %}
             {% if collection.handle contains "knife"
               or collection.title contains "Knife"
               or collection.title contains "Knives"
@@ -130,7 +143,12 @@
                   {% if has_wanted_tag %}
                     {% assign hidden_token = "||hidden_offer||" %}
                     {% unless tags_joined contains hidden_token %}
-                      {% render "product-card", product_product: product %}
+                      {% assign kk_card_n = kk_card_n | plus: 1 %}
+                      {% if kk_card_n <= 4 %}
+                        {% render "product-card", product_product: product, card_priority: true %}
+                      {% else %}
+                        {% render "product-card", product_product: product %}
+                      {% endif %}
                       {% assign rendered_ids = rendered_ids
                         | append: product.id
                         | append: ","
@@ -150,7 +168,12 @@
                     | split: "||"
                   -%}
                   {% unless tags_lower contains "hidden_offer" %}
-                    {% render "product-card", product_product: product %}
+                    {% assign kk_card_n = kk_card_n | plus: 1 %}
+                    {% if kk_card_n <= 4 %}
+                      {% render "product-card", product_product: product, card_priority: true %}
+                    {% else %}
+                      {% render "product-card", product_product: product %}
+                    {% endif %}
                   {% endunless %}
                 {% endunless %}
               {% endfor %}
@@ -162,7 +185,12 @@
                   | split: "||"
                 -%}
                 {% unless tags_lower contains "hidden_offer" %}
-                  {% render "product-card", product_product: product %}
+                  {% assign kk_card_n = kk_card_n | plus: 1 %}
+                  {% if kk_card_n <= 4 %}
+                    {% render "product-card", product_product: product, card_priority: true %}
+                  {% else %}
+                    {% render "product-card", product_product: product %}
+                  {% endif %}
                 {% endunless %}
               {% else %}
                 <div class='col-span-full text-center py-12'>

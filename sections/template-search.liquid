@@ -1,4 +1,5 @@
 <div class='container mx-auto min-h-[calc(100vh-40vh)]' x-data='searchPage()'>
+  {% render 'product-card-js' %}
   {% paginate search.results by 9 %}
     <h1 class='text-xl my-4 text-center'>Search Results</h1>
 
@@ -43,6 +44,7 @@
               class='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6'
               id='search-results-grid'
             >
+              {% assign kk_card_n = 0 %}
               {% for item in search.results %}
                 {% case item.object_type %}
                   {% when "product" %}
@@ -52,9 +54,12 @@
                       | split: "||"
                     -%}
                     {% unless tags_lower contains "hidden_offer" %}
-                      <div data-product='{{ item | json | escape }}'>
+                      {% assign kk_card_n = kk_card_n | plus: 1 %}
+                      {% if kk_card_n <= 4 %}
+                        {% render "product-card", product_product: item, card_priority: true %}
+                      {% else %}
                         {% render "product-card", product_product: item %}
-                      </div>
+                      {% endif %}
                     {% endunless %}
                   {% else %}
 

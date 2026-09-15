@@ -3,8 +3,20 @@
 </style>
 
 <script>
-  window.__collectionProducts = {{ collection.products | json }};
+  window.__collectionProducts = [
+    {%- for product in collection.products -%}
+      {
+        "available": {{ product.available | json }},
+        "type": {{ product.type | json }},
+        "product_type": {{ product.type | json }},
+        "tags": {{ product.tags | json }},
+        "price": {{ product.price | json }}
+      }{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  ];
 </script>
+
+{% render 'product-card-js' %}
 
 <div class='px-4 py-4 mx-auto' x-data='customCollectionPage()'>
   {% paginate collection.products by section.settings.number_of_products_per_page | default: 9 %}
@@ -81,6 +93,7 @@
           {% endif %}
         {% endfor %}
 
+        {% assign kk_card_n = 0 %}
         {% if collection.handle contains "knife"
           or collection.title contains "Knife"
           or collection.title contains "Knives"
@@ -111,7 +124,12 @@
                 {% if tags_hidden_check contains wanted_token
                   or tags_hidden_check contains wanted_alt_token
                 %}
-                  {% render "product-card", product_product: product %}
+                  {% assign kk_card_n = kk_card_n | plus: 1 %}
+                  {% if kk_card_n <= 4 %}
+                    {% render "product-card", product_product: product, card_priority: true %}
+                  {% else %}
+                    {% render "product-card", product_product: product %}
+                  {% endif %}
                   {% assign rendered_ids = rendered_ids
                     | append: product.id
                     | append: ","
@@ -137,7 +155,12 @@
                 | append: "||"
               -%}
               {% if tags_hidden_check contains "||hidden_offer||" %}
-                {% render "product-card", product_product: product %}
+                {% assign kk_card_n = kk_card_n | plus: 1 %}
+                {% if kk_card_n <= 4 %}
+                  {% render "product-card", product_product: product, card_priority: true %}
+                {% else %}
+                  {% render "product-card", product_product: product %}
+                {% endif %}
                 {% assign hidden_offer_count = hidden_offer_count | plus: 1 %}
               {% endif %}
             {% endunless %}
@@ -155,7 +178,12 @@
               | append: "||"
             -%}
             {% if tags_hidden_check contains "||hidden_offer||" %}
-              {% render "product-card", product_product: product %}
+              {% assign kk_card_n = kk_card_n | plus: 1 %}
+              {% if kk_card_n <= 4 %}
+                {% render "product-card", product_product: product, card_priority: true %}
+              {% else %}
+                {% render "product-card", product_product: product %}
+              {% endif %}
               {% assign hidden_offer_count = hidden_offer_count | plus: 1 %}
             {% endif %}
           {% endfor %}

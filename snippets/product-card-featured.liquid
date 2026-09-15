@@ -11,16 +11,26 @@
 
 {%- capture card_images_json -%}
 [
-{%- for image in product_obj.images -%}
-  {"id":{{ image.id | json }},"src":{{ image | image_url: width: 400 | json }}}{%- unless forloop.last -%},{%- endunless -%}
+{%- for image in product_obj.images limit: 2 -%}
+  {"id":{{ image.id | json }},"src":{{ image | image_url: width: 400, format: 'webp' | json }}}{%- unless forloop.last -%},{%- endunless -%}
+{%- endfor -%}
+]
+{%- endcapture -%}
+{%- capture card_product_json -%}
+{"id":{{ product_obj.id | json }},"title":{{ product_obj.title | json }},"handle":{{ product_obj.handle | json }},"type":{{ product_obj.type | json }},"product_type":{{ product_obj.type | json }},"available":{{ product_obj.available | json }},"price":{{ product_obj.price | json }},"options":{{ product_obj.options | json }}}
+{%- endcapture -%}
+{%- capture card_variants_json -%}
+[
+{%- for variant in product_obj.variants -%}
+{"id":{{ variant.id | json }},"title":{{ variant.title | json }},"available":{{ variant.available | json }},"price":{{ variant.price | json }},"option1":{{ variant.option1 | json }},"option2":{{ variant.option2 | json }},"option3":{{ variant.option3 | json }}{% if variant.featured_image %},"featured_image":{"src":{{ variant.featured_image | image_url: width: 400, format: 'webp' | json }}}{% else %},"featured_image":null{% endif %}}{%- unless forloop.last -%},{%- endunless -%}
 {%- endfor -%}
 ]
 {%- endcapture -%}
 
 <div
   class='product-card w-full box-border py-4 px-2 sm:py-6 sm:px-3'
-  data-product='{{ product_obj | json | escape }}'
-  data-variants='{{ product_obj.variants | json | escape }}'
+  data-product='{{ card_product_json | strip_newlines | escape }}'
+  data-variants='{{ card_variants_json | strip_newlines | escape }}'
   data-images='{{ card_images_json | strip_newlines | escape }}'
   x-data='fcCard()'
 >
@@ -74,7 +84,7 @@
           height='400'
           loading='lazy'
           decoding='async'
-          src='{{ product_obj.featured_image | default: product_obj.images.first | image_url: width: 400 }}'
+          src='{{ product_obj.featured_image | default: product_obj.images.first | image_url: width: 400, format: 'webp' }}'
           :src='currentImage'
           alt='{{ product_obj.title | escape }}'
           :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
@@ -602,6 +612,7 @@
           try {
             const u = new URL(src, window.location.href)
             u.searchParams.set('width', String(width))
+            u.searchParams.set('format', 'webp')
             return u.toString()
           } catch (e) {
             return src
