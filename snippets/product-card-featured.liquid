@@ -12,7 +12,7 @@
 {%- capture card_images_json -%}
 [
 {%- for image in product_obj.images -%}
-  {"id":{{ image.id | json }},"src":{{ image | image_url: width: 600 | json }}}{%- unless forloop.last -%},{%- endunless -%}
+  {"id":{{ image.id | json }},"src":{{ image | image_url: width: 400 | json }}}{%- unless forloop.last -%},{%- endunless -%}
 {%- endfor -%}
 ]
 {%- endcapture -%}
@@ -70,19 +70,19 @@
       >
         <!-- Base image -->
         <img
-          width='600'
-          height='600'
+          width='400'
+          height='400'
           loading='lazy'
           decoding='async'
-          src='{{ product_obj.featured_image | default: product_obj.images.first | image_url: width: 600 }}'
+          src='{{ product_obj.featured_image | default: product_obj.images.first | image_url: width: 400 }}'
           :src='currentImage'
           alt='{{ product_obj.title | escape }}'
           :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
         >
         <!-- Hover image (crossfades in) -->
         <img
-          width='600'
-          height='600'
+          width='400'
+          height='400'
           x-cloak
           x-show='secondImageSrc'
           :src='secondImageSrc'
@@ -593,11 +593,11 @@
           if (!this.imagesData || this.imagesData.length < 2) return null
           const img = this.imagesData[1]
           if (!img) return null
-          if (typeof img === 'string') return this.sizedImageUrl(img, 600)
-          return img.src ? this.sizedImageUrl(img.src, 600) : null
+          if (typeof img === 'string') return this.sizedImageUrl(img, 400)
+          return img.src ? this.sizedImageUrl(img.src, 400) : null
         },
 
-        sizedImageUrl(src, width = 600) {
+        sizedImageUrl(src, width = 400) {
           if (!src || typeof src !== 'string') return src
           try {
             const u = new URL(src, window.location.href)
@@ -756,7 +756,7 @@
 
         resolveImageSrc(image) {
           if (!image) return null
-          if (typeof image === 'string') return this.sizedImageUrl(image, 600)
+          if (typeof image === 'string') return this.sizedImageUrl(image, 400)
           if (Array.isArray(image) && image.length) {
             return this.resolveImageSrc(image[0])
           }
@@ -767,7 +767,7 @@
               image.originalSrc ||
               image.original_url ||
               null
-            return raw ? this.sizedImageUrl(raw, 600) : null
+            return raw ? this.sizedImageUrl(raw, 400) : null
           }
           return null
         },

@@ -64,7 +64,7 @@
 {%- capture card_images_json -%}
 [
 {%- for image in product_product.images -%}
-  {"id":{{ image.id | json }},"src":{{ image | image_url: width: 600 | json }}}{%- unless forloop.last -%},{%- endunless -%}
+  {"id":{{ image.id | json }},"src":{{ image | image_url: width: 400 | json }}}{%- unless forloop.last -%},{%- endunless -%}
 {%- endfor -%}
 ]
 {%- endcapture -%}
@@ -79,7 +79,7 @@
       {{ product_product.selected_or_first_available_variant.id }},
       {{ product_product.title | json }},
       {% if card_initial_image %}
-        {{ card_initial_image | image_url: width: 600 | json }}
+        {{ card_initial_image | image_url: width: 400 | json }}
       {% else %}
         null
       {% endif %},
@@ -116,8 +116,8 @@
       >
         <!-- Base image -->
         <img
-          width='600'
-          height='600'
+          width='400'
+          height='400'
           loading='lazy'
           decoding='async'
           :src='currentImage'
@@ -126,8 +126,8 @@
         >
         <!-- Hover image (crossfades in) -->
         <img
-          width='600'
-          height='600'
+          width='400'
+          height='400'
           loading='lazy'
           decoding='async'
           x-show='secondImageSrc'
@@ -534,7 +534,7 @@
 </div>
 <script>
   document.addEventListener('alpine:init', () => {
-    const kkSizedImageUrl = (src, width = 600) => {
+    const kkSizedImageUrl = (src, width = 400) => {
       if (!src || typeof src !== 'string') return src
       try {
         const u = new URL(src, window.location.href)
@@ -566,7 +566,7 @@
         hoverImageLoaded: false,
         useComplexOptionsTag: !!hasComplexOptionsTag,
 
-        sizedImageUrl(src, width = 600) {
+        sizedImageUrl(src, width = 400) {
           return kkSizedImageUrl(src, width)
         },
 
@@ -609,8 +609,8 @@
           if (!this.imagesData || this.imagesData.length < 2) return null
           const img = this.imagesData[1]
           if (!img) return null
-          if (typeof img === 'string') return this.sizedImageUrl(img, 600)
-          return img.src ? this.sizedImageUrl(img.src, 600) : null
+          if (typeof img === 'string') return this.sizedImageUrl(img, 400)
+          return img.src ? this.sizedImageUrl(img.src, 400) : null
         },
 
         // Computed: currently selected handle color (option1)
@@ -1064,7 +1064,7 @@
             if (selectedVariant && selectedVariant.featured_image) {
               this.currentImage = this.sizedImageUrl(
                 selectedVariant.featured_image.src,
-                600
+                400
               )
             } else {
               // No featured image, use the product's featured image

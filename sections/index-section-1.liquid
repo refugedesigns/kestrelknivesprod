@@ -5,11 +5,30 @@
       <!-- Image Section -->
       <div class='order-2 md:order-1 -mx-4 md:mx-0'>
         {% if section.settings.image != blank %}
-          <img
-            src='{{ section.settings.image | img_url: '800x600' }}'
-            alt='{{ section.settings.image.alt | default: section.settings.title }}'
-            class='w-full h-auto rounded-none lg:rounded-lg shadow-lg'
-          >
+          <picture>
+            <source
+              type='image/webp'
+              srcset='
+                {{ section.settings.image | image_url: width: 400, format: 'webp' }} 400w,
+                {{ section.settings.image | image_url: width: 800, format: 'webp' }} 800w
+              '
+              sizes='(min-width: 768px) 50vw, 100vw'
+            >
+            <img
+              src='{{ section.settings.image | image_url: width: 800 }}'
+              srcset='
+                {{ section.settings.image | image_url: width: 400 }} 400w,
+                {{ section.settings.image | image_url: width: 800 }} 800w
+              '
+              sizes='(min-width: 768px) 50vw, 100vw'
+              alt='{{ section.settings.image.alt | default: section.settings.title | escape }}'
+              class='w-full h-auto rounded-none lg:rounded-lg shadow-lg'
+              width='{{ section.settings.image.width }}'
+              height='{{ section.settings.image.height }}'
+              loading='lazy'
+              decoding='async'
+            >
+          </picture>
         {% else %}
           {{
             "lifestyle-1"

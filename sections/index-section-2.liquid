@@ -5,11 +5,32 @@
 >
   <!-- Background Image -->
   {% if section.settings.image != blank %}
-    <img
-      src='{{ section.settings.image | img_url: '1920x1080' }}'
-      alt='{{ section.settings.image.alt | default: section.settings.title }}'
-      class='absolute inset-0 w-full h-full object-cover'
-    >
+    <picture>
+      <source
+        type='image/webp'
+        srcset='
+          {{ section.settings.image | image_url: width: 800, format: 'webp' }} 800w,
+          {{ section.settings.image | image_url: width: 1200, format: 'webp' }} 1200w,
+          {{ section.settings.image | image_url: width: 1600, format: 'webp' }} 1600w
+        '
+        sizes='100vw'
+      >
+      <img
+        src='{{ section.settings.image | image_url: width: 1200 }}'
+        srcset='
+          {{ section.settings.image | image_url: width: 800 }} 800w,
+          {{ section.settings.image | image_url: width: 1200 }} 1200w,
+          {{ section.settings.image | image_url: width: 1600 }} 1600w
+        '
+        sizes='100vw'
+        alt='{{ section.settings.image.alt | default: section.settings.title | escape }}'
+        class='absolute inset-0 w-full h-full object-cover'
+        width='{{ section.settings.image.width }}'
+        height='{{ section.settings.image.height }}'
+        loading='lazy'
+        decoding='async'
+      >
+    </picture>
   {% else %}
     {{
       "lifestyle-1"

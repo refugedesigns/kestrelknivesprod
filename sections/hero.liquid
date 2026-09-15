@@ -31,7 +31,8 @@
   <link
     rel='preload'
     as='image'
-    href='{{ hero_preload_mobile | image_url: width: 900 }}'
+    href='{{ hero_preload_mobile | image_url: width: 750, format: 'webp' }}'
+    type='image/webp'
     media='(max-width: 767px)'
     fetchpriority='high'
   >
@@ -40,7 +41,8 @@
   <link
     rel='preload'
     as='image'
-    href='{{ hero_preload_tablet | image_url: width: 1400 }}'
+    href='{{ hero_preload_tablet | image_url: width: 1100, format: 'webp' }}'
+    type='image/webp'
     media='(min-width: 768px) and (max-width: 1099px)'
     fetchpriority='high'
   >
@@ -49,17 +51,28 @@
   <link
     rel='preload'
     as='image'
-    href='{{ hero_preload_desktop | image_url: width: 1600 }}'
+    href='{{ hero_preload_desktop | image_url: width: 1400, format: 'webp' }}'
+    type='image/webp'
     media='(min-width: 1100px)'
     fetchpriority='high'
   >
 {% endif %}
 <style>
   .hero-root {
-    /* Reserve height from first slide aspect so Swiper can't collapse to 0 before init */
-    aspect-ratio: {{ hero_first_aspect }};
+    /* Prefer mobile aspect for first paint reservation when available */
+    aspect-ratio: {% if hero_preload_mobile != blank %}{{ hero_preload_mobile.aspect_ratio | default: hero_first_aspect }}{% else %}{{ hero_first_aspect }}{% endif %};
     width: 100%;
     background-color: #0a0a0a;
+  }
+  @media (min-width: 768px) {
+    .hero-root {
+      aspect-ratio: {% if hero_preload_tablet != blank %}{{ hero_preload_tablet.aspect_ratio | default: hero_first_aspect }}{% else %}{{ hero_first_aspect }}{% endif %};
+    }
+  }
+  @media (min-width: 1100px) {
+    .hero-root {
+      aspect-ratio: {{ hero_first_aspect }};
+    }
   }
 
   .hero-scale-wrap,

@@ -30,6 +30,14 @@
     assign base_image = image_mobile
   endif
 
+  assign dim_image = image_mobile
+  if dim_image == blank
+    assign dim_image = image_tablet
+  endif
+  if dim_image == blank
+    assign dim_image = base_image
+  endif
+
   assign button_action = block.settings.button_action | default: 'link'
   assign button_url = block.settings.button_url | default: '/collections/professional'
   assign slide_title = block.settings.title | default: 'Premium Knives'
@@ -72,22 +80,36 @@
     <picture class='w-full h-full block'>
       {% if image_mobile %}
         <source
-          srcset='{{ image_mobile | image_url: width: 900 }}'
+          type='image/webp'
+          srcset='{{ image_mobile | image_url: width: 750, format: 'webp' }}'
+          media='(max-width: 767px)'
+        >
+        <source
+          srcset='{{ image_mobile | image_url: width: 750 }}'
           media='(max-width: 767px)'
         >
       {% endif %}
       {% if image_tablet %}
         <source
-          srcset='{{ image_tablet | image_url: width: 1400 }}'
+          type='image/webp'
+          srcset='{{ image_tablet | image_url: width: 1100, format: 'webp' }}'
+          media='(max-width: 1099px)'
+        >
+        <source
+          srcset='{{ image_tablet | image_url: width: 1100 }}'
           media='(max-width: 1099px)'
         >
       {% endif %}
+      <source
+        type='image/webp'
+        srcset='{{ base_image | image_url: width: 1400, format: 'webp' }}'
+      >
       <img
-        src='{{ base_image | image_url: width: 1600 }}'
+        src='{{ base_image | image_url: width: 1400 }}'
         alt='{{ slide_title | escape }}'
         class='w-full h-full'
-        width='{{ base_image.width }}'
-        height='{{ base_image.height }}'
+        width='{{ dim_image.width }}'
+        height='{{ dim_image.height }}'
         style='transform: scale({{ block.settings.image_zoom | default: 100 | divided_by: 100.0 }});'
         {% if is_priority_slide %}
           loading='eager'
