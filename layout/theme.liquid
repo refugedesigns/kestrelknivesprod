@@ -145,11 +145,17 @@
     {%- endif -%}
     <script src='{{ 'alpine.min.js' | asset_url }}' defer></script>
 
-    {%- comment -%} Swiper: homepage + pages that rely on layout (product templates load their own) {%- endcomment -%}
+    {%- comment -%}
+      Swiper only on templates that render carousels.
+      Product templates load their own Swiper asset.
+    {%- endcomment -%}
     {%- if template.name == 'index'
       or template.name == 'collection'
-      or template.name == 'page'
       or template.name == 'list-collections'
+      or template.suffix == 'testimonials'
+      or template.suffix == 'paboyzoutdoors'
+      or template.suffix == 'eastmans'
+      or template.suffix == 'eastmans-promo'
     -%}
       <script src='{{ 'swiper-element-bundle.min.js' | asset_url }}' defer></script>
     {%- endif -%}

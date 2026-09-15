@@ -71,6 +71,7 @@
     position: relative;
     z-index: 1;
     width: 100%;
+    min-height: 520px;
     pointer-events: auto;
   }
   .gear-testing-form-section__form.pifyform,
@@ -78,6 +79,9 @@
     position: relative;
     z-index: 1;
     pointer-events: auto;
+  }
+  .gear-testing-form-section__form.pifyform iframe {
+    min-height: 520px;
   }
   .gear-testing-form-section__form.pifyform.formloading iframe {
     visibility: hidden !important;
@@ -91,20 +95,29 @@
 </style>
 
 <div class='gear-testing-form-section'>
-  <img
-    class='gear-testing-form-section__bg'
-    src='{{ 'field_tester_program.jpg' | asset_url }}'
-    alt=''
-    loading='eager'
-    fetchpriority='high'
-  >
+  <picture>
+    <source
+      srcset='{{ 'field_tester_program.webp' | asset_url }}'
+      type='image/webp'
+    >
+    <img
+      class='gear-testing-form-section__bg'
+      src='{{ 'field_tester_program.jpg' | asset_url }}'
+      alt=''
+      width='667'
+      height='1024'
+      loading='eager'
+      fetchpriority='high'
+      decoding='async'
+    >
+  </picture>
   <div class='gear-testing-form-section__overlay' aria-hidden='true'></div>
 
   <div class='gear-testing-form-section__content py-10 px-4 sm:px-6 lg:px-8'>
     <div
       id='pifyform-36391'
       class='gear-testing-form-section__form pifyform'
-      style='margin: 10px 0;'
+      style='margin: 10px 0; min-height: 520px; height: 520px;'
     >
       <script charset='UTF-8' defer>
         document.getElementById('pifyform-36391').classList.add('formloading')
@@ -225,8 +238,9 @@
           a.scrolling = 'no'
           a.style.display = 'block'
           a.style.minWidth = '100%'
-          a.style.width = '100px'
-          a.style.height = '100%'
+          a.style.width = '100%'
+          a.style.height = '520px'
+          a.style.minHeight = '520px'
           a.style.border = 'none'
           a.style.overflow = 'auto'
           setTimeout(function () {

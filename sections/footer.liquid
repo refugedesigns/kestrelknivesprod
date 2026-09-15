@@ -70,16 +70,24 @@
         {% if footer_logo_image == blank and shop.brand_asset_default_logo %}
           {% assign footer_logo_image = shop.brand_asset_default_logo %}
         {% endif %}
+        {% assign footer_logo_h_mobile = section.settings.logo_height_mobile | default: 40 %}
+        {% assign footer_logo_h_desktop = section.settings.logo_height_desktop | default: 80 %}
         {% if footer_logo_image != blank %}
+          {% assign footer_logo_aspect = footer_logo_image.aspect_ratio | default: 1.38 %}
+          {% assign footer_logo_w_mobile = footer_logo_h_mobile | times: footer_logo_aspect | round %}
           <a
             href='{{ routes.root_url }}'
             class='flex items-center mb-4 lg:mb-0'
           >
             <img
-              src='{{ footer_logo_image | image_url: width: 400 }}'
-              style='height: {{ section.settings.logo_height_mobile | default: 40 }}px;'
+              src='{{ footer_logo_image | image_url: width: 200 }}'
+              width='{{ footer_logo_w_mobile }}'
+              height='{{ footer_logo_h_mobile }}'
+              style='height: {{ footer_logo_h_mobile }}px; width: auto;'
               class='footer-logo w-auto md:h-auto'
               alt='{{ shop.name }} Logo'
+              loading='lazy'
+              decoding='async'
             >
           </a>
         {% else %}
@@ -89,9 +97,13 @@
           >
             <img
               src='{{ "logo_white.png" | asset_url }}'
-              style='height: {{ section.settings.logo_height_mobile | default: 40 }}px;'
+              width='174'
+              height='{{ footer_logo_h_mobile }}'
+              style='height: {{ footer_logo_h_mobile }}px; width: auto;'
               class='footer-logo w-auto md:h-auto'
               alt='{{ shop.name }} Logo'
+              loading='lazy'
+              decoding='async'
             >
           </a>
         {% endif %}
