@@ -1,0 +1,180 @@
+{% liquid
+  assign active_collection = section.settings.featured_collection
+  if active_collection == blank and section.settings.collection_handle != blank
+    assign active_collection = collections[section.settings.collection_handle]
+  endif
+
+  assign products_limit = section.settings.number_of_products_to_show | default: 4
+  assign mobile_cols = section.settings.mobile_columns | default: 2
+  assign tablet_cols = section.settings.tablet_columns | default: 2
+  assign desktop_cols = section.settings.desktop_columns | default: 4
+%}
+
+<div class='flex flex-col items-center my-8 px-4'>
+  <h1 class='text-center text-3xl'>{{ section.settings.title }}</h1>
+
+  <div class='max-w-8xl mx-auto w-full'>
+    {% if active_collection != blank and active_collection.products_count > 0 %}
+      <div
+        class='grid w-full gap-2 md:gap-6 featured-apparel-grid'
+        style='--mobile-cols: {{ mobile_cols }}; --tablet-cols: {{ tablet_cols }}; --desktop-cols: {{ desktop_cols }};'
+      >
+        {% assign rendered_count = 0 %}
+        {% for product in active_collection.products limit: products_limit %}
+          {%- assign tags_hidden = product.tags
+            | join: "||"
+            | downcase
+            | replace: "-", "_"
+            | replace: " ", "_"
+          -%}
+          {%- assign tags_hidden = "||" | append: tags_hidden | append: "||" -%}
+          {% unless tags_hidden contains "||hidden_offer||" %}
+            {% render "product-card-featured", product_product: product %}
+            {% assign rendered_count = rendered_count | plus: 1 %}
+          {% endunless %}
+        {% endfor %}
+
+        {% if rendered_count == 0 %}
+          <div class='col-span-full text-center py-8 text-gray-500'>
+            No apparel products to display in this collection.
+          </div>
+        {% endif %}
+      </div>
+    {% else %}
+      <div
+        class='grid w-full gap-2 md:gap-6 featured-apparel-grid'
+        style='--mobile-cols: {{ mobile_cols }}; --tablet-cols: {{ tablet_cols }}; --desktop-cols: {{ desktop_cols }};'
+      >
+        {% for item in (1..4) %}
+          {% render "product-card-placeholder" %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .featured-apparel-grid {
+    grid-template-columns: repeat(var(--mobile-cols), 1fr);
+  }
+  @media (min-width: 768px) {
+    .featured-apparel-grid {
+      grid-template-columns: repeat(var(--tablet-cols), 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .featured-apparel-grid {
+      grid-template-columns: repeat(var(--desktop-cols), 1fr);
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Featured Apparel",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Apparel",
+      "label": "Title"
+    },
+    {
+      "type": "collection",
+      "id": "featured_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "text",
+      "id": "collection_handle",
+      "label": "Collection handle (fallback)",
+      "default": "apparel",
+      "info": "Used when the collection picker above is empty. Must match your apparel collection handle in Shopify."
+    },
+    {
+      "type": "range",
+      "id": "number_of_products_to_show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4,
+      "label": "Number of products to show"
+    },
+    {
+      "type": "range",
+      "id": "mobile_columns",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2,
+      "label": "Mobile columns"
+    },
+    {
+      "type": "range",
+      "id": "tablet_columns",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2,
+      "label": "Tablet columns"
+    },
+    {
+      "type": "range",
+      "id": "desktop_columns",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 4,
+      "label": "Desktop columns"
+    },
+    {
+      "type": "header",
+      "content": "Color Variant Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "orange_image",
+      "label": "Orange Color Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "black_orange_image",
+      "label": "Black w/Orange Liner Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "black_image",
+      "label": "Black Color Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "green_image",
+      "label": "Green Color Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "camo_image",
+      "label": "Camo/Earth Color Image"
+    },
+    {
+      "type": "header",
+      "content": "Card color override images"
+    },
+    {
+      "type": "image_picker",
+      "id": "high_vis_orange_image",
+      "label": "High Vis Orange Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "high_vis_green_image",
+      "label": "High Vis Green Image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Apparel"
+    }
+  ]
+}
+{% endschema %}

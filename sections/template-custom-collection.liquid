@@ -20,13 +20,13 @@
       </h1>
     </div>
 
-    <div class='max-w-2xl mx-auto'>
+    <div class='max-w-3xl mx-auto'>
       {%- comment -%} Product count removed {%- endcomment -%}
 
       <!-- Products Grid -->
       <div
         id='products-grid'
-        class='grid grid-cols-2 md:grid-cols-2 gap-2 md:gap-8'
+        class='grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-8'
       >
         {% assign hidden_offer_count = 0 %}
 
@@ -51,17 +51,27 @@
         {%- endcomment -%}
         {% assign has_position_tags = false %}
         {% for product in collection.products %}
-          {%- assign tags_lower = product.tags
+          {%- assign tags_hidden_check = product.tags
             | join: "||"
             | downcase
-            | split: "||"
+            | replace: "-", "_"
+            | replace: " ", "_"
           -%}
-          {% if tags_lower contains "hidden_offer" %}
+          {%- assign tags_hidden_check = "||"
+            | append: tags_hidden_check
+            | append: "||"
+          -%}
+          {% if tags_hidden_check contains "||hidden_offer||" %}
             {% for i in (1..999) %}
               {% assign wanted = "product_" | append: i %}
               {% assign wanted_alt = "position_" | append: i %}
-              {% if tags_lower contains wanted
-                or tags_lower contains wanted_alt
+              {% assign wanted_token = "||" | append: wanted | append: "||" %}
+              {% assign wanted_alt_token = "||"
+                | append: wanted_alt
+                | append: "||"
+              %}
+              {% if tags_hidden_check contains wanted_token
+                or tags_hidden_check contains wanted_alt_token
               %}
                 {% assign has_position_tags = true %}
                 {% break %}
@@ -82,14 +92,24 @@
             {% assign wanted = "product_" | append: i %}
             {% assign wanted_alt = "position_" | append: i %}
             {% for product in collection.products %}
-              {%- assign tags_lower = product.tags
+              {%- assign tags_hidden_check = product.tags
                 | join: "||"
                 | downcase
-                | split: "||"
+                | replace: "-", "_"
+                | replace: " ", "_"
               -%}
-              {% if tags_lower contains "hidden_offer" %}
-                {% if tags_lower contains wanted
-                  or tags_lower contains wanted_alt
+              {%- assign tags_hidden_check = "||"
+                | append: tags_hidden_check
+                | append: "||"
+              -%}
+              {% if tags_hidden_check contains "||hidden_offer||" %}
+                {% assign wanted_token = "||" | append: wanted | append: "||" %}
+                {% assign wanted_alt_token = "||"
+                  | append: wanted_alt
+                  | append: "||"
+                %}
+                {% if tags_hidden_check contains wanted_token
+                  or tags_hidden_check contains wanted_alt_token
                 %}
                   {% render "product-card", product_product: product %}
                   {% assign rendered_ids = rendered_ids
@@ -106,12 +126,17 @@
           {% for product in collection.products %}
             {% assign pid = product.id | append: "," %}
             {% unless rendered_ids contains pid %}
-              {%- assign tags_lower = product.tags
+              {%- assign tags_hidden_check = product.tags
                 | join: "||"
                 | downcase
-                | split: "||"
+                | replace: "-", "_"
+                | replace: " ", "_"
               -%}
-              {% if tags_lower contains "hidden_offer" %}
+              {%- assign tags_hidden_check = "||"
+                | append: tags_hidden_check
+                | append: "||"
+              -%}
+              {% if tags_hidden_check contains "||hidden_offer||" %}
                 {% render "product-card", product_product: product %}
                 {% assign hidden_offer_count = hidden_offer_count | plus: 1 %}
               {% endif %}
@@ -119,12 +144,17 @@
           {% endfor %}
         {% else %}
           {% for product in collection.products %}
-            {%- assign tags_lower = product.tags
+            {%- assign tags_hidden_check = product.tags
               | join: "||"
               | downcase
-              | split: "||"
+              | replace: "-", "_"
+              | replace: " ", "_"
             -%}
-            {% if tags_lower contains "hidden_offer" %}
+            {%- assign tags_hidden_check = "||"
+              | append: tags_hidden_check
+              | append: "||"
+            -%}
+            {% if tags_hidden_check contains "||hidden_offer||" %}
               {% render "product-card", product_product: product %}
               {% assign hidden_offer_count = hidden_offer_count | plus: 1 %}
             {% endif %}

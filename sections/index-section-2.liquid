@@ -42,12 +42,18 @@
       {% endif %}
 
       {% if section.settings.description != blank %}
-        <p
-          class='text-lg text-white leading-relaxed max-w-2xl mx-auto'
+        <div
+          class='text-lg text-white leading-relaxed w-full max-w-2xl mx-auto text-center index-section-2-description'
           style='margin: 0 !important;'
         >
-          {{ section.settings.description }}
-        </p>
+          {% assign description_parts = section.settings.description | split: "." %}
+          {% for part in description_parts %}
+            {% assign trimmed_part = part | strip %}
+            {% if trimmed_part != blank %}
+              <span class='block w-full text-center'>{{ trimmed_part }}.</span>
+            {% endif %}
+          {% endfor %}
+        </div>
       {% endif %}
 
       {% if section.settings.button_text != blank
@@ -88,7 +94,8 @@
       "type": "textarea",
       "id": "description",
       "label": "Description",
-      "default": "Experience the difference that quality craftsmanship makes. Our products are designed to exceed your expectations and stand the test of time."
+      "info": "Use a period (.) to split the description onto multiple lines. Periods are kept at the end of each line.",
+      "default": "Built with purpose, designed for the field, and trusted by those who live in it. No excess. No compromise. Just knives that work for you season after season."
     },
     {
       "type": "header",

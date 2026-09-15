@@ -1,4 +1,20 @@
-{% if section.settings.countdown_enabled %}
+{% liquid
+  assign countdown_is_visible = countdown_banner_visible
+  if countdown_is_visible == blank
+    assign countdown_is_visible = false
+    if section.settings.countdown_enabled
+      if section.settings.countdown_show_timer != false and section.settings.countdown_target_date != blank
+        assign countdown_is_visible = true
+      elsif section.settings.countdown_title != blank
+        assign countdown_is_visible = true
+      elsif section.settings.notify_button_text != blank
+        assign countdown_is_visible = true
+      endif
+    endif
+  endif
+%}
+
+{% if countdown_is_visible %}
   <div x-data='countdownBanner()' x-init='init()'>
     <style>
       .countdown-drawer {
@@ -19,24 +35,48 @@
         opacity: 1;
         pointer-events: auto;
       }
+
+      #countdownBanner {
+        width: 100%;
+        max-width: 100vw;
+        overflow: visible;
+        min-height: 80px;
+      }
+
+      @media (min-width: 640px) {
+        #countdownBanner {
+          min-height: 48px;
+        }
+      }
+
+      @media (max-width: 639px) {
+        .countdown-banner__title {
+          line-height: 1.25;
+        }
+
+        .countdown-banner__button {
+          white-space: normal;
+          word-break: break-word;
+        }
+      }
     </style>
     <div
       id='countdownBanner'
       class='fixed top-0 left-0 right-0 z-30 transition-transform duration-300'
       style='background-color: {{ section.settings.countdown_bg_color | default: "#000000" }};'
     >
-      <div class='mx-auto px-4 sm:px-6 max-w-8xl'>
-        <div class='flex flex-row items-center justify-center py-2 gap-2 sm:gap-4 text-center'>
+      <div class='mx-auto px-2 sm:px-4 max-w-8xl'>
+        <div class='flex flex-col sm:flex-row items-center justify-center py-2 gap-2 sm:gap-4 text-center'>
           <div
-            class='text-white flex-1 md:flex-none text-xs sm:text-sm font-medium whitespace-nowrap flex items-center space-x-2'
+            class='flex items-center justify-center flex-wrap gap-x-2 gap-y-1 w-full sm:w-auto sm:flex-nowrap text-[11px] sm:text-sm font-medium tabular-nums'
             style='color: {{ section.settings.countdown_text_color | default: "#ffffff" }};'
           >
             {% if section.settings.countdown_show_timer != false %}
-              <span x-text='formattedTime'></span>
+              <span class='shrink-0 whitespace-nowrap' x-text='formattedTime'></span>
             {% endif %}
             {% if section.settings.countdown_title != blank %}
               <span
-                class='text-white text-xs sm:text-sm font-bold whitespace-nowrap'
+                class='countdown-banner__title font-bold sm:whitespace-nowrap'
                 style='color: {{ section.settings.countdown_text_color | default: "#ffffff" }};'
               >
                 {{ section.settings.countdown_title }}
@@ -46,24 +86,22 @@
           {% if section.settings.notify_button_action == "link"
             and section.settings.notify_button_link != blank
           %}
-            <div class=''>
-              <a
-                href='{{ section.settings.notify_button_link }}'
-                class='px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors hover:opacity-90 inline-block text-center no-underline'
-                style='background-color: {{ section.settings.notify_button_bg_color | default: "#ea580c" }}; color: {{ section.settings.notify_button_text_color | default: "#ffffff" }};'
-              >
-                {{ section.settings.notify_button_text | default: "NOTIFY ME" }}
-              </a>
-            </div>
+            <a
+              href='{{ section.settings.notify_button_link }}'
+              class='countdown-banner__button shrink-0 px-3 sm:px-4 py-1 sm:py-1.5 text-[11px] sm:text-sm font-medium whitespace-nowrap transition-colors hover:opacity-90 inline-block text-center no-underline'
+              style='background-color: {{ section.settings.notify_button_bg_color | default: "#ea580c" }}; color: {{ section.settings.notify_button_text_color | default: "#ffffff" }};'
+            >
+              {{ section.settings.notify_button_text | default: "NOTIFY ME" }}
+            </a>
           {% else %}
             <button
+              type='button'
               onclick='openCountdownDrawer()'
-              class='px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors hover:opacity-90'
+              class='countdown-banner__button shrink-0 px-3 sm:px-4 py-1 sm:py-1.5 text-[11px] sm:text-sm font-medium whitespace-nowrap transition-colors hover:opacity-90'
               style='background-color: {{ section.settings.notify_button_bg_color | default: "#ea580c" }}; color: {{ section.settings.notify_button_text_color | default: "#ffffff" }};'
             >
               {{ section.settings.notify_button_text | default: "NOTIFY ME" }}
             </button>
-            </div>
           {% endif %}
         </div>
       </div>
@@ -108,19 +146,6 @@
         init() {
           this.startCountdown()
           this.setupScrollBehavior()
-          this.updateBannerHeight()
-          window.addEventListener('resize', () => this.updateBannerHeight())
-        },
-
-        updateBannerHeight() {
-          const banner = document.getElementById('countdownBanner')
-          if (banner) {
-            const height = banner.offsetHeight
-            document.documentElement.style.setProperty(
-              '--countdown-banner-height',
-              height + 'px'
-            )
-          }
         },
 
         setupScrollBehavior() {
@@ -128,13 +153,22 @@
           const header = document.getElementById('siteHeader')
           if (!banner || !header) return
 
+          const getBannerHeight = () => {
+            const cssHeight = parseFloat(
+              getComputedStyle(document.documentElement).getPropertyValue(
+                '--countdown-banner-height'
+              )
+            )
+            return cssHeight || banner.offsetHeight
+          }
+
           let ticking = false
           const handleScroll = () => {
             if (!ticking) {
               window.requestAnimationFrame(() => {
                 const scrollTop =
                   window.pageYOffset || document.documentElement.scrollTop
-                const bannerHeight = banner.offsetHeight
+                const bannerHeight = getBannerHeight()
 
                 if (scrollTop > bannerHeight) {
                   banner.style.transform = 'translateY(-100%)'

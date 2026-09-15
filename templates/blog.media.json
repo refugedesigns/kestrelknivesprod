@@ -1,0 +1,9 @@
+{
+  "name": "Media",
+  "sections": {
+    "media-coming-soon": {
+      "type": "template-blog-media"
+    }
+  },
+  "order": ["media-coming-soon"]
+}

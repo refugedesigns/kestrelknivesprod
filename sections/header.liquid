@@ -1,3 +1,28 @@
+{% liquid
+  assign countdown_banner_visible = false
+  if section.settings.countdown_enabled
+    if section.settings.countdown_show_timer != false and section.settings.countdown_target_date != blank
+      assign countdown_banner_visible = true
+    elsif section.settings.countdown_title != blank
+      assign countdown_banner_visible = true
+    elsif section.settings.notify_button_text != blank
+      assign countdown_banner_visible = true
+    endif
+  endif
+
+  assign logo_h_mobile = section.settings.logo_height_mobile | default: 32
+  assign logo_h_desktop = section.settings.logo_height_desktop | default: 80
+  assign header_pad_y = 16
+  assign header_border = 0
+  if section.settings.header_border_bottom
+    assign header_border = 1
+  endif
+  assign header_bar_mobile = logo_h_mobile | plus: header_pad_y | plus: header_border
+  assign header_bar_desktop = logo_h_desktop | plus: header_pad_y | plus: header_border
+  assign countdown_h_mobile = 80
+  assign countdown_h_desktop = 48
+%}
+
 <style>
   /* Responsive logo sizing */
   .header-logo {
@@ -52,25 +77,48 @@
     }
   }
 
-  /* Mobile menu panel visibility */
-  .mobile-menu-panel {
-    display: block;
-  }
+  /* Hide mobile menu on desktop; Alpine x-show + x-cloak control mobile */
   @media (min-width: 1100px) {
     .mobile-menu-panel {
       display: none !important;
     }
   }
+
+  :root {
+    --header-bar-height: {{ header_bar_mobile }}px;
+    --header-height: {{ header_bar_mobile }}px;
+    --countdown-banner-height: 0px;
+  }
+
+  @media (min-width: 1100px) {
+    :root {
+      --header-bar-height: {{ header_bar_desktop }}px;
+      --header-height: {{ header_bar_desktop }}px;
+    }
+  }
+
+  {% if countdown_banner_visible %}
+  :root {
+    --countdown-banner-height: {{ countdown_h_mobile }}px;
+    --header-height: calc(var(--header-bar-height) + {{ countdown_h_mobile }}px);
+  }
+
+  @media (min-width: 640px) {
+    :root {
+      --countdown-banner-height: {{ countdown_h_desktop }}px;
+      --header-height: calc(var(--header-bar-height) + {{ countdown_h_desktop }}px);
+    }
+  }
+  {% endif %}
 </style>
 
-{% render "countdown-banner", section: section %}
+{% render "countdown-banner", section: section, countdown_banner_visible: countdown_banner_visible %}
 
 <div
   id='siteHeader'
   class='fixed w-full z-40 start-0'
   x-data='{ mobileMenuOpen: false, searchBarOpen: false }'
-  x-cloak
-  style='background-color: {{ section.settings.header_bg_color | default: "#000000" }}; {% if section.settings.header_border_bottom %}border-bottom: 1px solid {{ section.settings.header_border_color | default: "#ffffff" }};{% endif %} {% if section.settings.countdown_enabled %}top: var(--countdown-banner-height, 0px);{% else %}top: 0;{% endif %}'
+  style='background-color: {{ section.settings.header_bg_color | default: "#000000" }}; {% if section.settings.header_border_bottom %}border-bottom: 1px solid {{ section.settings.header_border_color | default: "#ffffff" }};{% endif %} {% if countdown_banner_visible %}top: var(--countdown-banner-height, 0px);{% else %}top: 0;{% endif %}'
 >
   <div class='mx-auto px-4 sm:px-6 max-w-8xl'>
     <div class='flex justify-between items-center py-2 lg:justify-start lg:space-x-10'>
@@ -165,6 +213,7 @@
                 x-transition:leave-start='opacity-100 translate-y-0'
                 x-transition:leave-end='opacity-0 translate-y-3'
                 x-show='{{ link_handle }}'
+                x-cloak
                 @click.away='{{ link_handle }} = false'
                 class='absolute z-10 -ml-5 mt-5 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:left-1/2 lg:-translate-x-1/2'
               >
@@ -263,6 +312,7 @@
       <!-- MOBILE MENU CONTAINER -->
       <div
         x-show='mobileMenuOpen'
+        x-cloak
         @click.away='mobileMenuOpen = false'
         class='fixed z-50 inset-0 p-2 transform origin-top-left lg:hidden mobile-menu-panel max-h-screen overflow-y-auto w-screen'
         style='top: 0; left: 0; right: 0; bottom: 0; padding-top: 20px;'
@@ -471,53 +521,7 @@
     }
   }
 
-  function setHeaderHeight() {
-    const header = document.getElementById('siteHeader')
-    const countdownBanner = document.getElementById('countdownBanner')
 
-    let totalHeight = 0
-
-    if (countdownBanner) {
-      totalHeight += countdownBanner.offsetHeight
-    }
-
-    if (header) {
-      totalHeight += header.offsetHeight
-      document.documentElement.style.setProperty(
-        '--header-height',
-        totalHeight + 'px'
-      )
-    }
-  }
-
-  const headerHeightEvents = [
-    'DOMContentLoaded',
-    'load',
-    'resize',
-    'shopify:section:load',
-    'shopify:section:select',
-    'shopify:section:deselect',
-    'shopify:block:select',
-    'shopify:block:deselect',
-  ]
-
-  headerHeightEvents.forEach(eventName => {
-    if (eventName === 'resize') {
-      window.addEventListener(eventName, setHeaderHeight)
-    } else if (eventName === 'load') {
-      window.addEventListener(eventName, setHeaderHeight)
-    } else {
-      document.addEventListener(eventName, setHeaderHeight)
-    }
-  })
-
-  const headerElement = document.getElementById('siteHeader')
-  if (headerElement && 'ResizeObserver' in window) {
-    const headerResizeObserver = new ResizeObserver(() => setHeaderHeight())
-    headerResizeObserver.observe(headerElement)
-  }
-
-  setHeaderHeight()
 </script>
 
 {% schema %}

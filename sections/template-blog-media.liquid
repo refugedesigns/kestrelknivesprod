@@ -1,0 +1,30 @@
+<div class='py-8 px-4'>
+  <h1 class='text-center text-3xl font-bold text-gray-900 mb-8'>
+    {{ blog.title }}
+  </h1>
+
+  <div class='max-w-3xl mx-auto flex justify-center'>
+    <img
+      src='{{ 'coming_soon.png' | asset_url }}'
+      alt='{{ section.settings.image_alt | default: "Coming soon" | escape }}'
+      width='1000'
+      height='1000'
+      class='w-full h-auto'
+      loading='lazy'
+    >
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Media Blog",
+  "settings": [
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Image alt text",
+      "default": "Coming soon"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,16 @@
+{
+  "sections": {
+    "warranty": {
+      "type": "template-warranty",
+      "settings": {
+        "show_cta": true,
+        "cta_label": "Contact Us",
+        "header_bg_color": "#ffffff",
+        "header_height": 200,
+        "title_color": "#000000",
+        "header_border_bottom": false
+      }
+    }
+  },
+  "order": ["warranty"]
+}

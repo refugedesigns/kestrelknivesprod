@@ -1,0 +1,67 @@
+{% comment %}
+  Preorder line item details for cart display.
+  Renders selling plan name, ships-on date, and note when present.
+  Accepts: item (cart line item)
+{% endcomment %}
+
+{% if item.selling_plan_allocation %}
+  {% assign kk_ships_on = blank %}
+  {% assign kk_preorder_note = blank %}
+
+  {% for p in item.properties %}
+    {% assign kk_key = p.first | downcase %}
+    {% assign kk_val = p.last | strip %}
+    {% if kk_val != blank %}
+      {% unless kk_key contains '_mws_'
+        or kk_key contains '_apo_'
+        or kk_key contains '_build_'
+        or kk_key contains '_customization_'
+      %}
+        {% if kk_ships_on == blank and kk_key contains 'ship' %}
+          {% assign kk_ships_on = kk_val %}
+        {% elsif kk_preorder_note == blank and kk_key contains 'note' %}
+          {% assign kk_preorder_note = kk_val %}
+        {% elsif kk_ships_on == blank and kk_val contains 'Ships on' %}
+          {% assign kk_ships_on = kk_val %}
+        {% elsif kk_preorder_note == blank and kk_val contains 'Note:' %}
+          {% assign kk_preorder_note = kk_val | remove: 'Note:' | strip %}
+        {% endif %}
+      {% endunless %}
+    {% endif %}
+  {% endfor %}
+
+  {% assign kk_desc = item.selling_plan_allocation.selling_plan.description
+    | default: ''
+    | strip
+  %}
+  {% if kk_ships_on == blank and kk_desc contains 'Ships on' %}
+    {% assign kk_ships_on = kk_desc %}
+  {% endif %}
+  {% if kk_preorder_note == blank and kk_desc != blank %}
+    {% assign kk_preorder_note = kk_desc | remove: 'Note:' | strip %}
+  {% endif %}
+
+  <div class='mt-1 space-y-0.5'>
+    <p class='text-sm text-gray-500'>
+      {{ item.selling_plan_allocation.selling_plan.name }}
+    </p>
+    {% if kk_ships_on != blank %}
+      <p class='text-sm text-gray-500'>
+        {% if kk_ships_on contains 'Ships on' %}
+          {{ kk_ships_on }}
+        {% else %}
+          Ships on: {{ kk_ships_on }}
+        {% endif %}
+      </p>
+    {% endif %}
+    {% if kk_preorder_note != blank %}
+      <p class='text-sm text-gray-500'>
+        {% if kk_preorder_note contains 'Note:' %}
+          {{ kk_preorder_note }}
+        {% else %}
+          Note: {{ kk_preorder_note }}
+        {% endif %}
+      </p>
+    {% endif %}
+  </div>
+{% endif %}

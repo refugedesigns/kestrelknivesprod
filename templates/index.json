@@ -1,31 +1,249 @@
 {
   "sections": {
     "hero-section": {
-      "type": "hero"
+      "type": "hero",
+      "settings": {
+        "hero_mode": "carousel",
+        "single_hero_slide_number": 1,
+        "hero_height_px": 600,
+        "hero_height_mobile_px": 520,
+        "hero_mobile_overlay_padding_bottom": 40,
+        "hero_mobile_text_padding_top": 0,
+        "hero_mobile_overlay_inner_margin_bottom": 0,
+        "hero_mobile_button_margin_top": 20,
+        "hero_mobile_button_margin_bottom": 0,
+        "slider_autoplay_delay": 4,
+        "scale_percent": 100,
+        "scale_radius": 16,
+        "show_text_overlay": true
+      },
+      "blocks": {
+        "hero-slide-1": {
+          "type": "slide",
+          "settings": {
+            "button_enable": true,
+            "overlay_enable": false,
+            "overlay_opacity": 40,
+            "text_bg_enable": false,
+            "text_bg_color": "#000000",
+            "text_bg_opacity": 50,
+            "text_shadow_strength": "soft",
+            "text_shadow_blur": 6,
+            "text_color": "#ffffff",
+            "button_bg_color": "#ffffff",
+            "button_text_color": "#000000",
+            "image": "shopify://shop_images/benner_1.jpg",
+            "image_tablet": "shopify://shop_images/benner_1_mobile.png",
+            "image_mobile": "shopify://shop_images/benner_1_mobile.png",
+            "image_fit": "cover",
+            "image_fit_mobile": "cover",
+            "image_fit_tablet": "cover",
+            "image_fit_desktop": "cover",
+            "image_position": "center",
+            "image_position_mobile": "top",
+            "image_position_tablet": "top",
+            "image_position_desktop": "top",
+            "image_zoom": 100,
+            "title": "Ovis Hunter 2.0",
+            "subtitle": "Skip the drop.\nNo waitlists.\nGrab yours while they're here",
+            "button_text": "Buy The Ovis Hunter Now!",
+            "button_action": "link",
+            "button_form_id": "",
+            "button_url": "shopify://products/ovis-hunter",
+            "image_link_enable": false
+          }
+        },
+        "hero-slide-2": {
+          "type": "slide",
+          "settings": {
+            "button_enable": true,
+            "overlay_enable": false,
+            "overlay_opacity": 40,
+            "text_bg_enable": false,
+            "text_bg_color": "#000000",
+            "text_bg_opacity": 50,
+            "text_shadow_strength": "soft",
+            "text_shadow_blur": 6,
+            "text_color": "#ffffff",
+            "button_bg_color": "#ffffff",
+            "button_text_color": "#000000",
+            "image": "shopify://shop_images/lifestyle_1_-_25-05-2026_11-26-30.png",
+            "image_tablet": "shopify://shop_images/scalpel_mobile.png",
+            "image_mobile": "shopify://shop_images/scalpel_mobile.png",
+            "image_fit": "cover",
+            "image_fit_mobile": "cover",
+            "image_fit_tablet": "cover",
+            "image_fit_desktop": "cover",
+            "image_position": "center",
+            "image_position_mobile": "top",
+            "image_position_tablet": "top",
+            "image_position_desktop": "top",
+            "image_zoom": 100,
+            "title": "Mountain Scalpel",
+            "subtitle": "Lightest replaceable knife.\nOn the market at 12g!",
+            "button_text": "Buy the Mountain Scalpel Now!",
+            "button_action": "link",
+            "button_form_id": "",
+            "button_url": "shopify://products/mountain-scalpel-early-access",
+            "image_link_enable": true
+          }
+        },
+        "hero-slide-3": {
+          "type": "slide",
+          "settings": {
+            "button_enable": true,
+            "overlay_enable": false,
+            "overlay_opacity": 40,
+            "text_bg_enable": false,
+            "text_bg_color": "#000000",
+            "text_bg_opacity": 50,
+            "text_shadow_strength": "soft",
+            "text_shadow_blur": 6,
+            "text_color": "#ffffff",
+            "button_bg_color": "#ffffff",
+            "button_text_color": "#000000",
+            "image": "shopify://shop_images/6.png",
+            "image_tablet": "shopify://shop_images/mobile_6.png",
+            "image_mobile": "shopify://shop_images/mobile_6.png",
+            "image_fit": "cover",
+            "image_fit_mobile": "cover",
+            "image_fit_tablet": "cover",
+            "image_fit_desktop": "cover",
+            "image_position": "center",
+            "image_position_mobile": "top",
+            "image_position_tablet": "top",
+            "image_position_desktop": "top",
+            "image_zoom": 100,
+            "title": "Mountain Caper 2.0",
+            "subtitle": "Only 20 grams.\nZero compromise.\nRefined for more control.",
+            "button_text": "Buy The Mountain Caper Now!",
+            "button_action": "link",
+            "button_form_id": "",
+            "button_url": "shopify://products/mountain-caper",
+            "image_link_enable": true
+          }
+        },
+        "hero-slide-4": {
+          "type": "slide",
+          "settings": {
+            "button_enable": true,
+            "overlay_enable": false,
+            "overlay_opacity": 40,
+            "text_bg_enable": false,
+            "text_bg_color": "#000000",
+            "text_bg_opacity": 50,
+            "text_shadow_strength": "soft",
+            "text_shadow_blur": 6,
+            "text_color": "#ffffff",
+            "button_bg_color": "#ffffff",
+            "button_text_color": "#000000",
+            "image": "shopify://shop_images/3.png",
+            "image_tablet": "shopify://shop_images/mobile_3_287b5c24-5291-455f-9ec5-90773d8b4946.png",
+            "image_mobile": "shopify://shop_images/mobile_3_287b5c24-5291-455f-9ec5-90773d8b4946.png",
+            "image_fit": "cover",
+            "image_fit_mobile": "cover",
+            "image_fit_tablet": "cover",
+            "image_fit_desktop": "cover",
+            "image_position": "center",
+            "image_position_mobile": "top",
+            "image_position_tablet": "top",
+            "image_position_desktop": "top",
+            "image_zoom": 100,
+            "title": "Knife Sharpening",
+            "subtitle": "Your knife keeps its history.\nYour blade gets new life.",
+            "button_text": "Get Your Knife Sharpened",
+            "button_action": "link",
+            "button_form_id": "",
+            "button_url": "shopify://products/knife-sharpening",
+            "image_link_enable": true
+          }
+        }
+      },
+      "block_order": [
+        "hero-slide-1",
+        "hero-slide-2",
+        "hero-slide-3",
+        "hero-slide-4"
+      ]
     },
     "featured-collection": {
       "type": "featured-collection",
       "settings": {
-        "featured_collection": "all"
+        "title": "In Stock Knives",
+        "featured_collection": "featured",
+        "number_of_products_to_show": 4,
+        "mobile_collection": "featured-mobile",
+        "mobile_products_to_show": 4,
+        "mobile_columns": 2,
+        "tablet_collection": "",
+        "tablet_products_to_show": 4,
+        "tablet_columns": 2,
+        "desktop_columns": 4
       }
     },
     "index-section-2": {
-      "type": "index-section-2"
+      "type": "index-section-2",
+      "settings": {
+        "title": "Ultralight By Design",
+        "subtitle": "Functional simplicity meets 100% American Made craftsmanship",
+        "description": "Built with purpose, designed for the field, and trusted by those who live in it.\nNo excess.\nNo compromise.\nJust knives that work for you season after season.",
+        "image": "shopify://shop_images/D7598C26-CFE6-4FA8-A6D4-E7DACDECAB09.jpg",
+        "section_height_vh": 40,
+        "min_height": 500,
+        "button_text": "Explore Collection",
+        "button_url": ""
+      }
+    },
+    "featured-collection-apparel": {
+      "type": "featured-apparel-collection",
+      "settings": {
+        "title": "Most Popular Apparel",
+        "featured_collection": "apparels",
+        "collection_handle": "apparel",
+        "number_of_products_to_show": 4,
+        "mobile_columns": 2,
+        "tablet_columns": 2,
+        "desktop_columns": 4
+      }
     },
     "big-timer": {
       "type": "big-timer",
+      "disabled": true,
       "settings": {
-        "show_timer": true
+        "show_timer": true,
+        "main_title": "Ovis Hunter Drop:",
+        "slogan": "Working Knives For Working People.",
+        "button_text": "NOTIFY ME",
+        "button_color": "#2563eb",
+        "button_text_color": "#ffffff",
+        "button_action": "klaviyo",
+        "button_url": "",
+        "target_date": "2026-01-30T19:00:00-05:00",
+        "form_title": "Get Notified",
+        "form_subtitle": "Enter your email to be notified when we launch",
+        "success_title": "You're on the list!",
+        "success_subtitle": "We'll notify you when we launch",
+        "success_message": "Thanks for signing up!",
+        "success_button_color": "bg-black"
       }
     },
     "index-section-1": {
-      "type": "index-section-1"
+      "type": "index-section-1",
+      "settings": {
+        "title": "Welcome to Kestrel Knives",
+        "subtitle": "Every knife we build starts with a simple idea: create tools that perform in the field and stand the test of time.",
+        "description": "Our community drives everything we do, from design to refinement. Each knife is crafted with 100% American made materials, built by hand in Pennsylvania, and trusted by those who live for the hunt, thrive in the backcountry, or just love a solid EDC",
+        "image": "shopify://shop_images/5DM49812-EDIT.webp",
+        "button_text": "Learn More",
+        "button_url": ""
+      }
     }
   },
   "order": [
     "hero-section",
     "featured-collection",
     "index-section-2",
+    "featured-collection-apparel",
     "big-timer",
     "index-section-1"
   ]

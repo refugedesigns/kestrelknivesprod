@@ -92,7 +92,7 @@
         </div>
       {% else %}
         <div
-          x-show='!isAvailable'
+          x-show='!isAvailable && !cardHasPreorder'
           class='absolute top-2 left-2 md:top-4 md:left-4 bg-black text-white font-bold px-2 py-1 text-xs md:text-sm uppercase z-10'
         >
           SOLD OUT
@@ -309,16 +309,14 @@
       </div>
 
       {% unless is_apparel or is_custom or is_accessory %}
-        <!-- Add to Cart Button (only show when available and not apparels) -->
-        <div x-show='isAvailable'>
+        <!-- Add to Cart / Pre-order button -->
+        <div x-show='canPurchase' x-cloak>
           <button
             @click='addToCart'
             :disabled='isAddingToCart'
             class='w-full bg-black cursor-pointer hover:bg-gray-900 text-white font-semibold py-2 md:py-3 px-3 md:px-4 text-xs md:text-base transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
           >
-            <span
-              x-text="isAddingToCart ? 'Adding...' : '+ ADD TO CART'"
-            ></span>
+            <span x-text="isAddingToCart ? 'Adding...' : cardAddToCartLabel"></span>
           </button>
         </div>
       {% endunless %}
@@ -503,13 +501,11 @@
             {% else %}
               <button
                 @click='qvAddToCart()'
-                :disabled='!qvCanAddToCart'
+                :disabled='!qvCanPurchase'
                 class='w-full text-white font-bold py-4 text-base transition-colors duration-200'
-                :class="qvCanAddToCart ? 'cursor-pointer bg-black hover:bg-gray-900' : 'bg-gray-400 cursor-not-allowed opacity-80'"
+                :class="qvCanPurchase ? 'cursor-pointer bg-black hover:bg-gray-900' : 'bg-gray-400 cursor-not-allowed opacity-80'"
               >
-                <span
-                  x-text="qvCanAddToCart ? 'Add to Cart' : 'SOLD OUT'"
-                ></span>
+                <span x-text="qvAddToCartLabel"></span>
               </button>
             {% endif %}
             <a
@@ -533,6 +529,7 @@
         currentImage,
         hasComplexOptionsTag
       ) => ({
+        ...(window.KKDibsPreorder ? window.KKDibsPreorder.createState() : {}),
         selectedVariant: selectedVariantId,
         currentImage: currentImage,
         productData: {},
@@ -609,8 +606,8 @@
               : ''
           }
 
-          const qvSelectedVariant = this.variantsData.find(
-            v => v.id === this.qvSelectedVariantId
+          const qvSelectedVariant = this.getVariantById(
+            this.qvSelectedVariantId
           )
           if (qvSelectedVariant && qvSelectedVariant.price != null) {
             return this.formatMoney(qvSelectedVariant.price)
@@ -620,19 +617,34 @@
             ? this.formatMoney(this.productData.price)
             : ''
         },
-        get qvSelectedVariantObj() {
-          if (!this.variantsData || !this.variantsData.length) return null
-          const targetId = this.qvSelectedVariantId || this.selectedVariant
-          return this.variantsData.find(v => v.id === targetId) || null
+        getVariantById(id) {
+          if (id == null || !this.variantsData || !this.variantsData.length) {
+            return null
+          }
+          const target = String(id)
+          return (
+            this.variantsData.find(v => String(v.id) === target) || null
+          )
         },
-        get qvCanAddToCart() {
-          if (this.productData && this.productData.available === false) {
-            return false
+        get qvSelectedVariantObj() {
+          return this.getVariantById(
+            this.qvSelectedVariantId || this.selectedVariant
+          )
+        },
+        // Must be defined here (not via createState spread) so Alpine keeps live getters.
+        get qvCanPurchase() {
+          if (typeof this.isQvPurchasable === 'function') {
+            return this.isQvPurchasable()
           }
-          if (this.qvSelectedVariantObj) {
-            return !!this.qvSelectedVariantObj.available
-          }
+          const selected = this.qvSelectedVariantObj
+          if (selected) return !!selected.available
           return !!this.isAvailable
+        },
+        get qvAddToCartLabel() {
+          if (typeof this.getQvPurchaseLabel === 'function') {
+            return this.getQvPurchaseLabel()
+          }
+          return this.qvCanPurchase ? 'Add to Cart' : 'SOLD OUT'
         },
         // Quick View state
         isQuickViewOpen: false,
@@ -707,6 +719,7 @@
           this.updateImage()
           // Preload hover image for smooth crossfade
           this.preloadSecondImage()
+          this.initDibsPreorder()
         },
 
         openQuickView() {
@@ -724,16 +737,28 @@
             this.optionNames = []
           }
           // Seed option selections from current variant if available
-          const current = (this.variantsData || []).find(
-            v => v.id === (this.selectedVariant || this.qvSelectedVariantId)
+          const current = this.getVariantById(
+            this.selectedVariant || this.qvSelectedVariantId
           )
           if (current) {
             this.qvOption1 = current.option1 || null
             this.qvOption2 = current.option2 || null
+          } else {
+            // Fall back to first available variant's options
+            const firstAvailable =
+              (this.variantsData || []).find(v => !!v.available) ||
+              (this.variantsData || [])[0] ||
+              null
+            if (firstAvailable) {
+              this.qvSelectedVariantId = firstAvailable.id
+              this.qvOption1 = firstAvailable.option1 || null
+              this.qvOption2 = firstAvailable.option2 || null
+            }
           }
           // Initialize drawer image from current card image
           this.qvImage = this.currentImage
           this.updateQVSelectedVariant()
+          this.syncQvDibsPlanSelection()
           this.isQuickViewOpen = true
           document.body.style.overflow = 'hidden'
         },
@@ -770,7 +795,7 @@
           this.updateTitle()
           this.checkAvailability()
           this.updateImage(true)
-          // Price will update automatically via the formattedPrice computed property
+          this.syncDibsPlanSelection()
         },
 
         // Select by handle color (option1). Prefer an available variant; fallback to first match.
@@ -786,51 +811,75 @@
           this.updateTitle()
           this.checkAvailability()
           this.updateImage(true)
+          this.syncDibsPlanSelection()
         },
 
         checkAvailability() {
           if (this.variantsData && this.variantsData.length > 0) {
-            const selectedVariant = this.variantsData.find(
-              v => v.id === this.selectedVariant
-            )
+            const selectedVariant = this.getVariantById(this.selectedVariant)
             this.isAvailable = selectedVariant
-              ? selectedVariant.available
-              : false
+              ? !!selectedVariant.available
+              : !!this.productData.available
           } else {
-            this.isAvailable = this.productData.available
+            this.isAvailable = !!this.productData.available
+          }
+          if (typeof this.refreshPurchaseState === 'function') {
+            this.refreshPurchaseState()
           }
         },
 
         async addToCart() {
-          if (!this.isAvailable || this.isAddingToCart) return
+          if (!this.canPurchase || this.isAddingToCart) return
 
           this.isAddingToCart = true
 
           try {
-            // Get the cart sheet component
-            const cartSheet = document.querySelector('[x-data*="cartSheet"]')
-            if (
-              cartSheet &&
-              cartSheet._x_dataStack &&
-              cartSheet._x_dataStack[0]
-            ) {
-              await cartSheet._x_dataStack[0].addToCart(this.selectedVariant, 1)
+            if (this.cardHasPreorder && !this.getDibsSellingPlanId()) {
+              await this.loadDibsPreorder()
+            }
+            const sellingPlanId = this.getDibsSellingPlanId()
+            const preorderProps = sellingPlanId
+              ? this.getDibsCartLineProperties()
+              : null
+            if (window.KKDibsPreorder) {
+              await window.KKDibsPreorder.addToCartWithPlan(
+                this.selectedVariant,
+                1,
+                sellingPlanId,
+                'product-card',
+                preorderProps
+              )
             } else {
-              // Fallback: direct API call using FormData
-              const formData = new FormData()
-              formData.append('id', this.selectedVariant)
-              formData.append('quantity', '1')
-
-              const response = await fetch('/cart/add.js', {
-                method: 'POST',
-                body: formData,
-              })
-
-              if (response.ok) {
-                // Dispatch event to open cart
-                window.dispatchEvent(new CustomEvent('open-cart'))
+              const cartSheet = document.querySelector('[x-data*="cartSheet"]')
+              if (
+                cartSheet &&
+                cartSheet._x_dataStack &&
+                cartSheet._x_dataStack[0]
+              ) {
+                await cartSheet._x_dataStack[0].addToCart(
+                  this.selectedVariant,
+                  1,
+                  'product-card',
+                  preorderProps,
+                  sellingPlanId
+                )
               } else {
-                throw new Error('Failed to add to cart')
+                const payload = {
+                  id: this.selectedVariant,
+                  quantity: 1,
+                }
+                if (sellingPlanId) payload.selling_plan = sellingPlanId
+                const response = await fetch('/cart/add.js', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload),
+                })
+
+                if (response.ok) {
+                  window.dispatchEvent(new CustomEvent('open-cart'))
+                } else {
+                  throw new Error('Failed to add to cart')
+                }
               }
             }
           } catch (error) {
@@ -842,30 +891,48 @@
         },
 
         async qvAddToCart() {
-          if (!this.qvCanAddToCart) return
+          if (!this.qvCanPurchase) return
           try {
-            // Prefer cart sheet addToCart if available
-            const cartSheet = document.querySelector('[x-data*="cartSheet"]')
-            if (
-              cartSheet &&
-              cartSheet._x_dataStack &&
-              cartSheet._x_dataStack[0]
-            ) {
-              await cartSheet._x_dataStack[0].addToCart(
+            const sellingPlanId = this.getQvDibsSellingPlanId()
+            const preorderProps = sellingPlanId
+              ? this.getQvDibsCartLineProperties()
+              : null
+            if (window.KKDibsPreorder) {
+              await window.KKDibsPreorder.addToCartWithPlan(
                 this.qvSelectedVariantId || this.selectedVariant,
-                this.qvQuantity
+                this.qvQuantity,
+                sellingPlanId,
+                'product-card-qv',
+                preorderProps
               )
             } else {
-              const formData = new FormData()
-              formData.append(
-                'id',
-                this.qvSelectedVariantId || this.selectedVariant
-              )
-              formData.append('quantity', String(this.qvQuantity || 1))
-              await fetch('/cart/add.js', { method: 'POST', body: formData })
+              const cartSheet = document.querySelector('[x-data*="cartSheet"]')
+              if (
+                cartSheet &&
+                cartSheet._x_dataStack &&
+                cartSheet._x_dataStack[0]
+              ) {
+                await cartSheet._x_dataStack[0].addToCart(
+                  this.qvSelectedVariantId || this.selectedVariant,
+                  this.qvQuantity,
+                  'product-card-qv',
+                  preorderProps,
+                  sellingPlanId
+                )
+              } else {
+                const payload = {
+                  id: this.qvSelectedVariantId || this.selectedVariant,
+                  quantity: this.qvQuantity || 1,
+                }
+                if (sellingPlanId) payload.selling_plan = sellingPlanId
+                await fetch('/cart/add.js', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload),
+                })
+              }
             }
             this.closeQuickView()
-            // Open cart drawer
             window.dispatchEvent(new CustomEvent('open-cart'))
           } catch (e) {
             console.error('QuickView addToCart failed', e)
@@ -915,10 +982,10 @@
           })
         },
         updateQVSelectedVariant() {
-          // Find variant matching current option selections
+          // Find variant matching current option selections (prefer available)
           let chosen = null
           if (this.qvOption1 || this.qvOption2) {
-            chosen = (this.variantsData || []).find(v => {
+            const matches = (this.variantsData || []).filter(v => {
               const ok1 = this.qvOption1
                 ? String(v.option1 || '') === String(this.qvOption1)
                 : true
@@ -927,6 +994,8 @@
                 : true
               return ok1 && ok2
             })
+            chosen =
+              matches.find(v => !!v.available) || matches[0] || null
           }
           if (chosen) {
             this.qvSelectedVariantId = chosen.id
@@ -937,6 +1006,7 @@
           } else {
             this.qvSelectedVariantId = this.selectedVariant
           }
+          this.syncQvDibsPlanSelection()
         },
 
         updateImage(forceVariantImage = false) {

@@ -64,11 +64,98 @@
     | round
   %}
 {% endif %}
+{% assign product_image_count = 0 %}
+{% assign product_video_count = 0 %}
+{% for media in product.media %}
+  {% if media.media_type == 'image' %}
+    {% assign product_image_count = product_image_count | plus: 1 %}
+  {% elsif media.media_type == 'video' or media.media_type == 'external_video' %}
+    {% assign product_video_count = product_video_count | plus: 1 %}
+  {% endif %}
+{% endfor %}
 
 <style>
   /* Custom styles for enhanced functionality */
   html {
     scroll-behavior: smooth;
+  }
+
+  /* Restore Shopify rich-text formatting (Tailwind Preflight strips list styles;
+     prose classes require application.css which is not loaded) */
+  .product-description p {
+    margin: 0 0 1rem;
+    line-height: 1.7;
+  }
+
+  .product-description p:last-child {
+    margin-bottom: 0;
+  }
+
+  .product-description strong,
+  .product-description b {
+    font-weight: 700;
+  }
+
+  .product-description em,
+  .product-description i {
+    font-style: italic;
+  }
+
+  .product-description ul,
+  .product-description ol {
+    margin: 0 0 1rem;
+    padding-left: 1.5rem;
+  }
+
+  .product-description ul {
+    list-style-type: disc;
+  }
+
+  .product-description ol {
+    list-style-type: decimal;
+  }
+
+  .product-description li {
+    margin: 0.35rem 0;
+    line-height: 1.6;
+    display: list-item;
+  }
+
+  .product-description ul ul {
+    list-style-type: circle;
+    margin-top: 0.35rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .product-description h1,
+  .product-description h2,
+  .product-description h3,
+  .product-description h4,
+  .product-description h5,
+  .product-description h6 {
+    color: #111827;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 1.5rem 0 0.75rem;
+  }
+
+  .product-description h1 { font-size: 1.875rem; }
+  .product-description h2 { font-size: 1.5rem; }
+  .product-description h3 { font-size: 1.25rem; }
+  .product-description h4 { font-size: 1.125rem; }
+
+  .product-description a {
+    color: #111827;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .product-description blockquote {
+    margin: 1rem 0;
+    padding-left: 1rem;
+    border-left: 4px solid #d1d5db;
+    font-style: italic;
+    color: #4b5563;
   }
 
   /* Image transition effects */
@@ -511,15 +598,19 @@
               id='thumbnailStrip'
               class='flex space-x-4 overflow-x-auto pb-2'
             >
+              {% assign image_index = 0 %}
               {% for media in product.media %}
-                <button
-                  @click='changeImage({{ forloop.index0 }})'
-                  data-thumb-index='{{ forloop.index0 }}'
-                  class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 transition-colors border-gray-200 hover:border-black'
-                  :class="currentImageIndex === {{ forloop.index0 }} ? 'border-black' : 'border-gray-200 hover:border-black'"
-                >
-                  {% render "product-media", media: media %}
-                </button>
+                {% if media.media_type == 'image' %}
+                  <button
+                    @click='changeImage({{ image_index }})'
+                    data-thumb-index='{{ image_index }}'
+                    class='thumbnail flex-shrink-0 w-20 h-20 bg-gray-50 rounded-lg overflow-hidden border-2 transition-colors border-gray-200 hover:border-black'
+                    :class="currentImageIndex === {{ image_index }} ? 'border-black' : 'border-gray-200 hover:border-black'"
+                  >
+                    {% render "product-media", media: media %}
+                  </button>
+                  {% assign image_index = image_index | plus: 1 %}
+                {% endif %}
               {% endfor %}
             </div>
             <div
@@ -1120,10 +1211,8 @@
                 <button
                   id='addToCartBtn'
                   type='submit'
-                  class='w-full text-sm whitespace-nowrap md:text-base uppercase bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mb-6 {% if product_status_text != blank or selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
-                  {% if product_status_text != blank
-                    or selected_variant.available == false
-                  %}
+                  class='w-full text-sm whitespace-nowrap md:text-base uppercase bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mb-6 {% if product_status_text != blank %}opacity-50 cursor-not-allowed{% elsif selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
+                  {% if product_status_text != blank %}
                     disabled
                   {% endif %}
                 >
@@ -1268,10 +1357,8 @@
         id='stickyAddToCartBtn'
         type='button'
         onclick='stickyAddToCart()'
-        class='bg-black uppercase hover:bg-gray-800 text-white cursor-pointer font-semibold py-2 px-4 md:py-3 md:px-6 text-sm md:text-base transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] {% if product_status_text != blank or selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
-        {% if product_status_text != blank
-          or selected_variant.available == false
-        %}
+        class='bg-black uppercase hover:bg-gray-800 text-white cursor-pointer font-semibold py-2 px-4 md:py-3 md:px-6 text-sm md:text-base transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] {% if product_status_text != blank %}opacity-50 cursor-not-allowed{% elsif selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
+        {% if product_status_text != blank %}
           disabled
         {% endif %}
       >
@@ -1296,7 +1383,7 @@
         <!-- Description (Left - 7 columns) -->
         <div class='lg:col-span-7'>
           {% if product.description != blank %}
-            <div class='prose prose-black max-w-none'>
+            <div class='product-description max-w-none'>
               {{ product.description }}
             </div>
           {% endif %}
@@ -1357,6 +1444,27 @@
           </div>
         {% endif %}
       </div>
+      {% if product_video_count > 0 %}
+        {% assign video_poster_url = product.featured_image | image_url: width: 1200 %}
+        <div class='mt-12'>
+          <h3 class='text-2xl md:text-3xl font-bold text-black text-center mb-6'>
+            How to Use {{ product.title }}
+          </h3>
+          <div class='max-w-xl mx-auto space-y-6'>
+            {% for media in product.media %}
+              {% if media.media_type == 'video' %}
+                <div class='bg-black rounded-lg overflow-hidden'>
+                  {{ media | video_tag: class: 'w-full h-auto', controls: true, preload: 'none', poster: video_poster_url }}
+                </div>
+              {% elsif media.media_type == 'external_video' %}
+                <div class='bg-black rounded-lg overflow-hidden aspect-video'>
+                  {{ media | external_video_tag: class: 'w-full h-full' }}
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
     </div>
   </section>
 
@@ -1571,8 +1679,9 @@
   document.addEventListener('DOMContentLoaded', function() {
 
     const productId = {{ product.id }};
+    const relatedProductsLimit = 10;
     
-    fetch(`${window.Shopify.routes.root}recommendations/products.json?product_id=${productId}&limit=6&intent=related`)
+    fetch(`${window.Shopify.routes.root}recommendations/products.json?product_id=${productId}&limit=${relatedProductsLimit}&intent=related`)
       .then(response => response.json())
       .then(({ products }) => {
         if (products && products.length > 0) {
@@ -2257,13 +2366,15 @@
       :initial-slide='currentSlide'
     >
       {% for media in product.media %}
-        <swiper-slide class='flex items-center justify-center'>
-          <img
-            src='{{ media | img_url: 'large' }}'
-            alt='{{ media.preview_image.alt }}'
-            class='w-full h-full object-contain'
-          >
-        </swiper-slide>
+        {% if media.media_type == 'image' %}
+          <swiper-slide class='flex items-center justify-center'>
+            <img
+              src='{{ media | img_url: 'large' }}'
+              alt='{{ media.preview_image.alt }}'
+              class='w-full h-full object-contain'
+            >
+          </swiper-slide>
+        {% endif %}
       {% endfor %}
     </swiper-container>
   </div>
@@ -2559,9 +2670,15 @@
         return {
           currentImageIndex: 0,
           quantity: 1,
+          dibsProduct: null,
+          dibsSelectedPlanId: null,
+          currentVariantId: {{ selected_variant.id }},
           productImages: [
+            {% assign first_product_image = true %}
             {% for media in product.media %}
-              '{{ media | img_url: "2048x2048" }}'{% unless forloop.last %},{% endunless %}
+              {% if media.media_type == 'image' %}
+                {% unless first_product_image %},{% endunless %}'{{ media | img_url: "2048x2048" }}'{% assign first_product_image = false %}
+              {% endif %}
             {% endfor %}
           ],
           useComplexOptions,
@@ -2570,6 +2687,20 @@
 
           // dynamic selected options (kept in array ordered by product.options index)
           selectedOptions: initialOptions.slice(),
+
+          get dibsVariantPlans() {
+            if (!window.KKDibsPreorder || !this.dibsProduct || !this.currentVariantId) {
+              return [];
+            }
+            return window.KKDibsPreorder.getVariantPlans(
+              this.dibsProduct,
+              this.currentVariantId
+            );
+          },
+
+          get dibsHasPreorder() {
+            return this.dibsVariantPlans.length > 0;
+          },
 
           init() {
             // initial image set
@@ -2592,7 +2723,31 @@
               }
             }, 100);
 
+            this.loadDibsPreorder();
+
             // watch for page scroll/resize (you already do this; keep in component)
+          },
+
+          async loadDibsPreorder() {
+            if (!window.KKDibsPreorder) return;
+            this.dibsProduct = await window.KKDibsPreorder.fetchProduct(
+              {{ product.handle | json }}
+            );
+            this.syncDibsPlanSelection();
+            const variant =
+              variants.find((v) => v.id === this.currentVariantId) ||
+              variants.find((v) => v.available) ||
+              variants[0] ||
+              null;
+            if (variant) this.updateAddToCartState(variant);
+          },
+
+          syncDibsPlanSelection() {
+            if (!window.KKDibsPreorder) return;
+            this.dibsSelectedPlanId = window.KKDibsPreorder.syncPlanSelection(
+              this.dibsVariantPlans,
+              this.dibsSelectedPlanId
+            );
           },
 
           bindOptionInputs() {
@@ -2722,6 +2877,8 @@
             }
 
              if (variant) {
+               this.currentVariantId = variant.id;
+
                // update hidden input
                const variantInput = document.getElementById('variantIdInput');
                if (variantInput) variantInput.value = variant.id;
@@ -2744,6 +2901,7 @@
                }
 
                // update add to cart button state
+               this.syncDibsPlanSelection();
                this.updateAddToCartState(variant);
                
                // sync sticky size selector if it exists
@@ -2900,6 +3058,21 @@
             if (!btn && !sticky) return;
             const statusText = '{{ product_status_text | escape }}';
             const hasStatus = statusText && statusText.trim().length > 0;
+            const plans = this.dibsVariantPlans || [];
+            const hasPreorder = plans.length > 0;
+            const selectedPlanId =
+              window.KKDibsPreorder && hasPreorder
+                ? window.KKDibsPreorder.resolveSellingPlanId(
+                    plans,
+                    document.getElementById('product-form') || document
+                  )
+                : null;
+            const selectedPlan =
+              plans.find((p) => p.id === selectedPlanId) || plans[0];
+            const preorderLabel = selectedPlan
+              ? selectedPlan.submitButton
+              : 'Preorder Now!';
+
             if (hasStatus) {
               if (btn) {
                 btn.setAttribute('disabled','disabled');
@@ -2911,7 +3084,7 @@
                 sticky.classList.add('opacity-50','cursor-not-allowed');
                 sticky.textContent = statusText;
               }
-            } else if (!variant.available) {
+            } else if (!variant.available && !hasPreorder) {
               if (btn) {
                 btn.setAttribute('disabled','disabled');
                 btn.classList.add('opacity-50','cursor-not-allowed');
@@ -2923,15 +3096,16 @@
                 sticky.textContent = 'SOLD OUT';
               }
             } else {
+              const label = hasPreorder ? preorderLabel : 'ADD TO CART';
               if (btn) {
                 btn.removeAttribute('disabled');
                 btn.classList.remove('opacity-50','cursor-not-allowed');
-                btn.innerText = 'ADD TO CART';
+                btn.innerText = label;
               }
               if (sticky) {
                 sticky.removeAttribute('disabled');
                 sticky.classList.remove('opacity-50','cursor-not-allowed');
-                sticky.textContent = 'ADD TO CART';
+                sticky.textContent = label;
               }
             }
           },
@@ -3256,7 +3430,7 @@
         const images = state && Array.isArray(state.productImages) ? state.productImages : [];
         let total = images.length;
         if (!total) {
-          total = {{ product.media.size }};
+          total = {{ product_image_count }};
         }
 
         if (!total || total <= 1) {
@@ -3447,24 +3621,48 @@
               window.addEventListener('open-cart', restore);
               setTimeout(restore, 6000);
 
+              let sellingPlanId = formData.get('selling_plan') || null;
+              const productPageEl = document.querySelector('[x-data*="productPage"]');
+              if (
+                !sellingPlanId &&
+                productPageEl &&
+                productPageEl._x_dataStack &&
+                productPageEl._x_dataStack[0] &&
+                productPageEl._x_dataStack[0].dibsHasPreorder &&
+                window.KKDibsPreorder
+              ) {
+                sellingPlanId = window.KKDibsPreorder.resolveSellingPlanId(
+                  productPageEl._x_dataStack[0].dibsVariantPlans,
+                  productForm || document
+                );
+              }
+
               // Get the cart sheet component
               const cartSheet = document.querySelector('[x-data*="cartSheet"]');
               if (cartSheet && cartSheet._x_dataStack && cartSheet._x_dataStack[0]) {
                 
-                await cartSheet._x_dataStack[0].addToCart(variantId, quantity, 'main-button');
+                await cartSheet._x_dataStack[0].addToCart(
+                  variantId,
+                  quantity,
+                  'main-button',
+                  null,
+                  sellingPlanId
+                );
                 // Ensure button is restored on success as well
                 restore();
               } else {
                 // Fallback: direct API call
+                const payload = {
+                  id: variantId,
+                  quantity: quantity,
+                };
+                if (sellingPlanId) payload.selling_plan = Number(sellingPlanId);
                 const response = await fetch('/cart/add.js', {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
                   },
-                  body: JSON.stringify({
-                    id: variantId,
-                    quantity: quantity,
-                  }),
+                  body: JSON.stringify(payload),
                 });
 
                 if (response.ok) {
@@ -3637,6 +3835,25 @@
               quantity = productPage._x_dataStack[0].quantity || 1
             }
 
+            let sellingPlanId = null
+            const formSellingPlan = form
+              ? new FormData(form).get('selling_plan')
+              : null
+            if (formSellingPlan) sellingPlanId = formSellingPlan
+            if (
+              !sellingPlanId &&
+              productPage &&
+              productPage._x_dataStack &&
+              productPage._x_dataStack[0] &&
+              productPage._x_dataStack[0].dibsHasPreorder &&
+              window.KKDibsPreorder
+            ) {
+              sellingPlanId = window.KKDibsPreorder.resolveSellingPlanId(
+                productPage._x_dataStack[0].dibsVariantPlans,
+                form || document
+              )
+            }
+
             // Use the updated variant ID if available, otherwise use the original
             const finalVariantId = sizeSelector && variantInput ? variantInput.value : variantId
             console.log('Final variant ID for cart:', finalVariantId)
@@ -3649,12 +3866,19 @@
               typeof cartSheet._x_dataStack[0].addToCart === 'function' &&
               finalVariantId
             ) {
-              await cartSheet._x_dataStack[0].addToCart(finalVariantId, quantity, 'sticky-button')
+              await cartSheet._x_dataStack[0].addToCart(
+                finalVariantId,
+                quantity,
+                'sticky-button',
+                null,
+                sellingPlanId
+              )
               return
             }
 
             // Fallback
             const payload = { id: finalVariantId, quantity }
+            if (sellingPlanId) payload.selling_plan = Number(sellingPlanId)
             const res = await fetch('/cart/add.js', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
