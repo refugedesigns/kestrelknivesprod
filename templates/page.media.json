@@ -12,7 +12,7 @@
     "template-media": {
       "type": "template-media",
       "settings": {
-        "hero_image_desktop": "shopify://shop_images/WhatsApp_Image_2025-10-07_at_15.26.50_d934302e_194f1fc8-9d31-4588-b456-66dfbeaa5fbf.jpg",
+        "hero_image_desktop": "shopify://shop_images/media_1.png",
         "hero_image_tablet": "shopify://shop_images/WhatsApp_Image_2025-10-07_at_15.26.50_d934302e_194f1fc8-9d31-4588-b456-66dfbeaa5fbf.jpg",
         "hero_alt": "Hero image",
         "hero_padding_top": 80,
