@@ -6,7 +6,7 @@
   window.__collectionProducts = {{ collection.products | json }};
 </script>
 
-<div class='px-4 py-4 mx-auto' x-data='customCollectionPage()' x-cloak>
+<div class='px-4 py-4 mx-auto' x-data='customCollectionPage()'>
   {% paginate collection.products by section.settings.number_of_products_per_page | default: 9 %}
     <div
       class='text-center mb-8 px-6 py-4 rounded-lg flex items-center justify-center'

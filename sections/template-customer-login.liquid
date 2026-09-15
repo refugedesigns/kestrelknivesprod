@@ -1,7 +1,6 @@
 <div
   class='min-h-screen bg-white pt-20 md:pt-28'
   x-data='{ loginForm: true, pwRecoverForm: false }'
-  x-cloak
 >
   <div class='max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16'>
     <!-- Login Form -->
@@ -128,7 +127,7 @@
     </div>
 
     <!-- Password Recovery Form -->
-    <div x-show='pwRecoverForm'>
+    <div x-show='pwRecoverForm' x-cloak style='display: none;'>
       <div class='mb-8 text-center md:text-left'>
         <h2 class='text-2xl font-bold text-gray-900 mb-2'>
           Recover your password

@@ -1,12 +1,33 @@
 <!-- Hero Carousel Section -->
+{% liquid
+  assign hero_first_aspect = 1.7778
+  for block in section.blocks
+    if block.type != 'slide'
+      continue
+    endif
+    if block.settings.image != blank
+      assign hero_first_aspect = block.settings.image.aspect_ratio | default: 1.7778
+    elsif block.settings.image_tablet != blank
+      assign hero_first_aspect = block.settings.image_tablet.aspect_ratio | default: 1.7778
+    elsif block.settings.image_mobile != blank
+      assign hero_first_aspect = block.settings.image_mobile.aspect_ratio | default: 1.7778
+    endif
+    break
+  endfor
+%}
 <style>
   .hero-root {
-    min-height: 0
+    /* Reserve height from first slide aspect so Swiper can't collapse to 0 before init */
+    aspect-ratio: {{ hero_first_aspect }};
+    width: 100%;
+    background-color: #0a0a0a;
   }
 
   .hero-scale-wrap,
   .hero-swiper {
-    min-height: inherit;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
   }
 
   .hero-overlay {
@@ -17,7 +38,7 @@
     margin-bottom: 3rem;
   }
 
-  @media (max-width: 1023px) {
+  @media (max-width: 1099px) {
     .hero-overlay {
       padding-top: calc(var(--header-height, 64px) + 16px);
       padding-bottom: var(--hero-mobile-overlay-padding-bottom, 12px);
@@ -91,13 +112,17 @@
         loop='false'
         allow-touch-move='false'
       {% endif %}
-      auto-height='true'
+      auto-height='false'
     >
       {% for block in section.blocks %}
         {% if block.type != 'slide' %}{% continue %}{% endif %}
         {% assign slide_counter = slide_counter | plus: 1 %}
         {% if hero_mode == 'single' and slide_counter != single_slide_num %}{% continue %}{% endif %}
-        {% render 'hero-slide', block: block, section: section %}
+        {% render 'hero-slide',
+          block: block,
+          section: section,
+          is_priority_slide: slide_counter == 1
+        %}
       {% endfor %}
     </swiper-container>
   </div>
@@ -124,16 +149,23 @@
 
 <!-- Swiper Styles -->
 <style>
+  /* Before Swiper.js upgrades the element, custom elements can be 0-height */
+  swiper-container.hero-swiper:not(:defined) {
+    aspect-ratio: {{ hero_first_aspect }};
+    display: block;
+    width: 100%;
+  }
+
   .hero-swiper {
     width: 100%;
-    height: auto;
+    height: 100%;
     border-radius: var(--hero-radius, 0px);
     overflow: hidden;
   }
 
   .hero-scale-wrap {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -147,7 +179,7 @@
   }
 
   .hero-swiper swiper-slide {
-    height: auto;
+    height: 100%;
     width: 100%;
     overflow: visible;
     display: flex;
@@ -160,7 +192,8 @@
 
   .hero-slide-media {
     width: 100%;
-    aspect-ratio: var(--slide-aspect-desktop, 1.7778);
+    height: 100%;
+    aspect-ratio: auto;
     display: block;
     position: relative;
     overflow: hidden;
@@ -178,7 +211,7 @@
     margin-bottom: 2rem;
   }
 
-  @media (min-width: 1024px) {
+  @media (min-width: 1100px) {
     .hero-slide-button-wrap {
       margin-top: 1rem;
     }
@@ -207,15 +240,23 @@
   }
   .kk-text-content { position: relative; z-index: 1; }
 
-  @media (max-width: 1024px) {
+  @media (max-width: 1099px) {
     .hero-slide-media {
-      aspect-ratio: var(--slide-aspect-tablet, var(--slide-aspect-desktop, 1.7778));
+      aspect-ratio: auto;
+      height: 100%;
     }
   }
 
   @media (max-width: 768px) {
     .hero-root {
+      aspect-ratio: auto;
       min-height: {{ section.settings.hero_height_mobile_px | default: 520 }}px;
+      height: var(--hero-height-mobile, {{ section.settings.hero_height_mobile_px | default: 520 }}px);
+    }
+
+    .hero-scale-wrap,
+    .hero-swiper {
+      height: 100%;
     }
 
     .hero-scale-wrap .hero-swiper {
@@ -224,7 +265,7 @@
     }
     .hero-slide-media,
     .hero-swiper swiper-slide {
-      height: var(--hero-height-mobile, 420px);
+      height: 100%;
       aspect-ratio: auto;
     }
   }
@@ -238,7 +279,7 @@
     {% endif %}
   {% endfor %}
 
-  @media (max-width: 1024px) {
+  @media (max-width: 1099px) {
   {% for block in section.blocks %}
     {% if block.type == 'slide' %}
     .hero-root [data-hero-slide="{{ block.id }}"] img {
@@ -492,7 +533,7 @@
         {
           "type": "image_picker",
           "id": "image_tablet",
-          "label": "Image - Tablet (≤1024px)",
+          "label": "Image - Tablet (<1100px)",
           "info": "Optional override for tablet."
         },
         {

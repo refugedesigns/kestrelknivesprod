@@ -82,7 +82,7 @@
     border-radius: 0.5rem;
     z-index: -1;
   }
-  @media (max-width: 1024px) {
+  @media (max-width: 1099px) {
     .eastmans-hero {
       padding-top: calc(var(--header-height, 64px) + 16px);
       align-items: center !important;
@@ -162,7 +162,7 @@
             {% if banner_image_tablet %}
               <source
                 srcset='{{ banner_image_tablet | image_url: width: 1600 }}'
-                media='(max-width: 1024px)'
+                media='(max-width: 1099px)'
               >
             {% endif %}
             <img
@@ -270,7 +270,7 @@
         slides-per-view='3'
         space-between='12'
         centered-slides='false'
-        breakpoints='{"0":{"slidesPerView":1},"640":{"slidesPerView":2},"1024":{"slidesPerView":4}}'
+        breakpoints='{"0":{"slidesPerView":1},"640":{"slidesPerView":2},"1100":{"slidesPerView":4}}'
       >
         {% if shared_images != blank %}
           {% for shared_image in shared_images %}
@@ -623,7 +623,7 @@
     {
       "type": "image_picker",
       "id": "banner_image_tablet",
-      "label": "Banner image - Tablet (<=1024px)",
+      "label": "Banner image - Tablet (<1100px)",
       "info": "Optional override used on tablet viewports."
     },
     {

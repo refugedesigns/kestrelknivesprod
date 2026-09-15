@@ -79,7 +79,7 @@
       {% if image_tablet %}
         <source
           srcset='{{ image_tablet | image_url: width: 1600 }}'
-          media='(max-width: 1024px)'
+          media='(max-width: 1099px)'
         >
       {% endif %}
       <img
@@ -89,7 +89,14 @@
         width='{{ base_image.width }}'
         height='{{ base_image.height }}'
         style='transform: scale({{ block.settings.image_zoom | default: 100 | divided_by: 100.0 }});'
-        loading='lazy'
+        {% if is_priority_slide %}
+          loading='eager'
+          fetchpriority='high'
+          decoding='async'
+        {% else %}
+          loading='lazy'
+          decoding='async'
+        {% endif %}
       >
     </picture>
   {% else %}

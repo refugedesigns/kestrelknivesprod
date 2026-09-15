@@ -1,2 +1,23 @@
 @import 'tailwindcss';
-@plugin "@tailwindcss/typography";
+@plugin '@tailwindcss/typography';
+
+/* Scan theme files for class names (Tailwind v4) */
+@source '../layout/**/*.liquid';
+@source '../sections/**/*.liquid';
+@source '../snippets/**/*.liquid';
+@source '../templates/**/*.liquid';
+@source '../templates/**/*.json';
+@source '../assets/**/*.js';
+
+/*
+  Match the live theme breakpoints previously set via
+  <style type="text/tailwindcss"> in layout/theme.liquid.
+  lg starts at 1100px (not Tailwind's default 1024px).
+*/
+@theme {
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1100px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
