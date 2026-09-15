@@ -3,34 +3,120 @@
     id='guide-outfitter-header'
     class='text-3xl md:text-4xl font-bold text-gray-900 mb-4'
   >
-    Guide and Outfitter Application
+    {{ section.settings.page_title | default: 'Guide and Outfitter Application' }}
   </h1>
   <p class='text-gray-700 text-lg'>
-    Join our network of professional guides and outfitters
+    {{ section.settings.subtitle | default: 'Join our network of professional guides and outfitters' }}
   </p>
 </div>
 
-<div
-  class='relative py-16 px-4 sm:px-6 lg:px-8'
-  style='background-image: url({{ "guide_and_outfitter_background.jpg" | asset_url }}); background-size: cover; background-position: center; background-repeat: no-repeat;'
->
-  <!-- Optional overlay for better text readability -->
-  <div class='absolute inset-0 bg-black/30'></div>
+<style>
+  .guide-outfitter-form-section {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    width: 100%;
+  }
+  .guide-outfitter-form-section__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .guide-outfitter-form-section__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+  }
+  .guide-outfitter-form-section__content {
+    position: relative;
+    z-index: 2;
+    max-width: 56rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    overflow: visible;
+    pointer-events: auto;
+  }
+  .guide-outfitter-form-section__content::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    background: rgba(255, 255, 255, 0.4);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    pointer-events: none;
+  }
+  .guide-outfitter-form-section__form {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    /* Reserve space before Pify posts real height (CLS); do not lock height */
+    min-height: 520px;
+    pointer-events: auto;
+  }
+  .guide-outfitter-form-section__form.pifyform,
+  .guide-outfitter-form-section__form.pifyform iframe {
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
+  }
+  .guide-outfitter-form-section__form.pifyform.formloading iframe {
+    visibility: hidden !important;
+  }
+  .guide-outfitter-form-section__form.pifyform.formloading {
+    background-image: url(https://form-builder.pifyapp.com/assets/images/loading.gif?v=4.6);
+    background-position: center 30px;
+    background-size: 30px 30px;
+    background-repeat: no-repeat;
+  }
+</style>
 
-  <div class='relative max-w-4xl mx-auto rounded-lg shadow-lg bg-white/40 backdrop-blur-sm p-8'>
-    <!-- pifyform-start -->
-    <style>
-      .pifyform.formloading iframe {
-        visibility: hidden !important;
-      }
-      .pifyform.formloading {
-        background-image: url(https://form-builder.pifyapp.com/assets/images/loading.gif?v=4.6);
-        background-position: center 30px;
-        background-size: 30px 30px;
-        background-repeat: no-repeat;
-      }
-    </style>
-    <div id='pifyform-35653' class='pifyform' style='margin:10px 0;'>
+<div class='guide-outfitter-form-section py-16 px-4 sm:px-6 lg:px-8'>
+  <picture>
+    <source
+      media='(max-width: 749px)'
+      srcset='{{ 'guide_and_outfitter_background-750.webp' | asset_url }}'
+      type='image/webp'
+    >
+    <source
+      media='(max-width: 1099px)'
+      srcset='{{ 'guide_and_outfitter_background.webp' | asset_url }}'
+      type='image/webp'
+    >
+    <source
+      srcset='{{ 'guide_and_outfitter_background-1400.webp' | asset_url }}'
+      type='image/webp'
+    >
+    <img
+      class='guide-outfitter-form-section__bg'
+      src='{{ 'guide_and_outfitter_background.jpg' | asset_url }}'
+      alt=''
+      width='1400'
+      height='787'
+      loading='eager'
+      fetchpriority='high'
+      decoding='async'
+    >
+  </picture>
+  <div class='guide-outfitter-form-section__overlay' aria-hidden='true'></div>
+
+  <div class='guide-outfitter-form-section__content'>
+    <div
+      id='pifyform-35653'
+      class='guide-outfitter-form-section__form pifyform'
+      style='margin: 10px 0;'
+    >
       <script charset='UTF-8' defer>
         document.getElementById('pifyform-35653').classList.add('formloading')
         ;(function (h) {
@@ -48,16 +134,20 @@
                 f = JSON.parse(b.data)
               } catch (e) {}
               if (f != null && f.height != undefined) {
+                var nextHeight = Math.max(520, Number(f.height) || 520)
                 if (f.formId == undefined) {
-                  d.style.height = f.height + 'px'
+                  d.style.minHeight = nextHeight + 'px'
+                  d.style.height = nextHeight + 'px'
                 } else if ('pifyform-' + f.formId == d.id) {
-                  d.style.height = f.height + 'px'
+                  d.style.minHeight = nextHeight + 'px'
+                  d.style.height = nextHeight + 'px'
                 }
               }
               if (f != null && f.redirect != undefined && f.redirect != '') {
                 window.location.href = f.redirect
               }
               if (f != null && f.retsetHeight != undefined && f.retsetHeight) {
+                d.style.minHeight = '520px'
                 d.style.height = '520px'
                 window.location.href = '#pifyform-35653'
               }
@@ -131,6 +221,7 @@
           h.addEventListener && h.addEventListener('message', t, !1)
           a.src = 'https://form-builder-en.pifyapp.com/form/s/35653'
           a.id = 'form-iframe-35653'
+          a.title = 'Guide and Outfitter application form'
           a.onload = function () {
             document
               .getElementById('pifyform-35653')
@@ -144,7 +235,7 @@
           a.scrolling = 'no'
           a.style.display = 'block'
           a.style.minWidth = '100%'
-          a.style.width = '100px'
+          a.style.width = '100%'
           a.style.height = '100%'
           a.style.border = 'none'
           a.style.overflow = 'auto'
@@ -156,296 +247,8 @@
         })(window)
       </script>
     </div>
-    <!-- pifyform-end -->
   </div>
 </div>
-
-{% comment %}
-  <!-- Page Header -->
-  <div class='text-center mb-12 border-b border-gray-200 pb-8'>
-    <h1
-      id='guide-outfitter-header'
-      class='text-3xl md:text-4xl font-bold text-gray-900 mb-4'
-    >
-      Guide and Outfitter Application
-    </h1>
-    <p class='text-gray-700 text-lg'>
-      Join our network of professional guides and outfitters
-    </p>
-  </div>
-
-  <!-- Application Form -->
-  <div class='bg-white rounded-lg shadow-sm border border-gray-200 p-8'>
-    {% form "contact" %}
-      {% if form.errors %}
-        <div class='border border-red-300 bg-red-50 p-4 mb-6 rounded'>
-          <div class='flex items-center mb-2'>
-            <div class='text-red-500 mr-2'>
-              <svg class='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
-                <path fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' clip-rule='evenodd'></path>
-              </svg>
-            </div>
-            <div class='text-sm font-medium text-red-800'>
-              Please correct the following errors:
-            </div>
-          </div>
-          <ul class='text-sm text-red-700 ml-7 list-disc'>
-            {% for error in form.errors %}
-              <li>{{ form.errors.messages[error] }}</li>
-            {% endfor %}
-          </ul>
-        </div>
-        <script>
-          window.addEventListener('load', function () {
-            try {
-              var headerEl = document.getElementById('siteHeader')
-              var headerH = headerEl ? headerEl.offsetHeight : 0
-              var target = document.getElementById('guide-outfitter-header')
-              var y =
-                (target
-                  ? target.getBoundingClientRect().top + window.pageYOffset
-                  : 0) -
-                headerH -
-                12
-              window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
-            } catch (e) {}
-          })
-        </script>
-      {% elsif form.posted_successfully? %}
-        <div
-          id='guide-success'
-          class='border border-green-300 bg-green-50 p-4 mb-6 rounded'
-        >
-          <div class='flex items-center'>
-            <div class='text-green-500 mr-2'>
-              <svg class='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
-                <path fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' clip-rule='evenodd'></path>
-              </svg>
-            </div>
-            <div class='text-sm font-medium text-green-800'>
-              Application submitted successfully! We'll review your application
-              and get back to you soon.
-            </div>
-          </div>
-        </div>
-        <script>
-          window.addEventListener('load', function () {
-            try {
-              var siteHeader = document.getElementById('siteHeader')
-              var headerHeight = siteHeader ? siteHeader.offsetHeight : 0
-              var target = document.getElementById('guide-outfitter-header')
-              var y =
-                (target
-                  ? target.getBoundingClientRect().top + window.pageYOffset
-                  : 0) -
-                headerHeight -
-                12
-              window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' })
-
-              var cleanUrl =
-                window.location.pathname + (window.location.hash || '')
-              if (window.history && window.history.replaceState) {
-                window.history.replaceState({}, document.title, cleanUrl)
-              }
-            } catch (e) {}
-          })
-        </script>
-      {% endif %}
-
-      <!-- Hidden field for email subject -->
-      <input
-        type='hidden'
-        name='contact[subject]'
-        value='Someone requested a guide and outfitter'
-      >
-
-      <!-- Name of Outfitter/Company -->
-      <div class='mb-6'>
-        <label class='block text-sm font-medium text-gray-700 mb-2'>
-          Name of Outfitter/Company
-        </label>
-        <input
-          type='text'
-          name='contact[company_name]'
-          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
-          required
-        >
-      </div>
-
-      <!-- Name of Applicant -->
-      <div class='mb-6'>
-        <label class='block text-sm font-medium text-gray-700 mb-2'>
-          Full Name
-        </label>
-        <div>
-          <input
-            type='text'
-            name='contact[full_name]'
-            class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
-            required
-          >
-        </div>
-      </div>
-
-      <!-- License ID # -->
-      <div class='mb-6'>
-        <label class='block text-sm font-medium text-gray-700 mb-2'>
-          License ID
-        </label>
-        <input
-          type='text'
-          name='contact[license_id]'
-          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
-          required
-        >
-      </div>
-
-      <!-- Email Address -->
-      <div class='mb-6'>
-        <label class='block text-sm font-medium text-gray-700 mb-2'>
-          Email Address
-        </label>
-        <input
-          type='email'
-          name='contact[email]'
-          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
-          required
-        >
-      </div>
-
-      <!-- Geographic Area of Services Provided -->
-      <div class='mb-6'>
-        <label class='block text-sm font-medium text-gray-700 mb-2'>
-          Geographic Area of Services Provided
-        </label>
-        <input
-          type='text'
-          name='contact[service_area]'
-          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
-          required
-        >
-      </div>
-
-      <!-- Summary of Services Provided -->
-      <div class='mb-6'>
-        <label class='block text-sm font-medium text-gray-700 mb-2'>
-          Summary of Services Provided
-        </label>
-        <textarea
-          name='contact[services_summary]'
-          rows='4'
-          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black resize-vertical'
-          required
-        ></textarea>
-      </div>
-
-      <!-- Employment/Business -->
-      <div class='mb-6'>
-        <label class='block text-sm font-medium text-gray-700 mb-2'>
-          Employment/Business
-        </label>
-        <div class='flex space-x-6'>
-          <label class='flex items-center'>
-            <input
-              type='radio'
-              name='contact[employment_type]'
-              value='Full Time'
-              class='mr-2 text-black focus:ring-black'
-              required
-            >
-            <span class='text-sm text-gray-700'>Full Time</span>
-          </label>
-          <label class='flex items-center'>
-            <input
-              type='radio'
-              name='contact[employment_type]'
-              value='Part Time'
-              class='mr-2 text-black focus:ring-black'
-              required
-            >
-            <span class='text-sm text-gray-700'>Part Time</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Number of Trips Per Year -->
-      <div class='mb-6'>
-        <label class='block text-sm font-medium text-gray-700 mb-2'>
-          Number of Trips Per Year
-        </label>
-        <input
-          type='text'
-          name='contact[trips_per_year]'
-          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
-          required
-        >
-      </div>
-
-      <!-- Website -->
-      <div class='mb-6'>
-        <label class='block text-sm font-medium text-gray-700 mb-2'>
-          Website
-        </label>
-        <input
-          type='url'
-          name='contact[website]'
-          placeholder='https://example.com'
-          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
-          oninvalid="this.setCustomValidity('Please enter a full URL by including http://')"
-          oninput="this.setCustomValidity('')"
-        >
-      </div>
-
-      <!-- Social Media Page -->
-      <div class='mb-6'>
-        <label class='block text-sm font-medium text-gray-700 mb-2'>
-          Social Media Page
-        </label>
-        <input
-          type='url'
-          name='contact[social_media_page]'
-          placeholder='https://www.facebook.com/yourpage'
-          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
-          required
-        >
-      </div>
-
-      <!-- Phone -->
-      <div class='mb-6'>
-        <label class='block text-sm font-medium text-gray-700 mb-2'>
-          Phone
-        </label>
-        <input
-          type='tel'
-          name='contact[phone]'
-          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black'
-          required
-        >
-      </div>
-
-      <!-- Message -->
-      <div class='mb-8'>
-        <label class='block text-sm font-medium text-gray-700 mb-2'>
-          Tell Us A Little About You
-        </label>
-        <textarea
-          name='contact[body]'
-          required
-          rows='4'
-          class='w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black resize-vertical'
-        ></textarea>
-      </div>
-
-      <!-- Submit Button -->
-      <button
-        type='submit'
-        class='w-full rounded-md cursor-pointer bg-black text-white py-3 px-6 border-2 border-black hover:bg-white hover:text-black transition-colors duration-200 font-medium uppercase tracking-wide'
-      >
-        Submit
-      </button>
-    {% endform %}
-  </div>
-{% endcomment %}
 
 {% schema %}
 {
