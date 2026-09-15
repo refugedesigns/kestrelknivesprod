@@ -43,26 +43,25 @@
             </label>
 
             <!-- Group-tag subfilters under the selected parent -->
-            <template
-              x-if='isParentSelected(t.value) && groupTags.length'
+            <div
+              class='mt-2 space-y-2 pl-6'
+              x-show='isParentSelected(t.value) && groupTags.length'
             >
-              <div class='mt-2 space-y-2 pl-6'>
-                <template x-for='tag in groupTags' :key='tag.tag'>
-                  <label class='flex items-center space-x-2 cursor-pointer'>
-                    <input
-                      type='checkbox'
-                      :checked='isGroupTagSelected(tag)'
-                      @change='toggleGroupTag(tag.tag, $event.target.checked)'
-                      class='border-gray-300 text-black focus:ring-gray-900'
-                    >
-                    <span
-                      class='text-sm text-gray-700'
-                      x-text='tag.label'
-                    ></span>
-                  </label>
-                </template>
-              </div>
-            </template>
+              <template x-for='tag in groupTags' :key='tag.tag'>
+                <label class='flex items-center space-x-2 cursor-pointer'>
+                  <input
+                    type='checkbox'
+                    :checked='isGroupTagSelected(tag)'
+                    @change='toggleGroupTag(tag.tag, $event.target.checked)'
+                    class='border-gray-300 text-black focus:ring-gray-900'
+                  >
+                  <span
+                    class='text-sm text-gray-700'
+                    x-text='tag.label'
+                  ></span>
+                </label>
+              </template>
+            </div>
           </div>
         </template>
       </div>
@@ -162,7 +161,7 @@
 <script>
   document.addEventListener('alpine:init', () => {
     Alpine.data('collectionFilters', () => ({
-      // Fixed parent filters only
+      // Parent filters = Product Type (fixed allowlist)
       PARENT_TYPES: ['Accessories', 'Apparel', 'Ultralight Knives'],
 
       filtersOpen: {
@@ -239,8 +238,7 @@
       },
 
       /**
-       * Tags whose last word is "Group" → { tag, label without Group, handle }
-       * e.g. "Hat Group" → label "Hat"
+       * "Hat Group" → { tag: "Hat Group", label: "Hat", handle: "hat-group" }
        */
       parseGroupTag(raw) {
         const s = String(raw || '').trim()
@@ -248,13 +246,22 @@
         const parts = s.split(/\s+/).filter(Boolean)
         if (parts.length < 2) return null
         if (parts[parts.length - 1].toLowerCase() !== 'group') return null
-        const labelParts = parts.slice(0, -1)
-        const label = this.titleCase(labelParts.join(' '))
+        const label = this.titleCase(parts.slice(0, -1).join(' '))
         if (!label) return null
         return {
           tag: s,
           label,
           handle: this.toHandleSafe(s),
+        }
+      },
+
+      /** /collections/{handle} or /collections/{handle}/{tag-handle} */
+      getCollectionParts() {
+        const path = window.location.pathname || ''
+        const m = path.match(/\/collections\/([^\/]+)(?:\/([^\/]+))?/i)
+        return {
+          handle: m && m[1] ? decodeURIComponent(m[1]) : 'all',
+          tagHandle: m && m[2] ? decodeURIComponent(m[2]) : '',
         }
       },
 
@@ -271,14 +278,14 @@
 
       buildProductTypes() {
         try {
-          const meta = (window.__filterMeta && window.__filterMeta.productTypes) || []
+          const meta =
+            (window.__filterMeta && window.__filterMeta.productTypes) || []
           const products = window.__collectionProducts || []
 
           this.productTypes = this.PARENT_TYPES.map(canonical => {
             const metaHit = meta.find(t =>
               this.matchesParentType(t.value, canonical)
             )
-            // Prefer Shopify's exact type string when present
             const value = metaHit ? String(metaHit.value) : canonical
             let count = metaHit ? Number(metaHit.count || 0) : 0
             if (!count && products.length) {
@@ -320,27 +327,27 @@
             String(a.label).localeCompare(String(b.label))
           )
 
-          // Keep the active URL tag visible even if not in the current product dump
+          // Keep active selection visible
           const active = this.selectedFilters.groupTagSelected
           if (active) {
             const parsed = this.parseGroupTag(active)
+            const activeHandle = this.toHandleSafe(active)
             const exists = this.groupTags.some(
               t =>
                 t.tag === active ||
-                t.handle === this.toHandleSafe(active) ||
+                t.handle === activeHandle ||
                 (parsed && t.tag === parsed.tag)
             )
             if (!exists) {
-              const fallback =
-                parsed ||
-                ({
+              this.groupTags.push(
+                parsed || {
                   tag: active,
                   label: this.titleCase(
                     String(active).replace(/\s+group$/i, '').trim()
                   ),
-                  handle: this.toHandleSafe(active),
-                })
-              this.groupTags.push(fallback)
+                  handle: activeHandle,
+                }
+              )
               this.groupTags.sort((a, b) =>
                 String(a.label).localeCompare(String(b.label))
               )
@@ -351,42 +358,75 @@
         }
       },
 
+      resolveGroupTagFromHandle(tagHandle) {
+        if (!tagHandle) return ''
+        const handle = this.toHandleSafe(tagHandle)
+        const products = window.__collectionProducts || []
+        for (let i = 0; i < products.length; i++) {
+          const tags = products[i].tags || []
+          for (let j = 0; j < tags.length; j++) {
+            const parsed = this.parseGroupTag(tags[j])
+            if (parsed && parsed.handle === handle) return parsed.tag
+          }
+        }
+        // Fallback: hat-group → "Hat Group"
+        return this.titleCase(String(tagHandle).replace(/-/g, ' '))
+      },
+
       hydrateFromUrl() {
         try {
           const url = new URL(window.location.href)
+          const parts = this.getCollectionParts()
 
-          const types = (url.searchParams.getAll('filter.p.product_type') || [])
-            .filter(t => this.isAllowedParent(t))
+          const types = (
+            url.searchParams.getAll('filter.p.product_type') || []
+          ).filter(t => this.isAllowedParent(t))
 
           if (types.length) {
-            // Map URL value onto the allowlisted productTypes entry
             const match = (this.productTypes || []).find(pt =>
               this.matchesParentType(pt.value, types[0])
             )
             this.selectedFilters.productTypeSelected = match
               ? match.value
               : types[0]
-          } else {
-            // Infer parent from collection handle when it matches an allowlisted type
-            const path = window.location.pathname || ''
-            const m = path.match(/\/collections\/([^\/]+)/)
-            const collectionHandle = m && m[1] ? decodeURIComponent(m[1]) : ''
+          } else if (parts.handle && parts.handle !== 'all') {
+            const matchType = (this.productTypes || []).find(pt => {
+              const typeHandle = this.toHandleSafe(pt.value)
+              if (typeHandle === parts.handle) return true
+              if (typeHandle.endsWith('-' + parts.handle)) return true
+              if (
+                parts.handle.endsWith('s') &&
+                typeHandle === parts.handle.slice(0, -1)
+              )
+                return true
+              return false
+            })
+            if (matchType) {
+              this.selectedFilters.productTypeSelected = matchType.value
+            }
+          }
 
-            if (collectionHandle && collectionHandle !== 'all') {
-              const matchType = (this.productTypes || []).find(pt => {
-                const typeHandle = this.toHandleSafe(pt.value)
-                if (typeHandle === collectionHandle) return true
-                if (typeHandle.endsWith('-' + collectionHandle)) return true
-                if (
-                  collectionHandle.endsWith('s') &&
-                  typeHandle === collectionHandle.slice(0, -1)
-                )
-                  return true
-                return false
-              })
-              if (matchType) {
-                this.selectedFilters.productTypeSelected = matchType.value
-              }
+          // Infer parent from products when on a tag URL without product_type
+          if (
+            !this.selectedFilters.productTypeSelected &&
+            (window.__collectionProducts || []).length
+          ) {
+            const typeCounts = {}
+            ;(window.__collectionProducts || []).forEach(p => {
+              const t = String(p.product_type || p.type || '').trim()
+              if (!this.isAllowedParent(t)) return
+              typeCounts[t] = (typeCounts[t] || 0) + 1
+            })
+            const top = Object.keys(typeCounts).sort(
+              (a, b) => typeCounts[b] - typeCounts[a]
+            )[0]
+            if (top) {
+              const match = (this.productTypes || []).find(pt =>
+                this.matchesParentType(pt.value, top)
+              )
+              this.selectedFilters.productTypeSelected = match
+                ? match.value
+                : top
             }
           }
 
@@ -399,10 +439,16 @@
             }
           }
 
-          // Group tag from query (exact tag value, e.g. "Hat Group")
-          const tagParam = url.searchParams.get('filter.p.tag')
-          if (tagParam) {
-            this.selectedFilters.groupTagSelected = tagParam
+          // Subfilter from native tag path: /collections/all/hat-group
+          if (parts.tagHandle) {
+            this.selectedFilters.groupTagSelected =
+              this.resolveGroupTagFromHandle(parts.tagHandle)
+          } else {
+            // Legacy query param support
+            const tagParam = url.searchParams.get('filter.p.tag')
+            if (tagParam) {
+              this.selectedFilters.groupTagSelected = tagParam
+            }
           }
         } catch (e) {
           // ignore
@@ -412,7 +458,6 @@
       onParentTypeChange() {
         this.selectedFilters.groupTagSelected = ''
         this.selectedFilters.availabilitySelected = ''
-        this.buildGroupTags()
         this.applyFilters(true)
       },
 
@@ -463,25 +508,25 @@
 
         const url = new URL(window.location.href)
         url.searchParams.delete('page')
+        // Tag filtering uses the collection path, not filter.p.tag
+        url.searchParams.delete('filter.p.tag')
 
-        // Stay on the current collection; only normalize legacy /collections/all/{tag} paths
-        const path = url.pathname || ''
-        if (/\/collections\/all\/[^/]+$/.test(path)) {
-          url.pathname = '/collections/all'
-        }
-
-        // Parent product type
-        url.searchParams.delete('filter.p.product_type')
         const selected = this.selectedFilters.productTypeSelected || ''
+        const groupTag = this.selectedFilters.groupTagSelected || ''
+
+        // Parent = product type on /collections/all so shoppers see ALL of that type
+        url.searchParams.delete('filter.p.product_type')
         if (selected && this.isAllowedParent(selected)) {
           url.searchParams.append('filter.p.product_type', selected)
-        }
-
-        // Group subfilter → Shopify product tag filter (exact tag, includes "Group")
-        url.searchParams.delete('filter.p.tag')
-        const groupTag = this.selectedFilters.groupTagSelected || ''
-        if (groupTag) {
-          url.searchParams.append('filter.p.tag', groupTag)
+          if (groupTag) {
+            // Subfilter = native Shopify tag URL
+            url.pathname = `/collections/all/${this.toHandleSafe(groupTag)}`
+          } else {
+            url.pathname = '/collections/all'
+          }
+        } else {
+          // Cleared parent — leave tag path too
+          url.pathname = '/collections/all'
         }
 
         // Availability
