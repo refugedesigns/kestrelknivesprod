@@ -271,7 +271,7 @@
 
         this.buildProductTypes()
         this.hydrateFromUrl()
-        this.buildGroupTags()
+        await this.buildGroupTags()
 
         this.isInitializing = false
       },
@@ -303,7 +303,108 @@
         }
       },
 
-      buildGroupTags() {
+      groupTagsCacheKey(typeValue) {
+        return `kk_groupTags_${this.toHandleSafe(typeValue)}`
+      },
+
+      collectGroupTagsFromProducts(products, typeValue, map) {
+        ;(products || []).forEach(p => {
+          if (!this.matchesParentType(p.product_type || p.type, typeValue)) {
+            return
+          }
+          ;(p.tags || []).forEach(tag => {
+            const parsed = this.parseGroupTag(tag)
+            if (!parsed) return
+            if (!map[parsed.tag]) map[parsed.tag] = parsed
+          })
+        })
+      },
+
+      readCachedGroupTags(typeValue) {
+        try {
+          const raw = sessionStorage.getItem(this.groupTagsCacheKey(typeValue))
+          if (!raw) return []
+          const arr = JSON.parse(raw)
+          return Array.isArray(arr) ? arr : []
+        } catch (e) {
+          return []
+        }
+      },
+
+      writeCachedGroupTags(typeValue, tags) {
+        try {
+          if (!typeValue || !tags || !tags.length) return
+          sessionStorage.setItem(
+            this.groupTagsCacheKey(typeValue),
+            JSON.stringify(tags)
+          )
+        } catch (e) {
+          // ignore quota / private mode
+        }
+      },
+
+      applyGroupTagMap(map, typeValue) {
+        const active = this.selectedFilters.groupTagSelected
+        if (active) {
+          const parsed = this.parseGroupTag(active)
+          const activeHandle = this.toHandleSafe(active)
+          const exists = Object.keys(map).some(k => {
+            const t = map[k]
+            return (
+              t.tag === active ||
+              t.handle === activeHandle ||
+              (parsed && t.tag === parsed.tag)
+            )
+          })
+          if (!exists) {
+            const fallback =
+              parsed ||
+              ({
+                tag: active,
+                label: this.titleCase(
+                  String(active).replace(/\s+group$/i, '').trim()
+                ),
+                handle: activeHandle,
+              })
+            map[fallback.tag] = fallback
+          }
+        }
+
+        this.groupTags = Object.values(map).sort((a, b) =>
+          String(a.label).localeCompare(String(b.label))
+        )
+
+        // Cache whenever we have more than the single active tag
+        if (this.groupTags.length > 1 || !active) {
+          this.writeCachedGroupTags(typeValue, this.groupTags)
+        }
+      },
+
+      async fetchCatalogProducts() {
+        try {
+          const loc = new URL(window.location.href)
+          const preview = loc.searchParams.get('preview_theme_id')
+          const fetchUrl = preview
+            ? `/collections/all/products.json?limit=250&preview_theme_id=${encodeURIComponent(preview)}`
+            : '/collections/all/products.json?limit=250'
+          const res = await fetch(fetchUrl, {
+            credentials: 'same-origin',
+            headers: { Accept: 'application/json' },
+          })
+          if (!res.ok) return []
+          const data = await res.json()
+          return (data && data.products) || []
+        } catch (e) {
+          return []
+        }
+      },
+
+      /**
+       * Build ALL Group subfilters for the selected product type.
+       * Uses cache + catalog fetch so selecting one tag doesn't hide the others
+       * (current page products alone only contain the active Group tag).
+       */
+      async buildGroupTags() {
         try {
           const selected = this.selectedFilters.productTypeSelected
           if (!selected || !this.isAllowedParent(selected)) {
@@ -312,46 +413,26 @@
           }
 
           const map = {}
-          ;(window.__collectionProducts || []).forEach(p => {
-            if (!this.matchesParentType(p.product_type || p.type, selected)) {
-              return
-            }
-            ;(p.tags || []).forEach(tag => {
-              const parsed = this.parseGroupTag(tag)
-              if (!parsed) return
-              if (!map[parsed.tag]) map[parsed.tag] = parsed
-            })
+
+          // 1) Cached full list for this parent (from a previous unfiltered view)
+          this.readCachedGroupTags(selected).forEach(t => {
+            if (t && t.tag) map[t.tag] = t
           })
 
-          this.groupTags = Object.values(map).sort((a, b) =>
-            String(a.label).localeCompare(String(b.label))
+          // 2) Current page products
+          this.collectGroupTagsFromProducts(
+            window.__collectionProducts || [],
+            selected,
+            map
           )
 
-          // Keep active selection visible
-          const active = this.selectedFilters.groupTagSelected
-          if (active) {
-            const parsed = this.parseGroupTag(active)
-            const activeHandle = this.toHandleSafe(active)
-            const exists = this.groupTags.some(
-              t =>
-                t.tag === active ||
-                t.handle === activeHandle ||
-                (parsed && t.tag === parsed.tag)
-            )
-            if (!exists) {
-              this.groupTags.push(
-                parsed || {
-                  tag: active,
-                  label: this.titleCase(
-                    String(active).replace(/\s+group$/i, '').trim()
-                  ),
-                  handle: activeHandle,
-                }
-              )
-              this.groupTags.sort((a, b) =>
-                String(a.label).localeCompare(String(b.label))
-              )
-            }
+          this.applyGroupTagMap(map, selected)
+
+          // 3) Refresh from full catalog so all Groups stay visible under the parent
+          const catalog = await this.fetchCatalogProducts()
+          if (catalog.length) {
+            this.collectGroupTagsFromProducts(catalog, selected, map)
+            this.applyGroupTagMap(map, selected)
           }
         } catch (e) {
           this.groupTags = []
