@@ -33,7 +33,7 @@
                 name='productType'
                 :value='t.value'
                 x-model='selectedFilters.productTypeSelected'
-                @change='applyFilters(true)'
+                @change='onParentTypeChange()'
                 class='border-gray-300 text-black focus:ring-gray-900'
               >
               <span
@@ -42,17 +42,17 @@
               ></span>
             </label>
 
-            <!-- Inline apparel tag drill-down (only under Apparel) -->
+            <!-- Group-tag subfilters under the selected parent -->
             <template
-              x-if="t.value && t.value.toLowerCase() === 'apparel' && selectedFilters.productTypeSelected && selectedFilters.productTypeSelected.toLowerCase() === 'apparel' && apparelTagsTop.length"
+              x-if='isParentSelected(t.value) && groupTags.length'
             >
               <div class='mt-2 space-y-2 pl-6'>
-                <template x-for='tag in apparelTagsTop' :key='tag.handle'>
+                <template x-for='tag in groupTags' :key='tag.tag'>
                   <label class='flex items-center space-x-2 cursor-pointer'>
                     <input
                       type='checkbox'
-                      :checked='selectedFilters.apparelTagSelected === tag.handle'
-                      @change='toggleApparelTag(tag.handle, $event.target.checked)'
+                      :checked='isGroupTagSelected(tag)'
+                      @change='toggleGroupTag(tag.tag, $event.target.checked)'
                       class='border-gray-300 text-black focus:ring-gray-900'
                     >
                     <span
@@ -87,7 +87,6 @@
       </button>
 
       <div x-show='filtersOpen.availability' class='space-y-2'>
-        <!-- All option -->
         <label class='flex items-center space-x-2 cursor-pointer'>
           <input
             type='radio'
@@ -128,7 +127,6 @@
       </div>
     </div>
 
-    <!-- Clear Filters Button -->
     <button
       @click='clearFilters'
       class='w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded transition-colors duration-200'
@@ -139,7 +137,6 @@
 </div>
 
 <script>
-  // Server-side filter metadata for counts
   window.__filterMeta = window.__filterMeta || {}
   window.__filterMeta.productTypes = [
     {% assign pt = collection.filters | where: 'param_name', 'filter.p.product_type' | first %}
@@ -162,309 +159,24 @@
     {% endif %}
   }
 </script>
-<script type='application/json' id='kk-filter-meta'>
-  {
-    "productTypes": [
-      {% assign pt = collection.filters | where: 'param_name', 'filter.p.product_type' | first %}
-      {% if pt and pt.values %}
-        {% for v in pt.values %}
-          { "value": {{ v.value | json }}, "count": {{ v.count | default: 0 }} }{% unless forloop.last %},{% endunless %}
-        {% endfor %}
-      {% endif %}
-    ]
-  }
-</script>
 <script>
   document.addEventListener('alpine:init', () => {
     Alpine.data('collectionFilters', () => ({
-      titleCase(str) {
-        try {
-          return String(str || '')
-            .toLowerCase()
-            .split(/\s+/)
-            .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-            .join(' ')
-        } catch (e) {
-          return str
-        }
-      },
+      // Fixed parent filters only
+      PARENT_TYPES: ['Accessories', 'Apparel', 'Ultralight Knives'],
+
       filtersOpen: {
         productType: true,
         availability: true,
       },
       selectedFilters: {
-        productType: [],
         productTypeSelected: '',
-        apparelTagSelected: '',
+        groupTagSelected: '',
         availabilitySelected: '',
       },
       productTypes: [],
-      apparelTags: [],
-      get apparelTagsTop() {
-        return (this.apparelTags || []).filter(
-          t =>
-            String(t.handle || '')
-              .toLowerCase()
-              .indexOf('position') === -1
-        )
-      },
+      groupTags: [],
       isInitializing: true,
-
-      async init() {
-        // Clear any cached data that might contain hidden offer
-        sessionStorage.removeItem('kk_allProductTypes')
-
-        // Build product types from products (await async fetch when needed)
-        await this.buildProductTypes()
-
-        // Hydrate selections from URL so checked states reflect current filters
-        this.hydrateFromUrl()
-
-        // Build apparel tag options from the full catalog
-        await this.buildApparelTags()
-
-        // Mark initialization complete
-        this.isInitializing = false
-      },
-
-      // Fetch full product type facets from /collections/all via a lightweight JSON view
-      async fetchAllProductTypesFromAllCollection() {
-        try {
-          const loc = new URL(window.location.href)
-          const preview = loc.searchParams.get('preview_theme_id')
-          const fetchUrl = preview
-            ? `/collections/all?view=filter-meta&preview_theme_id=${encodeURIComponent(preview)}`
-            : '/collections/all?view=filter-meta'
-          const res = await fetch(fetchUrl, {
-            credentials: 'same-origin',
-            headers: { Accept: 'application/json' },
-          })
-          if (!res.ok) return []
-          const text = await res.text()
-          const parsed = JSON.parse(text || '{}')
-          console.log(parsed)
-          const arr = (parsed && parsed.productTypes) || []
-          if (arr && arr.length) {
-            return arr
-              .map(it => ({
-                value: String(it.value || ''),
-                count: Number(it.count || 0),
-              }))
-              .filter(it => {
-                const val = String(it.value || '').toLowerCase()
-                return it.value && !this.isExcludedProductType(val)
-              })
-          }
-          // Fallback: fetch list of collections and map to product types heuristically
-          const url2 = preview
-            ? `/collections?view=filter-meta&preview_theme_id=${encodeURIComponent(preview)}`
-            : '/collections?view=filter-meta'
-          const res2 = await fetch(url2, {
-            credentials: 'same-origin',
-            headers: { Accept: 'application/json' },
-          })
-          if (!res2.ok) return []
-          const text2 = await res2.text()
-          const parsed2 = JSON.parse(text2 || '{}')
-          const colls = (parsed2 && parsed2.collections) || []
-          // Convert collections to product types by title
-          const HIDE_HANDLES = [
-            'all',
-            'frontpage',
-            'products',
-            'featured',
-            'home',
-            'home-page',
-            'homepage',
-            'hidden-offer',
-            'featured-mobile',
-          ]
-          const HIDE_TITLES = [
-            'featured',
-            'home page',
-            'products',
-            'hidden offer',
-            'featured mobile',
-            'eastmans offer',
-          ]
-          return colls
-            .filter(c => {
-              const h = String(c.handle || '').toLowerCase()
-              const t = String(c.title || '').toLowerCase()
-              if (!h && !t) return false
-              if (HIDE_HANDLES.includes(h)) return false
-              if (HIDE_TITLES.includes(t)) return false
-              if (t.includes('hidden') || h.includes('hidden')) return false
-              return true
-            })
-            .map(c => ({ value: String(c.title || ''), count: 0 }))
-            .filter(it => it.value)
-        } catch (e) {
-          return []
-        }
-      },
-
-      // Get full product types from cache or fetch them once from /collections/all
-      async getFullProductTypes() {
-        try {
-          const cached = sessionStorage.getItem('kk_allProductTypes')
-          const cachedTypes = cached ? JSON.parse(cached) : null
-          // If cache exists but is suspiciously small (e.g., 0 or 1), refetch to ensure full list
-          if (cachedTypes && cachedTypes.length >= 2) {
-            // Filter out hidden offer from cached types
-            return cachedTypes.filter(t => {
-              const val = String(t.value || '').toLowerCase()
-              return !this.isExcludedProductType(val)
-            })
-          }
-          const fetched = await this.fetchAllProductTypesFromAllCollection()
-          if (fetched && fetched.length) {
-            // Filter out hidden offer from fetched types
-            const filtered = fetched.filter(t => {
-              const val = String(t.value || '').toLowerCase()
-              return !this.isExcludedProductType(val)
-            })
-            sessionStorage.setItem(
-              'kk_allProductTypes',
-              JSON.stringify(filtered)
-            )
-            return filtered
-          }
-          return []
-        } catch (e) {
-          return []
-        }
-      },
-
-      hydrateFromUrl() {
-        try {
-          const url = new URL(window.location.href)
-
-          // Product types (multiple allowed)
-          const types = url.searchParams.getAll('filter.p.product_type') || []
-          const filteredTypes = types.filter(
-            t => String(t || '').toLowerCase() !== 'custom'
-          )
-          if (types.length && filteredTypes.length !== types.length) {
-            // Clean legacy Custom filter from URL
-            url.searchParams.delete('filter.p.product_type')
-            filteredTypes.forEach(t =>
-              url.searchParams.append('filter.p.product_type', t)
-            )
-            const cleanedUrl = url.toString()
-            if (cleanedUrl !== window.location.href) {
-              window.location.replace(cleanedUrl)
-              return
-            }
-          }
-
-          if (filteredTypes && filteredTypes.length) {
-            this.selectedFilters.productType = filteredTypes
-            // Use first type as the selected value (single-select UI)
-            this.selectedFilters.productTypeSelected = filteredTypes[0]
-
-            // Ensure the selected type is in productTypes array
-            if (this.selectedFilters.productTypeSelected) {
-              const selectedExists = (this.productTypes || []).some(
-                pt => pt.value === this.selectedFilters.productTypeSelected
-              )
-              if (!selectedExists) {
-                // Add it to ensure the radio button can render
-                this.productTypes.push({
-                  value: this.selectedFilters.productTypeSelected,
-                  count: 0,
-                })
-              }
-            }
-          } else {
-            // If no explicit param, infer selection from collection URL (e.g., /collections/apparels)
-            const path = window.location.pathname || ''
-            const m = path.match(/\/collections\/([^\/]+)/)
-            const collectionHandle = m && m[1] ? decodeURIComponent(m[1]) : ''
-
-            // Skip when viewing all collections
-            if (collectionHandle && collectionHandle !== 'all') {
-              const toHandle = s =>
-                String(s || '')
-                  .toLowerCase()
-                  .trim()
-                  .replace(/[^a-z0-9]+/g, '-')
-                  .replace(/^-+|-+$/g, '')
-
-              // Helper to match collection handle to product type value
-              const matchesHandle = (typeValue, handle) => {
-                const typeHandle = toHandle(typeValue)
-                // Direct match
-                if (typeHandle === handle) return true
-                // Plural/singular swap
-                if (
-                  handle.endsWith('s') &&
-                  typeHandle === handle.slice(0, 1) + handle.slice(1, -1)
-                )
-                  return true
-                if (
-                  typeHandle.endsWith('s') &&
-                  handle === typeHandle.slice(0, -1)
-                )
-                  return true
-                // Suffix match: allow collection handle being a suffix of the type handle
-                // e.g., handle "knives" should match "ultralight-knives"
-                if (typeHandle.endsWith('-' + handle)) return true
-                return false
-              }
-
-              // Find a product type whose handle matches the collection handle
-              const matchType = (this.productTypes || []).find(pt =>
-                matchesHandle(pt.value, collectionHandle)
-              )
-              if (matchType) {
-                this.selectedFilters.productTypeSelected = matchType.value
-              }
-            }
-          }
-
-          // Availability (1=in stock, 0=out of stock)
-          const avParam = url.searchParams.get('filter.v.availability')
-          if (avParam !== null) {
-            if (String(avParam) === '1') {
-              this.selectedFilters.availabilitySelected = 'in-stock'
-            } else if (String(avParam) === '0') {
-              this.selectedFilters.availabilitySelected = 'out-of-stock'
-            }
-          }
-
-          // Apparel tag (filter.p.tag)
-          const tagParam = url.searchParams.get('filter.p.tag')
-          if (tagParam) {
-            this.selectedFilters.apparelTagSelected = tagParam
-          }
-
-          // Apparel tag from path /collections/all/{tag}
-          const pathMatch = (url.pathname || '').match(
-            /\/collections\/all\/([^\/]+)$/
-          )
-          if (pathMatch && pathMatch[1]) {
-            this.selectedFilters.apparelTagSelected = decodeURIComponent(
-              pathMatch[1]
-            )
-            if (!this.selectedFilters.productTypeSelected) {
-              this.selectedFilters.productTypeSelected = 'Apparel'
-              this.selectedFilters.productType = ['Apparel']
-            }
-          }
-        } catch (e) {
-          // ignore
-        }
-      },
-
-      toggleApparelTag(tag, checked) {
-        if (checked) {
-          this.selectedFilters.apparelTagSelected = tag
-        } else {
-          this.selectedFilters.apparelTagSelected = ''
-        }
-        this.applyFilters()
-      },
 
       titleCase(str) {
         try {
@@ -475,101 +187,6 @@
             .join(' ')
         } catch (e) {
           return str
-        }
-      },
-
-      isApparelLikeType(typeVal) {
-        const t = String(typeVal || '').toLowerCase().trim()
-        return (
-          t.includes('apparel') ||
-          t.includes('hoodie') ||
-          t.includes('sweatshirt') ||
-          t.includes('beanie') ||
-          t.includes('hat') ||
-          t.includes('cap')
-        )
-      },
-
-      collectApparelTagsFromProducts(products, map) {
-        ;(products || []).forEach(p => {
-          const typeVal = String(p.product_type || p.type || '')
-          if (!this.isApparelLikeType(typeVal)) return
-          const tags = p.tags || []
-          tags.forEach(tag => {
-            const raw = String(tag || '').trim()
-            if (!raw) return
-            const low = raw.toLowerCase()
-            if (low.includes('hidden')) return
-            if (low.includes('position_') || low.includes('product_')) return
-            const handle = this.toHandleSafe(raw)
-            if (!handle) return
-            if (!map[handle]) {
-              map[handle] = this.titleCase(raw)
-            }
-          })
-        })
-      },
-
-      async fetchAllCatalogProducts() {
-        try {
-          const loc = new URL(window.location.href)
-          const preview = loc.searchParams.get('preview_theme_id')
-          const fetchUrl = preview
-            ? `/collections/all/products.json?limit=250&preview_theme_id=${encodeURIComponent(preview)}`
-            : '/collections/all/products.json?limit=250'
-          const res = await fetch(fetchUrl, {
-            credentials: 'same-origin',
-            headers: { Accept: 'application/json' },
-          })
-          if (!res.ok) return []
-          const data = await res.json()
-          return (data && data.products) || []
-        } catch (e) {
-          return []
-        }
-      },
-
-      async buildApparelTags() {
-        try {
-          // Only build when apparel is selected
-          if (
-            !this.selectedFilters.productTypeSelected ||
-            this.selectedFilters.productTypeSelected.toLowerCase() !== 'apparel'
-          ) {
-            this.apparelTags = []
-            return
-          }
-
-          const map = {}
-          const cached = sessionStorage.getItem('kk_apparelTagsAll')
-          if (cached) {
-            try {
-              const arr = JSON.parse(cached)
-              arr.forEach(t => {
-                if (t && t.handle) map[String(t.handle)] = t.label || t.handle
-              })
-            } catch (e) {
-              // ignore cache parse errors
-            }
-          }
-
-          this.collectApparelTagsFromProducts(
-            window.__collectionProducts || [],
-            map
-          )
-
-          const catalogProducts = await this.fetchAllCatalogProducts()
-          if (catalogProducts.length) {
-            this.collectApparelTagsFromProducts(catalogProducts, map)
-          }
-
-          const arr = Object.keys(map)
-            .sort()
-            .map(h => ({ handle: h, label: map[h] }))
-          this.apparelTags = arr
-          sessionStorage.setItem('kk_apparelTagsAll', JSON.stringify(arr))
-        } catch (e) {
-          this.apparelTags = []
         }
       },
 
@@ -585,60 +202,223 @@
         }
       },
 
-      isExcludedProductType(val) {
-        const t = String(val || '').toLowerCase().trim()
-        return (
-          !t ||
-          t.includes('hidden') ||
-          t === 'custom' ||
-          t === 'eastmans offer'
+      normalizeType(val) {
+        return String(val || '')
+          .toLowerCase()
+          .trim()
+          .replace(/[_-]+/g, ' ')
+          .replace(/\s+/g, ' ')
+      },
+
+      matchesParentType(productType, parentValue) {
+        const a = this.normalizeType(productType)
+        const b = this.normalizeType(parentValue)
+        if (!a || !b) return false
+        if (a === b) return true
+        if (this.toHandleSafe(a) === this.toHandleSafe(b)) return true
+        return false
+      },
+
+      isParentSelected(typeValue) {
+        return this.matchesParentType(
+          this.selectedFilters.productTypeSelected,
+          typeValue
         )
       },
 
-      async buildProductTypes() {
-        try {
-          // Prefer server-provided facet metadata when available
-          const meta = window.__filterMeta || {}
+      isGroupTagSelected(tag) {
+        const sel = this.selectedFilters.groupTagSelected
+        if (!sel || !tag) return false
+        if (sel === tag.tag) return true
+        return this.toHandleSafe(sel) === tag.handle
+      },
 
-          // Current page facet (may be partial). Filter out 'hidden offer'.
-          const metaTypes = (meta.productTypes || [])
-            .filter(t => {
-              const val = String(t.value || '').toLowerCase()
-              return !this.isExcludedProductType(val)
-            })
-            .map(t => ({
-              value: String(t.value || ''),
-              count: Number(t.count || 0),
-            }))
+      isAllowedParent(val) {
+        const n = this.normalizeType(val)
+        return this.PARENT_TYPES.some(p => this.normalizeType(p) === n)
+      },
 
-          // Always attempt to use the full set from /collections/all
-          const fullTypes = await this.getFullProductTypes()
-          if (fullTypes && fullTypes.length) {
-            this.productTypes = fullTypes
-            return
-          }
-
-          // If we couldn't get a full set, fall back to meta types if present
-          if (metaTypes && metaTypes.length) {
-            this.productTypes = metaTypes
-            return
-          }
-
-          // Last resort: derive counts from products on the current page (may be incomplete)
-          const products = window.__collectionProducts || []
-          const counts = {}
-          products.forEach(p => {
-            const t = (p.product_type || p.type || '').toString().trim()
-            if (this.isExcludedProductType(t)) return
-            counts[t] = (counts[t] || 0) + 1
-          })
-          this.productTypes = Object.keys(counts).map(k => ({
-            value: k,
-            count: counts[k],
-          }))
-        } catch (e) {
-          this.productTypes = []
+      /**
+       * Tags whose last word is "Group" → { tag, label without Group, handle }
+       * e.g. "Hat Group" → label "Hat"
+       */
+      parseGroupTag(raw) {
+        const s = String(raw || '').trim()
+        if (!s) return null
+        const parts = s.split(/\s+/).filter(Boolean)
+        if (parts.length < 2) return null
+        if (parts[parts.length - 1].toLowerCase() !== 'group') return null
+        const labelParts = parts.slice(0, -1)
+        const label = this.titleCase(labelParts.join(' '))
+        if (!label) return null
+        return {
+          tag: s,
+          label,
+          handle: this.toHandleSafe(s),
         }
+      },
+
+      async init() {
+        sessionStorage.removeItem('kk_allProductTypes')
+        sessionStorage.removeItem('kk_apparelTagsAll')
+
+        this.buildProductTypes()
+        this.hydrateFromUrl()
+        this.buildGroupTags()
+
+        this.isInitializing = false
+      },
+
+      buildProductTypes() {
+        try {
+          const meta = (window.__filterMeta && window.__filterMeta.productTypes) || []
+          const products = window.__collectionProducts || []
+
+          this.productTypes = this.PARENT_TYPES.map(canonical => {
+            const metaHit = meta.find(t =>
+              this.matchesParentType(t.value, canonical)
+            )
+            // Prefer Shopify's exact type string when present
+            const value = metaHit ? String(metaHit.value) : canonical
+            let count = metaHit ? Number(metaHit.count || 0) : 0
+            if (!count && products.length) {
+              count = products.filter(p =>
+                this.matchesParentType(p.product_type || p.type, canonical)
+              ).length
+            }
+            return { value, count }
+          })
+        } catch (e) {
+          this.productTypes = this.PARENT_TYPES.map(value => ({
+            value,
+            count: 0,
+          }))
+        }
+      },
+
+      buildGroupTags() {
+        try {
+          const selected = this.selectedFilters.productTypeSelected
+          if (!selected || !this.isAllowedParent(selected)) {
+            this.groupTags = []
+            return
+          }
+
+          const map = {}
+          ;(window.__collectionProducts || []).forEach(p => {
+            if (!this.matchesParentType(p.product_type || p.type, selected)) {
+              return
+            }
+            ;(p.tags || []).forEach(tag => {
+              const parsed = this.parseGroupTag(tag)
+              if (!parsed) return
+              if (!map[parsed.tag]) map[parsed.tag] = parsed
+            })
+          })
+
+          this.groupTags = Object.values(map).sort((a, b) =>
+            String(a.label).localeCompare(String(b.label))
+          )
+
+          // Keep the active URL tag visible even if not in the current product dump
+          const active = this.selectedFilters.groupTagSelected
+          if (active) {
+            const parsed = this.parseGroupTag(active)
+            const exists = this.groupTags.some(
+              t =>
+                t.tag === active ||
+                t.handle === this.toHandleSafe(active) ||
+                (parsed && t.tag === parsed.tag)
+            )
+            if (!exists) {
+              const fallback =
+                parsed ||
+                ({
+                  tag: active,
+                  label: this.titleCase(
+                    String(active).replace(/\s+group$/i, '').trim()
+                  ),
+                  handle: this.toHandleSafe(active),
+                })
+              this.groupTags.push(fallback)
+              this.groupTags.sort((a, b) =>
+                String(a.label).localeCompare(String(b.label))
+              )
+            }
+          }
+        } catch (e) {
+          this.groupTags = []
+        }
+      },
+
+      hydrateFromUrl() {
+        try {
+          const url = new URL(window.location.href)
+
+          const types = (url.searchParams.getAll('filter.p.product_type') || [])
+            .filter(t => this.isAllowedParent(t))
+
+          if (types.length) {
+            // Map URL value onto the allowlisted productTypes entry
+            const match = (this.productTypes || []).find(pt =>
+              this.matchesParentType(pt.value, types[0])
+            )
+            this.selectedFilters.productTypeSelected = match
+              ? match.value
+              : types[0]
+          } else {
+            // Infer parent from collection handle when it matches an allowlisted type
+            const path = window.location.pathname || ''
+            const m = path.match(/\/collections\/([^\/]+)/)
+            const collectionHandle = m && m[1] ? decodeURIComponent(m[1]) : ''
+
+            if (collectionHandle && collectionHandle !== 'all') {
+              const matchType = (this.productTypes || []).find(pt => {
+                const typeHandle = this.toHandleSafe(pt.value)
+                if (typeHandle === collectionHandle) return true
+                if (typeHandle.endsWith('-' + collectionHandle)) return true
+                if (
+                  collectionHandle.endsWith('s') &&
+                  typeHandle === collectionHandle.slice(0, -1)
+                )
+                  return true
+                return false
+              })
+              if (matchType) {
+                this.selectedFilters.productTypeSelected = matchType.value
+              }
+            }
+          }
+
+          const avParam = url.searchParams.get('filter.v.availability')
+          if (avParam !== null) {
+            if (String(avParam) === '1') {
+              this.selectedFilters.availabilitySelected = 'in-stock'
+            } else if (String(avParam) === '0') {
+              this.selectedFilters.availabilitySelected = 'out-of-stock'
+            }
+          }
+
+          // Group tag from query (exact tag value, e.g. "Hat Group")
+          const tagParam = url.searchParams.get('filter.p.tag')
+          if (tagParam) {
+            this.selectedFilters.groupTagSelected = tagParam
+          }
+        } catch (e) {
+          // ignore
+        }
+      },
+
+      onParentTypeChange() {
+        this.selectedFilters.groupTagSelected = ''
+        this.selectedFilters.availabilitySelected = ''
+        this.buildGroupTags()
+        this.applyFilters(true)
+      },
+
+      toggleGroupTag(tag, checked) {
+        this.selectedFilters.groupTagSelected = checked ? tag : ''
+        this.applyFilters()
       },
 
       toggleFilter(filterName) {
@@ -647,101 +427,64 @@
 
       clearFilters() {
         this.selectedFilters = {
-          productType: [],
           productTypeSelected: '',
-          apparelTagSelected: '',
+          groupTagSelected: '',
           availabilitySelected: '',
         }
-        // Clear cache to force refresh and remove any cached hidden offer data
-        sessionStorage.removeItem('kk_allProductTypes')
+        this.groupTags = []
         this.applyFilters()
       },
 
       get inStockCount() {
         const meta = window.__filterMeta || {}
-        if (meta.availability && typeof meta.availability.in === 'number')
+        if (meta.availability && typeof meta.availability.in === 'number') {
           return meta.availability.in
+        }
         const products = window.__collectionProducts || []
-        return products ? products.filter(p => p.available).length : 0
+        return products.filter(p => p.available).length
       },
 
       get outOfStockCount() {
         const meta = window.__filterMeta || {}
-        if (meta.availability && typeof meta.availability.out === 'number')
+        if (meta.availability && typeof meta.availability.out === 'number') {
           return meta.availability.out
+        }
         const products = window.__collectionProducts || []
-        return products ? products.filter(p => !p.available).length : 0
+        return products.filter(p => !p.available).length
       },
 
       applyFilters(productTypeChanged = false) {
         if (this.isInitializing) return
 
-        // Reset availability filter when product type changes
         if (productTypeChanged) {
           this.selectedFilters.availabilitySelected = ''
-          this.selectedFilters.apparelTagSelected = ''
-          this.apparelTags = []
+          this.selectedFilters.groupTagSelected = ''
         }
 
-        // Build server-side filter URL and navigate
         const url = new URL(window.location.href)
-        // Always reset pagination to the first page when filters change
         url.searchParams.delete('page')
-        const currentPath = url.pathname || ''
-        const m = currentPath.match(/\/collections\/([^\/]+)/)
-        const currentHandle = m && m[1] ? decodeURIComponent(m[1]) : ''
-        const toHandle = s =>
-          String(s || '')
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '')
-        // product type — from single-select radio
-        const selected = this.selectedFilters.productTypeSelected || ''
+
+        // Stay on the current collection; only normalize legacy /collections/all/{tag} paths
+        const path = url.pathname || ''
+        if (/\/collections\/all\/[^/]+$/.test(path)) {
+          url.pathname = '/collections/all'
+        }
+
+        // Parent product type
         url.searchParams.delete('filter.p.product_type')
-        if (selected) {
+        const selected = this.selectedFilters.productTypeSelected || ''
+        if (selected && this.isAllowedParent(selected)) {
           url.searchParams.append('filter.p.product_type', selected)
         }
 
-        // If the selected type does not match the current collection handle,
-        // navigate to /collections/all so the type filter can return results.
-        if (selected) {
-          const selectedHandle = toHandle(selected)
-          if (
-            currentHandle &&
-            currentHandle !== 'all' &&
-            currentHandle !== selectedHandle
-          ) {
-            url.pathname = '/collections/all'
-          }
-        } else {
-          // If user chose ALL while on a specific collection, also go to /collections/all
-          if (currentHandle && currentHandle !== 'all') {
-            url.pathname = '/collections/all'
-          }
+        // Group subfilter → Shopify product tag filter (exact tag, includes "Group")
+        url.searchParams.delete('filter.p.tag')
+        const groupTag = this.selectedFilters.groupTagSelected || ''
+        if (groupTag) {
+          url.searchParams.append('filter.p.tag', groupTag)
         }
 
-        // Apparel tag — MUST be in pathname, not query params.
-        // Drop the product_type param so tagged items like beanies/hats are not
-        // excluded when their Shopify type is not exactly "Apparel".
-        if (
-          selected &&
-          selected.toLowerCase() === 'apparel' &&
-          this.selectedFilters.apparelTagSelected
-        ) {
-          const tagHandle = toHandle(this.selectedFilters.apparelTagSelected)
-          if (tagHandle) {
-            url.pathname = `/collections/all/${tagHandle}`
-            url.searchParams.delete('filter.p.product_type')
-          }
-        } else {
-          // If no apparel tag, ensure we’re not stuck on a tag URL
-          if (url.pathname.match(/\/collections\/all\/[^/]+$/)) {
-            url.pathname = '/collections/all'
-          }
-        }
-
-        // availability
+        // Availability
         url.searchParams.delete('filter.v.availability')
         const availabilitySelected =
           this.selectedFilters.availabilitySelected || ''
