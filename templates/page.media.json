@@ -1,8 +1,51 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "template-media": {
-      "type": "template-media"
+      "type": "template-media",
+      "settings": {
+        "hero_image_desktop": "shopify://shop_images/WhatsApp_Image_2025-10-07_at_15.26.50_d934302e_194f1fc8-9d31-4588-b456-66dfbeaa5fbf.jpg",
+        "hero_image_tablet": "shopify://shop_images/WhatsApp_Image_2025-10-07_at_15.26.50_d934302e_194f1fc8-9d31-4588-b456-66dfbeaa5fbf.jpg",
+        "hero_alt": "Hero image",
+        "hero_padding_top": 80,
+        "hero_height_mobile_px": 420,
+        "hero_max_height_desktop_px": 800,
+        "hero_link": "",
+        "hero_aspect_ratio_desktop": "1.7778",
+        "hero_aspect_ratio_tablet": "",
+        "hero_aspect_ratio_mobile": "",
+        "hero_image_fit": "cover",
+        "hero_image_fit_mobile": "cover",
+        "hero_image_fit_tablet": "cover",
+        "hero_image_fit_desktop": "cover",
+        "hero_image_position": "center",
+        "hero_image_position_mobile": "top",
+        "hero_image_position_tablet": "top",
+        "hero_image_position_desktop": "top",
+        "hero_image_zoom": 100,
+        "youtube_url": "",
+        "facebook_url": "",
+        "email_url": "",
+        "instagram_url": "",
+        "twitter_url": "",
+        "shared_gallery_page": "",
+        "columns_desktop": 4,
+        "columns_tablet": 3,
+        "columns_mobile": 2,
+        "show_captions": false,
+        "gallery_scale": 100
+      }
     }
   },
-  "order": ["template-media"]
+  "order": [
+    "template-media"
+  ]
 }
