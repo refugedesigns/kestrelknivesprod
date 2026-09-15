@@ -30,10 +30,7 @@
       <meta name='robots' content='noindex,nofollow'>
     {%- endif -%}
 
-    {%- comment -%} Speed up first byte from third-party origins {%- endcomment -%}
-    <link rel='preconnect' href='https://cdn.shopify.com' crossorigin>
-    <link rel='preconnect' href='https://cdn.jsdelivr.net' crossorigin>
-    <link rel='preconnect' href='https://unpkg.com' crossorigin>
+    {%- comment -%} Prefer same-origin assets; avoid unused CDN preconnects {%- endcomment -%}
     <link rel='dns-prefetch' href='https://cdn.shopify.com'>
 
     {%- comment -%} Open Graph + Twitter Card (page-aware fallbacks) {%- endcomment -%}
@@ -137,18 +134,25 @@
     </script>
     <!-- Header hook for plugins -->
     {{ 'application.css' | asset_url | stylesheet_tag }}
-    <script src='{{ application.js | asset_url }}' defer></script>
-    <script src='{{ 'dibs-preorder.js' | asset_url }}' defer></script>
-    <script
-      defer
-      src='https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js'
-    ></script>
+    <script src='{{ 'application.js' | asset_url }}' defer></script>
+    {%- if template.name == 'index'
+      or template.name == 'collection'
+      or template.name == 'product'
+      or template.name == 'cart'
+      or template.name == 'search'
+    -%}
+      <script src='{{ 'dibs-preorder.js' | asset_url }}' defer></script>
+    {%- endif -%}
+    <script src='{{ 'alpine.min.js' | asset_url }}' defer></script>
 
-    <!-- Swiper JS -->
-    <script
-      src='https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js'
-      defer
-    ></script>
+    {%- comment -%} Swiper: homepage + pages that rely on layout (product templates load their own) {%- endcomment -%}
+    {%- if template.name == 'index'
+      or template.name == 'collection'
+      or template.name == 'page'
+      or template.name == 'list-collections'
+    -%}
+      <script src='{{ 'swiper-element-bundle.min.js' | asset_url }}' defer></script>
+    {%- endif -%}
 
     <style>
     [x-cloak] {

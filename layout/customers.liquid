@@ -12,25 +12,13 @@
     <meta name='robots' content='noindex,nofollow'>
     <link rel='canonical' href='{{ canonical_url }}'>
 
-    <link rel='preconnect' href='https://cdn.shopify.com' crossorigin>
-    <link rel='preconnect' href='https://cdn.jsdelivr.net' crossorigin>
-    <link rel='preconnect' href='https://unpkg.com' crossorigin>
     <link rel='dns-prefetch' href='https://cdn.shopify.com'>
 
     {{ content_for_header }}
     <!-- Header hook for plugins -->
     {{ "application.css" | asset_url | stylesheet_tag }}
-    <script src='{{ application.js | asset_url }}' defer></script>
-    <script
-      defer
-      src='https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js'
-    ></script>
-
-    <!-- Swiper JS -->
-    <script
-      src='https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js'
-      defer
-    ></script>
+    <script src='{{ "application.js" | asset_url }}' defer></script>
+    <script src='{{ "alpine.min.js" | asset_url }}' defer></script>
 
     <style>
       [x-cloak] {

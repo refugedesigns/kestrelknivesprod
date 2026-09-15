@@ -60,17 +60,26 @@
   {% assign card_initial_image = product_product.images[0] %}
 {% endif %}
 
+{%- comment -%} Sized card images for Alpine hover/variant swaps (avoid full-res CDN .src) {%- endcomment -%}
+{%- capture card_images_json -%}
+[
+{%- for image in product_product.images -%}
+  {"id":{{ image.id | json }},"src":{{ image | image_url: width: 600 | json }}}{%- unless forloop.last -%},{%- endunless -%}
+{%- endfor -%}
+]
+{%- endcapture -%}
+
 <div
   class='py-2 md:py-3 px-3 hover:cursor-pointer product-card w-full'
   data-product='{{ product_product | json | escape }}'
   data-variants='{{ product_product.variants | json | escape }}'
-  data-images='{{ product_product.images | json | escape }}'
+  data-images='{{ card_images_json | strip_newlines | escape }}'
   x-data='
     productCard(
       {{ product_product.selected_or_first_available_variant.id }},
       {{ product_product.title | json }},
       {% if card_initial_image %}
-        {{ card_initial_image | image_url: width: 400 | json }}
+        {{ card_initial_image | image_url: width: 600 | json }}
       {% else %}
         null
       {% endif %},
@@ -107,16 +116,20 @@
       >
         <!-- Base image -->
         <img
-          width='400'
-          height='400'
+          width='600'
+          height='600'
+          loading='lazy'
+          decoding='async'
           :src='currentImage'
           :alt="'{{ product_product.title }}'"
           :class="'absolute inset-0 w-full h-full {% if is_apparel %}object-contain object-top{% else %}object-contain{% endif %} transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
         >
         <!-- Hover image (crossfades in) -->
         <img
-          width='400'
-          height='400'
+          width='600'
+          height='600'
+          loading='lazy'
+          decoding='async'
           x-show='secondImageSrc'
           :src='secondImageSrc'
           :alt="'{{ product_product.title }}'"
@@ -521,6 +534,17 @@
 </div>
 <script>
   document.addEventListener('alpine:init', () => {
+    const kkSizedImageUrl = (src, width = 600) => {
+      if (!src || typeof src !== 'string') return src
+      try {
+        const u = new URL(src, window.location.href)
+        u.searchParams.set('width', String(width))
+        return u.toString()
+      } catch (e) {
+        return src
+      }
+    }
+
     Alpine.data(
       'productCard',
       (
@@ -541,6 +565,10 @@
         isHovering: false,
         hoverImageLoaded: false,
         useComplexOptionsTag: !!hasComplexOptionsTag,
+
+        sizedImageUrl(src, width = 600) {
+          return kkSizedImageUrl(src, width)
+        },
 
         // Computed property for formatted price
         get formattedPrice() {
@@ -570,7 +598,7 @@
             this.imagesData &&
             this.imagesData.length > 1
           ) {
-            return this.imagesData[1].src || this.imagesData[1]
+            return this.secondImageSrc || this.currentImage
           }
           // Otherwise show current image
           return this.currentImage
@@ -581,8 +609,8 @@
           if (!this.imagesData || this.imagesData.length < 2) return null
           const img = this.imagesData[1]
           if (!img) return null
-          if (typeof img === 'string') return img
-          return img.src || null
+          if (typeof img === 'string') return this.sizedImageUrl(img, 600)
+          return img.src ? this.sizedImageUrl(img.src, 600) : null
         },
 
         // Computed: currently selected handle color (option1)
@@ -970,7 +998,9 @@
               v.featured_image &&
               v.featured_image.src
           )
-          if (variantWithImage) return variantWithImage.featured_image.src
+          if (variantWithImage) {
+            return this.sizedImageUrl(variantWithImage.featured_image.src, 800)
+          }
           // Fallback to current product image
           return this.qvImage || this.currentImage
         },
@@ -1001,7 +1031,7 @@
             this.qvSelectedVariantId = chosen.id
             // Update image to variant image if present
             if (chosen.featured_image && chosen.featured_image.src) {
-              this.qvImage = chosen.featured_image.src
+              this.qvImage = this.sizedImageUrl(chosen.featured_image.src, 800)
             }
           } else {
             this.qvSelectedVariantId = this.selectedVariant
@@ -1032,7 +1062,10 @@
 
             // If variant has a featured image, use it
             if (selectedVariant && selectedVariant.featured_image) {
-              this.currentImage = selectedVariant.featured_image.src
+              this.currentImage = this.sizedImageUrl(
+                selectedVariant.featured_image.src,
+                600
+              )
             } else {
               // No featured image, use the product's featured image
             }

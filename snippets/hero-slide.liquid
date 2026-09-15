@@ -72,18 +72,18 @@
     <picture class='w-full h-full block'>
       {% if image_mobile %}
         <source
-          srcset='{{ image_mobile | image_url: width: 1200 }}'
+          srcset='{{ image_mobile | image_url: width: 900 }}'
           media='(max-width: 767px)'
         >
       {% endif %}
       {% if image_tablet %}
         <source
-          srcset='{{ image_tablet | image_url: width: 1600 }}'
+          srcset='{{ image_tablet | image_url: width: 1400 }}'
           media='(max-width: 1099px)'
         >
       {% endif %}
       <img
-        src='{{ base_image | image_url: width: 1920 }}'
+        src='{{ base_image | image_url: width: 1600 }}'
         alt='{{ slide_title | escape }}'
         class='w-full h-full'
         width='{{ base_image.width }}'

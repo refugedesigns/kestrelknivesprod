@@ -1,20 +1,59 @@
 <!-- Hero Carousel Section -->
 {% liquid
   assign hero_first_aspect = 1.7778
+  assign hero_preload_desktop = blank
+  assign hero_preload_tablet = blank
+  assign hero_preload_mobile = blank
   for block in section.blocks
     if block.type != 'slide'
       continue
     endif
     if block.settings.image != blank
       assign hero_first_aspect = block.settings.image.aspect_ratio | default: 1.7778
+      assign hero_preload_desktop = block.settings.image
     elsif block.settings.image_tablet != blank
       assign hero_first_aspect = block.settings.image_tablet.aspect_ratio | default: 1.7778
+      assign hero_preload_desktop = block.settings.image_tablet
     elsif block.settings.image_mobile != blank
       assign hero_first_aspect = block.settings.image_mobile.aspect_ratio | default: 1.7778
+      assign hero_preload_desktop = block.settings.image_mobile
+    endif
+    if block.settings.image_tablet != blank
+      assign hero_preload_tablet = block.settings.image_tablet
+    endif
+    if block.settings.image_mobile != blank
+      assign hero_preload_mobile = block.settings.image_mobile
     endif
     break
   endfor
 %}
+{% if hero_preload_mobile != blank %}
+  <link
+    rel='preload'
+    as='image'
+    href='{{ hero_preload_mobile | image_url: width: 900 }}'
+    media='(max-width: 767px)'
+    fetchpriority='high'
+  >
+{% endif %}
+{% if hero_preload_tablet != blank %}
+  <link
+    rel='preload'
+    as='image'
+    href='{{ hero_preload_tablet | image_url: width: 1400 }}'
+    media='(min-width: 768px) and (max-width: 1099px)'
+    fetchpriority='high'
+  >
+{% endif %}
+{% if hero_preload_desktop != blank %}
+  <link
+    rel='preload'
+    as='image'
+    href='{{ hero_preload_desktop | image_url: width: 1600 }}'
+    media='(min-width: 1100px)'
+    fetchpriority='high'
+  >
+{% endif %}
 <style>
   .hero-root {
     /* Reserve height from first slide aspect so Swiper can't collapse to 0 before init */

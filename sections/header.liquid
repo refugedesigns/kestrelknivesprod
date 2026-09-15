@@ -180,6 +180,8 @@
           x-on:click='mobileMenuOpen = true'
           type='button'
           class='p-2 pr-4 inline-flex items-center justify-center focus:outline-none'
+          aria-label='Open menu'
+          :aria-expanded='mobileMenuOpen'
           style='color: {{ section.settings.mobile_menu_button_color | default: "#ffffff" }};'
         >
           {% render "icon-menu" %}
@@ -345,6 +347,7 @@
                   x-on:click='mobileMenuOpen = false'
                   type='button'
                   class='rounded-md p-2'
+                  aria-label='Close menu'
                   style='background-color: {{ section.settings.mobile_menu_close_button_bg_color | default: "#1f2937" }}; color: {{ section.settings.mobile_menu_close_button_color | default: "#ffffff" }};'
                 >
                   {% render "icon-close" %}

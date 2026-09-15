@@ -9,11 +9,19 @@
 
 {% assign product_obj = product_product %}
 
+{%- capture card_images_json -%}
+[
+{%- for image in product_obj.images -%}
+  {"id":{{ image.id | json }},"src":{{ image | image_url: width: 600 | json }}}{%- unless forloop.last -%},{%- endunless -%}
+{%- endfor -%}
+]
+{%- endcapture -%}
+
 <div
   class='product-card w-full box-border py-4 px-2 sm:py-6 sm:px-3'
   data-product='{{ product_obj | json | escape }}'
   data-variants='{{ product_obj.variants | json | escape }}'
-  data-images='{{ product_obj.images | json | escape }}'
+  data-images='{{ card_images_json | strip_newlines | escape }}'
   x-data='fcCard()'
 >
   <div class='bg-white overflow-hidden w-full flex flex-col'>
@@ -62,23 +70,26 @@
       >
         <!-- Base image -->
         <img
-          width='400'
-          height='400'
-          src='{{ product_obj.featured_image | default: product_obj.images.first | image_url: width: 400 }}'
+          width='600'
+          height='600'
+          loading='lazy'
+          decoding='async'
+          src='{{ product_obj.featured_image | default: product_obj.images.first | image_url: width: 600 }}'
           :src='currentImage'
           alt='{{ product_obj.title | escape }}'
           :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
         >
         <!-- Hover image (crossfades in) -->
         <img
-          width='400'
-          height='400'
+          width='600'
+          height='600'
           x-cloak
           x-show='secondImageSrc'
           :src='secondImageSrc'
           alt='{{ product_obj.title | escape }}'
           :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 pointer-events-none ' + ((isHovering && hoverImageLoaded) ? 'opacity-100' : 'opacity-0')"
           loading='lazy'
+          decoding='async'
         >
       </a>
     </div>
@@ -582,8 +593,19 @@
           if (!this.imagesData || this.imagesData.length < 2) return null
           const img = this.imagesData[1]
           if (!img) return null
-          if (typeof img === 'string') return img
-          return img.src || null
+          if (typeof img === 'string') return this.sizedImageUrl(img, 600)
+          return img.src ? this.sizedImageUrl(img.src, 600) : null
+        },
+
+        sizedImageUrl(src, width = 600) {
+          if (!src || typeof src !== 'string') return src
+          try {
+            const u = new URL(src, window.location.href)
+            u.searchParams.set('width', String(width))
+            return u.toString()
+          } catch (e) {
+            return src
+          }
         },
 
         formatMoney(cents) {
@@ -734,18 +756,18 @@
 
         resolveImageSrc(image) {
           if (!image) return null
-          if (typeof image === 'string') return image
+          if (typeof image === 'string') return this.sizedImageUrl(image, 600)
           if (Array.isArray(image) && image.length) {
             return this.resolveImageSrc(image[0])
           }
           if (typeof image === 'object') {
-            return (
+            const raw =
               image.src ||
               image.url ||
               image.originalSrc ||
               image.original_url ||
               null
-            )
+            return raw ? this.sizedImageUrl(raw, 600) : null
           }
           return null
         },
