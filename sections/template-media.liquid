@@ -226,7 +226,7 @@
       "type": "page",
       "id": "shared_gallery_page",
       "label": "Shared gallery page (optional)",
-      "info": "Uses page metafield custom.shared_gallery_images (file list) when set."
+      "info": "Fallback only. Gallery prefers this page's custom.shared_gallery_images metafield first."
     },
     {
       "type": "range",
@@ -537,10 +537,15 @@
 <!-- Media Gallery -->
 <div class='pt-2 pb-12 px-4'>
   <div class='mx-auto'>
-    {% assign shared_page = section.settings.shared_gallery_page %}
     {% assign shared_images = blank %}
-    {% if shared_page != blank and shared_page.metafields.custom.shared_gallery_images != blank %}
-      {% assign shared_images = shared_page.metafields.custom.shared_gallery_images.value %}
+    {% if page.metafields.custom.shared_gallery_images != blank %}
+      {% assign shared_images = page.metafields.custom.shared_gallery_images.value %}
+    {% endif %}
+    {% if shared_images == blank
+      and section.settings.shared_gallery_page != blank
+      and section.settings.shared_gallery_page.metafields.custom.shared_gallery_images != blank
+    %}
+      {% assign shared_images = section.settings.shared_gallery_page.metafields.custom.shared_gallery_images.value %}
     {% endif %}
     {% if shared_images != blank %}
       <div style='transform: scale({{ section.settings.gallery_scale | divided_by: 100.0 }}); transform-origin: center;'>
@@ -551,8 +556,7 @@
           data-tablet-cols='{{ section.settings.columns_tablet }}'
           data-desktop-cols='{{ section.settings.columns_desktop }}'
         >
-          {% for item in shared_images %}
-            {% assign shared_image = item.image %}
+          {% for shared_image in shared_images %}
             <div class='group relative overflow-hidden rounded-lg aspect-square w-full h-full'>
               {% if shared_image != blank %}
                 <img
@@ -560,6 +564,8 @@
                   alt=''
                   class='w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300'
                   loading='lazy'
+                  width='800'
+                  height='800'
                 >
               {% else %}
                 <div class='w-full h-full bg-gray-200 flex items-center justify-center aspect-square'>
