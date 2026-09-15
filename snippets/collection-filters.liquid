@@ -200,42 +200,19 @@
       },
       productTypes: [],
       apparelTags: [],
-      apparelFilterGroups: [
-        {
-          handle: 'hat',
-          label: 'Hat',
-          matchTags: [
-            'hat',
-            'hats',
-            'beanie',
-            'beanies',
-            'campfire-beanie',
-            'campfire-hat',
-          ],
-          excludeTags: ['sweatshirt', 'sweatshirts', 'tshirt', 't-shirt', 'tshirts', 't-shirts'],
-        },
-        {
-          handle: 'sweatshirt',
-          label: 'Sweatshirt',
-          matchTags: ['sweatshirt', 'sweatshirts'],
-          excludeTags: [],
-        },
-        {
-          handle: 'tshirt',
-          label: 'Tshirt',
-          matchTags: ['tshirt', 't-shirt', 'tshirts', 't-shirts'],
-          excludeTags: [],
-        },
-      ],
       get apparelTagsTop() {
-        return this.apparelTags || []
+        return (this.apparelTags || []).filter(
+          t =>
+            String(t.handle || '')
+              .toLowerCase()
+              .indexOf('position') === -1
+        )
       },
       isInitializing: true,
 
       async init() {
-        // Clear any cached data that might contain hidden offer or stale tag lists
+        // Clear any cached data that might contain hidden offer
         sessionStorage.removeItem('kk_allProductTypes')
-        sessionStorage.removeItem('kk_apparelTagsAll')
 
         // Build product types from products (await async fetch when needed)
         await this.buildProductTypes()
@@ -456,41 +433,20 @@
             }
           }
 
-          const toHandle = s =>
-            String(s || '')
-              .toLowerCase()
-              .trim()
-              .replace(/[^a-z0-9]+/g, '-')
-              .replace(/^-+|-+$/g, '')
-
-          // Apparel category (custom query param supports multi-tag groups)
-          const categoryParam =
-            url.searchParams.get('kk_apparel_category') ||
-            url.searchParams.get('filter.p.tag')
-          if (categoryParam) {
-            const categoryHandle = toHandle(categoryParam)
-            const group = (this.apparelFilterGroups || []).find(
-              g =>
-                g.handle === categoryHandle ||
-                toHandle(g.label) === categoryHandle
-            )
-            this.selectedFilters.apparelTagSelected = group
-              ? group.handle
-              : categoryHandle
+          // Apparel tag (filter.p.tag)
+          const tagParam = url.searchParams.get('filter.p.tag')
+          if (tagParam) {
+            this.selectedFilters.apparelTagSelected = tagParam
           }
 
-          // Legacy apparel category URLs: /collections/all/{tag}
+          // Apparel tag from path /collections/all/{tag}
           const pathMatch = (url.pathname || '').match(
             /\/collections\/all\/([^\/]+)$/
           )
-          if (pathMatch && pathMatch[1] && !categoryParam) {
-            const pathHandle = toHandle(decodeURIComponent(pathMatch[1]))
-            const group = (this.apparelFilterGroups || []).find(
-              g => g.handle === pathHandle
+          if (pathMatch && pathMatch[1]) {
+            this.selectedFilters.apparelTagSelected = decodeURIComponent(
+              pathMatch[1]
             )
-            this.selectedFilters.apparelTagSelected = group
-              ? group.handle
-              : pathHandle
             if (!this.selectedFilters.productTypeSelected) {
               this.selectedFilters.productTypeSelected = 'Apparel'
               this.selectedFilters.productType = ['Apparel']
@@ -534,38 +490,23 @@
         )
       },
 
-      productMatchesApparelGroup(product, groupHandle) {
-        const group = (this.apparelFilterGroups || []).find(
-          g => g.handle === groupHandle
-        )
-        if (!group) return false
-
-        const typeVal = String(product.product_type || product.type || '')
-        if (!this.isApparelLikeType(typeVal)) return false
-
-        const tagHandles = (product.tags || []).map(tag =>
-          this.toHandleSafe(tag)
-        )
-        const matchSet = new Set(
-          (group.matchTags || []).map(tag => this.toHandleSafe(tag))
-        )
-        const excludeSet = new Set(
-          (group.excludeTags || []).map(tag => this.toHandleSafe(tag))
-        )
-
-        if (!tagHandles.some(tag => matchSet.has(tag))) return false
-        if (tagHandles.some(tag => excludeSet.has(tag))) return false
-        return true
-      },
-
       collectApparelTagsFromProducts(products, map) {
-        ;(this.apparelFilterGroups || []).forEach(group => {
-          const hasMatch = (products || []).some(product =>
-            this.productMatchesApparelGroup(product, group.handle)
-          )
-          if (hasMatch) {
-            map[group.handle] = group.label
-          }
+        ;(products || []).forEach(p => {
+          const typeVal = String(p.product_type || p.type || '')
+          if (!this.isApparelLikeType(typeVal)) return
+          const tags = p.tags || []
+          tags.forEach(tag => {
+            const raw = String(tag || '').trim()
+            if (!raw) return
+            const low = raw.toLowerCase()
+            if (low.includes('hidden')) return
+            if (low.includes('position_') || low.includes('product_')) return
+            const handle = this.toHandleSafe(raw)
+            if (!handle) return
+            if (!map[handle]) {
+              map[handle] = this.titleCase(raw)
+            }
+          })
         })
       },
 
@@ -780,20 +721,24 @@
           }
         }
 
-        // Apparel category — custom param so Hat can match beanie/campfire tags too
-        url.searchParams.delete('filter.p.tag')
-        url.searchParams.delete('kk_apparel_category')
+        // Apparel tag — MUST be in pathname, not query params.
+        // Drop the product_type param so tagged items like beanies/hats are not
+        // excluded when their Shopify type is not exactly "Apparel".
         if (
           selected &&
           selected.toLowerCase() === 'apparel' &&
           this.selectedFilters.apparelTagSelected
         ) {
           const tagHandle = toHandle(this.selectedFilters.apparelTagSelected)
-          url.pathname = '/collections/all'
-          url.searchParams.set('filter.p.product_type', selected)
-          url.searchParams.set('kk_apparel_category', tagHandle)
-        } else if (url.pathname.match(/\/collections\/all\/[^/]+$/)) {
-          url.pathname = '/collections/all'
+          if (tagHandle) {
+            url.pathname = `/collections/all/${tagHandle}`
+            url.searchParams.delete('filter.p.product_type')
+          }
+        } else {
+          // If no apparel tag, ensure we’re not stuck on a tag URL
+          if (url.pathname.match(/\/collections\/all\/[^/]+$/)) {
+            url.pathname = '/collections/all'
+          }
         }
 
         // availability

@@ -1,0 +1,86 @@
+{% comment %}
+  Debug helper: log Dibs preorder data for every product on the page.
+  Requires the Dibs app embed to be enabled in the theme.
+{% endcomment %}
+<script>
+  (function () {
+    function decodeHtmlEntities(str) {
+      const txt = document.createElement('textarea');
+      txt.innerHTML = str;
+      return txt.value;
+    }
+
+    function parseProductHandle(el) {
+      try {
+        const raw = el.getAttribute('data-product') || '{}';
+        const product = JSON.parse(decodeHtmlEntities(raw));
+        return product && product.handle ? product.handle : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function collectProductHandles() {
+      const handles = [];
+      document.querySelectorAll('[data-product]').forEach(function (el) {
+        const handle = parseProductHandle(el);
+        if (handle && handles.indexOf(handle) === -1) handles.push(handle);
+      });
+
+      {% if product %}
+        var pageHandle = {{ product.handle | json }};
+        if (pageHandle && handles.indexOf(pageHandle) === -1) handles.push(pageHandle);
+      {% endif %}
+
+      return handles;
+    }
+
+    function waitForDibs(maxAttempts) {
+      return new Promise(function (resolve) {
+        var attempts = 0;
+
+        function check() {
+          if (typeof lbOrdereasyGetProducts === 'function') {
+            resolve(true);
+            return;
+          }
+          attempts += 1;
+          if (attempts >= maxAttempts) {
+            resolve(false);
+            return;
+          }
+          setTimeout(check, 250);
+        }
+
+        check();
+      });
+    }
+
+    async function logDibsForAllProducts() {
+      var handles = collectProductHandles();
+      if (!handles.length) return;
+
+      var ready = await waitForDibs(40);
+      if (!ready) {
+        console.warn('[Dibs] lbOrdereasyGetProducts is not available');
+        return;
+      }
+
+      for (var i = 0; i < handles.length; i++) {
+        var handle = handles[i];
+        try {
+          var result = await lbOrdereasyGetProducts({ productHandles: [handle] });
+          console.log('[Dibs]', handle, result);
+        } catch (e) {
+          console.error('[Dibs]', handle, e);
+        }
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', logDibsForAllProducts);
+    } else {
+      logDibsForAllProducts();
+    }
+  })();
+</script>
