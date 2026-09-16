@@ -83,7 +83,6 @@
   {% assign is_priority_card = true %}
 {% endif %}
 {% if card_initial_image %}
-  {% assign card_img_200 = card_initial_image | image_url: width: 200, format: 'webp' %}
   {% assign card_img_400 = card_initial_image | image_url: width: 400, format: 'webp' %}
 {% endif %}
 
@@ -132,7 +131,9 @@
         @mouseenter='handleImageHover(true)'
         @mouseleave='handleImageHover(false)'
       >
-        <!-- Base image: static WebP src for LCP; Alpine :src for variant/hover swaps -->
+        <!-- Base image: static WebP src for LCP; Alpine :src for variant/hover swaps.
+             Do not set a static srcset here — browsers prefer srcset over :src and
+             would keep showing the initial image after swatch clicks. -->
         <img
           width='400'
           height='400'
@@ -145,8 +146,6 @@
           decoding='async'
           {% if card_initial_image %}
             src='{{ card_img_400 }}'
-            srcset='{{ card_img_200 }} 200w, {{ card_img_400 }} 400w'
-            sizes='(min-width: 1100px) 33vw, 50vw'
           {% endif %}
           :src='currentImage'
           alt='{{ product_product.title | escape }}'

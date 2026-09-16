@@ -524,18 +524,18 @@
 
           // Update image when variant changes (for knives/non-apparels)
           if (this.variantsData && this.variantsData.length > 0) {
-            const selectedVariant = this.variantsData.find(
-              v => v.id === this.selectedVariant
-            )
+            const selectedVariant = this.getVariantById(this.selectedVariant)
 
             // If variant has a featured image, use it
-            if (selectedVariant && selectedVariant.featured_image) {
+            if (
+              selectedVariant &&
+              selectedVariant.featured_image &&
+              selectedVariant.featured_image.src
+            ) {
               this.currentImage = this.sizedImageUrl(
                 selectedVariant.featured_image.src,
                 400
               )
-            } else {
-              // No featured image, use the product's featured image
             }
           }
         },
