@@ -1,58 +1,3 @@
-{% schema %}
-{
-  "name": "Contact Page",
-  "settings": [
-    {
-      "type": "text",
-      "id": "page_title",
-      "label": "Page Title",
-      "default": "GET IN TOUCH"
-    },
-    {
-      "type": "url",
-      "id": "faq_link",
-      "label": "FAQ Link"
-    },
-    {
-      "type": "text",
-      "id": "store_address",
-      "label": "Store Address",
-      "default": "3527 Sterrettania Rd, Erie, PA 16506, USA"
-    },
-    {
-      "type": "select",
-      "id": "map_provider",
-      "label": "Map Provider",
-      "options": [
-        { "value": "embed", "label": "Google Embed (default)" },
-        { "value": "google_js", "label": "Google JS API (no info box)" }
-      ],
-      "default": "embed"
-    },
-    {
-      "type": "text",
-      "id": "maps_api_key",
-      "label": "Google Maps API Key (for JS API mode)",
-      "info": "Only required if Map Provider is Google JS API"
-    },
-    {
-      "type": "range",
-      "id": "map_zoom",
-      "label": "Map Zoom",
-      "min": 10,
-      "max": 20,
-      "step": 1,
-      "default": 10
-    }
-  ],
-  "presets": [
-    {
-      "name": "Contact Page"
-    }
-  ]
-}
-{% endschema %}
-
 <div class='max-w-8xl mx-auto py-4 px-4 md:px-0 md:pt-16'>
   <!-- Page Header -->
   <div class='text-center mb-8 border-b border-gray-200 pb-4'>
@@ -68,19 +13,30 @@
   <div class='grid grid-cols-1 lg:grid-cols-4 gap-12 lg:px-0 md:max-w-7xl mx-4 md:mx-8 xl:mx-auto py-12'>
     <!-- Contact Form (Left Side) -->
     <div class='lg:col-span-2'>
-      <!-- pifyform-start -->
       <style>
-        .pifyform.formloading iframe {
+        .contact-pifyform {
+          position: relative;
+          width: 100%;
+          /* Reserve space before Pify posts real height (CLS) */
+          min-height: 520px;
+        }
+        .contact-pifyform.pifyform.formloading iframe {
           visibility: hidden !important;
         }
-        .pifyform.formloading {
+        .contact-pifyform.pifyform.formloading {
           background-image: url(https://form-builder.pifyapp.com/assets/images/loading.gif?v=4.6);
           background-position: center 30px;
           background-size: 30px 30px;
           background-repeat: no-repeat;
         }
+        .contact-pifyform.pifyform iframe {
+          display: block;
+          width: 100%;
+          height: 100%;
+          border: 0;
+        }
       </style>
-      <div id='pifyform-35649' class='pifyform'>
+      <div id='pifyform-35649' class='contact-pifyform pifyform'>
         <script charset='UTF-8' defer>
           document.getElementById('pifyform-35649').classList.add('formloading')
           ;(function (h) {
@@ -98,10 +54,13 @@
                   f = JSON.parse(b.data)
                 } catch (e) {}
                 if (f != null && f.height != undefined) {
+                  var nextHeight = Math.max(520, Number(f.height) || 520)
                   if (f.formId == undefined) {
-                    d.style.height = f.height + 'px'
+                    d.style.minHeight = nextHeight + 'px'
+                    d.style.height = nextHeight + 'px'
                   } else if ('pifyform-' + f.formId == d.id) {
-                    d.style.height = f.height + 'px'
+                    d.style.minHeight = nextHeight + 'px'
+                    d.style.height = nextHeight + 'px'
                   }
                 }
                 if (f != null && f.redirect != undefined && f.redirect != '') {
@@ -112,6 +71,7 @@
                   f.retsetHeight != undefined &&
                   f.retsetHeight
                 ) {
+                  d.style.minHeight = '520px'
                   d.style.height = '520px'
                   window.location.href = '#pifyform-35649'
                 }
@@ -194,6 +154,7 @@
               'https://form-builder-en.pifyapp.com/form/s/35649' +
               parentQueryString
             a.id = 'form-iframe-35649'
+            a.title = 'Contact form'
             a.onload = function () {
               document
                 .getElementById('pifyform-35649')
@@ -207,7 +168,7 @@
             a.scrolling = 'no'
             a.style.display = 'block'
             a.style.minWidth = '100%'
-            a.style.width = '100px'
+            a.style.width = '100%'
             a.style.height = '100%'
             a.style.border = 'none'
             a.style.overflow = 'auto'
@@ -219,7 +180,6 @@
           })(window)
         </script>
       </div>
-      <!-- pifyform-end -->
     </div>
 
     <!-- Information Section (Right Side) -->
@@ -230,6 +190,7 @@
     </div>
   </div>
 </div>
+
 <style>
   /* Force icons within Shopify page content to render black */
   .contact-content svg,
@@ -240,26 +201,65 @@
     fill: currentColor !important;
     stroke: currentColor !important;
   }
-  /* Prevent clipping and ensure consistent rendering */
   .contact-content svg {
     display: inline-block;
-    overflow: visible; /* avoid cutting strokes at edges */
+    overflow: visible;
     vertical-align: middle;
+    width: 1.25rem;
+    height: 1.25rem;
   }
   .contact-content a svg {
     width: 24px;
     height: 24px;
   }
-  /* Hover color override to gray */
   .contact-content a:hover svg,
   .contact-content a:hover svg * {
-    color: #6b7280 !important; /* gray-500 */
+    color: #6b7280 !important;
   }
-  /* In case incoming content uses text-white on wrappers */
   .contact-content .text-white {
     color: #000 !important;
   }
+
+  /* Reserve map space so embed paint cannot shift layout */
+  .contact-map {
+    position: relative;
+    width: 100%;
+    height: 24rem; /* h-96 */
+    max-width: 100%;
+    overflow: hidden;
+    background: #e5e7eb;
+  }
+  .contact-map iframe,
+  .contact-map #contact-map {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    filter: grayscale(100%);
+  }
+  .contact-map__mask-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 7rem;
+    background: #fff;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .contact-map__mask-corner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 16rem;
+    height: 4rem;
+    background: #fff;
+    pointer-events: none;
+    z-index: 2;
+  }
 </style>
+
 {% assign api_mode = false %}
 {% if section.settings.map_provider == "google_js"
   and section.settings.maps_api_key != blank
@@ -267,67 +267,137 @@
   {% assign api_mode = true %}
 {% endif %}
 
-<div class='w-full h-96 overflow-hidden relative'>
+<div class='contact-map' aria-label='Store location map'>
   {% if api_mode %}
-    <div id='contact-map' class='w-full h-full'></div>
+    <div id='contact-map'></div>
     <script>
-      (function() {
+      ;(function () {
         function initContactMap() {
           try {
-            const geocoder = new google.maps.Geocoder();
-            geocoder.geocode({ address: {{ section.settings.store_address | json }} }, function(results, status) {
-              if (status === 'OK' && results && results[0]) {
-                const grayscaleStyles = [
-                  { stylers: [{ saturation: -100 }] }
-                ];
-                const map = new google.maps.Map(document.getElementById('contact-map'), {
-                  zoom: {{ section.settings.map_zoom | default: 16 }},
-                  center: results[0].geometry.location,
-                  disableDefaultUI: false,
-                  styles: grayscaleStyles,
-                });
-                new google.maps.Marker({
-                  map: map,
-                  position: results[0].geometry.location,
-                  title: {{ section.settings.store_address | json }}
-                });
+            const geocoder = new google.maps.Geocoder()
+            geocoder.geocode(
+              { address: {{ section.settings.store_address | json }} },
+              function (results, status) {
+                if (status === 'OK' && results && results[0]) {
+                  const grayscaleStyles = [{ stylers: [{ saturation: -100 }] }]
+                  const map = new google.maps.Map(
+                    document.getElementById('contact-map'),
+                    {
+                      zoom: {{ section.settings.map_zoom | default: 16 }},
+                      center: results[0].geometry.location,
+                      disableDefaultUI: false,
+                      styles: grayscaleStyles,
+                    }
+                  )
+                  new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location,
+                    title: {{ section.settings.store_address | json }},
+                  })
+                }
               }
-            });
+            )
           } catch (e) {
-            console.error('Map init error', e);
+            console.error('Map init error', e)
           }
         }
-        if (!window.__contactMapLoaded) {
-          window.__contactMapLoaded = true;
-          const script = document.createElement('script');
-          script.src = 'https://maps.googleapis.com/maps/api/js?key={{ section.settings.maps_api_key | escape }}&callback=initContactMap&libraries=places';
-          script.async = true;
-          script.defer = true;
-          window.initContactMap = initContactMap;
-          document.head.appendChild(script);
-        } else {
-          initContactMap();
+        function loadMapWhenVisible() {
+          if (window.__contactMapLoaded) {
+            initContactMap()
+            return
+          }
+          window.__contactMapLoaded = true
+          window.initContactMap = initContactMap
+          const script = document.createElement('script')
+          script.src =
+            'https://maps.googleapis.com/maps/api/js?key={{ section.settings.maps_api_key | escape }}&callback=initContactMap&libraries=places'
+          script.async = true
+          script.defer = true
+          document.head.appendChild(script)
         }
-      })();
+        const el = document.querySelector('.contact-map')
+        if ('IntersectionObserver' in window && el) {
+          const io = new IntersectionObserver(
+            function (entries) {
+              if (entries.some(function (e) { return e.isIntersecting })) {
+                io.disconnect()
+                loadMapWhenVisible()
+              }
+            },
+            { rootMargin: '200px' }
+          )
+          io.observe(el)
+        } else {
+          window.addEventListener('load', loadMapWhenVisible)
+        }
+      })()
     </script>
   {% else %}
     <iframe
-      class='w-full h-full'
-      width='100%'
-      height='400'
-      style='border:0; aspect-ratio: 16/9; filter: grayscale(100%);'
-      loading='eager'
-      allowfullscreen
+      title='Store location map'
+      width='600'
+      height='384'
+      loading='lazy'
       referrerpolicy='no-referrer-when-downgrade'
+      allowfullscreen
       src='https://www.google.com/maps?q={{ section.settings.store_address | url_encode }}&output=embed&z={{ section.settings.map_zoom | default: 16 }}'
-    >
-    </iframe>
-    <!-- Overlays to hide embed UI boxes -->
-    <div
-      class='absolute top-0 left-0 w-full h-28 bg-white pointer-events-none z-18'
-    ></div>
-    <div
-      class='absolute top-0 left-0 w-64 h-16 bg-white pointer-events-none z-18'
-    ></div>
+    ></iframe>
+    <div class='contact-map__mask-top' aria-hidden='true'></div>
+    <div class='contact-map__mask-corner' aria-hidden='true'></div>
   {% endif %}
 </div>
+
+{% schema %}
+{
+  "name": "Contact Page",
+  "settings": [
+    {
+      "type": "text",
+      "id": "page_title",
+      "label": "Page Title",
+      "default": "GET IN TOUCH"
+    },
+    {
+      "type": "url",
+      "id": "faq_link",
+      "label": "FAQ Link"
+    },
+    {
+      "type": "text",
+      "id": "store_address",
+      "label": "Store Address",
+      "default": "3527 Sterrettania Rd, Erie, PA 16506, USA"
+    },
+    {
+      "type": "select",
+      "id": "map_provider",
+      "label": "Map Provider",
+      "options": [
+        { "value": "embed", "label": "Google Embed (default)" },
+        { "value": "google_js", "label": "Google JS API (no info box)" }
+      ],
+      "default": "embed"
+    },
+    {
+      "type": "text",
+      "id": "maps_api_key",
+      "label": "Google Maps API Key (for JS API mode)",
+      "info": "Only required if Map Provider is Google JS API"
+    },
+    {
+      "type": "range",
+      "id": "map_zoom",
+      "label": "Map Zoom",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "default": 10
+    }
+  ],
+  "presets": [
+    {
+      "name": "Contact Page"
+    }
+  ]
+}
+{% endschema %}
