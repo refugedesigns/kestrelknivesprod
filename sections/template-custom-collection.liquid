@@ -19,7 +19,7 @@
 {% render 'product-card-js' %}
 
 <div class='px-4 py-4 mx-auto' x-data='customCollectionPage()'>
-  {% paginate collection.products by section.settings.number_of_products_per_page | default: 9 %}
+  {% paginate collection.products by section.settings.number_of_products_per_page %}
     <div
       class='text-center mb-8 px-6 py-4 rounded-lg flex items-center justify-center'
       style='background-color: {{ section.settings.page_title_bg_color | default: "#ffffff" }};'
@@ -295,3 +295,15 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{% paginate collection.products by section.settings.number_of_products_per_page
+    | default: 9 %}"
+  to: "{% paginate collection.products by section.settings.number_of_products_per_page
+    %}"
+  position: 610..692
+{% endcomment %}

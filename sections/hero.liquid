@@ -170,11 +170,7 @@
         {% if block.type != 'slide' %}{% continue %}{% endif %}
         {% assign slide_counter = slide_counter | plus: 1 %}
         {% if hero_mode == 'single' and slide_counter != single_slide_num %}{% continue %}{% endif %}
-        {% render 'hero-slide',
-          block: block,
-          section: section,
-          is_priority_slide: slide_counter == 1
-        %}
+        {% render 'hero-slide', block: block, section: section, is_priority_slide: slide_counter %}
       {% endfor %}
     </swiper-container>
   </div>
@@ -1015,3 +1011,19 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: |-
+    {% render 'hero-slide',
+              block: block,
+              section: section,
+              is_priority_slide: slide_counter == 1
+            %}
+  to: "{% render 'hero-slide', block: block, section: section, is_priority_slide:
+    slide_counter %}"
+  position: 6463..6554
+{% endcomment %}

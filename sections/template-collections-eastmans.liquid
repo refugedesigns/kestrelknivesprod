@@ -224,7 +224,7 @@
 {% endif %}
 
 <div class='px-4 pt-6 lg:pt-10 pb-0 mx-auto'>
-  {% paginate collection.products by section.settings.number_of_products_per_page | default: 18 %}
+  {% paginate collection.products by section.settings.number_of_products_per_page %}
     <div class='max-w-4xl mx-auto'>
       <div class='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6'>
         {% for product in collection.products %}
@@ -826,3 +826,15 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{% paginate collection.products by section.settings.number_of_products_per_page
+    | default: 18 %}"
+  to: "{% paginate collection.products by section.settings.number_of_products_per_page
+    %}"
+  position: 10048..10130
+{% endcomment %}

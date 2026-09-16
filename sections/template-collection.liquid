@@ -33,7 +33,7 @@
     >
   {% endcomment %}
 
-  {% paginate collection.products by section.settings.number_of_products_per_page | default: 19 %}
+  {% paginate collection.products by section.settings.number_of_products_per_page %}
     <h1 class='text-3xl font-bold text-center mb-2' x-html='getPageTitle()'>
       {{ collection_title_display }}
     </h1>
@@ -471,3 +471,15 @@
   ]
 }
 {% endschema %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{% paginate collection.products by section.settings.number_of_products_per_page
+    | default: 19 %}"
+  to: "{% paginate collection.products by section.settings.number_of_products_per_page
+    %}"
+  position: 1082..1164
+{% endcomment %}
