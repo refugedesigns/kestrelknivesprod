@@ -65,10 +65,17 @@
             id='products-grid'
           >
             {% comment %}
-              Knives special ordering: render products on this page (paginate.items)
-              in the order of tags product_1, product_2, ... product_999.
-              Any items without such tags are rendered afterwards in original order.
+              Ordering:
+              - early-access collection: early_access_position_N
+              - knives / position tags: product_N / position_N
+              Untagged items render afterwards in collection order.
             {% endcomment %}
+            {% assign handle_norm = collection.handle | downcase | replace: "-", "_" %}
+            {% assign is_early_access = false %}
+            {% if handle_norm contains "early_access" %}
+              {% assign is_early_access = true %}
+            {% endif %}
+
             {% assign has_knife_filter = false %}
             {% assign url_string = request.path
               | append: "?"
@@ -85,32 +92,76 @@
               This allows sorting to trigger even on /collections/all when filtered to knives.
             {%- endcomment -%}
             {% assign has_position_tags = false %}
-            {% for product in collection.products %}
-              {%- assign tags_joined = product.tags | join: "||" | downcase -%}
-              {% assign tags_joined = "||"
-                | append: tags_joined
-                | append: "||"
-              %}
-              {% for i in (1..999) %}
-                {% assign wanted = "product_" | append: i %}
-                {% assign wanted_alt = "position_" | append: i %}
-                {% assign wanted_token = "||" | append: wanted | append: "||" %}
-                {% assign wanted_alt_token = "||"
-                  | append: wanted_alt
+            {% unless is_early_access %}
+              {% for product in collection.products %}
+                {%- assign tags_joined = product.tags | join: "||" | downcase -%}
+                {% assign tags_joined = "||"
+                  | append: tags_joined
                   | append: "||"
                 %}
-                {% if tags_joined contains wanted_token
-                  or tags_joined contains wanted_alt_token
-                %}
-                  {% assign has_position_tags = true %}
-                  {% break %}
-                {% endif %}
+                {% for i in (1..999) %}
+                  {% assign wanted = "product_" | append: i %}
+                  {% assign wanted_alt = "position_" | append: i %}
+                  {% assign wanted_token = "||" | append: wanted | append: "||" %}
+                  {% assign wanted_alt_token = "||"
+                    | append: wanted_alt
+                    | append: "||"
+                  %}
+                  {% if tags_joined contains wanted_token
+                    or tags_joined contains wanted_alt_token
+                  %}
+                    {% assign has_position_tags = true %}
+                    {% break %}
+                  {% endif %}
+                {% endfor %}
+                {% if has_position_tags %}{% break %}{% endif %}
               {% endfor %}
-              {% if has_position_tags %}{% break %}{% endif %}
-            {% endfor %}
+            {% endunless %}
 
             {% assign kk_card_n = 0 %}
-            {% if collection.handle contains "knife"
+            {% if is_early_access %}
+              {% assign rendered_ids = "," %}
+              {% for i in (1..999) %}
+                {% assign wanted = "early_access_position_" | append: i %}
+                {% assign wanted_token = "||" | append: wanted | append: "||" %}
+                {% for product in collection.products %}
+                  {%- assign tags_joined = product.tags
+                    | join: "||"
+                    | downcase
+                    | replace: "-", "_"
+                    | replace: " ", "_"
+                  -%}
+                  {% assign tags_joined = "||"
+                    | append: tags_joined
+                    | append: "||"
+                  %}
+                  {% if tags_joined contains wanted_token %}
+                    {% assign kk_card_n = kk_card_n | plus: 1 %}
+                    {% if kk_card_n <= 4 %}
+                      {% render "product-card", product_product: product, card_priority: true %}
+                    {% else %}
+                      {% render "product-card", product_product: product %}
+                    {% endif %}
+                    {% assign rendered_ids = rendered_ids
+                      | append: product.id
+                      | append: ","
+                    %}
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+
+              {% for product in collection.products %}
+                {% assign pid = product.id | append: "," %}
+                {% unless rendered_ids contains pid %}
+                  {% assign kk_card_n = kk_card_n | plus: 1 %}
+                  {% if kk_card_n <= 4 %}
+                    {% render "product-card", product_product: product, card_priority: true %}
+                  {% else %}
+                    {% render "product-card", product_product: product %}
+                  {% endif %}
+                {% endunless %}
+              {% endfor %}
+            {% elsif collection.handle contains "knife"
               or collection.title contains "Knife"
               or collection.title contains "Knives"
               or has_knife_filter

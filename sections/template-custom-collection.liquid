@@ -41,132 +41,50 @@
         class='grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-8'
       >
         {% assign hidden_offer_count = 0 %}
+        {% assign kk_card_n = 0 %}
+        {% assign rendered_ids = "," %}
 
         {% comment %}
-          Only render products with hidden_offer tag.
-          Apply same knife sorting logic if applicable.
+          Early access / Hidden Offer page: sort by early_access_position_N only
+          (independent of knives collection product_N / position_N tags).
+          Only render products tagged hidden_offer.
         {% endcomment %}
-
-        {% assign has_knife_filter = false %}
-        {% assign url_string = request.path
-          | append: "?"
-          | append: request.query_string
-        %}
-        {% if url_string contains "filter.p.product_type=Knives"
-          or url_string contains "filter.p.product_type=knives"
-        %}
-          {% assign has_knife_filter = true %}
-        {% endif %}
-
-        {%- comment -%}
-          Determine if any product on the current page has explicit position tags.
-        {%- endcomment -%}
-        {% assign has_position_tags = false %}
-        {% for product in collection.products %}
-          {%- assign tags_hidden_check = product.tags
-            | join: "||"
-            | downcase
-            | replace: "-", "_"
-            | replace: " ", "_"
-          -%}
-          {%- assign tags_hidden_check = "||"
-            | append: tags_hidden_check
-            | append: "||"
-          -%}
-          {% if tags_hidden_check contains "||hidden_offer||" %}
-            {% for i in (1..999) %}
-              {% assign wanted = "product_" | append: i %}
-              {% assign wanted_alt = "position_" | append: i %}
-              {% assign wanted_token = "||" | append: wanted | append: "||" %}
-              {% assign wanted_alt_token = "||"
-                | append: wanted_alt
-                | append: "||"
-              %}
-              {% if tags_hidden_check contains wanted_token
-                or tags_hidden_check contains wanted_alt_token
-              %}
-                {% assign has_position_tags = true %}
-                {% break %}
+        {% for i in (1..999) %}
+          {% assign wanted = "early_access_position_" | append: i %}
+          {% assign wanted_token = "||" | append: wanted | append: "||" %}
+          {% for product in collection.products %}
+            {%- assign tags_hidden_check = product.tags
+              | join: "||"
+              | downcase
+              | replace: "-", "_"
+              | replace: " ", "_"
+            -%}
+            {%- assign tags_hidden_check = "||"
+              | append: tags_hidden_check
+              | append: "||"
+            -%}
+            {% if tags_hidden_check contains "||hidden_offer||"
+              and tags_hidden_check contains wanted_token
+            %}
+              {% assign kk_card_n = kk_card_n | plus: 1 %}
+              {% if kk_card_n <= 4 %}
+                {% render "product-card", product_product: product, card_priority: true %}
+              {% else %}
+                {% render "product-card", product_product: product %}
               {% endif %}
-            {% endfor %}
-            {% if has_position_tags %}{% break %}{% endif %}
-          {% endif %}
+              {% assign rendered_ids = rendered_ids
+                | append: product.id
+                | append: ","
+              %}
+              {% assign hidden_offer_count = hidden_offer_count | plus: 1 %}
+            {% endif %}
+          {% endfor %}
         {% endfor %}
 
-        {% assign kk_card_n = 0 %}
-        {% if collection.handle contains "knife"
-          or collection.title contains "Knife"
-          or collection.title contains "Knives"
-          or has_knife_filter
-          or has_position_tags
-        %}
-          {% assign rendered_ids = "," %}
-          {% for i in (1..999) %}
-            {% assign wanted = "product_" | append: i %}
-            {% assign wanted_alt = "position_" | append: i %}
-            {% for product in collection.products %}
-              {%- assign tags_hidden_check = product.tags
-                | join: "||"
-                | downcase
-                | replace: "-", "_"
-                | replace: " ", "_"
-              -%}
-              {%- assign tags_hidden_check = "||"
-                | append: tags_hidden_check
-                | append: "||"
-              -%}
-              {% if tags_hidden_check contains "||hidden_offer||" %}
-                {% assign wanted_token = "||" | append: wanted | append: "||" %}
-                {% assign wanted_alt_token = "||"
-                  | append: wanted_alt
-                  | append: "||"
-                %}
-                {% if tags_hidden_check contains wanted_token
-                  or tags_hidden_check contains wanted_alt_token
-                %}
-                  {% assign kk_card_n = kk_card_n | plus: 1 %}
-                  {% if kk_card_n <= 4 %}
-                    {% render "product-card", product_product: product, card_priority: true %}
-                  {% else %}
-                    {% render "product-card", product_product: product %}
-                  {% endif %}
-                  {% assign rendered_ids = rendered_ids
-                    | append: product.id
-                    | append: ","
-                  %}
-                  {% assign hidden_offer_count = hidden_offer_count | plus: 1 %}
-                {% endif %}
-              {% endif %}
-            {% endfor %}
-          {% endfor %}
-
-          {%- comment -%} Render any remaining hidden_offer items without product_N tag {%- endcomment -%}
-          {% for product in collection.products %}
-            {% assign pid = product.id | append: "," %}
-            {% unless rendered_ids contains pid %}
-              {%- assign tags_hidden_check = product.tags
-                | join: "||"
-                | downcase
-                | replace: "-", "_"
-                | replace: " ", "_"
-              -%}
-              {%- assign tags_hidden_check = "||"
-                | append: tags_hidden_check
-                | append: "||"
-              -%}
-              {% if tags_hidden_check contains "||hidden_offer||" %}
-                {% assign kk_card_n = kk_card_n | plus: 1 %}
-                {% if kk_card_n <= 4 %}
-                  {% render "product-card", product_product: product, card_priority: true %}
-                {% else %}
-                  {% render "product-card", product_product: product %}
-                {% endif %}
-                {% assign hidden_offer_count = hidden_offer_count | plus: 1 %}
-              {% endif %}
-            {% endunless %}
-          {% endfor %}
-        {% else %}
-          {% for product in collection.products %}
+        {%- comment -%} Remaining hidden_offer products without early_access_position_N {%- endcomment -%}
+        {% for product in collection.products %}
+          {% assign pid = product.id | append: "," %}
+          {% unless rendered_ids contains pid %}
             {%- assign tags_hidden_check = product.tags
               | join: "||"
               | downcase
@@ -186,8 +104,8 @@
               {% endif %}
               {% assign hidden_offer_count = hidden_offer_count | plus: 1 %}
             {% endif %}
-          {% endfor %}
-        {% endif %}
+          {% endunless %}
+        {% endfor %}
 
         {% if hidden_offer_count == 0 %}
           <div class='col-span-full text-center py-12'>
