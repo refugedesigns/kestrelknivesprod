@@ -15,10 +15,62 @@
     }
 
   /* Klaviyo footer forms — reserve space before script injects markup */
+  .footer-klaviyo-wrap {
+    position: relative;
+    width: 100%;
+    min-height: 6.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .footer-klaviyo-wrap {
+      min-height: 3.5rem;
+    }
+  }
+
   .klaviyo-form-WFPv59,
   .klaviyo-form-Viz953 {
-    min-height: 3.5rem;
     width: 100%;
+  }
+
+  .footer-klaviyo-loading {
+    display: none;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .footer-klaviyo-wrap.is-loading .footer-klaviyo-loading {
+    display: flex;
+  }
+
+  .footer-klaviyo-spinner {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: footer-klaviyo-spin 0.65s linear infinite;
+  }
+
+  .footer-klaviyo-loading .footer-klaviyo-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @keyframes footer-klaviyo-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   /* Klaviyo footer forms — field spacing */
@@ -70,11 +122,20 @@
         {% if footer_logo_image == blank and shop.brand_asset_default_logo %}
           {% assign footer_logo_image = shop.brand_asset_default_logo %}
         {% endif %}
-        {% assign footer_logo_h_mobile = section.settings.logo_height_mobile | default: 40 %}
-        {% assign footer_logo_h_desktop = section.settings.logo_height_desktop | default: 80 %}
+        {% assign footer_logo_h_mobile = section.settings.logo_height_mobile
+          | default: 40
+        %}
+        {% assign footer_logo_h_desktop = section.settings.logo_height_desktop
+          | default: 80
+        %}
         {% if footer_logo_image != blank %}
-          {% assign footer_logo_aspect = footer_logo_image.aspect_ratio | default: 1.38 %}
-          {% assign footer_logo_w_mobile = footer_logo_h_mobile | times: footer_logo_aspect | round %}
+          {% assign footer_logo_aspect = footer_logo_image.aspect_ratio
+            | default: 1.38
+          %}
+          {% assign footer_logo_w_mobile = footer_logo_h_mobile
+            | times: footer_logo_aspect
+            | round
+          %}
           <a
             href='{{ routes.root_url }}'
             class='flex items-center mb-2 lg:mb-0'
@@ -115,10 +176,36 @@
           class='mb-6 lg:mb-0 relative flex flex-col justify-center items-center lg:space-y-6 px-10 md:px-0 w-full max-w-2xl lg:max-w-none mx-auto'
         >
           <!-- Klaviyo form desktop -->
-          <div class='klaviyo-form-WFPv59 hidden md:block w-full'></div>
+          <div
+            class='footer-klaviyo-wrap is-loading hidden md:block'
+            data-footer-klaviyo
+          >
+            <div
+              class='footer-klaviyo-loading'
+              role='status'
+              aria-live='polite'
+            >
+              <span class='footer-klaviyo-sr'>Loading subscription form</span>
+              <span class='footer-klaviyo-spinner' aria-hidden='true'></span>
+            </div>
+            <div class='klaviyo-form-WFPv59'></div>
+          </div>
 
           <!-- Klaviyo form mobile -->
-          <div class='klaviyo-form-Viz953 md:hidden w-full'></div>
+          <div
+            class='footer-klaviyo-wrap is-loading md:hidden'
+            data-footer-klaviyo
+          >
+            <div
+              class='footer-klaviyo-loading'
+              role='status'
+              aria-live='polite'
+            >
+              <span class='footer-klaviyo-sr'>Loading newsletter form</span>
+              <span class='footer-klaviyo-spinner' aria-hidden='true'></span>
+            </div>
+            <div class='klaviyo-form-Viz953'></div>
+          </div>
 
           <!-- Navigation Links -->
           <div class='flex flex-col w-full mt-10 lg:mt-8 md:px-2 lg:pr-8 xl:whitespace-nowrap'>
@@ -302,6 +389,47 @@
     </div>
   </div>
 </footer>
+
+<script>
+  ;(function () {
+    function formIsReady(formEl) {
+      if (!formEl) return false
+      if (formEl.querySelector('form, input, button, iframe')) return true
+      return formEl.children.length > 0
+    }
+
+    function markReady(wrap) {
+      wrap.classList.remove('is-loading')
+    }
+
+    document.querySelectorAll('[data-footer-klaviyo]').forEach(function (wrap) {
+      var formEl = wrap.querySelector('[class*="klaviyo-form-"]')
+      if (!formEl) {
+        markReady(wrap)
+        return
+      }
+
+      if (formIsReady(formEl)) {
+        markReady(wrap)
+        return
+      }
+
+      var observer = new MutationObserver(function () {
+        if (formIsReady(formEl)) {
+          observer.disconnect()
+          markReady(wrap)
+        }
+      })
+
+      observer.observe(formEl, { childList: true, subtree: true })
+
+      setTimeout(function () {
+        observer.disconnect()
+        markReady(wrap)
+      }, 15000)
+    })
+  })()
+</script>
 
 {% schema %}
 {
