@@ -50,11 +50,10 @@
         },
         "slide_fcXNcg": {
           "type": "slide",
-          "disabled": true,
           "settings": {
-            "image": "shopify://shop_images/7.png",
-            "image_tablet": "shopify://shop_images/lifestyle_bdb04469-f459-4a6e-8a44-e9e72a1f30d6.png",
-            "image_mobile": "shopify://shop_images/lifestyle_bdb04469-f459-4a6e-8a44-e9e72a1f30d6.png",
+            "image": "shopify://shop_images/15.png",
+            "image_tablet": "shopify://shop_images/mobile_15.png",
+            "image_mobile": "shopify://shop_images/mobile_15.png",
             "image_fit": "cover",
             "image_fit_mobile": "cover",
             "image_fit_tablet": "cover",
@@ -75,7 +74,7 @@
             "text_bg_color": "#000000",
             "text_bg_opacity": 50,
             "button_enable": true,
-            "button_text": "Order Now",
+            "button_text": "In Stock 9/19",
             "button_action": "link",
             "button_form_id": "",
             "button_url": "shopify://products/ovis-scalpel",
