@@ -222,7 +222,16 @@
                     name='contact[tags]'
                     value='{{ section.settings.newsletter_tags | default: "newsletter,footer" | escape }}'
                   >
-                  <input type='hidden' name='contact[accepts_marketing]' value='true'>
+                  <input
+                    type='hidden'
+                    name='customer[accepts_marketing]'
+                    value='true'
+                  >
+                  <input
+                    type='hidden'
+                    name='return_to'
+                    value='{{ request.path }}?customer_posted=true#FooterNewsletterForm'
+                  >
 
                   <label class='footer-newsletter__sr' for='FooterNewsletterEmail'>
                     {{ section.settings.newsletter_placeholder | default: 'Email' }}
@@ -232,6 +241,7 @@
                     class='footer-newsletter__input'
                     type='email'
                     name='contact[email]'
+                    value='{% if form.email %}{{ form.email | escape }}{% endif %}'
                     placeholder='{{ section.settings.newsletter_placeholder | default: "Email" | escape }}'
                     autocomplete='email'
                     required
@@ -441,15 +451,16 @@
     var configEl = document.querySelector('[data-footer-newsletter]')
     if (!configEl) return
 
-    var form = document.getElementById('FooterNewsletterForm')
-    if (!form) return
-
     var successTitle = configEl.getAttribute('data-success-title') || 'Successfully signed up!'
     var successMessage = configEl.getAttribute('data-success-message') || 'Thanks for signing up!'
     var errorTitle = configEl.getAttribute('data-error-title') || 'Something went wrong'
     var errorMessage = configEl.getAttribute('data-error-message') || 'Please try again.'
     var postedSuccess = configEl.getAttribute('data-posted-success') === 'true'
     var postedError = configEl.getAttribute('data-posted-error') === 'true'
+    var params = new URLSearchParams(window.location.search)
+    var urlSuccess =
+      params.get('customer_posted') === 'true' ||
+      params.get('contact_posted') === 'true'
 
     function whenToastrReady(callback) {
       if (window.toastr && window.jQuery) {
@@ -495,44 +506,23 @@
       })
     }
 
-    if (postedSuccess) showSuccess()
-    if (postedError) showError()
-
-    form.addEventListener('submit', function (event) {
-      event.preventDefault()
-
-      if (!form.checkValidity()) {
-        form.reportValidity()
-        return
+    if (postedSuccess || urlSuccess) {
+      showSuccess()
+      if (window.history && window.history.replaceState) {
+        var cleanUrl = window.location.pathname + window.location.hash
+        window.history.replaceState({}, document.title, cleanUrl)
       }
+    } else if (postedError) {
+      showError(errorMessage)
+    }
 
-      var submitBtn = form.querySelector('[data-footer-newsletter-submit]')
-      if (submitBtn) submitBtn.disabled = true
-
-      var formData = new FormData(form)
-
-      fetch(form.action || window.location.pathname, {
-        method: 'POST',
-        body: formData,
-        credentials: 'same-origin',
-        headers: {
-          Accept: 'text/html,application/xhtml+xml',
-        },
+    var form = document.getElementById('FooterNewsletterForm')
+    if (form) {
+      form.addEventListener('submit', function () {
+        var submitBtn = form.querySelector('[data-footer-newsletter-submit]')
+        if (submitBtn) submitBtn.disabled = true
       })
-        .then(function (response) {
-          if (!response.ok) {
-            throw new Error('Request failed')
-          }
-          showSuccess()
-          form.reset()
-        })
-        .catch(function () {
-          showError()
-        })
-        .finally(function () {
-          if (submitBtn) submitBtn.disabled = false
-        })
-    })
+    }
   })()
 </script>
 
