@@ -14,48 +14,41 @@
       }
     }
 
-  /* Klaviyo footer forms — reserve space before script injects markup */
-  .footer-klaviyo-wrap {
-    position: relative;
+  .footer-newsletter {
     width: 100%;
-    min-height: 6.5rem;
+    max-width: 36rem;
+    margin-inline: auto;
   }
 
   @media (min-width: 768px) {
-    .footer-klaviyo-wrap {
-      min-height: 3.5rem;
+    .footer-newsletter {
+      max-width: none;
     }
   }
 
-  .klaviyo-form-WFPv59,
-  .klaviyo-form-Viz953 {
+  .footer-newsletter form {
+    width: 100%;
+    margin: 0;
+  }
+
+  .footer-newsletter__form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
     width: 100%;
   }
 
-  .footer-klaviyo-loading {
-    display: none;
-    position: absolute;
-    inset: 0;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    z-index: 1;
+  @media (min-width: 768px) {
+    .footer-newsletter__form {
+      flex-direction: row;
+      align-items: stretch;
+      gap: 0.75rem;
+      max-width: none;
+    }
   }
 
-  .footer-klaviyo-wrap.is-loading .footer-klaviyo-loading {
-    display: flex;
-  }
-
-  .footer-klaviyo-spinner {
-    width: 1.5rem;
-    height: 1.5rem;
-    border: 2px solid rgba(255, 255, 255, 0.25);
-    border-top-color: #ffffff;
-    border-radius: 50%;
-    animation: footer-klaviyo-spin 0.65s linear infinite;
-  }
-
-  .footer-klaviyo-loading .footer-klaviyo-sr {
+  .footer-newsletter__sr {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -67,48 +60,76 @@
     border: 0;
   }
 
-  @keyframes footer-klaviyo-spin {
-    to {
-      transform: rotate(360deg);
-    }
+  .footer-newsletter__input {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--footer-newsletter-input-bg, #111827);
+    border: 1px solid var(--footer-newsletter-input-border, #9ca3af);
+    color: var(--footer-newsletter-input-text, #ffffff);
+    padding: 0.85rem 1rem;
+    font-size: 0.9375rem;
+    line-height: 1.25;
+    border-radius: 0;
+    outline: none;
   }
 
-  /* Klaviyo footer forms — field spacing */
-  .klaviyo-form-WFPv59 form,
-  .klaviyo-form-WFPv59 > div,
-  .klaviyo-form-Viz953 form,
-  .klaviyo-form-Viz953 > div {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 0.75rem !important;
-    align-items: center !important;
-    justify-content: center !important;
+  .footer-newsletter__input::placeholder {
+    color: var(--footer-newsletter-placeholder, #9ca3af);
+    opacity: 1;
+  }
+
+  .footer-newsletter__input:focus {
+    border-color: var(--footer-newsletter-input-focus, #ffffff);
+  }
+
+  .footer-newsletter__button {
+    flex: 0 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--footer-newsletter-button-bg, #000000);
+    border: 1px solid var(--footer-newsletter-button-border, #ffffff);
+    color: var(--footer-newsletter-button-text, #ffffff);
+    padding: 0.85rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.25;
+    border-radius: 0;
+    cursor: pointer;
+    white-space: nowrap;
   }
 
   @media (min-width: 768px) {
-    .klaviyo-form-WFPv59 form,
-    .klaviyo-form-WFPv59 > div {
-      gap: 1rem !important;
-      justify-content: flex-start !important;
+    .footer-newsletter__button {
+      width: auto;
+      min-width: 11.5rem;
     }
   }
 
-  .klaviyo-form-WFPv59:focus,
-  .klaviyo-form-WFPv59 input:focus,
-  .klaviyo-form-WFPv59 button:focus {
-    outline: none !important;
-    box-shadow: none !important;
-    border: 1px solid white !important;
+  .footer-newsletter__button:hover {
+    opacity: 0.9;
   }
 
-  .klaviyo-form-Viz953:focus,
-  .klaviyo-form-Viz953 input:focus,
-  .klaviyo-form-Viz953 button:focus {
-    outline: none !important;
-    box-shadow: none !important;
-    border: 1px solid white !important;
+  .footer-newsletter__button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  .footer-newsletter__button:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
   }
 </style>
+
+<link
+  rel='stylesheet'
+  href='https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css'
+  crossorigin='anonymous'
+  referrerpolicy='no-referrer'
+>
 
 <footer
   class='py-8 md:py-10'
@@ -175,37 +196,63 @@
         <div
           class='mb-6 lg:mb-0 relative flex flex-col justify-center items-center lg:space-y-6 px-10 md:px-0 w-full max-w-2xl lg:max-w-none mx-auto'
         >
-          <!-- Klaviyo form desktop -->
-          <div
-            class='footer-klaviyo-wrap is-loading hidden md:block'
-            data-footer-klaviyo
-          >
+          {% if section.settings.newsletter_enable != false %}
             <div
-              class='footer-klaviyo-loading'
-              role='status'
-              aria-live='polite'
+              class='footer-newsletter w-full mb-2 md:mb-0'
+              style='
+                --footer-newsletter-input-bg: {{ section.settings.input_bg_color | default: "#111827" }};
+                --footer-newsletter-input-border: {{ section.settings.input_border_color | default: "#9ca3af" }};
+                --footer-newsletter-input-text: {{ section.settings.input_text_color | default: "#ffffff" }};
+                --footer-newsletter-placeholder: {{ section.settings.input_placeholder_color | default: "#9ca3af" }};
+                --footer-newsletter-input-focus: {{ section.settings.input_focus_border_color | default: "#ffffff" }};
+                --footer-newsletter-button-bg: {{ section.settings.button_bg_color | default: "#000000" }};
+                --footer-newsletter-button-border: {{ section.settings.button_border_color | default: "#ffffff" }};
+                --footer-newsletter-button-text: {{ section.settings.button_text_color | default: "#ffffff" }};
+              '
             >
-              <span class='footer-klaviyo-sr'>Loading subscription form</span>
-              <span class='footer-klaviyo-spinner' aria-hidden='true'></span>
-            </div>
-            <div class='klaviyo-form-WFPv59'></div>
-          </div>
+              {% form 'customer', id: 'FooterNewsletterForm' %}
+                <div
+                  class='footer-newsletter__form'
+                  data-footer-newsletter
+                  data-success-title='{{ section.settings.notification_title | default: "Successfully signed up!" | escape }}'
+                  data-success-message='{{ section.settings.notification_success_message | default: "Thanks for signing up!" | escape }}'
+                  data-error-title='{{ section.settings.notification_error_title | default: "Something went wrong" | escape }}'
+                  data-error-message='{{ section.settings.notification_error_message | default: "Please try again." | escape }}'
+                  data-posted-success='{% if form.posted_successfully? %}true{% else %}false{% endif %}'
+                  {% if form.errors %}
+                    data-posted-error='true'
+                  {% endif %}
+                >
+                  <input
+                    type='hidden'
+                    name='contact[tags]'
+                    value='{{ section.settings.newsletter_tags | default: "newsletter,footer" | escape }}'
+                  >
+                  <input type='hidden' name='contact[accepts_marketing]' value='true'>
 
-          <!-- Klaviyo form mobile -->
-          <div
-            class='footer-klaviyo-wrap is-loading md:hidden'
-            data-footer-klaviyo
-          >
-            <div
-              class='footer-klaviyo-loading'
-              role='status'
-              aria-live='polite'
-            >
-              <span class='footer-klaviyo-sr'>Loading newsletter form</span>
-              <span class='footer-klaviyo-spinner' aria-hidden='true'></span>
+                  <label class='footer-newsletter__sr' for='FooterNewsletterEmail'>
+                    {{ section.settings.newsletter_placeholder | default: 'Email' }}
+                  </label>
+                  <input
+                    id='FooterNewsletterEmail'
+                    class='footer-newsletter__input'
+                    type='email'
+                    name='contact[email]'
+                    placeholder='{{ section.settings.newsletter_placeholder | default: "Email" | escape }}'
+                    autocomplete='email'
+                    required
+                  >
+                  <button
+                    type='submit'
+                    class='footer-newsletter__button'
+                    data-footer-newsletter-submit
+                  >
+                    {{ section.settings.newsletter_button_text | default: 'JOIN THE HUNT' }}
+                  </button>
+                </div>
+              {% endform %}
             </div>
-            <div class='klaviyo-form-Viz953'></div>
-          </div>
+          {% endif %}
 
           <!-- Navigation Links -->
           <div class='flex flex-col w-full mt-10 lg:mt-8 md:px-2 lg:pr-8 xl:whitespace-nowrap'>
@@ -390,43 +437,107 @@
   </div>
 </footer>
 
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js' defer></script>
+<script
+  src='https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js'
+  defer
+></script>
 <script>
-  ;(function () {
-    function formIsReady(formEl) {
-      if (!formEl) return false
-      if (formEl.querySelector('form, input, button, iframe')) return true
-      return formEl.children.length > 0
-    }
+  (function () {
+    var configEl = document.querySelector('[data-footer-newsletter]')
+    if (!configEl) return
 
-    function markReady(wrap) {
-      wrap.classList.remove('is-loading')
-    }
+    var form = document.getElementById('FooterNewsletterForm')
+    if (!form) return
 
-    document.querySelectorAll('[data-footer-klaviyo]').forEach(function (wrap) {
-      var formEl = wrap.querySelector('[class*="klaviyo-form-"]')
-      if (!formEl) {
-        markReady(wrap)
+    var successTitle = configEl.getAttribute('data-success-title') || 'Successfully signed up!'
+    var successMessage = configEl.getAttribute('data-success-message') || 'Thanks for signing up!'
+    var errorTitle = configEl.getAttribute('data-error-title') || 'Something went wrong'
+    var errorMessage = configEl.getAttribute('data-error-message') || 'Please try again.'
+    var postedSuccess = configEl.getAttribute('data-posted-success') === 'true'
+    var postedError = configEl.getAttribute('data-posted-error') === 'true'
+
+    function whenToastrReady(callback) {
+      if (window.toastr && window.jQuery) {
+        callback()
         return
       }
-
-      if (formIsReady(formEl)) {
-        markReady(wrap)
-        return
-      }
-
-      var observer = new MutationObserver(function () {
-        if (formIsReady(formEl)) {
-          observer.disconnect()
-          markReady(wrap)
+      var tries = 0
+      var timer = setInterval(function () {
+        tries += 1
+        if (window.toastr && window.jQuery) {
+          clearInterval(timer)
+          callback()
+        } else if (tries > 50) {
+          clearInterval(timer)
         }
+      }, 100)
+    }
+
+    function configureToastr() {
+      window.toastr.options = {
+        closeButton: true,
+        progressBar: true,
+        newestOnTop: true,
+        positionClass: {{ section.settings.toastr_position | default: "toast-top-right" | json }},
+        timeOut: {{ section.settings.toastr_timeout | default: 5000 }},
+        extendedTimeOut: 1500,
+        showDuration: 250,
+        hideDuration: 250,
+      }
+    }
+
+    function showSuccess() {
+      whenToastrReady(function () {
+        configureToastr()
+        window.toastr.success(successMessage, successTitle)
       })
+    }
 
-      observer.observe(formEl, { childList: true, subtree: true })
+    function showError(message) {
+      whenToastrReady(function () {
+        configureToastr()
+        window.toastr.error(message || errorMessage, errorTitle)
+      })
+    }
 
-      setTimeout(function () {
-        observer.disconnect()
-        markReady(wrap)
-      }, 15000)
+    if (postedSuccess) showSuccess()
+    if (postedError) showError()
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault()
+
+      if (!form.checkValidity()) {
+        form.reportValidity()
+        return
+      }
+
+      var submitBtn = form.querySelector('[data-footer-newsletter-submit]')
+      if (submitBtn) submitBtn.disabled = true
+
+      var formData = new FormData(form)
+
+      fetch(form.action || window.location.pathname, {
+        method: 'POST',
+        body: formData,
+        credentials: 'same-origin',
+        headers: {
+          Accept: 'text/html,application/xhtml+xml',
+        },
+      })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error('Request failed')
+          }
+          showSuccess()
+          form.reset()
+        })
+        .catch(function () {
+          showError()
+        })
+        .finally(function () {
+          if (submitBtn) submitBtn.disabled = false
+        })
     })
   })()
 </script>
@@ -555,85 +666,138 @@
     },
     {
       "type": "header",
-      "content": "Email Signup Notification"
+      "content": "Newsletter Form"
+    },
+    {
+      "type": "checkbox",
+      "id": "newsletter_enable",
+      "label": "Show newsletter form",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "newsletter_placeholder",
+      "label": "Email placeholder",
+      "default": "Email"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_button_text",
+      "label": "Button text",
+      "default": "JOIN THE HUNT"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_tags",
+      "label": "Customer tags",
+      "default": "newsletter,footer",
+      "info": "Comma-separated tags applied on signup (use with Shopify Flow → Klaviyo)."
+    },
+    {
+      "type": "color",
+      "id": "input_bg_color",
+      "label": "Input background",
+      "default": "#111827"
+    },
+    {
+      "type": "color",
+      "id": "input_border_color",
+      "label": "Input border",
+      "default": "#9ca3af"
+    },
+    {
+      "type": "color",
+      "id": "input_text_color",
+      "label": "Input text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "input_placeholder_color",
+      "label": "Input placeholder",
+      "default": "#9ca3af"
+    },
+    {
+      "type": "color",
+      "id": "input_focus_border_color",
+      "label": "Input focus border",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Button background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Button border",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Newsletter Toast Messages"
+    },
+    {
+      "type": "text",
+      "id": "notification_title",
+      "label": "Success title",
+      "default": "Successfully signed up!"
+    },
+    {
+      "type": "text",
+      "id": "notification_success_message",
+      "label": "Success message",
+      "default": "Thanks for signing up!"
+    },
+    {
+      "type": "text",
+      "id": "notification_error_title",
+      "label": "Error title",
+      "default": "Something went wrong"
+    },
+    {
+      "type": "text",
+      "id": "notification_error_message",
+      "label": "Error message",
+      "default": "Please try again."
+    },
+    {
+      "type": "select",
+      "id": "toastr_position",
+      "label": "Toast position",
+      "default": "toast-top-right",
+      "options": [
+        { "value": "toast-top-right", "label": "Top right" },
+        { "value": "toast-top-left", "label": "Top left" },
+        { "value": "toast-top-center", "label": "Top center" },
+        { "value": "toast-bottom-right", "label": "Bottom right" },
+        { "value": "toast-bottom-left", "label": "Bottom left" },
+        { "value": "toast-bottom-center", "label": "Bottom center" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "toastr_timeout",
+      "label": "Toast duration",
+      "min": 2000,
+      "max": 10000,
+      "step": 500,
+      "unit": "ms",
+      "default": 5000
     },
     {
       "type": "color",
       "id": "icon_color",
       "label": "Social Icons Color",
       "default": "#ffffff"
-    },
-    {
-      "type": "color",
-      "id": "input_bg_color",
-      "label": "Form Input Background",
-      "default": "#111827"
-    },
-    {
-      "type": "color",
-      "id": "input_border_color",
-      "label": "Form Input Border",
-      "default": "#4b5563"
-    },
-    {
-      "type": "color",
-      "id": "button_bg_color",
-      "label": "Form Button Background",
-      "default": "#000000"
-    },
-    {
-      "type": "color",
-      "id": "button_text_color",
-      "label": "Form Button Text",
-      "default": "#ffffff"
-    },
-    {
-      "type": "text",
-      "id": "notification_title",
-      "label": "Notification Title",
-      "default": "Successfully signed up!"
-    },
-    {
-      "type": "text",
-      "id": "notification_success_message",
-      "label": "Success Message",
-      "default": "Thanks for signing up!"
-    },
-    {
-      "type": "select",
-      "id": "notification_button_color",
-      "label": "Button Color",
-      "options": [
-        {
-          "value": "bg-orange-500",
-          "label": "Orange"
-        },
-        {
-          "value": "bg-blue-500",
-          "label": "Blue"
-        },
-        {
-          "value": "bg-green-500",
-          "label": "Green"
-        },
-        {
-          "value": "bg-red-500",
-          "label": "Red"
-        },
-        {
-          "value": "bg-purple-500",
-          "label": "Purple"
-        },
-        {
-          "value": "bg-gray-800",
-          "label": "Dark Gray"
-        },
-        {
-          "value": "bg-black",
-          "label": "Black"
-        }
-      ],
-      "default": "bg-black"
     }
   ]
 }
