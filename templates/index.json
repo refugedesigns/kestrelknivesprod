@@ -12,6 +12,41 @@
     "hero-section": {
       "type": "hero",
       "blocks": {
+        "slide_fzzeV6": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/14.png",
+            "image_tablet": "shopify://shop_images/mobile_14.png",
+            "image_mobile": "shopify://shop_images/mobile_14.png",
+            "image_fit": "cover",
+            "image_fit_mobile": "cover",
+            "image_fit_tablet": "cover",
+            "image_fit_desktop": "cover",
+            "image_position": "center",
+            "image_position_mobile": "top",
+            "image_position_tablet": "top",
+            "image_position_desktop": "top",
+            "image_zoom": 100,
+            "overlay_enable": false,
+            "overlay_opacity": 40,
+            "title": "The Return: Mouflon Skinner 2.0",
+            "subtitle": "",
+            "text_color": "#ffffff",
+            "text_shadow_strength": "soft",
+            "text_shadow_blur": 6,
+            "text_bg_enable": false,
+            "text_bg_color": "#000000",
+            "text_bg_opacity": 50,
+            "button_enable": true,
+            "button_text": "In Stock 9/19",
+            "button_action": "link",
+            "button_form_id": "",
+            "button_url": "shopify://products/mouflon-skinner",
+            "image_link_enable": true,
+            "button_bg_color": "#ffffff",
+            "button_text_color": "#000000"
+          }
+        },
         "slide_xPQKfw": {
           "type": "slide",
           "disabled": true,
@@ -226,6 +261,7 @@
         }
       },
       "block_order": [
+        "slide_fzzeV6",
         "slide_xPQKfw",
         "slide_fcXNcg",
         "hero-slide-1",
