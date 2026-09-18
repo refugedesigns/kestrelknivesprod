@@ -1,0 +1,917 @@
+{% comment %}
+  Homepage / site-wide newsletter overlay.
+  Dismiss (X) hides for 24 hours via localStorage; otherwise shows each visit.
+{% endcomment %}
+
+{% assign overlay_enabled = section.settings.enable %}
+{% if overlay_enabled == nil %}
+  {% assign overlay_enabled = true %}
+{% endif %}
+
+{% if overlay_enabled %}
+  {% assign overlay_turnstile = false %}
+  {% if section.settings.turnstile_enable and section.settings.turnstile_site_key != blank %}
+    {% assign overlay_turnstile = true %}
+  {% endif %}
+
+  {% assign overlay_bg = section.settings.background_image %}
+  {% if overlay_bg != blank %}
+    {% assign overlay_bg_url = overlay_bg | image_url: width: 2000 %}
+  {% else %}
+    {% assign overlay_bg_url = 'subscribe.jpg' | asset_url %}
+  {% endif %}
+
+  <link
+    rel='stylesheet'
+    href='https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&display=swap'
+    crossorigin
+  >
+
+  <style>
+    .subscribe-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99980;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    .subscribe-overlay.is-open {
+      display: flex;
+    }
+
+    .subscribe-overlay__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .subscribe-overlay__dialog {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 42rem);
+      max-height: calc(100vh - 2rem);
+      overflow: auto;
+      color: #ffffff;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+    }
+
+    @media (min-width: 768px) {
+      .subscribe-overlay__dialog {
+        width: min(92vw, 52rem);
+      }
+    }
+
+    .subscribe-overlay__media {
+      position: absolute;
+      inset: 0;
+      background-color: #1a1a1a;
+      background-image: var(--subscribe-overlay-bg);
+      background-size: cover;
+      background-position: center;
+      pointer-events: none;
+    }
+
+    .subscribe-overlay__media::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, var(--subscribe-overlay-scrim, 0.42));
+    }
+
+    .subscribe-overlay__close {
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+      z-index: 3;
+      width: 2.25rem;
+      height: 2.25rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      background: transparent;
+      color: #ffffff;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .subscribe-overlay__close:hover {
+      opacity: 0.8;
+    }
+
+    .subscribe-overlay__close:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: 2px;
+    }
+
+    .subscribe-overlay__close svg {
+      width: 1.15rem;
+      height: 1.15rem;
+      display: block;
+    }
+
+    .subscribe-overlay__inner {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 3.25rem 1.5rem 2rem;
+    }
+
+    @media (min-width: 768px) {
+      .subscribe-overlay__inner {
+        padding: 4rem 3.5rem 2.75rem;
+      }
+    }
+
+    .subscribe-overlay__heading {
+      margin: 0 0 1.25rem;
+      font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+      font-weight: 700;
+      font-size: clamp(1.85rem, 4.5vw, 2.75rem);
+      line-height: 1.15;
+      letter-spacing: 0.01em;
+      color: #ffffff;
+    }
+
+    .subscribe-overlay__list {
+      list-style: none;
+      margin: 0 0 1.75rem;
+      padding: 0;
+      width: 100%;
+      max-width: 34rem;
+      text-align: left;
+    }
+
+    .subscribe-overlay__list li {
+      position: relative;
+      padding-left: 1.15rem;
+      margin: 0 0 0.65rem;
+      font-size: clamp(0.9rem, 2.2vw, 1.05rem);
+      line-height: 1.45;
+      color: #ffffff;
+    }
+
+    .subscribe-overlay__list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 0.35rem;
+      height: 0.35rem;
+      border-radius: 50%;
+      background: #ffffff;
+    }
+
+    .subscribe-overlay__list strong {
+      font-weight: 700;
+    }
+
+    .subscribe-overlay__form {
+      width: 100%;
+      max-width: 28rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .subscribe-overlay__sr {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .subscribe-overlay__input {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--subscribe-input-bg, #1c1c1c);
+      border: 1px solid var(--subscribe-input-border, #5c5c5c);
+      color: var(--subscribe-input-text, #ffffff);
+      padding: 0.9rem 1rem;
+      font-size: 0.95rem;
+      line-height: 1.25;
+      border-radius: 0;
+      outline: none;
+    }
+
+    .subscribe-overlay__input::placeholder {
+      color: var(--subscribe-input-placeholder, #b0b0b0);
+      opacity: 1;
+    }
+
+    .subscribe-overlay__input:focus {
+      border-color: #ffffff;
+    }
+
+    .subscribe-overlay__button {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--subscribe-button-bg, #000000);
+      border: 1px solid var(--subscribe-button-border, #000000);
+      color: var(--subscribe-button-text, #ffffff);
+      padding: 0.95rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: none;
+      line-height: 1.25;
+      border-radius: 0;
+      cursor: pointer;
+    }
+
+    .subscribe-overlay__button:hover {
+      opacity: 0.92;
+    }
+
+    .subscribe-overlay__button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .subscribe-overlay__turnstile {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      min-height: 1.25rem;
+    }
+
+    body.subscribe-overlay-open {
+      overflow: hidden;
+    }
+  </style>
+
+  <div
+    id='SubscribeOverlay'
+    class='subscribe-overlay'
+    hidden
+    data-subscribe-overlay
+    data-storage-key='{{ section.settings.storage_key | default: "kk_subscribe_overlay_dismissed_until" | escape }}'
+    data-dismiss-hours='{{ section.settings.dismiss_hours | default: 24 }}'
+    data-delay-ms='{{ section.settings.show_delay_seconds | default: 10 | times: 1000 }}'
+    data-turnstile-enabled='{% if overlay_turnstile %}true{% else %}false{% endif %}'
+    data-success-title='{{ section.settings.success_title | default: "Successfully signed up!" | escape }}'
+    data-success-message='{{ section.settings.success_message | default: "Thanks for joining!" | escape }}'
+    data-error-title='{{ section.settings.error_title | default: "Something went wrong" | escape }}'
+    data-error-message='{{ section.settings.error_message | default: "Please try again." | escape }}'
+    style='
+      --subscribe-overlay-bg: url({{ overlay_bg_url | escape }});
+      --subscribe-overlay-scrim: {{ section.settings.overlay_opacity | default: 42 | divided_by: 100.0 }};
+      --subscribe-input-bg: {{ section.settings.input_bg_color | default: "#1c1c1c" }};
+      --subscribe-input-border: {{ section.settings.input_border_color | default: "#5c5c5c" }};
+      --subscribe-input-text: {{ section.settings.input_text_color | default: "#ffffff" }};
+      --subscribe-input-placeholder: {{ section.settings.input_placeholder_color | default: "#b0b0b0" }};
+      --subscribe-button-bg: {{ section.settings.button_bg_color | default: "#000000" }};
+      --subscribe-button-border: {{ section.settings.button_border_color | default: "#000000" }};
+      --subscribe-button-text: {{ section.settings.button_text_color | default: "#ffffff" }};
+    '
+  >
+    <button
+      type='button'
+      class='subscribe-overlay__backdrop'
+      data-subscribe-overlay-dismiss
+      aria-label='Close subscribe dialog'
+      tabindex='-1'
+    ></button>
+
+    <div
+      class='subscribe-overlay__dialog'
+      role='dialog'
+      aria-modal='true'
+      aria-labelledby='SubscribeOverlayHeading'
+      data-subscribe-overlay-dialog
+    >
+      <div class='subscribe-overlay__media' aria-hidden='true'></div>
+
+      <button
+        type='button'
+        class='subscribe-overlay__close'
+        data-subscribe-overlay-dismiss
+        aria-label='Close'
+      >
+        <svg viewBox='0 0 24 24' fill='none' aria-hidden='true'>
+          <path
+            d='M6 6l12 12M18 6L6 18'
+            stroke='currentColor'
+            stroke-width='2'
+            stroke-linecap='round'
+          />
+        </svg>
+      </button>
+
+      <div class='subscribe-overlay__inner'>
+        <h2 id='SubscribeOverlayHeading' class='subscribe-overlay__heading'>
+          {{ section.settings.heading | default: 'Win a Knife Every Month' }}
+        </h2>
+
+        <ul class='subscribe-overlay__list'>
+          {% if section.settings.bullet_1_title != blank or section.settings.bullet_1_text != blank %}
+            <li>
+              {% if section.settings.bullet_1_title != blank %}
+                <strong>{{ section.settings.bullet_1_title }}</strong>
+                {% if section.settings.bullet_1_text != blank %}
+                  &nbsp;- {{ section.settings.bullet_1_text }}
+                {% endif %}
+              {% else %}
+                {{ section.settings.bullet_1_text }}
+              {% endif %}
+            </li>
+          {% endif %}
+          {% if section.settings.bullet_2_title != blank or section.settings.bullet_2_text != blank %}
+            <li>
+              {% if section.settings.bullet_2_title != blank %}
+                <strong>{{ section.settings.bullet_2_title }}</strong>
+                {% if section.settings.bullet_2_text != blank %}
+                  &nbsp;- {{ section.settings.bullet_2_text }}
+                {% endif %}
+              {% else %}
+                {{ section.settings.bullet_2_text }}
+              {% endif %}
+            </li>
+          {% endif %}
+          {% if section.settings.bullet_3_title != blank or section.settings.bullet_3_text != blank %}
+            <li>
+              {% if section.settings.bullet_3_title != blank %}
+                <strong>{{ section.settings.bullet_3_title }}</strong>
+                {% if section.settings.bullet_3_text != blank %}
+                  &nbsp;- {{ section.settings.bullet_3_text }}
+                {% endif %}
+              {% else %}
+                {{ section.settings.bullet_3_text }}
+              {% endif %}
+            </li>
+          {% endif %}
+        </ul>
+
+        {% form 'customer', id: 'SubscribeOverlayForm', class: 'subscribe-overlay__form' %}
+          <div
+            hidden
+            data-subscribe-form-status
+            data-status='{% if form.posted_successfully? %}success{% elsif form.errors %}error{% else %}idle{% endif %}'
+          ></div>
+
+          <input
+            type='hidden'
+            name='contact[tags]'
+            value='{{ section.settings.customer_tags | default: "newsletter,overlay" | escape }}'
+          >
+          <input type='hidden' name='customer[accepts_marketing]' value='true'>
+          <input
+            type='hidden'
+            name='return_to'
+            value='{{ routes.root_url }}?customer_posted=true'
+          >
+
+          <label class='subscribe-overlay__sr' for='SubscribeOverlayEmail'>
+            {{ section.settings.email_placeholder | default: 'Email' }}
+          </label>
+          <input
+            id='SubscribeOverlayEmail'
+            class='subscribe-overlay__input'
+            type='email'
+            name='contact[email]'
+            value='{% if form.email %}{{ form.email | escape }}{% endif %}'
+            placeholder='{{ section.settings.email_placeholder | default: "Email" | escape }}'
+            autocomplete='email'
+            required
+          >
+
+          <button
+            type='submit'
+            class='subscribe-overlay__button'
+            data-subscribe-overlay-submit
+            {% if overlay_turnstile %}disabled{% endif %}
+          >
+            {{ section.settings.button_text | default: 'Unlock Member Only Perks' }}
+          </button>
+
+          {% if overlay_turnstile %}
+            <div class='subscribe-overlay__turnstile'>
+              <div
+                id='SubscribeOverlayTurnstile'
+                class='cf-turnstile'
+                data-sitekey='{{ section.settings.turnstile_site_key | escape }}'
+                data-theme='{{ section.settings.turnstile_theme | default: "dark" }}'
+                data-size='{{ section.settings.turnstile_size | default: "flexible" }}'
+                data-appearance='{{ section.settings.turnstile_appearance | default: "interaction-only" }}'
+                data-callback='subscribeOverlayTurnstileSuccess'
+                data-error-callback='subscribeOverlayTurnstileError'
+                data-expired-callback='subscribeOverlayTurnstileExpired'
+                data-timeout-callback='subscribeOverlayTurnstileExpired'
+              ></div>
+            </div>
+          {% endif %}
+        {% endform %}
+
+        <iframe
+          id='SubscribeOverlayFrame'
+          name='SubscribeOverlayFrame'
+          title='Newsletter signup'
+          hidden
+          style='position:absolute;width:0;height:0;border:0;clip:rect(0,0,0,0);'
+        ></iframe>
+      </div>
+    </div>
+  </div>
+
+  {% if overlay_turnstile %}
+    <script
+      src='https://challenges.cloudflare.com/turnstile/v0/api.js'
+      async
+      defer
+    ></script>
+  {% endif %}
+
+  <script>
+    (function () {
+      var root = document.querySelector('[data-subscribe-overlay]')
+      if (!root) return
+
+      var storageKey = root.getAttribute('data-storage-key') || 'kk_subscribe_overlay_dismissed_until'
+      var dismissHours = parseInt(root.getAttribute('data-dismiss-hours') || '24', 10)
+      var delayMs = parseInt(root.getAttribute('data-delay-ms') || '10000', 10)
+      var turnstileEnabled = root.getAttribute('data-turnstile-enabled') === 'true'
+      var form = document.getElementById('SubscribeOverlayForm')
+      var frame = document.getElementById('SubscribeOverlayFrame')
+      var submitBtn = root.querySelector('[data-subscribe-overlay-submit]')
+      var openTimer = null
+      var awaitingResponse = false
+
+      function setSubmitEnabled(enabled) {
+        if (!submitBtn) return
+        submitBtn.disabled = !enabled
+      }
+
+      window.subscribeOverlayTurnstileSuccess = function () {
+        if (!awaitingResponse) setSubmitEnabled(true)
+      }
+      window.subscribeOverlayTurnstileError = function () {
+        setSubmitEnabled(false)
+      }
+      window.subscribeOverlayTurnstileExpired = function () {
+        setSubmitEnabled(false)
+        if (window.turnstile && document.getElementById('SubscribeOverlayTurnstile')) {
+          try {
+            window.turnstile.reset('#SubscribeOverlayTurnstile')
+          } catch (e) {}
+        }
+      }
+
+      function isDismissed() {
+        try {
+          var until = parseInt(localStorage.getItem(storageKey) || '0', 10)
+          return until && Date.now() < until
+        } catch (e) {
+          return false
+        }
+      }
+
+      function dismissForHours() {
+        try {
+          var ms = Math.max(1, dismissHours) * 60 * 60 * 1000
+          localStorage.setItem(storageKey, String(Date.now() + ms))
+        } catch (e) {}
+      }
+
+      function dismissLongTerm() {
+        try {
+          localStorage.setItem(storageKey, String(Date.now() + 365 * 24 * 60 * 60 * 1000))
+        } catch (e) {}
+      }
+
+      function openOverlay() {
+        root.hidden = false
+        root.classList.add('is-open')
+        document.body.classList.add('subscribe-overlay-open')
+        var closeBtn = root.querySelector('.subscribe-overlay__close')
+        if (closeBtn) closeBtn.focus()
+      }
+
+      function closeOverlay(persistDismiss) {
+        root.classList.remove('is-open')
+        root.hidden = true
+        document.body.classList.remove('subscribe-overlay-open')
+        if (persistDismiss) dismissForHours()
+        if (openTimer) {
+          clearTimeout(openTimer)
+          openTimer = null
+        }
+      }
+
+      function whenToastrReady(cb) {
+        if (window.toastr && window.jQuery) {
+          cb()
+          return
+        }
+        var tries = 0
+        var timer = setInterval(function () {
+          tries += 1
+          if (window.toastr && window.jQuery) {
+            clearInterval(timer)
+            cb()
+          } else if (tries > 40) {
+            clearInterval(timer)
+          }
+        }, 100)
+      }
+
+      function showSuccessToast() {
+        whenToastrReady(function () {
+          window.toastr.options = window.toastr.options || {}
+          window.toastr.success(
+            root.getAttribute('data-success-message') || 'Thanks for joining!',
+            root.getAttribute('data-success-title') || 'Successfully signed up!'
+          )
+        })
+      }
+
+      function showErrorToast() {
+        whenToastrReady(function () {
+          window.toastr.options = window.toastr.options || {}
+          window.toastr.error(
+            root.getAttribute('data-error-message') || 'Please try again.',
+            root.getAttribute('data-error-title') || 'Something went wrong'
+          )
+        })
+      }
+
+      function handleSignupSuccess() {
+        awaitingResponse = false
+        showSuccessToast()
+        dismissLongTerm()
+        setTimeout(function () {
+          closeOverlay(false)
+          if (form) form.reset()
+          if (turnstileEnabled && window.turnstile && document.getElementById('SubscribeOverlayTurnstile')) {
+            try {
+              window.turnstile.reset('#SubscribeOverlayTurnstile')
+              setSubmitEnabled(false)
+            } catch (e) {}
+          } else {
+            setSubmitEnabled(true)
+          }
+        }, 450)
+      }
+
+      function handleSignupError() {
+        awaitingResponse = false
+        showErrorToast()
+        if (turnstileEnabled) {
+          setSubmitEnabled(false)
+          if (window.turnstile && document.getElementById('SubscribeOverlayTurnstile')) {
+            try {
+              window.turnstile.reset('#SubscribeOverlayTurnstile')
+            } catch (e) {}
+          }
+        } else {
+          setSubmitEnabled(true)
+        }
+      }
+
+      root.querySelectorAll('[data-subscribe-overlay-dismiss]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          closeOverlay(true)
+        })
+      })
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && root.classList.contains('is-open')) {
+          closeOverlay(true)
+        }
+      })
+
+      if (form && frame) {
+        form.setAttribute('target', 'SubscribeOverlayFrame')
+
+        form.addEventListener('submit', function (event) {
+          if (turnstileEnabled) {
+            var tokenInput = form.querySelector('[name="cf-turnstile-response"]')
+            if (!tokenInput || !tokenInput.value) {
+              event.preventDefault()
+              showErrorToast()
+              return
+            }
+          }
+          awaitingResponse = true
+          if (submitBtn) submitBtn.disabled = true
+        })
+
+        frame.addEventListener('load', function () {
+          if (!awaitingResponse) return
+
+          var ok = false
+          var failed = false
+          try {
+            var href = frame.contentWindow.location.href || ''
+            if (
+              href.indexOf('customer_posted=true') !== -1 ||
+              href.indexOf('contact_posted=true') !== -1
+            ) {
+              ok = true
+            } else {
+              var doc = frame.contentDocument
+              if (doc) {
+                var html = doc.documentElement ? doc.documentElement.innerHTML : ''
+                if (/customer_posted=true|contact_posted=true|form--success|posted_successfully/i.test(html)) {
+                  ok = true
+                } else if (/form__message--error|errors|error-message/i.test(html) && /contact|customer/i.test(html)) {
+                  failed = true
+                }
+              }
+            }
+          } catch (e) {
+            // Cross-origin unexpected — treat as success if we got a load after submit
+            ok = true
+          }
+
+          if (ok) {
+            handleSignupSuccess()
+          } else if (failed) {
+            handleSignupError()
+          } else {
+            // Shopify often redirects to a normal page without clear markers; assume success after submit
+            handleSignupSuccess()
+          }
+        })
+      }
+
+      var statusEl = root.querySelector('[data-subscribe-form-status]')
+      var formStatus = statusEl ? statusEl.getAttribute('data-status') : 'idle'
+
+      if (formStatus === 'success') {
+        showSuccessToast()
+        dismissLongTerm()
+      } else if (formStatus === 'error') {
+        showErrorToast()
+        openOverlay()
+      } else if (!isDismissed()) {
+        openTimer = setTimeout(openOverlay, Math.max(0, delayMs))
+      }
+    })()
+  </script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Subscribe overlay",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable",
+      "label": "Enable overlay",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "show_delay_seconds",
+      "label": "Show delay after page load",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "s",
+      "default": 10,
+      "info": "Wait this long after the page loads before showing the overlay."
+    },
+    {
+      "type": "range",
+      "id": "dismiss_hours",
+      "label": "Hide for (hours) after close",
+      "min": 1,
+      "max": 168,
+      "step": 1,
+      "unit": "h",
+      "default": 24
+    },
+    {
+      "type": "text",
+      "id": "storage_key",
+      "label": "Browser storage key",
+      "default": "kk_subscribe_overlay_dismissed_until",
+      "info": "Change only if you need to reset dismiss state for all visitors."
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image",
+      "info": "Defaults to theme asset subscribe.jpg if empty."
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Image darken overlay",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "%",
+      "default": 42
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Win a Knife Every Month"
+    },
+    {
+      "type": "text",
+      "id": "bullet_1_title",
+      "label": "Bullet 1 title",
+      "default": "Exclusive Giveaways"
+    },
+    {
+      "type": "text",
+      "id": "bullet_1_text",
+      "label": "Bullet 1 text",
+      "default": "Automatic entry into our monthly giveaways"
+    },
+    {
+      "type": "text",
+      "id": "bullet_2_title",
+      "label": "Bullet 2 title",
+      "default": "Early Access"
+    },
+    {
+      "type": "text",
+      "id": "bullet_2_text",
+      "label": "Bullet 2 text",
+      "default": "Be the first to hear about restocks, new models, and drops"
+    },
+    {
+      "type": "text",
+      "id": "bullet_3_title",
+      "label": "Bullet 3 title",
+      "default": "Insider Perks"
+    },
+    {
+      "type": "text",
+      "id": "bullet_3_text",
+      "label": "Bullet 3 text",
+      "default": "Field tips, prototype testing & community update."
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "Email placeholder",
+      "default": "Email"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Unlock Member Only Perks"
+    },
+    {
+      "type": "text",
+      "id": "customer_tags",
+      "label": "Customer tags",
+      "default": "newsletter,overlay",
+      "info": "Comma-separated tags for Shopify Flow / Klaviyo."
+    },
+    {
+      "type": "header",
+      "content": "Form colors"
+    },
+    {
+      "type": "color",
+      "id": "input_bg_color",
+      "label": "Input background",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "color",
+      "id": "input_border_color",
+      "label": "Input border",
+      "default": "#5c5c5c"
+    },
+    {
+      "type": "color",
+      "id": "input_text_color",
+      "label": "Input text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "input_placeholder_color",
+      "label": "Input placeholder",
+      "default": "#b0b0b0"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Button background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Button border",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Toast messages"
+    },
+    {
+      "type": "text",
+      "id": "success_title",
+      "label": "Success title",
+      "default": "Successfully signed up!"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "Thanks for joining!"
+    },
+    {
+      "type": "text",
+      "id": "error_title",
+      "label": "Error title",
+      "default": "Something went wrong"
+    },
+    {
+      "type": "text",
+      "id": "error_message",
+      "label": "Error message",
+      "default": "Please try again."
+    },
+    {
+      "type": "header",
+      "content": "Cloudflare Turnstile"
+    },
+    {
+      "type": "checkbox",
+      "id": "turnstile_enable",
+      "label": "Enable Turnstile captcha",
+      "default": false,
+      "info": "Client-side token gate. Create a Managed widget in Cloudflare and paste the site key."
+    },
+    {
+      "type": "text",
+      "id": "turnstile_site_key",
+      "label": "Turnstile site key"
+    },
+    {
+      "type": "select",
+      "id": "turnstile_appearance",
+      "label": "Appearance",
+      "default": "interaction-only",
+      "options": [
+        { "value": "interaction-only", "label": "Auto (show only if needed)" },
+        { "value": "always", "label": "Always visible" },
+        { "value": "execute", "label": "Visible after challenge starts" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "turnstile_theme",
+      "label": "Widget theme",
+      "default": "dark",
+      "options": [
+        { "value": "dark", "label": "Dark" },
+        { "value": "light", "label": "Light" },
+        { "value": "auto", "label": "Auto" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "turnstile_size",
+      "label": "Widget size",
+      "default": "flexible",
+      "options": [
+        { "value": "flexible", "label": "Flexible" },
+        { "value": "normal", "label": "Normal" },
+        { "value": "compact", "label": "Compact" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Subscribe overlay"
+    }
+  ]
+}
+{% endschema %}

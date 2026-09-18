@@ -376,8 +376,17 @@
           character === '.' &&
           isDigit(previousCharacter) &&
           isDigit(nextCharacter)
+        const isThousandsComma =
+          character === ',' &&
+          isDigit(previousCharacter) &&
+          isDigit(nextCharacter)
+        const isBreakCharacter =
+          (character === '.' && !isDecimalPoint) ||
+          character === ':' ||
+          (character === ',' && !isThousandsComma)
 
-        if (character === '.' && !isDecimalPoint) {
+        if (isBreakCharacter) {
+          currentLine += character
           const trimmedLine = currentLine.trim()
           if (trimmedLine) lines.push(trimmedLine)
           currentLine = ''

@@ -265,7 +265,7 @@
                   <input
                     type='hidden'
                     name='return_to'
-                    value='{{ request.path }}?customer_posted=true#FooterNewsletterForm'
+                    value='{{ routes.root_url }}?customer_posted=true'
                   >
 
                   <div class='footer-newsletter__fields'>
@@ -310,6 +310,13 @@
                   {% endif %}
                 </div>
               {% endform %}
+              <iframe
+                id='FooterNewsletterFrame'
+                name='FooterNewsletterFrame'
+                title='Newsletter signup'
+                hidden
+                style='position:absolute;width:0;height:0;border:0;clip:rect(0,0,0,0);'
+              ></iframe>
             </div>
           {% endif %}
 
@@ -510,14 +517,29 @@
 {% endif %}
 <script>
   (function () {
+    var configEl = document.querySelector('[data-footer-newsletter]')
+    if (!configEl) return
+
+    var form = document.getElementById('FooterNewsletterForm')
+    var frame = document.getElementById('FooterNewsletterFrame')
+    var submitBtn = document.querySelector('[data-footer-newsletter-submit]')
+    var turnstileEnabled = configEl.getAttribute('data-turnstile-enabled') === 'true'
+    var awaitingResponse = false
+
+    var successTitle = configEl.getAttribute('data-success-title') || 'Successfully signed up!'
+    var successMessage = configEl.getAttribute('data-success-message') || 'Thanks for signing up!'
+    var errorTitle = configEl.getAttribute('data-error-title') || 'Something went wrong'
+    var errorMessage = configEl.getAttribute('data-error-message') || 'Please try again.'
+    var postedSuccess = configEl.getAttribute('data-posted-success') === 'true'
+    var postedError = configEl.getAttribute('data-posted-error') === 'true'
+
     function setNewsletterSubmitEnabled(enabled) {
-      var btn = document.querySelector('[data-footer-newsletter-submit]')
-      if (!btn) return
-      btn.disabled = !enabled
+      if (!submitBtn) return
+      submitBtn.disabled = !enabled
     }
 
     window.footerTurnstileSuccess = function () {
-      setNewsletterSubmitEnabled(true)
+      if (!awaitingResponse) setNewsletterSubmitEnabled(true)
     }
 
     window.footerTurnstileError = function () {
@@ -532,21 +554,6 @@
         } catch (e) {}
       }
     }
-
-    var configEl = document.querySelector('[data-footer-newsletter]')
-    if (!configEl) return
-
-    var successTitle = configEl.getAttribute('data-success-title') || 'Successfully signed up!'
-    var successMessage = configEl.getAttribute('data-success-message') || 'Thanks for signing up!'
-    var errorTitle = configEl.getAttribute('data-error-title') || 'Something went wrong'
-    var errorMessage = configEl.getAttribute('data-error-message') || 'Please try again.'
-    var postedSuccess = configEl.getAttribute('data-posted-success') === 'true'
-    var postedError = configEl.getAttribute('data-posted-error') === 'true'
-    var turnstileEnabled = configEl.getAttribute('data-turnstile-enabled') === 'true'
-    var params = new URLSearchParams(window.location.search)
-    var urlSuccess =
-      params.get('customer_posted') === 'true' ||
-      params.get('contact_posted') === 'true'
 
     function whenToastrReady(callback) {
       if (window.toastr && window.jQuery) {
@@ -592,18 +599,38 @@
       })
     }
 
-    if (postedSuccess || urlSuccess) {
-      showSuccess()
-      if (window.history && window.history.replaceState) {
-        var cleanUrl = window.location.pathname + window.location.hash
-        window.history.replaceState({}, document.title, cleanUrl)
+    function resetAfterSubmit(success) {
+      awaitingResponse = false
+      if (form && success) form.reset()
+      if (turnstileEnabled && window.turnstile && document.getElementById('FooterTurnstile')) {
+        try {
+          window.turnstile.reset('#FooterTurnstile')
+        } catch (e) {}
+        setNewsletterSubmitEnabled(false)
+      } else {
+        setNewsletterSubmitEnabled(true)
       }
+    }
+
+    function handleSignupSuccess() {
+      showSuccess()
+      resetAfterSubmit(true)
+    }
+
+    function handleSignupError() {
+      showError()
+      resetAfterSubmit(false)
+    }
+
+    if (postedSuccess) {
+      showSuccess()
     } else if (postedError) {
       showError(errorMessage)
     }
 
-    var form = document.getElementById('FooterNewsletterForm')
-    if (form) {
+    if (form && frame) {
+      form.setAttribute('target', 'FooterNewsletterFrame')
+
       form.addEventListener('submit', function (event) {
         if (turnstileEnabled) {
           var tokenInput = form.querySelector('[name="cf-turnstile-response"]')
@@ -615,8 +642,44 @@
           }
         }
 
-        var submitBtn = form.querySelector('[data-footer-newsletter-submit]')
-        if (submitBtn) submitBtn.disabled = true
+        awaitingResponse = true
+        setNewsletterSubmitEnabled(false)
+      })
+
+      frame.addEventListener('load', function () {
+        if (!awaitingResponse) return
+
+        var ok = false
+        var failed = false
+        try {
+          var href = frame.contentWindow.location.href || ''
+          if (
+            href.indexOf('customer_posted=true') !== -1 ||
+            href.indexOf('contact_posted=true') !== -1
+          ) {
+            ok = true
+          } else {
+            var doc = frame.contentDocument
+            if (doc) {
+              var html = doc.documentElement ? doc.documentElement.innerHTML : ''
+              if (/customer_posted=true|contact_posted=true|form--success|posted_successfully/i.test(html)) {
+                ok = true
+              } else if (/form__message--error|errors|error-message/i.test(html) && /contact|customer/i.test(html)) {
+                failed = true
+              }
+            }
+          }
+        } catch (e) {
+          ok = true
+        }
+
+        if (ok) {
+          handleSignupSuccess()
+        } else if (failed) {
+          handleSignupError()
+        } else {
+          handleSignupSuccess()
+        }
       })
     }
   })()
