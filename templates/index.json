@@ -179,7 +179,7 @@
             "text_bg_color": "#000000",
             "text_bg_opacity": 50,
             "button_enable": true,
-            "button_text": "Buy the Mountain Scalpel Now!",
+            "button_text": "Try the Mountain Scalpel Today",
             "button_action": "link",
             "button_form_id": "",
             "button_url": "shopify://products/mountain-scalpel",
