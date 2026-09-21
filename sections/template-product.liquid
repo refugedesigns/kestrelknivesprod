@@ -910,7 +910,7 @@
                             | append: '.png'
                           %}
                           {% assign complex_asset_large = complex_asset_filename | asset_img_url: '2048x2048' %}
-                          {% assign complex_asset_thumb = complex_asset_filename | asset_img_url: '128x128' %}
+                          {% assign complex_asset_thumb = complex_asset_filename | asset_img_url: '256x256' %}
 
                           <label class='relative cursor-pointer color-option'>
                             <input
@@ -944,28 +944,42 @@
                                   | append: option_value_token
                                   | append: ".png"
                                 %}
+                                {% assign option_asset_jpg = option_name_token
+                                  | append: "_"
+                                  | append: option_value_token
+                                  | append: ".jpg"
+                                %}
                                 <img
-                                  src='{{ option_asset_filename | asset_img_url: '64x64' }}'
+                                  src='{{ option_asset_filename | asset_img_url: "256x256" }}'
+                                  srcset='{{ option_asset_filename | asset_img_url: "128x128" }} 1x, {{ option_asset_filename | asset_img_url: "256x256" }} 2x, {{ option_asset_filename | asset_img_url: "384x384" }} 3x'
                                   alt='{{ value }}'
                                   class='w-full h-full object-contain rounded-md'
-                                  width='64'
-                                  height='64'
+                                  width='128'
+                                  height='128'
+                                  loading='lazy'
+                                  decoding='async'
+                                  onerror="if(!this.dataset.swFb){this.dataset.swFb='1';this.src='{{ option_asset_jpg | asset_img_url: "256x256" }}';this.srcset='{{ option_asset_jpg | asset_img_url: "128x128" }} 1x, {{ option_asset_jpg | asset_img_url: "256x256" }} 2x, {{ option_asset_jpg | asset_img_url: "384x384" }} 3x'}"
                                 >
                               {% elsif use_complex_options and complex_asset_thumb != blank %}
                                 <img
                                   src='{{ complex_asset_thumb }}'
                                   alt='{{ value }}'
                                   class='w-full h-full object-contain rounded-md'
-                                  width='64'
-                                  height='64'
+                                  width='128'
+                                  height='128'
+                                  loading='lazy'
+                                  decoding='async'
                                 >
                               {% elsif option_image %}
                                 <img
-                                  src='{{ option_image | image_url: width: 64 }}'
+                                  src='{{ option_image | image_url: width: 256 }}'
+                                  srcset='{{ option_image | image_url: width: 128 }} 1x, {{ option_image | image_url: width: 256 }} 2x, {{ option_image | image_url: width: 384 }} 3x'
                                   alt='{{ value }}'
                                   class='w-full h-full object-contain rounded-md'
-                                  width='64'
-                                  height='64'
+                                  width='128'
+                                  height='128'
+                                  loading='lazy'
+                                  decoding='async'
                                 >
                               {% else %}
                                 <div class='w-full h-full bg-white rounded-md flex items-center justify-center'>

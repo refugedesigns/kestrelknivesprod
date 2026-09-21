@@ -1,9 +1,10 @@
 {% comment %}
   Local color swatch image — tries paracord_color_[color].png, then .jpg, then .jpeg.
-  Accepts: option_name, value, size (default 64x64), img_class, width, height
+  Accepts: option_name, value, size (default 256x256), img_class, width, height
 {% endcomment %}
 
-{% assign lc_size = size | default: '64x64' %}
+{% assign lc_size = size | default: '256x256' %}
+{% assign lc_size_2x = size_2x | default: '384x384' %}
 {% assign lc_option_token = option_name
   | strip
   | downcase
@@ -26,20 +27,30 @@
 %}
 {% assign lc_asset_base = lc_option_token | append: '_' | append: lc_value_token %}
 {% assign lc_png = lc_asset_base | append: '.png' | asset_img_url: lc_size %}
+{% assign lc_png_2x = lc_asset_base | append: '.png' | asset_img_url: lc_size_2x %}
 {% assign lc_jpg = lc_asset_base | append: '.jpg' | asset_img_url: lc_size %}
+{% assign lc_jpg_2x = lc_asset_base | append: '.jpg' | asset_img_url: lc_size_2x %}
 {% assign lc_jpeg = lc_asset_base | append: '.jpeg' | asset_img_url: lc_size %}
+{% assign lc_jpeg_2x = lc_asset_base | append: '.jpeg' | asset_img_url: lc_size_2x %}
 
 <img
   src='{{ lc_png }}'
+  srcset='{{ lc_png }} 1x, {{ lc_png_2x }} 2x'
   alt='{{ value | escape }}'
   {% if img_class != blank %}
     class='{{ img_class }}'
   {% endif %}
   {% if width != blank %}
     width='{{ width }}'
+  {% else %}
+    width='128'
   {% endif %}
   {% if height != blank %}
     height='{{ height }}'
+  {% else %}
+    height='128'
   {% endif %}
-  onerror="if(!this.dataset.lcFb){this.dataset.lcFb='jpg';this.src='{{ lc_jpg }}'}else if(this.dataset.lcFb==='jpg'){this.dataset.lcFb='jpeg';this.src='{{ lc_jpeg }}'}"
+  loading='lazy'
+  decoding='async'
+  onerror="if(!this.dataset.lcFb){this.dataset.lcFb='jpg';this.src='{{ lc_jpg }}';this.srcset='{{ lc_jpg }} 1x, {{ lc_jpg_2x }} 2x'}else if(this.dataset.lcFb==='jpg'){this.dataset.lcFb='jpeg';this.src='{{ lc_jpeg }}';this.srcset='{{ lc_jpeg }} 1x, {{ lc_jpeg_2x }} 2x'}"
 >
