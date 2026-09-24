@@ -1499,20 +1499,40 @@
                 {% for image in field.value %}
                   <div class='bg-white overflow-hidden'>
                     <img
-                      src='{{ image | img_url: '600x600' }}'
+                      src='{{ image | image_url: width: 1600, format: 'webp' }}'
+                      srcset='
+                        {{ image | image_url: width: 800, format: 'webp' }} 800w,
+                        {{ image | image_url: width: 1200, format: 'webp' }} 1200w,
+                        {{ image | image_url: width: 1600, format: 'webp' }} 1600w,
+                        {{ image | image_url: width: 2000, format: 'webp' }} 2000w
+                      '
+                      sizes='(min-width: 1024px) 50vw, 100vw'
                       alt='{{ key | replace: '_', ' ' | replace: '-', ' ' | strip | capitalize }}'
                       class='w-full object-contain'
+                      width='{{ image.width | default: 1600 }}'
+                      height='{{ image.height | default: 1600 }}'
                       loading='lazy'
+                      decoding='async'
                     >
                   </div>
                 {% endfor %}
               {% else %}
                 <div class='bg-white overflow-hidden'>
                   <img
-                    src='{{ field.value | img_url: '600x600' }}'
+                    src='{{ field.value | image_url: width: 1600, format: 'webp' }}'
+                    srcset='
+                      {{ field.value | image_url: width: 800, format: 'webp' }} 800w,
+                      {{ field.value | image_url: width: 1200, format: 'webp' }} 1200w,
+                      {{ field.value | image_url: width: 1600, format: 'webp' }} 1600w,
+                      {{ field.value | image_url: width: 2000, format: 'webp' }} 2000w
+                    '
+                    sizes='(min-width: 1024px) 50vw, 100vw'
                     alt='{{ key | replace: '_', ' ' | replace: '-', ' ' | strip | capitalize }}'
                     class='w-full object-contain'
+                    width='{{ field.value.width | default: 1600 }}'
+                    height='{{ field.value.height | default: 1600 }}'
                     loading='lazy'
+                    decoding='async'
                   >
                 </div>
               {% endif %}
