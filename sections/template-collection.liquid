@@ -33,7 +33,17 @@
     >
   {% endcomment %}
 
-  {% paginate collection.products by section.settings.number_of_products_per_page %}
+  {% assign handle_norm = collection.handle | downcase | replace: "-", "_" %}
+  {% assign is_early_access = false %}
+  {% if handle_norm contains "early_access" %}
+    {% assign is_early_access = true %}
+  {% endif %}
+  {% assign kk_per_page = section.settings.number_of_products_per_page | default: 18 %}
+  {% if is_early_access %}
+    {%- comment -%} 4-col grid: keep leftover products on this page (Shopify max 50). {%- endcomment -%}
+    {% assign kk_per_page = 50 %}
+  {% endif %}
+  {% paginate collection.products by kk_per_page %}
     <h1 class='text-3xl font-bold text-center mb-2' x-html='getPageTitle()'>
       {{ collection_title_display }}
     </h1>
@@ -474,7 +484,8 @@
       "type": "number",
       "id": "number_of_products_per_page",
       "default": 18,
-      "label": "Number of products per page"
+      "label": "Number of products per page",
+      "info": "On early-access, all products show on one page so the 4-column grid is not left empty."
     },
     {
       "type": "header",

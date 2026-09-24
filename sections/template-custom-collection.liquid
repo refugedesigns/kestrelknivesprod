@@ -15,7 +15,11 @@
 {% render 'product-card-js' %}
 
 <div class='px-4 py-4 mx-auto' x-data='customCollectionPage()'>
-  {% paginate collection.products by section.settings.number_of_products_per_page %}
+  {%- comment -%}
+    4-column grid: never paginate a leftover of 1–3 products onto the next page.
+    Early-access is a small curated list, so load the full collection (Shopify max 50).
+  {%- endcomment -%}
+  {% paginate collection.products by 50 %}
     <div
       class='text-center mb-8 px-6 py-4 rounded-lg flex items-center justify-center'
       style='background-color: {{ section.settings.page_title_bg_color | default: "#ffffff" }};'
@@ -159,8 +163,9 @@
     {
       "type": "number",
       "id": "number_of_products_per_page",
-      "default": 9,
-      "label": "Number of products per page"
+      "default": 12,
+      "label": "Number of products per page",
+      "info": "Unused on this template: all early-access products show on one page so the 4-column grid is not left empty."
     },
     {
       "type": "header",
