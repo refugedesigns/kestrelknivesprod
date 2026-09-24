@@ -1,7 +1,3 @@
-<style>
-  /* Using Tailwind grid utilities to match template-collection layout */
-</style>
-
 <script>
   window.__collectionProducts = [
     {%- for product in collection.products -%}
@@ -32,7 +28,7 @@
       </h1>
     </div>
 
-    <div class='max-w-6xl mx-auto'>
+    <div class='max-w-6xl mx-auto w-full'>
       {%- comment -%} Product count removed {%- endcomment -%}
 
       <!-- Products Grid -->
