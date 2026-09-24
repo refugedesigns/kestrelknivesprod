@@ -60,8 +60,14 @@
             {% assign has_apparel_filter = true %}
           {% endif %}
 
+          {% assign handle_norm = collection.handle | downcase | replace: "-", "_" %}
+          {% assign is_early_access = false %}
+          {% if handle_norm contains "early_access" %}
+            {% assign is_early_access = true %}
+          {% endif %}
+
           <div
-            class='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-6'
+            class='grid grid-cols-2 md:grid-cols-2 {% if is_early_access %}lg:grid-cols-4{% else %}lg:grid-cols-3{% endif %} gap-2 md:gap-6'
             id='products-grid'
           >
             {% comment %}
@@ -70,11 +76,6 @@
               - knives / position tags: product_N / position_N
               Untagged items render afterwards in collection order.
             {% endcomment %}
-            {% assign handle_norm = collection.handle | downcase | replace: "-", "_" %}
-            {% assign is_early_access = false %}
-            {% if handle_norm contains "early_access" %}
-              {% assign is_early_access = true %}
-            {% endif %}
 
             {% assign has_knife_filter = false %}
             {% assign url_string = request.path
