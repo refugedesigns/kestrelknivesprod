@@ -76,18 +76,6 @@
             >In stock (<span x-text='inStockCount'></span>)</span
           >
         </label>
-        <label class='flex items-center space-x-2 cursor-pointer'>
-          <input
-            type='checkbox'
-            x-model='selectedFilters.availability'
-            value='out-of-stock'
-            @change='applyFilters()'
-            class='rounded border-gray-300 text-black focus:ring-gray-900'
-          >
-          <span class='text-sm text-gray-700'
-            >Out of stock (<span x-text='outOfStockCount'></span>)</span
-          >
-        </label>
       </div>
     </div>
 
@@ -284,11 +272,6 @@
       get inStockCount() {
         const products = {{ search.results | json }}
         return products ? products.filter(p => p.available).length : 0
-      },
-
-      get outOfStockCount() {
-        const products = {{ search.results | json }}
-        return products ? products.filter(p => !p.available).length : 0
       },
 
       formatPrice(price) {

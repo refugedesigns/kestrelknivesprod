@@ -45,9 +45,9 @@
             <!-- Group-tag subfilters under the selected parent -->
             <div
               class='mt-2 space-y-2 pl-6'
-              x-show='isParentSelected(t.value) && groupTags.length'
+              x-show='isParentSelected(t.value) && sortedGroupTags.length'
             >
-              <template x-for='tag in groupTags' :key='tag.tag'>
+              <template x-for='tag in sortedGroupTags' :key='tag.tag'>
                 <label class='flex items-center space-x-2 cursor-pointer'>
                   <input
                     type='checkbox'
@@ -108,19 +108,6 @@
           >
           <span class='text-sm text-gray-700'
             >In Stock (<span x-text='inStockCount'></span>)</span
-          >
-        </label>
-        <label class='flex items-center space-x-2 cursor-pointer'>
-          <input
-            type='radio'
-            name='availability'
-            value='out-of-stock'
-            x-model='selectedFilters.availabilitySelected'
-            @change='applyFilters()'
-            class='border-gray-300 text-black focus:ring-gray-900'
-          >
-          <span class='text-sm text-gray-700'
-            >Out Of Stock (<span x-text='outOfStockCount'></span>)</span
           >
         </label>
       </div>
@@ -223,6 +210,19 @@
           this.selectedFilters.productTypeSelected,
           typeValue
         )
+      },
+
+      sortGroupTags(tags) {
+        return [...(tags || [])].sort((a, b) =>
+          String(a.label || '').localeCompare(String(b.label || ''), undefined, {
+            numeric: true,
+            sensitivity: 'base',
+          })
+        )
+      },
+
+      get sortedGroupTags() {
+        return this.sortGroupTags(this.groupTags)
       },
 
       isGroupTagSelected(tag) {
@@ -370,9 +370,7 @@
           }
         }
 
-        this.groupTags = Object.values(map).sort((a, b) =>
-          String(a.label).localeCompare(String(b.label))
-        )
+        this.groupTags = this.sortGroupTags(Object.values(map))
 
         // Cache whenever we have more than the single active tag
         if (this.groupTags.length > 1 || !active) {
@@ -508,12 +506,8 @@
           }
 
           const avParam = url.searchParams.get('filter.v.availability')
-          if (avParam !== null) {
-            if (String(avParam) === '1') {
-              this.selectedFilters.availabilitySelected = 'in-stock'
-            } else if (String(avParam) === '0') {
-              this.selectedFilters.availabilitySelected = 'out-of-stock'
-            }
+          if (avParam !== null && String(avParam) === '1') {
+            this.selectedFilters.availabilitySelected = 'in-stock'
           }
 
           // Subfilter from native tag path: /collections/all/hat-group
@@ -566,15 +560,6 @@
         return products.filter(p => p.available).length
       },
 
-      get outOfStockCount() {
-        const meta = window.__filterMeta || {}
-        if (meta.availability && typeof meta.availability.out === 'number') {
-          return meta.availability.out
-        }
-        const products = window.__collectionProducts || []
-        return products.filter(p => !p.available).length
-      },
-
       applyFilters(productTypeChanged = false) {
         if (this.isInitializing) return
 
@@ -612,8 +597,6 @@
           this.selectedFilters.availabilitySelected || ''
         if (availabilitySelected === 'in-stock') {
           url.searchParams.append('filter.v.availability', '1')
-        } else if (availabilitySelected === 'out-of-stock') {
-          url.searchParams.append('filter.v.availability', '0')
         }
 
         const nextUrl = url.toString()
