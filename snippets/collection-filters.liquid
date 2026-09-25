@@ -304,7 +304,7 @@
       },
 
       groupTagsCacheKey(typeValue) {
-        return `kk_groupTags_${this.toHandleSafe(typeValue)}`
+        return `kk_groupTags_v2_${this.toHandleSafe(typeValue)}`
       },
 
       collectGroupTagsFromProducts(products, typeValue, map) {
@@ -401,8 +401,8 @@
 
       /**
        * Build ALL Group subfilters for the selected product type.
-       * Uses cache + catalog fetch so selecting one tag doesn't hide the others
-       * (current page products alone only contain the active Group tag).
+       * Catalog tags are the source of truth so a renamed Group drops the old name.
+       * Cache is only a first-paint placeholder (filtered pages only have one Group).
        */
       async buildGroupTags() {
         try {
@@ -412,27 +412,23 @@
             return
           }
 
-          const map = {}
+          const pageProducts = window.__collectionProducts || []
 
-          // 1) Cached full list for this parent (from a previous unfiltered view)
+          // 1) First paint: current page + cache so other Groups do not vanish
+          const preview = {}
           this.readCachedGroupTags(selected).forEach(t => {
-            if (t && t.tag) map[t.tag] = t
+            if (t && t.tag) preview[t.tag] = t
           })
+          this.collectGroupTagsFromProducts(pageProducts, selected, preview)
+          this.applyGroupTagMap(preview, selected)
 
-          // 2) Current page products
-          this.collectGroupTagsFromProducts(
-            window.__collectionProducts || [],
-            selected,
-            map
-          )
-
-          this.applyGroupTagMap(map, selected)
-
-          // 3) Refresh from full catalog so all Groups stay visible under the parent
+          // 2) Replace with live catalog tags (do not merge stale cache names)
           const catalog = await this.fetchCatalogProducts()
           if (catalog.length) {
-            this.collectGroupTagsFromProducts(catalog, selected, map)
-            this.applyGroupTagMap(map, selected)
+            const live = {}
+            this.collectGroupTagsFromProducts(catalog, selected, live)
+            this.collectGroupTagsFromProducts(pageProducts, selected, live)
+            this.applyGroupTagMap(live, selected)
           }
         } catch (e) {
           this.groupTags = []
