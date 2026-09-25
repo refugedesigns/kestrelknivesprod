@@ -1,0 +1,113 @@
+{% doc %}
+  Apparel color swatches on product cards.
+
+  Uses the variant featured image (center-cropped) so each chip shows
+  the garment color without extra uploads. If the merchant set a native
+  Shopify option swatch (hex or image), that is used instead.
+
+  Shown only when the product has more than one color value.
+
+  @param {object} product_product - Product drop
+{% enddoc %}
+
+{% assign color_opt_index = 0 %}
+{% assign color_opt_name = '' %}
+{% for option in product_product.options_with_values %}
+  {% assign option_name_down = option.name | downcase %}
+  {% if option_name_down contains 'color'
+    or option_name_down contains 'colour'
+    or option_name_down contains 'shade'
+    or option_name_down contains 'finish'
+  %}
+    {% assign color_opt_index = forloop.index %}
+    {% assign color_opt_name = option.name %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% if color_opt_index == 0 %}
+  {% unless product_product.has_only_default_variant %}
+  {% assign first_option_name = product_product.options | first | downcase %}
+  {% unless first_option_name contains 'size'
+    or first_option_name contains 'title'
+  %}
+    {% assign color_opt_index = 1 %}
+    {% assign color_opt_name = product_product.options | first %}
+  {% endunless %}
+  {% endunless %}
+{% endif %}
+
+{% if color_opt_index > 0 %}
+  {% for option in product_product.options_with_values %}
+    {% if forloop.index == color_opt_index %}
+      {% if option.values.size > 1 %}
+        <div
+          class='mb-1'
+          role='group'
+          aria-label='{{ color_opt_name | escape }}'
+        >
+          <div class='flex flex-wrap gap-1 md:gap-2 justify-center'>
+            {% for value in option.values %}
+              {% assign color_label = value.name | default: value %}
+              {% assign swatch_image = nil %}
+              {% for variant in product_product.variants %}
+                {% assign color_match = false %}
+                {% if color_opt_index == 1 and variant.option1 == color_label %}
+                  {% assign color_match = true %}
+                {% elsif color_opt_index == 2 and variant.option2 == color_label %}
+                  {% assign color_match = true %}
+                {% elsif color_opt_index == 3 and variant.option3 == color_label %}
+                  {% assign color_match = true %}
+                {% endif %}
+                {% if color_match and variant.featured_image %}
+                  {% assign swatch_image = variant.featured_image %}
+                  {% break %}
+                {% endif %}
+              {% endfor %}
+
+              <button
+                type='button'
+                @click.stop='selectByColor({{ color_label | json }})'
+                :class="$el.dataset.colorLc && selectedColorLc === $el.dataset.colorLc ? 'ring-2 ring-black' : ''"
+                class='h-6 w-6 rounded-full border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-black overflow-hidden'
+                title='{{ color_label | escape }}'
+                aria-label='{{ color_label | escape }}'
+                :aria-pressed="$el.dataset.colorLc && selectedColorLc === $el.dataset.colorLc"
+                data-color-lc='{{ color_label | strip | downcase }}'
+              >
+                {% if value.swatch.color != blank %}
+                  <span
+                    class='block w-full h-full rounded-full'
+                    style='background-color: {{ value.swatch.color }};'
+                  ></span>
+                {% elsif value.swatch.image != blank %}
+                  <img
+                    width='48'
+                    height='48'
+                    src='{{ value.swatch.image | image_url: width: 64, height: 64, crop: "center" }}'
+                    alt='{{ color_label | escape }}'
+                    class='w-full h-full object-cover'
+                    loading='lazy'
+                    decoding='async'
+                  >
+                {% elsif swatch_image %}
+                  <img
+                    width='48'
+                    height='48'
+                    src='{{ swatch_image | image_url: width: 64, height: 64, crop: "center" }}'
+                    alt='{{ color_label | escape }}'
+                    class='w-full h-full object-cover'
+                    loading='lazy'
+                    decoding='async'
+                  >
+                {% else %}
+                  <span class='block w-full h-full rounded-full bg-gray-200'></span>
+                {% endif %}
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endif %}

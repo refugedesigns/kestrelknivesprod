@@ -96,6 +96,54 @@
             .toLowerCase()
         },
 
+        colorOptionKey() {
+          const raw =
+            (this.optionNames && this.optionNames.length
+              ? this.optionNames
+              : this.productData.options) || []
+          const names = raw.map(n =>
+            typeof n === 'string' ? n : (n && n.name) || ''
+          )
+          let idx = 0
+          names.forEach((n, i) => {
+            const ln = String(n || '').toLowerCase()
+            if (
+              ['color', 'colour', 'shade', 'finish'].some(k =>
+                ln.includes(k)
+              )
+            ) {
+              idx = i
+            }
+          })
+          if (idx === 1) return 'option2'
+          if (idx === 2) return 'option3'
+          return 'option1'
+        },
+
+        get selectedColorLc() {
+          const v = this.getVariantById(this.selectedVariant)
+          if (!v) return ''
+          return String(v[this.colorOptionKey()] || '')
+            .trim()
+            .toLowerCase()
+        },
+
+        selectByColor(colorValue) {
+          const hv = String(colorValue || '').trim()
+          const key = this.colorOptionKey()
+          const matches = (this.variantsData || []).filter(
+            v => String(v[key] || '') === hv
+          )
+          if (!matches.length) return
+          const available = matches.find(v => !!v.available)
+          const chosen = available || matches[0]
+          this.selectedVariant = chosen.id
+          this.updateTitle()
+          this.checkAvailability()
+          this.updateImage(true)
+          this.syncDibsPlanSelection()
+        },
+
         // Computed property for Quick View formatted price
         get qvFormattedPrice() {
           if (!this.variantsData || this.variantsData.length === 0) {
@@ -508,11 +556,11 @@
         },
 
         updateImage(forceVariantImage = false) {
-          // Always keep featured image for apparels/accessories
           const typeLower = (this.productData.type || '').toLowerCase()
           if (
-            typeLower.includes('apparel') ||
-            typeLower.includes('accessories')
+            (typeLower.includes('apparel') ||
+              typeLower.includes('accessories')) &&
+            !forceVariantImage
           ) {
             return
           }

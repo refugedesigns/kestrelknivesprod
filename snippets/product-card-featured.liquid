@@ -130,6 +130,11 @@
 
         <!-- Handle Color Variants (hide for Apparels) -->
         {% assign type_lower = product_obj.type | default: "" | downcase %}
+        {% if type_lower contains "apparel" %}
+          {% render 'product-card-apparel-swatches',
+            product_product: product_obj
+          %}
+        {% endif %}
         {% unless product_obj.has_only_default_variant
           or type_lower contains "apparel"
           or type_lower contains "accessories"
@@ -656,6 +661,54 @@
             .toLowerCase()
         },
 
+        colorOptionKey() {
+          const raw =
+            (this.optionNames && this.optionNames.length
+              ? this.optionNames
+              : this.productData.options) || []
+          const names = raw.map(n =>
+            typeof n === 'string' ? n : (n && n.name) || ''
+          )
+          let idx = 0
+          names.forEach((n, i) => {
+            const ln = String(n || '').toLowerCase()
+            if (
+              ['color', 'colour', 'shade', 'finish'].some(k =>
+                ln.includes(k)
+              )
+            ) {
+              idx = i
+            }
+          })
+          if (idx === 1) return 'option2'
+          if (idx === 2) return 'option3'
+          return 'option1'
+        },
+
+        get selectedColorLc() {
+          const v = this.getVariantById(this.selectedVariant)
+          if (!v) return ''
+          return String(v[this.colorOptionKey()] || '')
+            .trim()
+            .toLowerCase()
+        },
+
+        selectByColor(colorValue) {
+          const hv = String(colorValue || '').trim()
+          const key = this.colorOptionKey()
+          const matches = (this.variantsData || []).filter(
+            v => String(v[key] || '') === hv
+          )
+          if (!matches.length) return
+          const available = matches.find(v => !!v.available)
+          const chosen = available || matches[0]
+          this.selectedVariant = chosen.id
+          this.updateTitle()
+          this.checkAvailability()
+          this.updateImage(true)
+          this.syncDibsPlanSelection()
+        },
+
         // Select by handle color (option1). Prefer an available variant; fallback to first match.
         selectByHandle(handleValue) {
           const hv = String(handleValue || '').trim()
@@ -744,12 +797,12 @@
           return sizeValues.includes(v)
         },
 
-        updateImage() {
-          // For apparel, keep using the product's featured image (do not swap per variant)
+        updateImage(forceVariantImage = false) {
           const typeLower = (this.productData.type || '').toLowerCase()
           if (
-            typeLower.includes('apparel') ||
-            typeLower.includes('accessories')
+            (typeLower.includes('apparel') ||
+              typeLower.includes('accessories')) &&
+            !forceVariantImage
           ) {
             return
           }

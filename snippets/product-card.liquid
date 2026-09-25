@@ -189,6 +189,12 @@
           {% endunless %}
         </a>
 
+        {% if is_apparel %}
+          {% render 'product-card-apparel-swatches',
+            product_product: product_product
+          %}
+        {% endif %}
+
         <!-- Handle Color Variants (hide for Apparels) -->
         {% unless product_product.has_only_default_variant
           or is_apparel
