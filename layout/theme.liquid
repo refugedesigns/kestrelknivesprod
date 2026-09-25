@@ -146,6 +146,12 @@
       <script src='{{ 'dibs-preorder.js' | asset_url }}' defer></script>
     {%- endif -%}
     <script src='{{ 'alpine.min.js' | asset_url }}' defer></script>
+    {%- if template.name == 'index'
+      or template.name == 'collection'
+      or template.name == 'search'
+    -%}
+      <script src='{{ 'apparel-swatch-color.js' | asset_url }}' defer></script>
+    {%- endif -%}
 
     {%- comment -%}
       Swiper only on templates that render carousels.

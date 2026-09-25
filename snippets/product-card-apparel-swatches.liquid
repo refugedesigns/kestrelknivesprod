@@ -1,9 +1,9 @@
 {% doc %}
   Apparel color swatches on product cards.
 
-  Uses the variant featured image (center-cropped) so each chip shows
-  the garment color without extra uploads. If the merchant set a native
-  Shopify option swatch (hex or image), that is used instead.
+  Solid color chips. Prefers a Shopify option swatch hex; otherwise
+  Fast Average Color samples the variant image and ignores the white
+  background. Clicking still swaps the card image.
 
   Shown only when the product has more than one color value.
 
@@ -74,35 +74,17 @@
                 aria-label='{{ color_label | escape }}'
                 :aria-pressed="$el.dataset.colorLc && selectedColorLc === $el.dataset.colorLc"
                 data-color-lc='{{ color_label | strip | downcase }}'
-              >
-                {% if value.swatch.color != blank %}
-                  <span
-                    class='block w-full h-full rounded-full'
-                    style='background-color: {{ value.swatch.color }};'
-                  ></span>
-                {% elsif value.swatch.image != blank %}
-                  <img
-                    width='48'
-                    height='48'
-                    src='{{ value.swatch.image | image_url: width: 64, height: 64, crop: "center" }}'
-                    alt='{{ color_label | escape }}'
-                    class='w-full h-full object-cover'
-                    loading='lazy'
-                    decoding='async'
-                  >
-                {% elsif swatch_image %}
-                  <img
-                    width='48'
-                    height='48'
-                    src='{{ swatch_image | image_url: width: 64, height: 64, crop: "center" }}'
-                    alt='{{ color_label | escape }}'
-                    class='w-full h-full object-cover'
-                    loading='lazy'
-                    decoding='async'
-                  >
-                {% else %}
-                  <span class='block w-full h-full rounded-full bg-gray-200'></span>
+                {% if value.swatch.color == blank and swatch_image %}
+                  data-swatch-src='{{ swatch_image | image_url: width: 120, format: "jpg" }}'
                 {% endif %}
+              >
+                <span
+                  data-swatch-fill
+                  class='block w-full h-full rounded-full bg-gray-200'
+                  {% if value.swatch.color != blank %}
+                    style='background-color: {{ value.swatch.color }};'
+                  {% endif %}
+                ></span>
               </button>
             {% endfor %}
           </div>
