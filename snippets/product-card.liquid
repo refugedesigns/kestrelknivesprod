@@ -74,7 +74,7 @@
 {%- capture card_variants_json -%}
 [
 {%- for variant in product_product.variants -%}
-{"id":{{ variant.id | json }},"title":{{ variant.title | json }},"available":{{ variant.available | json }},"price":{{ variant.price | json }},"option1":{{ variant.option1 | json }},"option2":{{ variant.option2 | json }},"option3":{{ variant.option3 | json }}{% if variant.featured_image %},"featured_image":{"src":{{ variant.featured_image | image_url: width: 400, format: 'webp' | json }}}{% else %},"featured_image":null{% endif %}}{%- unless forloop.last -%},{%- endunless -%}
+{"id":{{ variant.id | json }},"title":{{ variant.title | json }},"available":{{ variant.available | json }},"price":{{ variant.price | json }},"option1":{{ variant.option1 | json }},"option2":{{ variant.option2 | json }},"option3":{{ variant.option3 | json }}{% if variant.featured_image %},"featured_image":{"id":{{ variant.featured_image.id | json }},"src":{{ variant.featured_image | image_url: width: 400, format: 'webp' | json }}}{% else %},"featured_image":null{% endif %}}{%- unless forloop.last -%},{%- endunless -%}
 {%- endfor -%}
 ]
 {%- endcapture -%}
@@ -86,14 +86,29 @@
   {% assign card_img_400 = card_initial_image | image_url: width: 400, format: 'webp' %}
 {% endif %}
 
+{% assign card_selected_variant = product_product.selected_or_first_available_variant %}
+{% if card_initial_image %}
+  {% for variant in product_product.variants %}
+    {% if variant.featured_image
+      and variant.featured_image.id == card_initial_image.id
+    %}
+      {% assign card_selected_variant = variant %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
 <div
   class='py-2 md:py-3 px-3 hover:cursor-pointer product-card w-full'
   data-product='{{ card_product_json | strip_newlines | escape }}'
   data-variants='{{ card_variants_json | strip_newlines | escape }}'
   data-images='{{ card_images_json | strip_newlines | escape }}'
+  {% if card_initial_image %}
+    data-initial-image-id='{{ card_initial_image.id }}'
+  {% endif %}
   x-data='
     productCard(
-      {{ product_product.selected_or_first_available_variant.id }},
+      {{ card_selected_variant.id }},
       {{ product_product.title | json }},
       {% if card_initial_image %}
         {{ card_img_400 | json }}

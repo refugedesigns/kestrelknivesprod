@@ -1,13 +1,672 @@
-<div
-  class='max-w-xl hidden lg:block shadow-md rounded-md mt-20 mx-auto px-4 md:px-0'
-  style='background-image: url({{ 'subscribe.jpg' | asset_url }}); background-size: cover; background-position: center;'
->
-  <div class='klaviyo-form-UEBBBe'></div>
-</div>
+{% comment %}
+  /pages/subscribe — full-page newsletter signup.
+  Replaces empty Klaviyo embeds with a Shopify customer form.
+{% endcomment %}
 
-<div
-  class='max-w-xl lg:hidden shadow-md rounded-md mt-20 mx-auto px-4 md:px-0'
-  style='background-image: url({{ 'subscribe.jpg' | asset_url }}); background-size: cover; background-position: center;'
+{% assign page_bg = section.settings.background_image %}
+{% if page_bg != blank %}
+  {% assign page_bg_url = page_bg | image_url: width: 2400 %}
+{% else %}
+  {% assign page_bg_url = 'subscribe.jpg' | asset_url %}
+{% endif %}
+
+{% assign turnstile_enabled = false %}
+{% if section.settings.turnstile_enable and section.settings.turnstile_site_key != blank %}
+  {% assign turnstile_enabled = true %}
+{% endif %}
+
+<link
+  rel='stylesheet'
+  href='https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&display=swap'
+  crossorigin
 >
-  <div class='klaviyo-form-XhsNz7'></div>
-</div>
+
+<style>
+  .subscribe-page {
+    --subscribe-page-scrim: {{ section.settings.overlay_opacity | default: 48 | divided_by: 100.0 }};
+    --subscribe-page-input-bg: {{ section.settings.input_bg_color | default: "#1c1c1c" }};
+    --subscribe-page-input-border: {{ section.settings.input_border_color | default: "#5c5c5c" }};
+    --subscribe-page-input-text: {{ section.settings.input_text_color | default: "#ffffff" }};
+    --subscribe-page-placeholder: {{ section.settings.input_placeholder_color | default: "#b0b0b0" }};
+    --subscribe-page-button-bg: {{ section.settings.button_bg_color | default: "#000000" }};
+    --subscribe-page-button-border: {{ section.settings.button_border_color | default: "#ffffff" }};
+    --subscribe-page-button-text: {{ section.settings.button_text_color | default: "#ffffff" }};
+
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100svh - 5.5rem);
+    padding: 2.5rem 1.25rem 3.5rem;
+    color: #ffffff;
+    box-sizing: border-box;
+  }
+
+  @media (min-width: 768px) {
+    .subscribe-page {
+      min-height: calc(100svh - 6.5rem);
+      padding: 4rem 2rem 5rem;
+    }
+  }
+
+  .subscribe-page__media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-color: #111111;
+    background-image: url({{ page_bg_url | json }});
+    background-size: cover;
+    background-position: center;
+  }
+
+  .subscribe-page__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, var(--subscribe-page-scrim, 0.48));
+  }
+
+  .subscribe-page__panel {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 36rem);
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  @media (min-width: 768px) {
+    .subscribe-page__panel {
+      width: min(100%, 42rem);
+    }
+  }
+
+  .subscribe-page__heading {
+    margin: 0 0 1.25rem;
+    font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    font-weight: 700;
+    font-size: clamp(1.85rem, 5vw, 3rem);
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+    color: #ffffff;
+  }
+
+  .subscribe-page__intro {
+    margin: 0 auto 1.5rem;
+    max-width: 32rem;
+    font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .subscribe-page__list {
+    list-style: none;
+    margin: 0 auto 1.75rem;
+    padding: 0;
+    width: 100%;
+    max-width: 34rem;
+    text-align: left;
+  }
+
+  .subscribe-page__list li {
+    position: relative;
+    padding-left: 1.15rem;
+    margin: 0 0 0.7rem;
+    font-size: clamp(0.92rem, 2.1vw, 1.05rem);
+    line-height: 1.45;
+    color: #ffffff;
+  }
+
+  .subscribe-page__list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 50%;
+    background: #ffffff;
+  }
+
+  .subscribe-page__list strong {
+    font-weight: 700;
+  }
+
+  .subscribe-page__form {
+    width: 100%;
+    max-width: 28rem;
+    margin: 0 auto;
+  }
+
+  .subscribe-page__form form {
+    margin: 0;
+    width: 100%;
+  }
+
+  .subscribe-page__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  @media (min-width: 640px) {
+    .subscribe-page__fields {
+      flex-direction: row;
+      align-items: stretch;
+    }
+  }
+
+  .subscribe-page__sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .subscribe-page__input {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--subscribe-page-input-bg, #1c1c1c);
+    border: 1px solid var(--subscribe-page-input-border, #5c5c5c);
+    color: var(--subscribe-page-input-text, #ffffff);
+    padding: 0.95rem 1rem;
+    font-size: 1rem;
+    line-height: 1.25;
+    border-radius: 0;
+    outline: none;
+  }
+
+  .subscribe-page__input::placeholder {
+    color: var(--subscribe-page-placeholder, #b0b0b0);
+    opacity: 1;
+  }
+
+  .subscribe-page__input:focus {
+    border-color: #ffffff;
+  }
+
+  .subscribe-page__button {
+    flex: 0 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--subscribe-page-button-bg, #000000);
+    border: 1px solid var(--subscribe-page-button-border, #ffffff);
+    color: var(--subscribe-page-button-text, #ffffff);
+    padding: 0.95rem 1.25rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.25;
+    border-radius: 0;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  @media (min-width: 640px) {
+    .subscribe-page__button {
+      width: auto;
+      min-width: 10.5rem;
+    }
+  }
+
+  .subscribe-page__button:hover {
+    opacity: 0.92;
+  }
+
+  .subscribe-page__button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  .subscribe-page__turnstile {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 0.75rem;
+    min-height: 1.25rem;
+  }
+
+  .subscribe-page__message {
+    margin: 0 0 1rem;
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  .subscribe-page__message--success {
+    background: rgba(16, 185, 129, 0.18);
+    border: 1px solid rgba(16, 185, 129, 0.55);
+    color: #ecfdf5;
+  }
+
+  .subscribe-page__message--error {
+    background: rgba(239, 68, 68, 0.18);
+    border: 1px solid rgba(239, 68, 68, 0.55);
+    color: #fef2f2;
+  }
+</style>
+
+<section
+  class='subscribe-page'
+  data-subscribe-page
+  data-turnstile-enabled='{% if turnstile_enabled %}true{% else %}false{% endif %}'
+  aria-labelledby='SubscribePageHeading'
+>
+  <div class='subscribe-page__media' aria-hidden='true'></div>
+
+  <div class='subscribe-page__panel'>
+    <h1 id='SubscribePageHeading' class='subscribe-page__heading'>
+      {{ section.settings.heading | default: 'Win a Knife Every Month' }}
+    </h1>
+
+    {% if section.settings.intro != blank %}
+      <p class='subscribe-page__intro'>{{ section.settings.intro }}</p>
+    {% endif %}
+
+    <ul class='subscribe-page__list'>
+      {% if section.settings.bullet_1_title != blank or section.settings.bullet_1_text != blank %}
+        <li>
+          {% if section.settings.bullet_1_title != blank %}
+            <strong>{{ section.settings.bullet_1_title }}</strong>
+            {% if section.settings.bullet_1_text != blank %}
+              &nbsp;- {{ section.settings.bullet_1_text }}
+            {% endif %}
+          {% else %}
+            {{ section.settings.bullet_1_text }}
+          {% endif %}
+        </li>
+      {% endif %}
+      {% if section.settings.bullet_2_title != blank or section.settings.bullet_2_text != blank %}
+        <li>
+          {% if section.settings.bullet_2_title != blank %}
+            <strong>{{ section.settings.bullet_2_title }}</strong>
+            {% if section.settings.bullet_2_text != blank %}
+              &nbsp;- {{ section.settings.bullet_2_text }}
+            {% endif %}
+          {% else %}
+            {{ section.settings.bullet_2_text }}
+          {% endif %}
+        </li>
+      {% endif %}
+      {% if section.settings.bullet_3_title != blank or section.settings.bullet_3_text != blank %}
+        <li>
+          {% if section.settings.bullet_3_title != blank %}
+            <strong>{{ section.settings.bullet_3_title }}</strong>
+            {% if section.settings.bullet_3_text != blank %}
+              &nbsp;- {{ section.settings.bullet_3_text }}
+            {% endif %}
+          {% else %}
+            {{ section.settings.bullet_3_text }}
+          {% endif %}
+        </li>
+      {% endif %}
+    </ul>
+
+    <div class='subscribe-page__form'>
+      {% form 'customer', id: 'SubscribePageForm' %}
+        {% if form.posted_successfully? %}
+          <p class='subscribe-page__message subscribe-page__message--success' role='status'>
+            {{ section.settings.success_message | default: 'Thanks for joining! Check your inbox soon.' }}
+          </p>
+        {% elsif form.errors %}
+          <p class='subscribe-page__message subscribe-page__message--error' role='alert'>
+            {{ form.errors | default_errors }}
+          </p>
+        {% endif %}
+
+        <input
+          type='hidden'
+          name='contact[tags]'
+          value='{{ section.settings.customer_tags | default: "newsletter,subscribe-page" | escape }}'
+        >
+        <input type='hidden' name='customer[accepts_marketing]' value='true'>
+        <input
+          type='hidden'
+          name='return_to'
+          value='{{ request.path }}?customer_posted=true'
+        >
+
+        <div class='subscribe-page__fields'>
+          <label class='subscribe-page__sr' for='SubscribePageEmail'>
+            {{ section.settings.email_placeholder | default: 'Email' }}
+          </label>
+          <input
+            id='SubscribePageEmail'
+            class='subscribe-page__input'
+            type='email'
+            name='contact[email]'
+            value='{% if form.email %}{{ form.email | escape }}{% endif %}'
+            placeholder='{{ section.settings.email_placeholder | default: "Email" | escape }}'
+            autocomplete='email'
+            required
+          >
+          <button
+            type='submit'
+            class='subscribe-page__button'
+            data-subscribe-page-submit
+            {% if turnstile_enabled %}disabled{% endif %}
+          >
+            {{ section.settings.button_text | default: 'JOIN THE HUNT' }}
+          </button>
+        </div>
+
+        {% if turnstile_enabled %}
+          <div class='subscribe-page__turnstile'>
+            <div
+              id='SubscribePageTurnstile'
+              class='cf-turnstile'
+              data-sitekey='{{ section.settings.turnstile_site_key | escape }}'
+              data-theme='{{ section.settings.turnstile_theme | default: "dark" }}'
+              data-size='{{ section.settings.turnstile_size | default: "flexible" }}'
+              data-appearance='{{ section.settings.turnstile_appearance | default: "interaction-only" }}'
+              data-callback='subscribePageTurnstileSuccess'
+              data-error-callback='subscribePageTurnstileError'
+              data-expired-callback='subscribePageTurnstileExpired'
+              data-timeout-callback='subscribePageTurnstileExpired'
+            ></div>
+          </div>
+        {% endif %}
+      {% endform %}
+
+      <iframe
+        id='SubscribePageFrame'
+        name='SubscribePageFrame'
+        title='Newsletter signup'
+        hidden
+        tabindex='-1'
+        style='display:none;width:0;height:0;border:0;'
+      ></iframe>
+    </div>
+  </div>
+</section>
+
+{% if turnstile_enabled %}
+  <script
+    src='https://challenges.cloudflare.com/turnstile/v0/api.js'
+    async
+    defer
+  ></script>
+{% endif %}
+
+<script>
+  (function () {
+    var root = document.querySelector('[data-subscribe-page]')
+    if (!root) return
+
+    var form = document.getElementById('SubscribePageForm')
+    var frame = document.getElementById('SubscribePageFrame')
+    var submitBtn = root.querySelector('[data-subscribe-page-submit]')
+    var turnstileEnabled = root.getAttribute('data-turnstile-enabled') === 'true'
+    var submitting = false
+
+    window.subscribePageTurnstileSuccess = function () {
+      if (submitBtn) submitBtn.disabled = false
+    }
+    window.subscribePageTurnstileError = function () {
+      if (submitBtn) submitBtn.disabled = true
+    }
+    window.subscribePageTurnstileExpired = function () {
+      if (submitBtn) submitBtn.disabled = true
+    }
+
+    if (!form || !frame) return
+
+    form.setAttribute('target', 'SubscribePageFrame')
+
+    form.addEventListener('submit', function (event) {
+      if (submitting) {
+        event.preventDefault()
+        return
+      }
+      if (turnstileEnabled) {
+        var tokenInput = form.querySelector('[name="cf-turnstile-response"]')
+        if (!tokenInput || !tokenInput.value) {
+          event.preventDefault()
+          return
+        }
+      }
+      submitting = true
+      if (submitBtn) {
+        submitBtn.disabled = true
+        submitBtn.dataset.originalLabel = submitBtn.textContent
+        submitBtn.textContent = 'Joining...'
+      }
+    })
+
+    frame.addEventListener('load', function () {
+      if (!submitting) return
+      submitting = false
+      var email = form.querySelector('[name="contact[email]"]')
+      if (email) email.value = ''
+      if (submitBtn) {
+        submitBtn.textContent =
+          submitBtn.dataset.originalLabel || {{ section.settings.button_text | default: "JOIN THE HUNT" | json }}
+        if (!turnstileEnabled) submitBtn.disabled = false
+      }
+      if (turnstileEnabled && window.turnstile && document.getElementById('SubscribePageTurnstile')) {
+        try {
+          window.turnstile.reset('#SubscribePageTurnstile')
+        } catch (e) {}
+        if (submitBtn) submitBtn.disabled = true
+      }
+      var existing = root.querySelector('.subscribe-page__message')
+      if (existing) existing.remove()
+      var msg = document.createElement('p')
+      msg.className = 'subscribe-page__message subscribe-page__message--success'
+      msg.setAttribute('role', 'status')
+      msg.textContent = {{ section.settings.success_message | default: "Thanks for joining! Check your inbox soon." | json }}
+      var formWrap = root.querySelector('.subscribe-page__form')
+      if (formWrap) formWrap.insertBefore(msg, formWrap.firstChild)
+    })
+  })()
+</script>
+
+{% schema %}
+{
+  "name": "Subscribe Page",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image",
+      "info": "Defaults to theme asset subscribe.jpg if empty."
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Image darken overlay",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "%",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Win a Knife Every Month"
+    },
+    {
+      "type": "textarea",
+      "id": "intro",
+      "label": "Intro (optional)",
+      "default": "Join the Kestrel list for giveaways, early access, and field-tested gear drops."
+    },
+    {
+      "type": "text",
+      "id": "bullet_1_title",
+      "label": "Bullet 1 title",
+      "default": "Monthly Giveaways"
+    },
+    {
+      "type": "text",
+      "id": "bullet_1_text",
+      "label": "Bullet 1 text",
+      "default": "Enter for a chance to win a Kestrel knife"
+    },
+    {
+      "type": "text",
+      "id": "bullet_2_title",
+      "label": "Bullet 2 title",
+      "default": "Early Access"
+    },
+    {
+      "type": "text",
+      "id": "bullet_2_text",
+      "label": "Bullet 2 text",
+      "default": "Be first to shop new drops and limited runs"
+    },
+    {
+      "type": "text",
+      "id": "bullet_3_title",
+      "label": "Bullet 3 title",
+      "default": "Member Perks"
+    },
+    {
+      "type": "text",
+      "id": "bullet_3_text",
+      "label": "Bullet 3 text",
+      "default": "Get exclusive offers and field updates"
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "Email placeholder",
+      "default": "Email"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "JOIN THE HUNT"
+    },
+    {
+      "type": "text",
+      "id": "customer_tags",
+      "label": "Customer tags",
+      "default": "newsletter,subscribe-page",
+      "info": "Comma-separated tags added to the customer for Flows / list routing."
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "Thanks for joining! Check your inbox soon."
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "input_bg_color",
+      "label": "Input background",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "color",
+      "id": "input_border_color",
+      "label": "Input border",
+      "default": "#5c5c5c"
+    },
+    {
+      "type": "color",
+      "id": "input_text_color",
+      "label": "Input text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "input_placeholder_color",
+      "label": "Input placeholder",
+      "default": "#b0b0b0"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Button background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Button border",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Turnstile (optional)"
+    },
+    {
+      "type": "checkbox",
+      "id": "turnstile_enable",
+      "label": "Enable Cloudflare Turnstile",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "turnstile_site_key",
+      "label": "Turnstile site key"
+    },
+    {
+      "type": "select",
+      "id": "turnstile_appearance",
+      "label": "Appearance",
+      "options": [
+        { "value": "always", "label": "Always" },
+        { "value": "execute", "label": "Execute" },
+        { "value": "interaction-only", "label": "Interaction only" }
+      ],
+      "default": "interaction-only"
+    },
+    {
+      "type": "select",
+      "id": "turnstile_theme",
+      "label": "Theme",
+      "options": [
+        { "value": "auto", "label": "Auto" },
+        { "value": "light", "label": "Light" },
+        { "value": "dark", "label": "Dark" }
+      ],
+      "default": "dark"
+    },
+    {
+      "type": "select",
+      "id": "turnstile_size",
+      "label": "Size",
+      "options": [
+        { "value": "normal", "label": "Normal" },
+        { "value": "flexible", "label": "Flexible" },
+        { "value": "compact", "label": "Compact" }
+      ],
+      "default": "flexible"
+    }
+  ]
+}
+{% endschema %}

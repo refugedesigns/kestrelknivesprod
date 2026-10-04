@@ -22,7 +22,7 @@
 {%- capture card_variants_json -%}
 [
 {%- for variant in product_obj.variants -%}
-{"id":{{ variant.id | json }},"title":{{ variant.title | json }},"available":{{ variant.available | json }},"price":{{ variant.price | json }},"option1":{{ variant.option1 | json }},"option2":{{ variant.option2 | json }},"option3":{{ variant.option3 | json }}{% if variant.featured_image %},"featured_image":{"src":{{ variant.featured_image | image_url: width: 400, format: 'webp' | json }}}{% else %},"featured_image":null{% endif %}}{%- unless forloop.last -%},{%- endunless -%}
+{"id":{{ variant.id | json }},"title":{{ variant.title | json }},"available":{{ variant.available | json }},"price":{{ variant.price | json }},"option1":{{ variant.option1 | json }},"option2":{{ variant.option2 | json }},"option3":{{ variant.option3 | json }}{% if variant.featured_image %},"featured_image":{"id":{{ variant.featured_image.id | json }},"src":{{ variant.featured_image | image_url: width: 400, format: 'webp' | json }}}{% else %},"featured_image":null{% endif %}}{%- unless forloop.last -%},{%- endunless -%}
 {%- endfor -%}
 ]
 {%- endcapture -%}
@@ -32,6 +32,9 @@
   data-product='{{ card_product_json | strip_newlines | escape }}'
   data-variants='{{ card_variants_json | strip_newlines | escape }}'
   data-images='{{ card_images_json | strip_newlines | escape }}'
+  {% if product_obj.featured_image %}
+    data-initial-image-id='{{ product_obj.featured_image.id }}'
+  {% endif %}
   x-data='fcCard()'
 >
   <div class='bg-white overflow-hidden w-full flex flex-col'>
@@ -583,6 +586,7 @@
             this.selectedVariant = initialVariant ? initialVariant.id : null
           }
 
+          this.syncApparelSelectionToImage()
           this.updateImage()
           this.updateTitle()
           this.checkAvailability()
@@ -691,6 +695,35 @@
           return String(v[this.colorOptionKey()] || '')
             .trim()
             .toLowerCase()
+        },
+
+        imageSrcKey(src) {
+          if (!src) return ''
+          try {
+            return new URL(src, window.location.href).pathname
+          } catch (e) {
+            return String(src).split('?')[0]
+          }
+        },
+
+        syncApparelSelectionToImage() {
+          const typeLower = (this.productData.type || '').toLowerCase()
+          if (!typeLower.includes('apparel')) return
+
+          const currentKey = this.imageSrcKey(this.currentImage)
+          const currentId = this.$el.getAttribute('data-initial-image-id')
+          const match = (this.variantsData || []).find(v => {
+            const img = v.featured_image
+            if (!img) return false
+            if (currentId && String(img.id) === String(currentId)) return true
+            return img.src && this.imageSrcKey(img.src) === currentKey
+          })
+
+          if (match) {
+            this.selectedVariant = match.id
+            return
+          }
+          this.updateImage(true)
         },
 
         selectByColor(colorValue) {

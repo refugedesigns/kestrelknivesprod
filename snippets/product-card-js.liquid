@@ -128,6 +128,35 @@
             .toLowerCase()
         },
 
+        imageSrcKey(src) {
+          if (!src) return ''
+          try {
+            return new URL(src, window.location.href).pathname
+          } catch (e) {
+            return String(src).split('?')[0]
+          }
+        },
+
+        syncApparelSelectionToImage() {
+          const typeLower = (this.productData.type || '').toLowerCase()
+          if (!typeLower.includes('apparel')) return
+
+          const currentKey = this.imageSrcKey(this.currentImage)
+          const currentId = this.$el.getAttribute('data-initial-image-id')
+          const match = (this.variantsData || []).find(v => {
+            const img = v.featured_image
+            if (!img) return false
+            if (currentId && String(img.id) === String(currentId)) return true
+            return img.src && this.imageSrcKey(img.src) === currentKey
+          })
+
+          if (match) {
+            this.selectedVariant = match.id
+            return
+          }
+          this.updateImage(true)
+        },
+
         selectByColor(colorValue) {
           const hv = String(colorValue || '').trim()
           const key = this.colorOptionKey()
@@ -254,6 +283,7 @@
           this.productData = JSON.parse(this.decodeHtmlEntities(rawProduct))
           this.variantsData = JSON.parse(this.decodeHtmlEntities(rawVariants))
           this.imagesData = JSON.parse(this.decodeHtmlEntities(rawImages))
+          this.syncApparelSelectionToImage()
 
           // Set initial title with first variant color
           this.updateTitle()
