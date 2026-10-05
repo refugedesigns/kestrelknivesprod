@@ -211,6 +211,16 @@
             "category": "Sharpening & Service",
             "show_item": true
           }
+        },
+        "faq_item_Em86bX": {
+          "type": "faq_item",
+          "name": "Ovis Scalpel & Replacement Blades",
+          "settings": {
+            "question": "What replacement blades fit the Ovis Scalpel?",
+            "answer": "The Ovis Scalpel accepts #60A, #70A and #60XT blades.\nThat gives you several different blade profiles depending on what you're doing and what you prefer.",
+            "category": "Ovis Scalpel & Replacement Blades",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -233,7 +243,8 @@
         "faq_item_EwpeMP",
         "faq_item_Jem3Rh",
         "faq_item_Xyg3Hw",
-        "faq_item_9AwcgQ"
+        "faq_item_9AwcgQ",
+        "faq_item_Em86bX"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
