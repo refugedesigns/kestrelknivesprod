@@ -251,6 +251,16 @@
             "category": "Sheaths & Carry",
             "show_item": true
           }
+        },
+        "faq_item_weRWx9": {
+          "type": "faq_item",
+          "name": "Sheaths & Carry",
+          "settings": {
+            "question": "Can I purchase a replacement sheath?",
+            "answer": "In most cases, yes, depending on current inventory and the knife model.\nEmail sales@kestrelknives.com and let us know which knife you have. We'll get you pointed in the right direction.",
+            "category": "Sheaths & Carry",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -277,7 +287,8 @@
         "faq_item_Em86bX",
         "faq_item_NRJmyT",
         "faq_item_ytnPYk",
-        "faq_item_pXpANW"
+        "faq_item_pXpANW",
+        "faq_item_weRWx9"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
