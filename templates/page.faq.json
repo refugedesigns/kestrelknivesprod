@@ -231,6 +231,16 @@
             "category": "Ovis Scalpel & Replacement Blades",
             "show_item": true
           }
+        },
+        "faq_item_ytnPYk": {
+          "type": "faq_item",
+          "name": "Ovis Scalpel & Replacement Blades",
+          "settings": {
+            "question": "Are replacement blades compatible across all Kestrel models?",
+            "answer": "Yes. :)\nIf you're unsure what you need, email sales@kestrelknives.com before ordering.",
+            "category": "Ovis Scalpel & Replacement Blades",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -255,7 +265,8 @@
         "faq_item_Xyg3Hw",
         "faq_item_9AwcgQ",
         "faq_item_Em86bX",
-        "faq_item_NRJmyT"
+        "faq_item_NRJmyT",
+        "faq_item_ytnPYk"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
