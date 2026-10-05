@@ -119,6 +119,15 @@
             "category": "Knives & Steel",
             "show_item": true
           }
+        },
+        "faq_item_hHMigL": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Are Kestrel Knives made in the USA?",
+            "answer": "Yes. Kestrel Knives are 100% made in the USA.\nWe work with American manufacturers and suppliers to build purpose-driven knives for hunters and outdoorsmen. \nWe're a small, veteran-owned American business, and keeping our manufacturing here matters to us.",
+            "category": "General",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -133,7 +142,8 @@
         "faq_item_JjgkV7",
         "faq_item_PWKfTh",
         "faq_item_wVXHqE",
-        "faq_item_DnjTqF"
+        "faq_item_DnjTqF",
+        "faq_item_hHMigL"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
