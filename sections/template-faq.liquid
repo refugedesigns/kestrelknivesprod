@@ -4,7 +4,7 @@
   data-contact-url='{{ section.settings.contact_url | default: "/pages/contact" | escape }}'
   data-shop-url='{{ section.settings.shop_url | default: "/collections/all" | escape }}'
   data-warranty-url='{{ section.settings.warranty_url | default: "/pages/warranty" | escape }}'
-  data-sharpening-url='{{ section.settings.sharpening_url | default: "/pages/lifetime-sharpening" | escape }}'
+  data-sharpening-url='{{ section.settings.sharpening_url | default: "/products/knife-sharpening" | escape }}'
 >
   <!-- Header Section -->
   <header
@@ -151,9 +151,9 @@
           (root && root.getAttribute('data-warranty-url')) || '/pages/warranty'
         var sharpeningUrl =
           (root && root.getAttribute('data-sharpening-url')) ||
-          '/pages/lifetime-sharpening'
+          '/products/knife-sharpening'
 
-        // Longest phrases first so "Ovis Hunter Camo" wins over "Ovis Hunter"
+        // Longest phrases first so longer matches win
         var phraseLinks = [
           ['Ovis Hunter Camo', '/products/ovis-hunter-camo'],
           ['Ovis Skeleton', '/products/skeleton-ovis-hunter'],
@@ -166,7 +166,11 @@
           ['Skeleton EDC', '/products/skeleton-edc'],
           ['Skeleton models', '/collections/ultralight-knives'],
           ['Lifetime knives', '/collections/ultralight-knives'],
+          ['free lifetime sharpening', sharpeningUrl],
+          ['free knife sharpening', sharpeningUrl],
+          ['lifetime sharpening', sharpeningUrl],
           ['Lifetime Sharpening', sharpeningUrl],
+          ['Knife Sharpening', sharpeningUrl],
           ['Lifetime Warranty', warrantyUrl],
           ['Build-A-Knife', '/products/build-your-knife-ovis-hunter-only'],
           ['Shop', shopUrl],
@@ -176,11 +180,22 @@
           return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
         }
 
+        function replaceOutsideLinks(html, pattern, replacer) {
+          var parts = String(html || '').split(/(<a\b[^>]*>[\s\S]*?<\/a>)/gi)
+          return parts
+            .map(function (part) {
+              if (/^<a\b/i.test(part)) return part
+              return part.replace(pattern, replacer)
+            })
+            .join('')
+        }
+
         function linkifyHtml(html) {
           var out = String(html || '')
 
           // Emails → contact page
-          out = out.replace(
+          out = replaceOutsideLinks(
+            out,
             /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
             function (email) {
               return (
@@ -194,7 +209,7 @@
           )
 
           // Full URLs
-          out = out.replace(/(https?:\/\/[^\s<]+)/g, function (url) {
+          out = replaceOutsideLinks(out, /(https?:\/\/[^\s<]+)/g, function (url) {
             return (
               '<a href="' +
               url +
@@ -208,8 +223,7 @@
             var phrase = pair[0]
             var href = pair[1]
             var re = new RegExp('\\b(' + escapeRegExp(phrase) + ')\\b', 'gi')
-            out = out.replace(re, function (match) {
-              // Skip if already inside an anchor
+            out = replaceOutsideLinks(out, re, function (match) {
               return (
                 '<a href="' +
                 href +
@@ -391,7 +405,8 @@
     {
       "type": "url",
       "id": "sharpening_url",
-      "label": "Lifetime sharpening page URL"
+      "label": "Knife sharpening product URL",
+      "info": "Defaults to /products/knife-sharpening. Used for Lifetime Sharpening / free knife sharpening mentions."
     },
     {
       "type": "text",
