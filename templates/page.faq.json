@@ -92,6 +92,15 @@
             "category": "Knives & Steel",
             "show_item": true
           }
+        },
+        "faq_item_PWKfTh": {
+          "type": "faq_item",
+          "settings": {
+            "question": "How does MagnaCut compare to Nitro-V?",
+            "answer": "Nitro-V is a very capable stainless knife steel. It's tough, corrosion resistant and relatively easy to sharpen.\nMagnaCut takes things further, particularly when you're looking at the overall combination of edge retention, toughness and corrosion resistance.\nThere's nothing wrong with Nitro-V. We simply believe MagnaCut's balance of properties makes it a better fit for many of our hunting knives.",
+            "category": "Knives & Steel",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -103,7 +112,8 @@
         "faq_item_DK7F8A",
         "faq_item_EGtMd7",
         "faq_item_ycFC8t",
-        "faq_item_JjgkV7"
+        "faq_item_JjgkV7",
+        "faq_item_PWKfTh"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
