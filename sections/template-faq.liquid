@@ -188,6 +188,7 @@
           ['UltiClip', '/products/sheath-attachments'],
           ['Short Clip', '/products/sheath-attachments'],
           ['Tek-Lok', '/products/sheath-attachments'],
+          ['attachment options', '/products/sheath-attachments'],
           ['We rewrap them for free', paracordUrl],
           ['Paracord rewraps are free', paracordUrl],
           ['Paracord rewraps', paracordUrl],
@@ -251,17 +252,18 @@
           phraseLinks.forEach(function (pair) {
             var phrase = pair[0]
             var href = pair[1]
-            // #codes like #60A aren't word-bounded the same way as normal words
+            // Allow spaces or <br> between words so wrapped lines still match
+            var flexible = escapeRegExp(phrase).replace(/ /g, '(?:\s|<br\s*\/?>)+')
             var re =
               phrase.charAt(0) === '#'
-                ? new RegExp('(' + escapeRegExp(phrase) + ')(?![A-Za-z0-9])', 'gi')
-                : new RegExp('\b(' + escapeRegExp(phrase) + ')\b', 'gi')
+                ? new RegExp('(' + flexible + ')(?![A-Za-z0-9])', 'gi')
+                : new RegExp('\b(' + flexible + ')\b', 'gi')
             out = replaceOutsideLinks(out, re, function (match) {
               return (
                 '<a href="' +
                 href +
                 '" class="faq-inline-link font-semibold text-black underline underline-offset-2 hover:opacity-80">' +
-                match +
+                match.replace(/<br\s*\/?>/gi, ' ').replace(/\s+/g, ' ').trim() +
                 '</a>'
               )
             })
