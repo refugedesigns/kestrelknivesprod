@@ -150,6 +150,11 @@
           "ordereasy_custom_script": "<script></script>",
           "disable_form_product_validation": false
         }
+      },
+      "11242429557760608184": {
+        "type": "shopify://apps/referrly/blocks/main-app-embed/75b5ccd5-af90-4f81-ab89-2c28499171fd",
+        "disabled": false,
+        "settings": {}
       }
     }
   },
