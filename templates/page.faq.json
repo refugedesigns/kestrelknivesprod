@@ -38,12 +38,22 @@
             "category": "Featured Questions",
             "show_item": true
           }
+        },
+        "faq_item_MmtgPh": {
+          "type": "faq_item",
+          "settings": {
+            "question": "4. Do Kestrel Knives come with free lifetime sharpening?",
+            "answer": "Yes! Our fixed-blade knives include free lifetime sharpening for customers in the continental United States.\nYou ship the knife to us. We'll put a fresh edge on it, clean it up and ship it back to you free of charge.\nThese knives are meant to be used. Don't be afraid to use yours.",
+            "category": "Featured Questions",
+            "show_item": true
+          }
         }
       },
       "block_order": [
         "faq_item_XJKL8m",
         "faq_item_T9xUkQ",
-        "faq_item_MfN4qJ"
+        "faq_item_MfN4qJ",
+        "faq_item_MmtgPh"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
