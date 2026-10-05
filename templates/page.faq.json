@@ -164,6 +164,15 @@
             "category": "Sharpening & Service",
             "show_item": true
           }
+        },
+        "faq_item_Jem3Rh": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do you rewrap paracord handles?",
+            "answer": "Yes. We rewrap them for free.\nIf you're sending your knife in for sharpening, include a note telling us you want the paracord replaced.\nIf you don't want us removing the old wrap, that's fine too. We'll leave it on and can include fresh paracord for when you're ready.",
+            "category": "Knives & Steel",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -183,7 +192,8 @@
         "faq_item_UH7fxV",
         "faq_item_G6nNCg",
         "faq_item_ydPkrn",
-        "faq_item_EwpeMP"
+        "faq_item_EwpeMP",
+        "faq_item_Jem3Rh"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
