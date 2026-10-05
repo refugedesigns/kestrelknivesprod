@@ -1,6 +1,10 @@
 <div
   class='bg-gray-50'
   x-data='faqPage()'
+  data-contact-url='{{ section.settings.contact_url | default: "/pages/contact" | escape }}'
+  data-shop-url='{{ section.settings.shop_url | default: "/collections/all" | escape }}'
+  data-warranty-url='{{ section.settings.warranty_url | default: "/pages/warranty" | escape }}'
+  data-sharpening-url='{{ section.settings.sharpening_url | default: "/pages/lifetime-sharpening" | escape }}'
 >
   <!-- Header Section -->
   <header
@@ -19,12 +23,12 @@
           }}
         </h1>
         <p
-          class='text-xl opacity-90 max-w-2xl mx-auto leading-relaxed'
+          class='text-xl opacity-90 max-w-3xl mx-auto leading-relaxed'
           style='color: {{ section.settings.subtitle_color | default: "#ffffff" }};'
         >
           {{
             section.settings.page_subtitle
-            | default: "Find answers to common questions about our services, billing, and support."
+            | default: "Find answers about our knives, sharpening, warranty, returns, and shipping."
           }}
         </p>
       </div>
@@ -33,9 +37,8 @@
 
   <!-- Search and Filter Section -->
   <div class='container mx-auto px-4 py-8'>
-    <div class='max-w-4xl mx-auto'>
-      <!-- Search Bar -->
-      <div class='bg-white rounded-2xl shadow-lg p-6 mb-8 hover:transform hover:-translate-y-1 transition-all duration-300'>
+    <div class='max-w-7xl mx-auto'>
+      <div class='bg-white rounded-2xl shadow-lg p-6 mb-8'>
         <div class='relative'>
           <input
             type='text'
@@ -48,31 +51,33 @@
             fill='none'
             stroke='currentColor'
             viewBox='0 0 24 24'
+            aria-hidden='true'
           >
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
         </div>
       </div>
 
-      <!-- Category Filters -->
-      <div class='bg-white rounded-2xl shadow-lg p-6 mb-8 hover:transform hover:-translate-y-1 transition-all duration-300'>
+      <div class='bg-white rounded-2xl shadow-lg p-6 mb-8'>
         <h3 class='text-lg font-semibold mb-4 text-gray-800'>
           Filter by Category
         </h3>
-        <div class='flex flex-wrap gap-4'>
+        <div class='flex flex-wrap gap-3 md:gap-4'>
           <button
+            type='button'
             x-on:click="filterByCategory('all')"
             :class="activeCategory === 'all' ? 'bg-black text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
-            class='px-6 py-2 rounded-full cursor-pointer font-medium transition-all duration-300'
+            class='px-5 py-2 rounded-full cursor-pointer font-medium transition-all duration-300'
           >
             All Questions
           </button>
           {% assign categories = section.settings.categories | split: "," %}
           {% for category in categories %}
             <button
+              type='button'
               x-on:click="filterByCategory('{{ category | strip | handle }}')"
               :class="activeCategory === '{{ category | strip | handle }}' ? 'bg-black text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'"
-              class='px-6 py-2 rounded-full cursor-pointer font-medium transition-all duration-300'
+              class='px-5 py-2 rounded-full cursor-pointer font-medium transition-all duration-300'
             >
               {{ category | strip }}
             </button>
@@ -82,51 +87,49 @@
     </div>
   </div>
 
-  <!-- FAQ Section -->
+  <!-- FAQ Section: 2 columns on tablet/desktop -->
   <div class='container mx-auto px-4 pb-16'>
-    <div class='max-w-4xl mx-auto'>
+    <div class='max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start'>
       {% for block in section.blocks %}
         {% if block.settings.show_item != false %}
           <div
-            class='bg-white rounded-2xl shadow-lg mb-4 overflow-hidden hover:transform hover:-translate-y-1 transition-all duration-300'
+            class='bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300'
             data-category='{{ block.settings.category | handle }}'
             data-question='{{ block.settings.question | downcase | escape }}'
-            data-answer='{{ block.settings.answer | downcase | escape }}'
+            data-answer='{{ block.settings.answer | strip_html | downcase | escape }}'
             x-show='isVisible()'
+            {{ block.shopify_attributes }}
           >
             <button
-              class='w-full text-left p-6 focus:outline-none focus:ring-4 focus:ring-gray-100'
+              type='button'
+              class='w-full text-left p-5 md:p-6 focus:outline-none focus:ring-4 focus:ring-gray-100'
               x-on:click='toggleFAQ("{{ block.id }}")'
+              :aria-expanded="openFAQs.includes('{{ block.id }}')"
             >
-              <div class='flex justify-between items-center'>
-                <h3 class='text-xl font-semibold text-gray-800 pr-4'>
+              <div class='flex justify-between items-start gap-3'>
+                <h3 class='text-lg md:text-xl font-semibold text-gray-800 pr-2'>
                   {{ block.settings.question }}
                 </h3>
                 <svg
-                  class='text-black w-5 h-5 transform transition-transform duration-300'
+                  class='text-black w-5 h-5 flex-shrink-0 mt-1 transform transition-transform duration-300'
                   :class="{ 'rotate-180': openFAQs.includes('{{ block.id }}') }"
                   fill='none'
                   stroke='currentColor'
                   viewBox='0 0 24 24'
+                  aria-hidden='true'
                 >
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
               </div>
             </button>
             <div
-              class='faq-answer px-6 pb-0'
-              :class="{ 'open': openFAQs.includes('{{ block.id }}') }"
+              class='faq-answer px-5 md:px-6 pb-0'
               x-show="openFAQs.includes('{{ block.id }}')"
-              x-transition:enter='transition ease-out duration-300'
-              x-transition:enter-start='opacity-0 max-h-0'
-              x-transition:enter-end='opacity-100 max-h-96'
-              x-transition:leave='transition ease-in duration-200'
-              x-transition:leave-start='opacity-100 max-h-96'
-              x-transition:leave-end='opacity-0 max-h-0'
+              x-cloak
             >
-              <div class='border-t border-gray-100 pt-6 pb-6'>
-                <div class='text-gray-600 leading-relaxed text-lg prose prose-gray max-w-none whitespace-pre-line faq-answer-text'>
-                  {{ block.settings.answer | escape }}
+              <div class='border-t border-gray-100 pt-5 pb-6'>
+                <div class='text-gray-600 leading-relaxed text-base md:text-lg faq-answer-text'>
+                  {{ block.settings.answer | escape | newline_to_br }}
                 </div>
               </div>
             </div>
@@ -136,31 +139,104 @@
     </div>
   </div>
 
-  <!-- Contact Section -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       try {
-        document.querySelectorAll('.faq-answer-text').forEach(function (el) {
-          var text = el.textContent || ''
-          var linked = text.replace(/(https?:\/\/[^\s]+)/g, function (m) {
+        var root = document.querySelector('[x-data="faqPage()"]')
+        var contactUrl =
+          (root && root.getAttribute('data-contact-url')) || '/pages/contact'
+        var shopUrl =
+          (root && root.getAttribute('data-shop-url')) || '/collections/all'
+        var warrantyUrl =
+          (root && root.getAttribute('data-warranty-url')) || '/pages/warranty'
+        var sharpeningUrl =
+          (root && root.getAttribute('data-sharpening-url')) ||
+          '/pages/lifetime-sharpening'
+
+        // Longest phrases first so "Ovis Hunter Camo" wins over "Ovis Hunter"
+        var phraseLinks = [
+          ['Ovis Hunter Camo', '/products/ovis-hunter-camo'],
+          ['Ovis Skeleton', '/products/skeleton-ovis-hunter'],
+          ['Ovis Hunter', '/products/ovis-hunter'],
+          ['Mouflon Skinner', '/products/mouflon-skinner'],
+          ['Mountain Scalpel', '/products/mountain-scalpel'],
+          ['Mountain Caper', '/products/mountain-caper'],
+          ['Ovis Scalpel', '/products/ovis-scalpel'],
+          ['Skeleton Skinner', '/products/skeleton-skinner'],
+          ['Skeleton EDC', '/products/skeleton-edc'],
+          ['Skeleton models', '/collections/ultralight-knives'],
+          ['Lifetime knives', '/collections/ultralight-knives'],
+          ['Lifetime Sharpening', sharpeningUrl],
+          ['Lifetime Warranty', warrantyUrl],
+          ['Build-A-Knife', '/products/build-your-knife-ovis-hunter-only'],
+          ['Shop', shopUrl],
+        ]
+
+        function escapeRegExp(s) {
+          return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        }
+
+        function linkifyHtml(html) {
+          var out = String(html || '')
+
+          // Emails → contact page
+          out = out.replace(
+            /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
+            function (email) {
+              return (
+                '<a href="' +
+                contactUrl +
+                '" class="faq-inline-link font-semibold text-black underline underline-offset-2 hover:opacity-80">' +
+                email +
+                '</a>'
+              )
+            }
+          )
+
+          // Full URLs
+          out = out.replace(/(https?:\/\/[^\s<]+)/g, function (url) {
             return (
               '<a href="' +
-              m +
-              '" class="text-blue-600 hover:text-blue-800 underline" target="_blank" rel="noopener">' +
-              m +
+              url +
+              '" class="faq-inline-link font-semibold text-black underline underline-offset-2 hover:opacity-80" target="_blank" rel="noopener">' +
+              url +
               '</a>'
             )
           })
-          el.innerHTML = linked
+
+          phraseLinks.forEach(function (pair) {
+            var phrase = pair[0]
+            var href = pair[1]
+            var re = new RegExp('\\b(' + escapeRegExp(phrase) + ')\\b', 'gi')
+            out = out.replace(re, function (match) {
+              // Skip if already inside an anchor
+              return (
+                '<a href="' +
+                href +
+                '" class="faq-inline-link font-semibold text-black underline underline-offset-2 hover:opacity-80">' +
+                match +
+                '</a>'
+              )
+            })
+          })
+
+          return out
+        }
+
+        document.querySelectorAll('.faq-answer-text').forEach(function (el) {
+          if (el.getAttribute('data-linkified') === '1') return
+          el.innerHTML = linkifyHtml(el.innerHTML)
+          el.setAttribute('data-linkified', '1')
         })
       } catch (e) {
         console && console.warn && console.warn('FAQ linkify error:', e)
       }
     })
   </script>
+
   <section class='bg-white py-16 border-t'>
     <div class='container mx-auto px-4'>
-      <div class='max-w-4xl mx-auto text-center'>
+      <div class='max-w-7xl mx-auto text-center'>
         <h2 class='text-3xl font-bold text-gray-800 mb-8'>
           {{
             section.settings.contact_title
@@ -173,6 +249,7 @@
               class='w-8 h-8 text-gray-600 mb-3'
               fill='currentColor'
               viewBox='0 0 20 20'
+              aria-hidden='true'
             >
               <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
               <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
@@ -181,8 +258,8 @@
               Email Support
             </h3>
             <a
-              href='mailto:{{ section.settings.email_text }}'
-              class='text-gray-600 hover:text-black underline transition-colors duration-200'
+              href='{{ section.settings.contact_url | default: "/pages/contact" }}'
+              class='text-gray-600 hover:text-black underline transition-colors duration-200 font-semibold'
             >
               {{ section.settings.email_text }}
             </a>
@@ -201,7 +278,6 @@
       openFAQs: [],
 
       init() {
-        // Initialize with any URL parameters for specific FAQ
         const urlParams = new URLSearchParams(window.location.search)
         const faqId = urlParams.get('faq')
         if (faqId) {
@@ -227,7 +303,6 @@
         const question = element.dataset.question
         const answer = element.dataset.answer
 
-        // Check category filter
         const categoryMatch =
           this.activeCategory === 'all' ||
           this.activeCategory.toLowerCase() === category.toLowerCase()
@@ -236,7 +311,6 @@
           return false
         }
 
-        // Check search term
         if (this.searchTerm) {
           const searchLower = this.searchTerm.toLowerCase()
           return question.includes(searchLower) || answer.includes(searchLower)
@@ -249,14 +323,19 @@
 </script>
 
 <style>
-  .faq-answer {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
+  [x-cloak] {
+    display: none !important;
   }
 
-  .faq-answer.open {
-    max-height: 500px;
+  .faq-inline-link {
+    font-weight: 600;
+    color: #111827;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .faq-inline-link:hover {
+    opacity: 0.8;
   }
 
   html {
@@ -278,7 +357,7 @@
       "type": "textarea",
       "id": "page_subtitle",
       "label": "Page Subtitle",
-      "default": "Find answers to common questions about our services, billing, and support."
+      "default": "Find answers about our knives, sharpening, warranty, returns, and shipping."
     },
     {
       "type": "text",
@@ -288,22 +367,38 @@
     },
     {
       "type": "text",
-      "id": "live_chat_text",
-      "label": "Live Chat Text",
-      "default": "Available 24/7 for instant support"
-    },
-    {
-      "type": "text",
       "id": "email_text",
       "label": "Email Support Text",
       "default": "sales@kestrelknives.com"
     },
     {
+      "type": "url",
+      "id": "contact_url",
+      "label": "Contact page URL",
+      "info": "Email mentions and the support email link go here."
+    },
+    {
+      "type": "url",
+      "id": "shop_url",
+      "label": "Shop URL",
+      "info": "Used when answers mention Shop."
+    },
+    {
+      "type": "url",
+      "id": "warranty_url",
+      "label": "Warranty page URL"
+    },
+    {
+      "type": "url",
+      "id": "sharpening_url",
+      "label": "Lifetime sharpening page URL"
+    },
+    {
       "type": "text",
       "id": "categories",
       "label": "FAQ Categories (comma-separated)",
-      "default": "General, Billing, Technical, Support",
-      "info": "Enter categories separated by commas (e.g., General, Billing, Technical, Support)"
+      "default": "Knives & Steel, Sharpening & Service, Warranty & Returns, Shipping",
+      "info": "Enter categories separated by commas. Match each FAQ item's Category field."
     },
     {
       "type": "header",
@@ -379,100 +474,33 @@
           "type": "text",
           "id": "question",
           "label": "Question",
-          "default": "How do I create an account?"
+          "default": "Which Kestrel knife should I choose?"
         },
         {
           "type": "textarea",
           "id": "answer",
           "label": "Answer",
-          "default": "Creating an account is simple! Click the 'Sign Up' button in the top right corner, enter your email address, create a secure password, and verify your email."
+          "default": "It really comes down to what you want the knife to do.\n\nThe Ovis Hunter is our do-it-all hunting knife. The Mouflon Skinner is more specialized toward skinning. The Mountain Caper is built for detailed caping. The Ovis Scalpel gives you replaceable blades.\n\nStill not sure? Email us at sales@kestrelknives.com."
         },
         {
           "type": "text",
           "id": "category",
           "label": "Category",
-          "default": "General",
-          "info": "Enter a category that matches one from the section's Categories list."
+          "default": "Knives & Steel",
+          "info": "Must match a category from the section Categories list (or leave blank for All)."
         },
         {
           "type": "checkbox",
           "id": "show_item",
           "label": "Show FAQ item",
-          "default": true,
-          "info": "Uncheck to hide this FAQ item from the page"
+          "default": true
         }
       ]
     }
   ],
   "presets": [
     {
-      "name": "FAQ Page",
-      "blocks": [
-        {
-          "type": "faq_item",
-          "settings": {
-            "question": "How do I create an account?",
-            "answer": "Creating an account is simple! Click the 'Sign Up' button in the top right corner, enter your email address, create a secure password, and verify your email. You'll be ready to start using our platform immediately. The entire process takes less than 2 minutes.",
-            "category": "General"
-          }
-        },
-        {
-          "type": "faq_item",
-          "settings": {
-            "question": "Is there a free trial available?",
-            "answer": "Yes! We offer a 14-day free trial with full access to all features. No credit card required. You can upgrade to a paid plan anytime during or after your trial period. Experience everything our platform has to offer risk-free.",
-            "category": "General"
-          }
-        },
-        {
-          "type": "faq_item",
-          "settings": {
-            "question": "What payment methods do you accept?",
-            "answer": "We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and bank transfers for enterprise customers. All payments are processed securely through our encrypted payment system with industry-standard security measures.",
-            "category": "Billing"
-          }
-        },
-        {
-          "type": "faq_item",
-          "settings": {
-            "question": "Can I cancel my subscription anytime?",
-            "answer": "Absolutely! You can cancel your subscription at any time from your account settings. Your access will continue until the end of your current billing period, and you won't be charged for the next cycle. No cancellation fees or hidden charges.",
-            "category": "Billing"
-          }
-        },
-        {
-          "type": "faq_item",
-          "settings": {
-            "question": "What integrations are available?",
-            "answer": "We offer integrations with over 100+ popular tools including Slack, Google Workspace, Microsoft Teams, Salesforce, HubSpot, Zapier, and many more. Our RESTful API also allows for custom integrations to fit your specific workflow needs.",
-            "category": "Technical"
-          }
-        },
-        {
-          "type": "faq_item",
-          "settings": {
-            "question": "Is my data secure and backed up?",
-            "answer": "Security is our top priority. We use enterprise-grade AES-256 encryption, regular third-party security audits, and automated daily backups. Your data is stored in secure, geographically distributed data centers with 99.9% uptime SLA guarantee.",
-            "category": "Technical"
-          }
-        },
-        {
-          "type": "faq_item",
-          "settings": {
-            "question": "How can I contact customer support?",
-            "answer": "Our support team is available 24/7 through multiple channels: live chat on our website, email at support@example.com, or phone at +1 (555) 123-4567. Premium customers also have access to dedicated account managers for personalized assistance.",
-            "category": "Support"
-          }
-        },
-        {
-          "type": "faq_item",
-          "settings": {
-            "question": "Do you offer training and onboarding?",
-            "answer": "Yes! We provide comprehensive onboarding for all new customers, including video tutorials, detailed documentation, and live training sessions. Enterprise customers receive personalized onboarding with dedicated success managers and custom training programs.",
-            "category": "Support"
-          }
-        }
-      ]
+      "name": "FAQ Page"
     }
   ]
 }
