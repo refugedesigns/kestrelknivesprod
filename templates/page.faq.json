@@ -29,11 +29,21 @@
             "category": "Knives & Steel",
             "show_item": true
           }
+        },
+        "faq_item_MfN4qJ": {
+          "type": "faq_item",
+          "settings": {
+            "question": "3. Why does Kestrel use MagnaCut?",
+            "answer": "Because hunting knives need more than a steel that just holds an edge.\nWe need a steel that can stay sharp while processing an animal, resist corrosion from blood and moisture, and still have the toughness required for real field use.\nCPM MagnaCut gives us an exceptional balance of edge retention, toughness and corrosion resistance. That's why you'll see it across many of our hunting knives.",
+            "category": "Featured Questions",
+            "show_item": true
+          }
         }
       },
       "block_order": [
         "faq_item_XJKL8m",
-        "faq_item_T9xUkQ"
+        "faq_item_T9xUkQ",
+        "faq_item_MfN4qJ"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
