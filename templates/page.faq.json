@@ -128,6 +128,15 @@
             "category": "General",
             "show_item": true
           }
+        },
+        "faq_item_UH7fxV": {
+          "type": "faq_item",
+          "settings": {
+            "question": "What type of knives does Kestrel make?",
+            "answer": "We specialize in Ultralight hunting and outdoor knives.\nThat includes all-purpose hunting knives, dedicated skinners, caping knives, ultralight skeletonized knives, EDC knives and replaceable-blade scalpels.\nSome guys want one knife that can handle almost everything. Others want a specific tool for every job. We build for both.",
+            "category": "General",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -143,7 +152,8 @@
         "faq_item_PWKfTh",
         "faq_item_wVXHqE",
         "faq_item_DnjTqF",
-        "faq_item_hHMigL"
+        "faq_item_hHMigL",
+        "faq_item_UH7fxV"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
