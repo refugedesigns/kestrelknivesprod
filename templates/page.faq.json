@@ -122,6 +122,7 @@
         },
         "faq_item_hHMigL": {
           "type": "faq_item",
+          "name": "General",
           "settings": {
             "question": "Are Kestrel Knives made in the USA?",
             "answer": "Yes. Kestrel Knives are 100% made in the USA.\nWe work with American manufacturers and suppliers to build purpose-driven knives for hunters and outdoorsmen. \nWe're a small, veteran-owned American business, and keeping our manufacturing here matters to us.",
@@ -131,6 +132,7 @@
         },
         "faq_item_UH7fxV": {
           "type": "faq_item",
+          "name": "General",
           "settings": {
             "question": "What type of knives does Kestrel make?",
             "answer": "We specialize in Ultralight hunting and outdoor knives.\nThat includes all-purpose hunting knives, dedicated skinners, caping knives, ultralight skeletonized knives, EDC knives and replaceable-blade scalpels.\nSome guys want one knife that can handle almost everything. Others want a specific tool for every job. We build for both.",
@@ -140,6 +142,7 @@
         },
         "faq_item_G6nNCg": {
           "type": "faq_item",
+          "name": "General",
           "settings": {
             "question": "Which Kestrel knife should I choose?",
             "answer": "It depends on what you hunt and what you expect your knife to do.\nThe Ovis Hunter is our versatile all-purpose hunting knife. The Mouflon Skinner is designed around skinning and processing. The Mountain Caper handles detailed caping and precision work. The Ovis Scalpel gives you replaceable-blade convenience.\nIf every ounce matters, check out our Skeleton models.\nStill unsure? Email sales@kestrelknives.com and tell us what you're hunting. We'll help you figure it out.",
