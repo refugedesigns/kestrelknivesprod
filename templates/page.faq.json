@@ -173,6 +173,15 @@
             "category": "Sharpening & Service",
             "show_item": true
           }
+        },
+        "faq_item_Xyg3Hw": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Can I sharpen my Kestrel knife myself?",
+            "answer": "Absolutely.\nThese are tools and they're meant to be maintained. Just make sure you're using an appropriate sharpening system and aren't drastically changing the edge geometry.\nDamage caused by improper sharpening isn't a manufacturing defect.\nAnd remember, if you don't want to mess with it, our fixed blades come with free lifetime sharpening.",
+            "category": "Sharpening & Service",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -193,7 +202,8 @@
         "faq_item_G6nNCg",
         "faq_item_ydPkrn",
         "faq_item_EwpeMP",
-        "faq_item_Jem3Rh"
+        "faq_item_Jem3Rh",
+        "faq_item_Xyg3Hw"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
