@@ -241,6 +241,16 @@
             "category": "Ovis Scalpel & Replacement Blades",
             "show_item": true
           }
+        },
+        "faq_item_pXpANW": {
+          "type": "faq_item",
+          "name": "Sheaths & Carry",
+          "settings": {
+            "question": "What sheath options are available?",
+            "answer": "It depends on the knife.\nWe have lightweight sheath systems for our ultralight knives as well as more traditional sheath configurations on models like the Ovis Hunter and Mouflon Skinner.\nDepending on the knife and sheath, attachment options can include UltiClip, Short Clip and Tek-Lok-style configurations.\nCheck the individual product page to see exactly what comes with your knife and what options are available.",
+            "category": "Sheaths & Carry",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -266,7 +276,8 @@
         "faq_item_9AwcgQ",
         "faq_item_Em86bX",
         "faq_item_NRJmyT",
-        "faq_item_ytnPYk"
+        "faq_item_ytnPYk",
+        "faq_item_pXpANW"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
