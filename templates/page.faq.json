@@ -59,6 +59,7 @@
         },
         "faq_item_DK7F8A": {
           "type": "faq_item",
+          "name": "Featured Questions",
           "settings": {
             "question": "What does the Kestrel Knives Lifetime Warranty cover?",
             "answer": "Our Lifetime Warranty covers manufacturing defects in materials and workmanship for the functional life of the knife.\nIf we determine your knife has a manufacturing defect, we'll repair or replace it at no charge at our discretion.\nIt doesn't cover misuse, abuse, prying, batoning, improper sharpening, unauthorized modifications, neglect, corrosion or damage caused by using the knife outside its intended purpose. Normal scratches and finish wear aren't defects either. They're usually just signs that you're actually using your knife.\nIf something happens, contact us. Photos help, but we may need to physically inspect the knife before determining what happened and what we can do.",
