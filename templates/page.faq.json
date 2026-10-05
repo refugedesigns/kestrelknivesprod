@@ -167,6 +167,7 @@
         },
         "faq_item_Jem3Rh": {
           "type": "faq_item",
+          "name": "Sharpening & Service",
           "settings": {
             "question": "Do you rewrap paracord handles?",
             "answer": "Yes. We rewrap them for free.\nIf you're sending your knife in for sharpening, include a note telling us you want the paracord replaced.\nIf you don't want us removing the old wrap, that's fine too. We'll leave it on and can include fresh paracord for when you're ready.",
@@ -176,6 +177,7 @@
         },
         "faq_item_Xyg3Hw": {
           "type": "faq_item",
+          "name": "Sharpening & Service",
           "settings": {
             "question": "Can I sharpen my Kestrel knife myself?",
             "answer": "Absolutely.\nThese are tools and they're meant to be maintained. Just make sure you're using an appropriate sharpening system and aren't drastically changing the edge geometry.\nDamage caused by improper sharpening isn't a manufacturing defect.\nAnd remember, if you don't want to mess with it, our fixed blades come with free lifetime sharpening.",
