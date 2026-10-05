@@ -83,6 +83,15 @@
             "category": "Knives & Steel",
             "show_item": true
           }
+        },
+        "faq_item_JjgkV7": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Why does Kestrel use MagnaCut?",
+            "answer": "We don't pick steel because the name looks good on a product page.\nFor hunting knives, we want edge retention, toughness and corrosion resistance. Improving one of those properties often comes at the expense of another.\nMagnaCut gives us an excellent balance of all three, which makes it a great fit for the type of knives we build.",
+            "category": "Knives & Steel",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -93,7 +102,8 @@
         "faq_item_BmwNA3",
         "faq_item_DK7F8A",
         "faq_item_EGtMd7",
-        "faq_item_ycFC8t"
+        "faq_item_ycFC8t",
+        "faq_item_JjgkV7"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
