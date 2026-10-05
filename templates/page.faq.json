@@ -110,6 +110,15 @@
             "category": "Knives & Steel",
             "show_item": true
           }
+        },
+        "faq_item_DnjTqF": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Does MagnaCut rust?",
+            "answer": "MagnaCut is extremely corrosion resistant, but that doesn't mean you should throw a bloody knife into a wet sheath and forget about it.\nClean the blade after processing an animal, dry it thoroughly and don't store it wet or dirty.\nTake care of your knife and it'll take care of you.",
+            "category": "Knives & Steel",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -123,7 +132,8 @@
         "faq_item_ycFC8t",
         "faq_item_JjgkV7",
         "faq_item_PWKfTh",
-        "faq_item_wVXHqE"
+        "faq_item_wVXHqE",
+        "faq_item_DnjTqF"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
