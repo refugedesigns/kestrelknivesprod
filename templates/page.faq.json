@@ -41,6 +41,7 @@
         },
         "faq_item_MmtgPh": {
           "type": "faq_item",
+          "name": "Featured Questions",
           "settings": {
             "question": "Do Kestrel Knives come with free lifetime sharpening?",
             "answer": "Yes! Our fixed-blade knives include free lifetime sharpening for customers in the continental United States.\nYou ship the knife to us. We'll put a fresh edge on it, clean it up and ship it back to you free of charge.\nThese knives are meant to be used. Don't be afraid to use yours.",
@@ -50,6 +51,7 @@
         },
         "faq_item_BmwNA3": {
           "type": "faq_item",
+          "name": "Featured Questions",
           "settings": {
             "question": "Do you rewrap paracord handles?",
             "answer": "Yes. Paracord rewraps are free.\nIf you're sending your knife in for sharpening, just put a note in the package telling us you'd like the paracord replaced.\nIf that old wrap has been on a few hunts and you'd rather keep it, we'll leave it alone and can include a fresh piece of paracord for when you're ready to change it.",
