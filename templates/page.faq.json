@@ -146,6 +146,24 @@
             "category": "General",
             "show_item": true
           }
+        },
+        "faq_item_ydPkrn": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do Kestrel fixed-blade knives include free lifetime sharpening?",
+            "answer": "It really comes down to what you want the knife to do.\n\nThe Ovis Hunter is our do-it-all hunting knife. The Mouflon Skinner is more specialized toward skinning. The Mountain Caper is built for detailed caping. The Ovis Scalpel gives you replaceable blades.\n\nStill not sure? Email us at sales@kestrelknives.com.",
+            "category": "Knives & Steel",
+            "show_item": true
+          }
+        },
+        "faq_item_EwpeMP": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do Kestrel fixed-blade knives include free lifetime sharpening?",
+            "answer": "Yes.\nOur fixed-blade knives include free lifetime sharpening for customers in the continental United States.\nYou ship it to us. We'll sharpen it, clean it up and ship it back to you free of charge.\nContact us before sending your knife in so we can give you the current shipping instructions.",
+            "category": "Sharpening & Service",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -163,7 +181,9 @@
         "faq_item_DnjTqF",
         "faq_item_hHMigL",
         "faq_item_UH7fxV",
-        "faq_item_G6nNCg"
+        "faq_item_G6nNCg",
+        "faq_item_ydPkrn",
+        "faq_item_EwpeMP"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
