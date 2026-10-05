@@ -210,6 +210,22 @@
           return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
         }
 
+        function linkClass() {
+          return 'faq-inline-link font-semibold text-black underline underline-offset-2 hover:opacity-80'
+        }
+
+        function wrapLink(href, label) {
+          return (
+            '<a href="' +
+            href +
+            '" class="' +
+            linkClass() +
+            '">' +
+            label +
+            '</a>'
+          )
+        }
+
         function replaceOutsideLinks(html, pattern, replacer) {
           var parts = String(html || '').split(/(<a\b[^>]*>[\s\S]*?<\/a>)/gi)
           return parts
@@ -220,63 +236,71 @@
             .join('')
         }
 
+        function phraseToPattern(phrase) {
+          return escapeRegExp(phrase).replace(/ /g, '(?:\\s|<br\\s*\\/?>)+')
+        }
+
         function linkifyHtml(html) {
           var out = String(html || '')
 
-          // Emails → contact page
           out = replaceOutsideLinks(
             out,
             /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
             function (email) {
-              return (
-                '<a href="' +
-                contactUrl +
-                '" class="faq-inline-link font-semibold text-black underline underline-offset-2 hover:opacity-80">' +
-                email +
-                '</a>'
-              )
+              return wrapLink(contactUrl, email)
             }
           )
 
-          // Full URLs
           out = replaceOutsideLinks(out, /(https?:\/\/[^\s<]+)/g, function (url) {
-            return (
-              '<a href="' +
-              url +
-              '" class="faq-inline-link font-semibold text-black underline underline-offset-2 hover:opacity-80" target="_blank" rel="noopener">' +
-              url +
-              '</a>'
+            return wrapLink(url, url).replace(
+              '<a href="',
+              '<a target="_blank" rel="noopener" href="'
             )
           })
 
-          phraseLinks.forEach(function (pair) {
-            var phrase = pair[0]
-            var href = pair[1]
-            // Allow spaces or <br> between words so wrapped lines still match
-            var flexible = escapeRegExp(phrase).replace(/ /g, '(?:\s|<br\s*\/?>)+')
-            var re =
-              phrase.charAt(0) === '#'
-                ? new RegExp('(' + flexible + ')(?![A-Za-z0-9])', 'gi')
-                : new RegExp('\b(' + flexible + ')\b', 'gi')
-            out = replaceOutsideLinks(out, re, function (match) {
-              return (
-                '<a href="' +
-                href +
-                '" class="faq-inline-link font-semibold text-black underline underline-offset-2 hover:opacity-80">' +
-                match.replace(/<br\s*\/?>/gi, ' ').replace(/\s+/g, ' ').trim() +
-                '</a>'
-              )
+          phraseLinks
+            .slice()
+            .sort(function (a, b) {
+              return b[0].length - a[0].length
             })
-          })
+            .forEach(function (pair) {
+              var phrase = pair[0]
+              var href = pair[1]
+              var flexible = phraseToPattern(phrase)
+              var re =
+                phrase.charAt(0) === '#'
+                  ? new RegExp('(' + flexible + ')(?![A-Za-z0-9])', 'gi')
+                  : new RegExp(
+                      '(^|[^A-Za-z0-9])(' + flexible + ')(?![A-Za-z0-9])',
+                      'gi'
+                    )
+              out = replaceOutsideLinks(out, re, function (match, p1, p2) {
+                if (phrase.charAt(0) === '#') {
+                  return wrapLink(href, match)
+                }
+                var prefix = p1 || ''
+                var label = String(p2 || match).replace(
+                  /<br\s*\/?>/gi,
+                  ' '
+                )
+                return prefix + wrapLink(href, label)
+              })
+            })
 
           return out
         }
 
-        document.querySelectorAll('.faq-answer-text').forEach(function (el) {
-          if (el.getAttribute('data-linkified') === '1') return
-          el.innerHTML = linkifyHtml(el.innerHTML)
-          el.setAttribute('data-linkified', '1')
-        })
+        function linkifyAnswers() {
+          document.querySelectorAll('.faq-answer-text').forEach(function (el) {
+            if (el.getAttribute('data-linkified') === '1') return
+            el.innerHTML = linkifyHtml(el.innerHTML)
+            el.setAttribute('data-linkified', '1')
+          })
+        }
+
+        linkifyAnswers()
+        document.addEventListener('alpine:init', linkifyAnswers)
+        setTimeout(linkifyAnswers, 0)
       } catch (e) {
         console && console.warn && console.warn('FAQ linkify error:', e)
       }
