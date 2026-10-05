@@ -66,6 +66,15 @@
             "show_item": true
           }
         },
+        "faq_item_EGtMd7": {
+          "type": "faq_item",
+          "settings": {
+            "question": "What is CPM MagnaCut?",
+            "answer": "CPM MagnaCut is a premium American-made stainless knife steel developed specifically for cutlery.\nWhat makes it impressive isn't one individual property. It's the balance of edge retention, toughness and corrosion resistance.\nFor a hunting knife that can be exposed to blood, moisture, dirt and hard use, that's exactly the kind of balance we're after.",
+            "category": "Knives & Steel",
+            "show_item": true
+          }
+        },
         "faq_item_ycFC8t": {
           "type": "faq_item",
           "settings": {
@@ -83,6 +92,7 @@
         "faq_item_MmtgPh",
         "faq_item_BmwNA3",
         "faq_item_DK7F8A",
+        "faq_item_EGtMd7",
         "faq_item_ycFC8t"
       ],
       "settings": {
