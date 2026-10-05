@@ -5,6 +5,7 @@
   data-shop-url='{{ section.settings.shop_url | default: "/collections/all" | escape }}'
   data-warranty-url='{{ section.settings.warranty_url | default: "/pages/warranty" | escape }}'
   data-sharpening-url='{{ section.settings.sharpening_url | default: "/products/knife-sharpening" | escape }}'
+  data-paracord-url='{{ section.settings.paracord_url | default: "/products/paracord-wraps" | escape }}'
 >
   <!-- Header Section -->
   <header
@@ -152,6 +153,9 @@
         var sharpeningUrl =
           (root && root.getAttribute('data-sharpening-url')) ||
           '/products/knife-sharpening'
+        var paracordUrl =
+          (root && root.getAttribute('data-paracord-url')) ||
+          '/products/paracord-wraps'
 
         // Longest phrases first so longer matches win
         var phraseLinks = [
@@ -165,7 +169,14 @@
           ['Skeleton Skinner', '/products/skeleton-skinner'],
           ['Skeleton EDC', '/products/skeleton-edc'],
           ['Skeleton models', '/collections/ultralight-knives'],
-          ['Lifetime knives', '/collections/ultralight-knives'],
+          ['Ultralight knives', '/collections/ultralight-knives'],
+          ['We rewrap them for free', paracordUrl],
+          ['Paracord rewraps are free', paracordUrl],
+          ['Paracord rewraps', paracordUrl],
+          ['paracord replaced', paracordUrl],
+          ['fresh paracord', paracordUrl],
+          ['Paracord Wraps', paracordUrl],
+          ['paracord handles', paracordUrl],
           ['free lifetime sharpening', sharpeningUrl],
           ['free knife sharpening', sharpeningUrl],
           ['lifetime sharpening', sharpeningUrl],
@@ -407,6 +418,12 @@
       "id": "sharpening_url",
       "label": "Knife sharpening product URL",
       "info": "Defaults to /products/knife-sharpening. Used for Lifetime Sharpening / free knife sharpening mentions."
+    },
+    {
+      "type": "url",
+      "id": "paracord_url",
+      "label": "Paracord wraps product URL",
+      "info": "Defaults to /products/paracord-wraps. Used for rewrap / paracord mentions."
     },
     {
       "type": "text",
