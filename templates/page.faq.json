@@ -221,6 +221,16 @@
             "category": "Ovis Scalpel & Replacement Blades",
             "show_item": true
           }
+        },
+        "faq_item_NRJmyT": {
+          "type": "faq_item",
+          "name": "Ovis Scalpel & Replacement Blades",
+          "settings": {
+            "question": "Are replacement blades included with the Scalpels?",
+            "answer": "Yes. We currently include 7 Scalpel blades. Check the Ovis Scalpel and Mountain Scalpel product page for the current blade configuration and exactly what's included with your knife.\nAdditional replacement blades are available separately in the Shop.",
+            "category": "Ovis Scalpel & Replacement Blades",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -244,7 +254,8 @@
         "faq_item_Jem3Rh",
         "faq_item_Xyg3Hw",
         "faq_item_9AwcgQ",
-        "faq_item_Em86bX"
+        "faq_item_Em86bX",
+        "faq_item_NRJmyT"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
