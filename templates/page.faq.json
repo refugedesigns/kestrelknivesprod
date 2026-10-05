@@ -12,15 +12,6 @@
     "template-faq": {
       "type": "template-faq",
       "blocks": {
-        "faq_item_T9xUkQ": {
-          "type": "faq_item",
-          "settings": {
-            "question": "2. What is the difference between the Ovis Hunter and Mouflon Skinner?",
-            "answer": "The biggest difference is blade geometry and what each knife was designed to do.\nThe Ovis Hunter is our all-purpose hunting knife. Its slight trailing-point design and upswept tip give you plenty of belly for skinning and long slicing cuts while still maintaining a fine point for detailed work. It's designed to move from one job to the next without needing to switch knives.\nThe Mouflon Skinner is more specialized. Its geometry is built around skinning and gives you a purpose-built cutting surface for separating hide and working through an animal efficiently.\nIf you want one knife to do a little bit of everything, go with the Ovis Hunter. If you want a dedicated skinner, that's where the Mouflon shines.",
-            "category": "Knives & Steel",
-            "show_item": true
-          }
-        },
         "faq_item_XJKL8m": {
           "type": "faq_item",
           "settings": {
@@ -29,11 +20,20 @@
             "category": "Featured Questions",
             "show_item": true
           }
+        },
+        "faq_item_T9xUkQ": {
+          "type": "faq_item",
+          "settings": {
+            "question": "2. What is the difference between the Ovis Hunter and Mouflon Skinner?",
+            "answer": "The biggest difference is blade geometry and what each knife was designed to do.\nThe Ovis Hunter is our all-purpose hunting knife. Its slight trailing-point design and upswept tip give you plenty of belly for skinning and long slicing cuts while still maintaining a fine point for detailed work. It's designed to move from one job to the next without needing to switch knives.\nThe Mouflon Skinner is more specialized. Its geometry is built around skinning and gives you a purpose-built cutting surface for separating hide and working through an animal efficiently.\nIf you want one knife to do a little bit of everything, go with the Ovis Hunter. If you want a dedicated skinner, that's where the Mouflon shines.",
+            "category": "Knives & Steel",
+            "show_item": true
+          }
         }
       },
       "block_order": [
-        "faq_item_T9xUkQ",
-        "faq_item_XJKL8m"
+        "faq_item_XJKL8m",
+        "faq_item_T9xUkQ"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
