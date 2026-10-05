@@ -166,6 +166,12 @@
           ['Mountain Scalpel', '/products/mountain-scalpel'],
           ['Mountain Caper', '/products/mountain-caper'],
           ['Ovis Scalpel', '/products/ovis-scalpel'],
+          ['#60XT', '/products/extra-blades'],
+          ['60XT', '/products/extra-blades'],
+          ['#60A', '/products/scalpel-kit'],
+          ['#70A', '/products/scalpel-kit'],
+          ['60A', '/products/scalpel-kit'],
+          ['70A', '/products/scalpel-kit'],
           ['Skeleton Skinner', '/products/skeleton-skinner'],
           ['Skeleton EDC', '/products/skeleton-edc'],
           ['Skeleton models', '/collections/ultralight-knives'],
@@ -233,7 +239,11 @@
           phraseLinks.forEach(function (pair) {
             var phrase = pair[0]
             var href = pair[1]
-            var re = new RegExp('\\b(' + escapeRegExp(phrase) + ')\\b', 'gi')
+            // #codes like #60A aren't word-bounded the same way as normal words
+            var re =
+              phrase.charAt(0) === '#'
+                ? new RegExp('(' + escapeRegExp(phrase) + ')(?![A-Za-z0-9])', 'gi')
+                : new RegExp('\b(' + escapeRegExp(phrase) + ')\b', 'gi')
             out = replaceOutsideLinks(out, re, function (match) {
               return (
                 '<a href="' +
