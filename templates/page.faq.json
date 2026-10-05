@@ -182,6 +182,15 @@
             "category": "Sharpening & Service",
             "show_item": true
           }
+        },
+        "faq_item_9AwcgQ": {
+          "type": "faq_item",
+          "settings": {
+            "question": "How should I care for my Kestrel knife?",
+            "answer": "It's pretty simple.\nClean it after use, especially after processing game. Get the blood, moisture and debris off the blade and dry everything thoroughly before putting it away.\nDon't leave a wet or dirty knife sitting inside its sheath for extended periods.\nScratches and wear are going to happen. These are hunting knives, not safe queens.",
+            "category": "Sharpening & Service",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -203,7 +212,8 @@
         "faq_item_ydPkrn",
         "faq_item_EwpeMP",
         "faq_item_Jem3Rh",
-        "faq_item_Xyg3Hw"
+        "faq_item_Xyg3Hw",
+        "faq_item_9AwcgQ"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
