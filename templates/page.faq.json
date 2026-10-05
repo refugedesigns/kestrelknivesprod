@@ -47,19 +47,33 @@
             "category": "Featured Questions",
             "show_item": true
           }
+        },
+        "faq_item_BmwNA3": {
+          "type": "faq_item",
+          "settings": {
+            "question": "5. Do you rewrap paracord handles?",
+            "answer": "Yes. Paracord rewraps are free.\nIf you're sending your knife in for sharpening, just put a note in the package telling us you'd like the paracord replaced.\nIf that old wrap has been on a few hunts and you'd rather keep it, we'll leave it alone and can include a fresh piece of paracord for when you're ready to change it.",
+            "category": "Featured Questions",
+            "show_item": true
+          }
         }
       },
       "block_order": [
         "faq_item_XJKL8m",
         "faq_item_T9xUkQ",
         "faq_item_MfN4qJ",
-        "faq_item_MmtgPh"
+        "faq_item_MmtgPh",
+        "faq_item_BmwNA3"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
         "page_subtitle": "Find answers to common questions about our services, billing, and support.",
         "contact_title": "Still have questions?",
         "email_text": "sales@kestrelknives.com",
+        "contact_url": "",
+        "shop_url": "",
+        "warranty_url": "",
+        "sharpening_url": "",
         "categories": "Featured Questions,General,Knives & Steel, Sharpening & Services, Warranty & Returns, Shipping",
         "header_bg_color": "#000000",
         "header_height": 200,
