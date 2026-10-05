@@ -65,6 +65,15 @@
             "category": "Featured Questions",
             "show_item": true
           }
+        },
+        "faq_item_ycFC8t": {
+          "type": "faq_item",
+          "settings": {
+            "question": "What is the difference between the Ovis Hunter and Mouflon Skinner?",
+            "answer": "The biggest difference is blade geometry.\nThe Ovis Hunter is designed to be a do-it-all hunting knife. Its slight trailing-point design gives you an upswept tip, plenty of belly and a fine point. That makes it useful for everything from long skinning cuts to more controlled detail work.\nThe Mouflon Skinner is more specialized toward skinning and processing.\nIf you're looking for one knife to cover a wide range of jobs, I'd look at the Ovis Hunter. If you already know you want a dedicated skinner, look at the Mouflon.",
+            "category": "Knives & Steel",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -73,7 +82,8 @@
         "faq_item_MfN4qJ",
         "faq_item_MmtgPh",
         "faq_item_BmwNA3",
-        "faq_item_DK7F8A"
+        "faq_item_DK7F8A",
+        "faq_item_ycFC8t"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
