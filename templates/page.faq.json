@@ -104,6 +104,7 @@
         },
         "faq_item_wVXHqE": {
           "type": "faq_item",
+          "name": "Knives & Steel",
           "settings": {
             "question": "How does MagnaCut compare to S35VN?",
             "answer": "S35VN is a proven premium knife steel and has been used successfully in quality knives for years.\nMagnaCut was developed more recently with a major focus on balancing toughness, edge retention and corrosion resistance.\nBoth are good steels. For the wet, dirty and sometimes rough conditions hunting knives see, we prefer the overall balance MagnaCut gives us.",
@@ -113,6 +114,7 @@
         },
         "faq_item_DnjTqF": {
           "type": "faq_item",
+          "name": "Knives & Steel",
           "settings": {
             "question": "Does MagnaCut rust?",
             "answer": "MagnaCut is extremely corrosion resistant, but that doesn't mean you should throw a bloody knife into a wet sheath and forget about it.\nClean the blade after processing an animal, dry it thoroughly and don't store it wet or dirty.\nTake care of your knife and it'll take care of you.",
