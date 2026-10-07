@@ -264,6 +264,9 @@
         function linkifyHtml(html) {
           var out = String(html || '')
 
+          // Put a blank line after each sentence (period + next sentence)
+          out = out.replace(/\.(?:\s|<br\s*\/?>)+(?=[A-Z])/g, '.<br><br>')
+
           out = replaceOutsideLinks(
             out,
             /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
