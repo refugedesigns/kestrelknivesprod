@@ -271,6 +271,16 @@
             "category": "Warranty & Repairs",
             "show_item": true
           }
+        },
+        "faq_item_WgwA66": {
+          "type": "faq_item",
+          "name": "Warranty & Repairs",
+          "settings": {
+            "question": "I snapped the tip of my knife. Can you repair it?",
+            "answer": "There's a good chance we can.\nWe can often repair a snapped tip at no charge, but we need to inspect the knife first and determine what happened and how much material we're working with.\nContact us before sending it in and don't try to reshape the blade yourself.",
+            "category": "Warranty & Repairs",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -299,7 +309,8 @@
         "faq_item_ytnPYk",
         "faq_item_pXpANW",
         "faq_item_weRWx9",
-        "faq_item_HtL99w"
+        "faq_item_HtL99w",
+        "faq_item_WgwA66"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
