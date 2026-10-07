@@ -264,15 +264,10 @@
         function linkifyHtml(html) {
           var out = String(html || '')
 
-          // Blank line after every sentence, but do not add another if one is already there.
+          // Small gap after every sentence. Reuse the same gap if a blank line is already there.
           out = out.replace(
             /\.((?:\s|<br\s*\/?>)*)(?=[A-Z])/g,
-            function (match, gap) {
-              var brs = (String(gap || '').match(/<br/gi) || []).length
-              var newlines = (String(gap || '').match(/\n/g) || []).length
-              if (brs >= 2 || newlines >= 2) return match
-              return '.<br><br>'
-            }
+            '.<span class="faq-sentence-gap"></span>'
           )
 
           out = replaceOutsideLinks(
@@ -459,6 +454,11 @@
 
   .faq-inline-link:hover {
     opacity: 0.8;
+  }
+
+  .faq-sentence-gap {
+    display: block;
+    height: 0.45em;
   }
 
   html {
