@@ -420,6 +420,16 @@
             "category": "Shipping",
             "show_item": true
           }
+        },
+        "faq_item_imaxDc": {
+          "type": "faq_item",
+          "name": "Shipping",
+          "settings": {
+            "question": "Will you lower the declared value of my international order?",
+            "answer": "No.\nWe know international duties can get expensive, but we're going to accurately declare what we're shipping and its value.\nWe're not going to falsify customs paperwork to reduce taxes or import fees.",
+            "category": "Shipping",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -463,7 +473,8 @@
         "faq_item_G9GAkA",
         "faq_item_z7qWWK",
         "faq_item_XHY4GW",
-        "faq_item_gTANag"
+        "faq_item_gTANag",
+        "faq_item_imaxDc"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
