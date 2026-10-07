@@ -370,6 +370,16 @@
             "category": "Returns & Orders",
             "show_item": true
           }
+        },
+        "faq_item_U9Ry8W": {
+          "type": "faq_item",
+          "name": "Shipping",
+          "settings": {
+            "question": "How long does shipping take?",
+            "answer": "You'll receive tracking by email as soon as your order ships.\nOne thing worth knowing is that your knife doesn't necessarily just sit on a shelf completely finished waiting for an order.\nWhen an order comes in, knives go through QC, sharpening, a cut test, assembly when required and a final QC before they're packaged and shipped.\nWe'd rather take the time to make sure the knife leaving our shop is right.",
+            "category": "Shipping",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -408,7 +418,8 @@
         "faq_item_TcgGRa",
         "faq_item_Ky6xwf",
         "faq_item_YBMqR7",
-        "faq_item_JGVK6X"
+        "faq_item_JGVK6X",
+        "faq_item_U9Ry8W"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
