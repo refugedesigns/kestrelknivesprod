@@ -291,6 +291,16 @@
             "category": "Warranty & Repairs",
             "show_item": true
           }
+        },
+        "faq_item_Cfwnnr": {
+          "type": "faq_item",
+          "name": "Warranty & Repairs",
+          "settings": {
+            "question": "What should I do if I think my knife has a manufacturing defect?",
+            "answer": "Email sales@kestrelknives.com before sending anything in.\nTell us what happened and include some clear photos if possible. We'll take a look and let you know if we need the knife sent back for inspection.",
+            "category": "Warranty & Repairs",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -321,7 +331,8 @@
         "faq_item_weRWx9",
         "faq_item_HtL99w",
         "faq_item_WgwA66",
-        "faq_item_rNGyck"
+        "faq_item_rNGyck",
+        "faq_item_Cfwnnr"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
