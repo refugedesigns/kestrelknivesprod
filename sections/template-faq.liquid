@@ -264,8 +264,16 @@
         function linkifyHtml(html) {
           var out = String(html || '')
 
-          // Put a blank line after each sentence (period + next sentence)
-          out = out.replace(/\.(?:\s|<br\s*\/?>)+(?=[A-Z])/g, '.<br><br>')
+          // Blank line after every sentence, but do not add another if one is already there.
+          out = out.replace(
+            /\.((?:\s|<br\s*\/?>)*)(?=[A-Z])/g,
+            function (match, gap) {
+              var brs = (String(gap || '').match(/<br/gi) || []).length
+              var newlines = (String(gap || '').match(/\n/g) || []).length
+              if (brs >= 2 || newlines >= 2) return match
+              return '.<br><br>'
+            }
+          )
 
           out = replaceOutsideLinks(
             out,
