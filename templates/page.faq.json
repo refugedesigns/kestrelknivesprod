@@ -307,7 +307,7 @@
           "name": "Returns & Orders",
           "settings": {
             "question": "What is your return policy?",
-            "answer": "Returns must be initiated within 5 days of confirmed delivery.\nThe item must be brand new, unused and in its original packaging. A 15% restocking fee applies to non-defective returns.\nReturn shipping is the buyer's responsibility unless we made an error with your order.\nYou must contact sales@kestrelknives.com before returning anything. Unauthorized returns will not be accepted.\nWe also recommend insuring the shipment. If a return is lost or damaged on its way back to us, we can't issue a refund for an item we didn't receive in its original condition.",
+            "answer": "Returns must be initiated within 5 days of confirmed delivery.\n\nThe item must be brand new, unused and in its original packaging. A 15% restocking fee applies to non-defective returns.\n\nReturn shipping is the buyer's responsibility unless we made an error with your order.\nYou must contact sales@kestrelknives.com before returning anything. Unauthorized returns will not be accepted.\n\nWe also recommend insuring the shipment. If a return is lost or damaged on its way back to us, we can't issue a refund for an item we didn't receive in its original condition.",
             "category": "Returns & Orders",
             "show_item": true
           }
