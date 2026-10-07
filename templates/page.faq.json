@@ -17,8 +17,17 @@
           "name": "Featured Questions",
           "settings": {
             "question": "Which Kestrel knife should I choose?",
-            "answer": "It really comes down to what you want the knife to do.\nThe Ovis Hunter is our do-it-all hunting knife and the knife I recommend if you want one blade capable of handling most of the work on an animal.\nThe Mouflon Skinner is more specialized toward skinning and processing. \nThe Mountain Caper is built for detailed caping and precision work. \nThe Ovis Scalpel gives you the convenience of replaceable blades and comfort like no other scalpel on the market.\nIf weight is your biggest concern, The Mountain Scalpel or our Skeleton models give you the performance of a fixed blade without the additional weight of traditional handles.\nStill not sure? Email us at sales@kestrelknives.com. Tell us what and how you hunt and we'll point you in the right direction",
+            "answer": "It really comes down to what you want the knife to do.\nThe Ovis Hunter is our do-it-all hunting knife and the knife I recommend if you want one blade capable of handling most of the work on an animal.\nThe Mouflon Skinner is more specialized toward skinning and processing. \nThe Mountain Caper is built for detailed caping and precision work. \nThe Ovis Scalpel gives you the convenience of replaceable blades and comfort like no other scalpel on the market.\nIf weight is your biggest concern, The Mountain Scalpel or our Skeleton models give you the performance of a fixed blade without the additional weight of traditional handles.\nStill not sure? Email us at sales@kestrelknives.com.  Tell us what and how you hunt and we'll point you in the right direction",
             "category": "Featured Questions",
+            "show_item": true
+          }
+        },
+        "faq_item_eVrptc": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Which Kestrel knife should I choose?",
+            "answer": "It really comes down to what you want the knife to do.\n\nThe Ovis Hunter is our do-it-all hunting knife. The Mouflon Skinner is more specialized toward skinning. The Mountain Caper is built for detailed caping. The Ovis Scalpel gives you replaceable blades.\n\nStill not sure? Email us at sales@kestrelknives.com.",
+            "category": "Knives & Steel",
             "show_item": true
           }
         },
@@ -27,7 +36,7 @@
           "name": "Featured Questions",
           "settings": {
             "question": "What is the difference between the Ovis Hunter and Mouflon Skinner?",
-            "answer": "The biggest difference is blade geometry and what each knife was designed to do.\nThe Ovis Hunter is our all-purpose hunting knife. Its slight trailing-point design and upswept tip give you plenty of belly for skinning and long slicing cuts while still maintaining a fine point for detailed work. It's designed to move from one job to the next without needing to switch knives.\nThe Mouflon Skinner is more specialized. Its geometry is built around skinning and gives you a purpose-built cutting surface for separating hide and working through an animal efficiently.\nIf you want one knife to do a little bit of everything, go with the Ovis Hunter. If you want a dedicated skinner, that's where the Mouflon shines.",
+            "answer": "The biggest difference is blade geometry and what each knife was designed to do.\nThe Ovis Hunter is our all-purpose hunting knife.  Its slight trailing-point design and upswept tip give you plenty of belly for skinning and long slicing cuts while still maintaining a fine point for detailed work.  It's designed to move from one job to the next without needing to switch knives.\nThe Mouflon Skinner is more specialized.  Its geometry is built around skinning and gives you a purpose-built cutting surface for separating hide and working through an animal efficiently.\nIf you want one knife to do a little bit of everything, go with the Ovis Hunter.  If you want a dedicated skinner, that's where the Mouflon shines.",
             "category": "Featured Questions",
             "show_item": true
           }
@@ -37,7 +46,7 @@
           "name": "Featured Questions",
           "settings": {
             "question": "Why does Kestrel use MagnaCut?",
-            "answer": "Because hunting knives need more than a steel that just holds an edge.\nWe need a steel that can stay sharp while processing an animal, resist corrosion from blood and moisture, and still have the toughness required for real field use.\nCPM MagnaCut gives us an exceptional balance of edge retention, toughness and corrosion resistance. That's why you'll see it across many of our hunting knives.",
+            "answer": "Because hunting knives need more than a steel that just holds an edge.\nWe need a steel that can stay sharp while processing an animal, resist corrosion from blood and moisture, and still have the toughness required for real field use.\nCPM MagnaCut gives us an exceptional balance of edge retention, toughness and corrosion resistance.  That's why you'll see it across many of our hunting knives.",
             "category": "Featured Questions",
             "show_item": true
           }
@@ -47,7 +56,7 @@
           "name": "Featured Questions",
           "settings": {
             "question": "Do Kestrel Knives come with free lifetime sharpening?",
-            "answer": "Yes! Our fixed-blade knives include free lifetime sharpening for customers in the continental United States.\nYou ship the knife to us. We'll put a fresh edge on it, clean it up and ship it back to you free of charge.\nThese knives are meant to be used. Don't be afraid to use yours.",
+            "answer": "Yes! Our fixed-blade knives include free lifetime sharpening for customers in the continental United States.\nYou ship the knife to us.  We'll put a fresh edge on it, clean it up and ship it back to you free of charge.\nThese knives are meant to be used.  Don't be afraid to use yours.",
             "category": "Featured Questions",
             "show_item": true
           }
@@ -57,7 +66,7 @@
           "name": "Featured Questions",
           "settings": {
             "question": "Do you rewrap paracord handles?",
-            "answer": "Yes. Paracord rewraps are free.\nIf you're sending your knife in for sharpening, just put a note in the package telling us you'd like the paracord replaced.\nIf that old wrap has been on a few hunts and you'd rather keep it, we'll leave it alone and can include a fresh piece of paracord for when you're ready to change it.",
+            "answer": "Yes.  Paracord rewraps are free.\nIf you're sending your knife in for sharpening, just put a note in the package telling us you'd like the paracord replaced.\nIf that old wrap has been on a few hunts and you'd rather keep it, we'll leave it alone and can include a fresh piece of paracord for when you're ready to change it.",
             "category": "Featured Questions",
             "show_item": true
           }
@@ -67,7 +76,7 @@
           "name": "Featured Questions",
           "settings": {
             "question": "What does the Kestrel Knives Lifetime Warranty cover?",
-            "answer": "Our Lifetime Warranty covers manufacturing defects in materials and workmanship for the functional life of the knife.\nIf we determine your knife has a manufacturing defect, we'll repair or replace it at no charge at our discretion.\nIt doesn't cover misuse, abuse, prying, batoning, improper sharpening, unauthorized modifications, neglect, corrosion or damage caused by using the knife outside its intended purpose. Normal scratches and finish wear aren't defects either. They're usually just signs that you're actually using your knife.\nIf something happens, contact us. Photos help, but we may need to physically inspect the knife before determining what happened and what we can do.",
+            "answer": "Our Lifetime Warranty covers manufacturing defects in materials and workmanship for the functional life of the knife.\nIf we determine your knife has a manufacturing defect, we'll repair or replace it at no charge at our discretion.\nIt doesn't cover misuse, abuse, prying, batoning, improper sharpening, unauthorized modifications, neglect, corrosion or damage caused by using the knife outside its intended purpose.  Normal scratches and finish wear aren't defects either.  They're usually just signs that you're actually using your knife.\nIf something happens, contact us.  Photos help, but we may need to physically inspect the knife before determining what happened and what we can do.",
             "category": "Featured Questions",
             "show_item": true
           }
@@ -77,7 +86,7 @@
           "name": "Knives & Steel",
           "settings": {
             "question": "What is CPM MagnaCut?",
-            "answer": "CPM MagnaCut is a premium American-made stainless knife steel developed specifically for cutlery.\nWhat makes it impressive isn't one individual property. It's the balance of edge retention, toughness and corrosion resistance.\nFor a hunting knife that can be exposed to blood, moisture, dirt and hard use, that's exactly the kind of balance we're after.",
+            "answer": "CPM MagnaCut is a premium American-made stainless knife steel developed specifically for cutlery.\nWhat makes it impressive isn't one individual property.  It's the balance of edge retention, toughness and corrosion resistance.\nFor a hunting knife that can be exposed to blood, moisture, dirt and hard use, that's exactly the kind of balance we're after.",
             "category": "Knives & Steel",
             "show_item": true
           }
@@ -157,7 +166,7 @@
           "name": "General",
           "settings": {
             "question": "Which Kestrel knife should I choose?",
-            "answer": "It depends on what you hunt and what you expect your knife to do.\nThe Ovis Hunter is our versatile all-purpose hunting knife. The Mouflon Skinner is designed around skinning and processing. The Mountain Caper handles detailed caping and precision work. The Ovis Scalpel gives you replaceable-blade convenience.\nIf every ounce matters, check out our Skeleton models.\nStill unsure? Email sales@kestrelknives.com and tell us what you're hunting. We'll help you figure it out.",
+            "answer": "It depends on what you hunt and what you expect your knife to do.\nThe Ovis Hunter is our versatile all-purpose hunting knife. The Mouflon Skinner is designed around skinning and processing. The Mountain Caper handles detailed caping and precision work. The Ovis Scalpel gives you replaceable-blade convenience.\nIf every ounce matters, check out our Skeleton models.\nStill unsure? Email sales@kestrelknives.com and tell us what you're hunting.  We'll help you figure it out.",
             "category": "General",
             "show_item": true
           }
@@ -177,7 +186,7 @@
           "name": "Sharpening & Service",
           "settings": {
             "question": "Do Kestrel fixed-blade knives include free lifetime sharpening?",
-            "answer": "Yes.\nOur fixed-blade knives include free lifetime sharpening for customers in the continental United States.\nYou ship it to us. We'll sharpen it, clean it up and ship it back to you free of charge.\nContact us before sending your knife in so we can give you the current shipping instructions.",
+            "answer": "Yes.\nOur fixed-blade knives include free lifetime sharpening for customers in the continental United States.\nYou ship it to us.  We'll sharpen it, clean it up and ship it back to you free of charge.\nContact us before sending your knife in so we can give you the current shipping instructions.",
             "category": "Sharpening & Service",
             "show_item": true
           }
@@ -227,7 +236,7 @@
           "name": "Ovis Scalpel & Replacement Blades",
           "settings": {
             "question": "Are replacement blades included with the Scalpels?",
-            "answer": "Yes. We currently include 7 Scalpel blades. Check the Ovis Scalpel and Mountain Scalpel product page for the current blade configuration and exactly what's included with your knife.\nAdditional replacement blades are available separately in the Shop.",
+            "answer": "Yes.  We currently include 7 Scalpel blades.  Check the Ovis Scalpel and Mountain Scalpel product page for the current blade configuration and exactly what's included with your knife.\nAdditional replacement blades are available separately in the Shop.",
             "category": "Ovis Scalpel & Replacement Blades",
             "show_item": true
           }
@@ -267,7 +276,7 @@
           "name": "Warranty & Repairs",
           "settings": {
             "question": "What does the Kestrel Knives Lifetime Warranty cover?",
-            "answer": "Our Lifetime Warranty covers manufacturing defects in materials and workmanship for the functional life of the knife.\nIf we determine there's a manufacturing defect, we'll repair or replace the knife at no charge at our discretion.\nIt doesn't cover misuse, abuse, prying, batoning, improper sharpening, unauthorized modifications, neglect, corrosion or using the knife outside its intended purpose.\nNormal scratches, sharpening marks and finish wear aren't manufacturing defects.\nContact us before shipping anything in. Photos are helpful, but sometimes we need the knife in our hands to determine exactly what happened.",
+            "answer": "Our Lifetime Warranty covers manufacturing defects in materials and workmanship for the functional life of the knife.\nIf we determine there's a manufacturing defect, we'll repair or replace the knife at no charge at our discretion.\nIt doesn't cover misuse, abuse, prying, batoning, improper sharpening, unauthorized modifications, neglect, corrosion or using the knife outside its intended purpose.\nNormal scratches, sharpening marks and finish wear aren't manufacturing defects.\nContact us before shipping anything in.  Photos are helpful, but sometimes we need the knife in our hands to determine exactly what happened.",
             "category": "Warranty & Repairs",
             "show_item": true
           }
@@ -287,7 +296,7 @@
           "name": "Warranty & Repairs",
           "settings": {
             "question": "Are scratches or finish wear covered under warranty?",
-            "answer": "No.\nOur knives are built to be used. Scratches, finish wear, sharpening marks and other cosmetic wear are normal parts of owning a field knife.\nIf you've used your Kestrel hard enough to put a few scratches in it, that's okay with us.",
+            "answer": "No.\nOur knives are built to be used.  Scratches, finish wear, sharpening marks and other cosmetic wear are normal parts of owning a field knife.\nIf you've used your Kestrel hard enough to put a few scratches in it, that's okay with us.",
             "category": "Warranty & Repairs",
             "show_item": true
           }
@@ -297,7 +306,7 @@
           "name": "Warranty & Repairs",
           "settings": {
             "question": "What should I do if I think my knife has a manufacturing defect?",
-            "answer": "Email sales@kestrelknives.com before sending anything in.\nTell us what happened and include some clear photos if possible. We'll take a look and let you know if we need the knife sent back for inspection.",
+            "answer": "Email sales@kestrelknives.com before sending anything in.\nTell us what happened and include some clear photos if possible.  We'll take a look and let you know if we need the knife sent back for inspection.",
             "category": "Warranty & Repairs",
             "show_item": true
           }
@@ -365,6 +374,7 @@
       },
       "block_order": [
         "faq_item_XJKL8m",
+        "faq_item_eVrptc",
         "faq_item_T9xUkQ",
         "faq_item_MfN4qJ",
         "faq_item_MmtgPh",
