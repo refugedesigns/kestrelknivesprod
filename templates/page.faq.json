@@ -390,6 +390,16 @@
             "category": "Shipping",
             "show_item": true
           }
+        },
+        "faq_item_z7qWWK": {
+          "type": "faq_item",
+          "name": "Shipping",
+          "settings": {
+            "question": "Do you ship internationally?",
+            "answer": "Yes, we ship to many international destinations.\nThere are restrictions depending on the country, and it's ultimately the buyer's responsibility to know their local knife and import laws before ordering.\nIf you're unsure whether we can ship to your country, email sales@kestrelknives.com before placing your order.",
+            "category": "Shipping",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -430,7 +440,8 @@
         "faq_item_YBMqR7",
         "faq_item_JGVK6X",
         "faq_item_U9Ry8W",
-        "faq_item_G9GAkA"
+        "faq_item_G9GAkA",
+        "faq_item_z7qWWK"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
