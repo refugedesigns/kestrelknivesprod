@@ -261,6 +261,16 @@
             "category": "Sheaths & Carry",
             "show_item": true
           }
+        },
+        "faq_item_HtL99w": {
+          "type": "faq_item",
+          "name": "Warranty & Repairs",
+          "settings": {
+            "question": "What does the Kestrel Knives Lifetime Warranty cover?",
+            "answer": "Our Lifetime Warranty covers manufacturing defects in materials and workmanship for the functional life of the knife.\nIf we determine there's a manufacturing defect, we'll repair or replace the knife at no charge at our discretion.\nIt doesn't cover misuse, abuse, prying, batoning, improper sharpening, unauthorized modifications, neglect, corrosion or using the knife outside its intended purpose.\nNormal scratches, sharpening marks and finish wear aren't manufacturing defects.\nContact us before shipping anything in. Photos are helpful, but sometimes we need the knife in our hands to determine exactly what happened.",
+            "category": "Warranty & Repairs",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -288,7 +298,8 @@
         "faq_item_NRJmyT",
         "faq_item_ytnPYk",
         "faq_item_pXpANW",
-        "faq_item_weRWx9"
+        "faq_item_weRWx9",
+        "faq_item_HtL99w"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
@@ -299,6 +310,7 @@
         "shop_url": "",
         "warranty_url": "",
         "sharpening_url": "",
+        "paracord_url": "",
         "categories": "Featured Questions,General,Knives & Steel,Ovis Scalpel & Replacement Blades,  Sheaths & Carry, Sharpening & Service, Warranty & Repairs, Shipping",
         "header_bg_color": "#000000",
         "header_height": 200,
