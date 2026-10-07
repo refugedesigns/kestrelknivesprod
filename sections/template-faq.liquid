@@ -209,7 +209,15 @@
           ['Shop', shopUrl],
         ]
 
-        var boldPhrases = ['at no charge']
+        var boldPhrases = [
+          'at no charge',
+          '5 days of confirmed delivery',
+          '15% restocking fee',
+          '48 hours of delivery',
+          'final sale',
+          'Custom knives, Build-A-Knife orders, sale or discounted items, gift cards and products sold "as is" are final sale.',
+          'Custom knives, Build-A-Knife orders, sale or discounted items, gift cards and products sold &quot;as is&quot; are final sale.',
+        ]
 
         function escapeRegExp(s) {
           return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -269,6 +277,24 @@
             )
           })
 
+          boldPhrases
+            .slice()
+            .sort(function (a, b) {
+              return b.length - a.length
+            })
+            .forEach(function (phrase) {
+              var flexible = phraseToPattern(phrase)
+              var re = new RegExp(
+                '(^|[^A-Za-z0-9])(' + flexible + ')(?![A-Za-z0-9])',
+                'gi'
+              )
+              out = replaceOutsideLinks(out, re, function (match, p1, p2) {
+                var prefix = p1 || ''
+                var label = String(p2 || match).replace(/<br\s*\/?>/gi, ' ')
+                return prefix + wrapBold(label)
+              })
+            })
+
           phraseLinks
             .slice()
             .sort(function (a, b) {
@@ -295,24 +321,6 @@
                   ' '
                 )
                 return prefix + wrapLink(href, label)
-              })
-            })
-
-          boldPhrases
-            .slice()
-            .sort(function (a, b) {
-              return b.length - a.length
-            })
-            .forEach(function (phrase) {
-              var flexible = phraseToPattern(phrase)
-              var re = new RegExp(
-                '(^|[^A-Za-z0-9])(' + flexible + ')(?![A-Za-z0-9])',
-                'gi'
-              )
-              out = replaceOutsideLinks(out, re, function (match, p1, p2) {
-                var prefix = p1 || ''
-                var label = String(p2 || match).replace(/<br\s*\/?>/gi, ' ')
-                return prefix + wrapBold(label)
               })
             })
 
