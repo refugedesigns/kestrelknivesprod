@@ -334,10 +334,11 @@
         },
         "faq_item_Ky6xwf": {
           "type": "faq_item",
+          "name": "Returns & Orders",
           "settings": {
             "question": "What if my order arrives damaged or defective?",
             "answer": "Contact us within 48 hours of delivery at sales@kestrelknives.com.\n\nSend us your order information, a quick explanation of what happened and clear photos of the knife and packaging.\n\nWe'll take it from there.",
-            "category": "Returns & Warranty",
+            "category": "Returns & Orders",
             "show_item": true
           }
         }
