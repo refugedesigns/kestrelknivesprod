@@ -281,6 +281,16 @@
             "category": "Warranty & Repairs",
             "show_item": true
           }
+        },
+        "faq_item_rNGyck": {
+          "type": "faq_item",
+          "name": "Warranty & Repairs",
+          "settings": {
+            "question": "Are scratches or finish wear covered under warranty?",
+            "answer": "No.\nOur knives are built to be used. Scratches, finish wear, sharpening marks and other cosmetic wear are normal parts of owning a field knife.\nIf you've used your Kestrel hard enough to put a few scratches in it, that's okay with us.",
+            "category": "Warranty & Repairs",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -310,7 +320,8 @@
         "faq_item_pXpANW",
         "faq_item_weRWx9",
         "faq_item_HtL99w",
-        "faq_item_WgwA66"
+        "faq_item_WgwA66",
+        "faq_item_rNGyck"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
