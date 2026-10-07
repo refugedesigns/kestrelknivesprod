@@ -341,6 +341,16 @@
             "category": "Returns & Orders",
             "show_item": true
           }
+        },
+        "faq_item_YBMqR7": {
+          "type": "faq_item",
+          "name": "Returns & Orders",
+          "settings": {
+            "question": "Can I order a custom knife?",
+            "answer": "Custom knives and Build-A-Knife options may be available depending on what we currently have going through the shop.\n\nCustom orders are built specifically for you and are final sale.\n\nEmail sales@kestrelknives.com to see what's currently available and discuss lead times.",
+            "category": "Returns & Orders",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -376,7 +386,8 @@
         "faq_item_x9QAtd",
         "faq_item_TfGaTf",
         "faq_item_TcgGRa",
-        "faq_item_Ky6xwf"
+        "faq_item_Ky6xwf",
+        "faq_item_YBMqR7"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
