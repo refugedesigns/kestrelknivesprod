@@ -321,6 +321,16 @@
             "category": "Returns & Orders",
             "show_item": true
           }
+        },
+        "faq_item_TcgGRa": {
+          "type": "faq_item",
+          "name": "Returns & Orders",
+          "settings": {
+            "question": "What items are non-returnable?",
+            "answer": "Custom knives, Build-A-Knife orders, sale or discounted items, gift cards and products sold \"as is\" are final sale.\n\nManufacturing defects are handled separately through our warranty process.",
+            "category": "Returns & Orders",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -354,7 +364,8 @@
         "faq_item_rNGyck",
         "faq_item_Cfwnnr",
         "faq_item_x9QAtd",
-        "faq_item_TfGaTf"
+        "faq_item_TfGaTf",
+        "faq_item_TcgGRa"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
