@@ -209,6 +209,8 @@
           ['Shop', shopUrl],
         ]
 
+        var boldPhrases = ['at no charge']
+
         function escapeRegExp(s) {
           return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
         }
@@ -229,11 +231,17 @@
           )
         }
 
+        function wrapBold(label) {
+          return '<strong class="font-semibold text-gray-800">' + label + '</strong>'
+        }
+
         function replaceOutsideLinks(html, pattern, replacer) {
-          var parts = String(html || '').split(/(<a\b[^>]*>[\s\S]*?<\/a>)/gi)
+          var parts = String(html || '').split(
+            /(<a\b[^>]*>[\s\S]*?<\/a>|<strong\b[^>]*>[\s\S]*?<\/strong>)/gi
+          )
           return parts
             .map(function (part) {
-              if (/^<a\b/i.test(part)) return part
+              if (/^<(a|strong)\b/i.test(part)) return part
               return part.replace(pattern, replacer)
             })
             .join('')
@@ -287,6 +295,24 @@
                   ' '
                 )
                 return prefix + wrapLink(href, label)
+              })
+            })
+
+          boldPhrases
+            .slice()
+            .sort(function (a, b) {
+              return b.length - a.length
+            })
+            .forEach(function (phrase) {
+              var flexible = phraseToPattern(phrase)
+              var re = new RegExp(
+                '(^|[^A-Za-z0-9])(' + flexible + ')(?![A-Za-z0-9])',
+                'gi'
+              )
+              out = replaceOutsideLinks(out, re, function (match, p1, p2) {
+                var prefix = p1 || ''
+                var label = String(p2 || match).replace(/<br\s*\/?>/gi, ' ')
+                return prefix + wrapBold(label)
               })
             })
 
