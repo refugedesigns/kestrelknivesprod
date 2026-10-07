@@ -410,6 +410,16 @@
             "category": "Shipping",
             "show_item": true
           }
+        },
+        "faq_item_gTANag": {
+          "type": "faq_item",
+          "name": "Shipping",
+          "settings": {
+            "question": "What happens if an international shipment is lost?",
+            "answer": "Once an international shipment leaves the United States, the risk of loss transfers to the buyer.\nUnfortunately, we can't control foreign postal systems or customs once a package has left the United States, so Kestrel isn't responsible for packages lost outside the U.S.",
+            "category": "Shipping",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -452,7 +462,8 @@
         "faq_item_U9Ry8W",
         "faq_item_G9GAkA",
         "faq_item_z7qWWK",
-        "faq_item_XHY4GW"
+        "faq_item_XHY4GW",
+        "faq_item_gTANag"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
