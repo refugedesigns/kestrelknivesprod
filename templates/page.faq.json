@@ -351,6 +351,15 @@
             "category": "Returns & Orders",
             "show_item": true
           }
+        },
+        "faq_item_JGVK6X": {
+          "type": "faq_item",
+          "settings": {
+            "question": "Can I modify my knife?",
+            "answer": "It's your knife, but understand that modifications can affect your warranty.\n\nDamage caused by grinding, reshaping, drilling, improper sharpening or other aftermarket modifications isn't a manufacturing defect.\n\nIf you're considering doing something major to the knife and aren't sure how it'll affect the warranty, shoot us an email first.",
+            "category": "Knives & Steel",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -387,7 +396,8 @@
         "faq_item_TfGaTf",
         "faq_item_TcgGRa",
         "faq_item_Ky6xwf",
-        "faq_item_YBMqR7"
+        "faq_item_YBMqR7",
+        "faq_item_JGVK6X"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
