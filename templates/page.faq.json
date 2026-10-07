@@ -380,6 +380,16 @@
             "category": "Shipping",
             "show_item": true
           }
+        },
+        "faq_item_G9GAkA": {
+          "type": "faq_item",
+          "name": "Shipping",
+          "settings": {
+            "question": "How will I know when my order ships?",
+            "answer": "You'll receive an email containing your tracking information as soon as your order has been processed and shipped.\nIt can take a little time for the carrier to scan the package and begin showing movement.",
+            "category": "Shipping",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -419,7 +429,8 @@
         "faq_item_Ky6xwf",
         "faq_item_YBMqR7",
         "faq_item_JGVK6X",
-        "faq_item_U9Ry8W"
+        "faq_item_U9Ry8W",
+        "faq_item_G9GAkA"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
