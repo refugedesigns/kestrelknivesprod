@@ -311,6 +311,16 @@
             "category": "Returns & Orders",
             "show_item": true
           }
+        },
+        "faq_item_TfGaTf": {
+          "type": "faq_item",
+          "name": "Returns & Orders",
+          "settings": {
+            "question": "Can I return a knife after I've used it?",
+            "answer": "No.\nA standard return needs to come back brand new and unused. Once a knife has been used, sharpened, modified or carried enough to show wear, we can't sell it as new again.\n\nIf you're having an actual issue with the knife that you believe is a manufacturing defect, contact us and we'll handle that through the warranty process.",
+            "category": "Returns & Orders",
+            "show_item": true
+          }
         }
       },
       "block_order": [
@@ -343,7 +353,8 @@
         "faq_item_WgwA66",
         "faq_item_rNGyck",
         "faq_item_Cfwnnr",
-        "faq_item_x9QAtd"
+        "faq_item_x9QAtd",
+        "faq_item_TfGaTf"
       ],
       "settings": {
         "page_title": "Frequently Asked Questions",
