@@ -74,13 +74,37 @@
           return this.currentImage
         },
 
-        // URL of second product image, if available
-        get secondImageSrc() {
-          if (!this.imagesData || this.imagesData.length < 2) return null
-          const img = this.imagesData[1]
+        imageEntrySrc(img) {
           if (!img) return null
           if (typeof img === 'string') return this.sizedImageUrl(img, 400)
           return img.src ? this.sizedImageUrl(img.src, 400) : null
+        },
+
+        isApparelProduct() {
+          const typeLower = (
+            this.productData.type ||
+            this.productData.product_type ||
+            ''
+          ).toLowerCase()
+          return typeLower.includes('apparel')
+        },
+
+        // Apparel hover uses the first media image; other products use the second gallery image.
+        get secondImageSrc() {
+          if (!this.imagesData || !this.imagesData.length) return null
+          if (this.isApparelProduct()) {
+            const firstMediaSrc = this.imageEntrySrc(this.imagesData[0])
+            if (!firstMediaSrc) return null
+            if (
+              this.imageSrcKey(firstMediaSrc) ===
+              this.imageSrcKey(this.currentImage)
+            ) {
+              return this.imageEntrySrc(this.imagesData[1])
+            }
+            return firstMediaSrc
+          }
+          if (this.imagesData.length < 2) return null
+          return this.imageEntrySrc(this.imagesData[1])
         },
 
         // Computed: currently selected handle color (option1)
@@ -614,6 +638,7 @@
                 selectedVariant.featured_image.src,
                 400
               )
+              this.hoverImageLoaded = false
             }
           }
         },
@@ -654,7 +679,7 @@
         },
 
         handleImageHover(isEntering) {
-          if (this.imagesData && this.imagesData.length > 1) {
+          if (this.secondImageSrc) {
             if (isEntering) this.preloadSecondImage()
             this.isHovering = isEntering
           }

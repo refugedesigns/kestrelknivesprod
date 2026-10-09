@@ -264,9 +264,9 @@
         function linkifyHtml(html) {
           var out = String(html || '')
 
-          // Small gap after every sentence. Reuse the same gap if a blank line is already there.
+          // Small gap after every sentence, but not inside abbreviations like U.S.
           out = out.replace(
-            /\.((?:\s|<br\s*\/?>)*)(?=[A-Z])/g,
+            /(?<=[A-Za-z]{2})\.((?:\s|<br\s*\/?>)*)(?=[A-Z](?:[a-z]|\s))/g,
             '.<span class="faq-sentence-gap"></span>'
           )
 
