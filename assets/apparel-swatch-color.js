@@ -2,7 +2,7 @@
   if (window.__kkApparelSwatchColor) return
   window.__kkApparelSwatchColor = true
 
-  var CACHE_KEY = 'kk_apparel_swatch_hex_v2'
+  var CACHE_KEY = 'kk_apparel_swatch_hex_v3'
   var NAME_HEX = {
     black: '#1a1a1a',
     charcoal: '#36454f',
@@ -45,19 +45,6 @@
     return ''
   }
 
-  function luminance(hex) {
-    var h = String(hex || '').replace('#', '')
-    if (h.length === 3) {
-      h = h.charAt(0) + h.charAt(0) + h.charAt(1) + h.charAt(1) + h.charAt(2) + h.charAt(2)
-    }
-    if (h.length !== 6) return -1
-    var r = parseInt(h.slice(0, 2), 16)
-    var g = parseInt(h.slice(2, 4), 16)
-    var b = parseInt(h.slice(4, 6), 16)
-    if (isNaN(r) || isNaN(g) || isNaN(b)) return -1
-    return (r + g + b) / 3
-  }
-
   function readCache() {
     try {
       return JSON.parse(sessionStorage.getItem(CACHE_KEY) || '{}')
@@ -90,7 +77,6 @@
         algorithm: 'dominant',
         mode: 'precision',
         silent: true,
-        ignoredColor: [[255, 255, 255, 255, 48]],
         left: box.left,
         top: box.top,
         width: box.width,
@@ -102,59 +88,36 @@
   }
 
   function colorFromImage(url, label) {
-    var named = hexFromName(label)
-    if (named) return Promise.resolve(named)
-
     var cache = readCache()
     if (cache[url]) return Promise.resolve(cache[url])
-    if (!window.FastAverageColor) return Promise.resolve('')
+    if (!window.FastAverageColor) return Promise.resolve(hexFromName(label))
 
     var fac = new window.FastAverageColor()
     return loadImage(url)
       .then(function (img) {
         var w = img.naturalWidth || img.width || 1
         var h = img.naturalHeight || img.height || 1
-        var side = sampleRegion(fac, img, {
-          left: Math.round(w * 0.08),
-          top: Math.round(h * 0.28),
-          width: Math.max(1, Math.round(w * 0.16)),
-          height: Math.max(1, Math.round(h * 0.42)),
-        })
-        var body = sampleRegion(fac, img, {
-          left: Math.round(w * 0.2),
-          top: Math.round(h * 0.55),
-          width: Math.max(1, Math.round(w * 0.6)),
-          height: Math.max(1, Math.round(h * 0.32)),
+        var color = sampleRegion(fac, img, {
+          left: Math.round(w * 0.32),
+          top: Math.round(h * 0.62),
+          width: Math.max(1, Math.round(w * 0.36)),
+          height: Math.max(1, Math.round(h * 0.22)),
         })
         fac.destroy()
 
-        var sideHex = side && side.hex
-        var bodyHex = body && body.hex
-        var sideLum = luminance(sideHex)
-        var bodyLum = luminance(bodyHex)
-        var hex = bodyHex || sideHex || ''
-        if (bodyLum > 210 && sideLum >= 0 && sideLum < 100) hex = sideHex
-        if (sideLum > 210 && bodyLum >= 0 && bodyLum < 100) hex = bodyHex
-
-        var labelLc = String(label || '').toLowerCase()
-        if (hex && luminance(hex) < 40 && /white|wht|ivory|cream|natural/.test(labelLc)) {
-          hex = '#f4f4f4'
-        }
-        if (hex && luminance(hex) > 210 && /black|charcoal|navy/.test(labelLc)) {
-          hex = hexFromName(label) || '#1a1a1a'
-        }
+        var hex = (color && color.hex) || ''
         if (hex) {
           cache[url] = hex
           writeCache(cache)
           return hex
         }
-        return ''
+        return hexFromName(label)
       })
       .catch(function () {
         try {
           fac.destroy()
         } catch (e) {}
-        return ''
+        return hexFromName(label)
       })
   }
 
@@ -175,14 +138,13 @@
       var url = btn.getAttribute('data-swatch-src') || ''
       var label =
         btn.getAttribute('title') || btn.getAttribute('data-color-lc') || ''
-      var named = hexFromName(label)
-      if (named || !url) {
-        paint(btn, named || '#d1d5db')
+      if (!url) {
+        paint(btn, hexFromName(label) || '#d1d5db')
         return
       }
       chain = chain.then(function () {
         return colorFromImage(url, label).then(function (hex) {
-          paint(btn, hex || '#d1d5db')
+          paint(btn, hex || hexFromName(label) || '#d1d5db')
         })
       })
     })
