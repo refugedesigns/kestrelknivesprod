@@ -63,6 +63,15 @@
         | downcase
       %}
       {% assign image_wrapper_classes = "relative h-full w-full mx-auto block" %}
+      {% assign card_display_image = product_obj.featured_image
+        | default: product_obj.images.first
+      %}
+      {% if product_type_lower contains "apparel" %}
+        {% assign apparel_first_variant = product_obj.variants.first %}
+        {% if apparel_first_variant.featured_image %}
+          {% assign card_display_image = apparel_first_variant.featured_image %}
+        {% endif %}
+      {% endif %}
       {% if product_type_lower contains "apparel"
         or product_type_lower contains "hoodie"
         or product_type_lower contains "sweatshirt"
@@ -87,7 +96,7 @@
           height='400'
           loading='lazy'
           decoding='async'
-          src='{{ product_obj.featured_image | default: product_obj.images.first | image_url: width: 400, format: 'webp' }}'
+          src='{{ card_display_image | image_url: width: 400, format: 'webp' }}'
           :src='currentImage'
           alt='{{ product_obj.title | escape }}'
           :class="'absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ' + ((isHovering && hoverImageLoaded) ? 'opacity-0' : 'opacity-100')"
@@ -632,7 +641,7 @@
               this.imageSrcKey(firstMediaSrc) ===
               this.imageSrcKey(this.currentImage)
             ) {
-              return this.imageEntrySrc(this.imagesData[1])
+              return null
             }
             return firstMediaSrc
           }
@@ -731,23 +740,19 @@
         },
 
         syncApparelSelectionToImage() {
-          const typeLower = (this.productData.type || '').toLowerCase()
-          if (!typeLower.includes('apparel')) return
+          if (!this.isApparelProduct()) return
 
-          const currentKey = this.imageSrcKey(this.currentImage)
-          const currentId = this.$el.getAttribute('data-initial-image-id')
-          const match = (this.variantsData || []).find(v => {
-            const img = v.featured_image
-            if (!img) return false
-            if (currentId && String(img.id) === String(currentId)) return true
-            return img.src && this.imageSrcKey(img.src) === currentKey
-          })
+          const firstVariant = (this.variantsData || [])[0]
+          if (!firstVariant) return
 
-          if (match) {
-            this.selectedVariant = match.id
-            return
+          this.selectedVariant = firstVariant.id
+          const variantImage = this.resolveImageSrc(
+            firstVariant.featured_image || firstVariant.image || null
+          )
+          if (variantImage) {
+            this.currentImage = variantImage
+            this.hoverImageLoaded = false
           }
-          this.updateImage(true)
         },
 
         selectByColor(colorValue) {

@@ -99,7 +99,7 @@
               this.imageSrcKey(firstMediaSrc) ===
               this.imageSrcKey(this.currentImage)
             ) {
-              return this.imageEntrySrc(this.imagesData[1])
+              return null
             }
             return firstMediaSrc
           }
@@ -162,23 +162,20 @@
         },
 
         syncApparelSelectionToImage() {
-          const typeLower = (this.productData.type || '').toLowerCase()
-          if (!typeLower.includes('apparel')) return
+          if (!this.isApparelProduct()) return
 
-          const currentKey = this.imageSrcKey(this.currentImage)
-          const currentId = this.$el.getAttribute('data-initial-image-id')
-          const match = (this.variantsData || []).find(v => {
-            const img = v.featured_image
-            if (!img) return false
-            if (currentId && String(img.id) === String(currentId)) return true
-            return img.src && this.imageSrcKey(img.src) === currentKey
-          })
+          const firstVariant = (this.variantsData || [])[0]
+          if (!firstVariant) return
 
-          if (match) {
-            this.selectedVariant = match.id
-            return
+          this.selectedVariant = firstVariant.id
+          const variantImage =
+            firstVariant.featured_image && firstVariant.featured_image.src
+              ? this.sizedImageUrl(firstVariant.featured_image.src, 400)
+              : null
+          if (variantImage) {
+            this.currentImage = variantImage
+            this.hoverImageLoaded = false
           }
-          this.updateImage(true)
         },
 
         selectByColor(colorValue) {

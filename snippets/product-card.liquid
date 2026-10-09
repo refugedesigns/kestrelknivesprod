@@ -27,11 +27,18 @@
 {% endif %}
 
 {%- comment -%}
-  Card hero: use product featured image only when it is not tied to an unavailable variant.
-  If the featured image belongs to an OOS variant, use the first in-stock variant's image.
+  Apparel: show the first variant's image, and select that variant.
+  Other products: use the featured image unless it belongs to an unavailable variant.
 {%- endcomment -%}
 {% assign card_initial_image = nil %}
-{% if product_product.featured_image %}
+{% assign card_selected_variant = product_product.selected_or_first_available_variant %}
+{% if is_apparel %}
+  {% assign card_selected_variant = product_product.variants.first %}
+  {% if card_selected_variant.featured_image %}
+    {% assign card_initial_image = card_selected_variant.featured_image %}
+  {% endif %}
+{% endif %}
+{% if card_initial_image == blank and product_product.featured_image %}
   {% assign replace_featured_image = false %}
   {% for variant in product_product.variants %}
     {% if variant.featured_image
@@ -86,17 +93,18 @@
   {% assign card_img_400 = card_initial_image | image_url: width: 400, format: 'webp' %}
 {% endif %}
 
-{% assign card_selected_variant = product_product.selected_or_first_available_variant %}
-{% if card_initial_image %}
-  {% for variant in product_product.variants %}
-    {% if variant.featured_image
-      and variant.featured_image.id == card_initial_image.id
-    %}
-      {% assign card_selected_variant = variant %}
-      {% break %}
-    {% endif %}
-  {% endfor %}
-{% endif %}
+{% unless is_apparel %}
+  {% if card_initial_image %}
+    {% for variant in product_product.variants %}
+      {% if variant.featured_image
+        and variant.featured_image.id == card_initial_image.id
+      %}
+        {% assign card_selected_variant = variant %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endunless %}
 
 <div
   class='py-2 md:py-3 px-3 hover:cursor-pointer product-card w-full'
