@@ -1,0 +1,11 @@
+{
+  "type": "custom.subscribe",
+  "name": "Subscribe overlay",
+  "sections": {
+    "subscribe_overlay": {
+      "type": "subscribe-overlay",
+      "settings": {}
+    }
+  },
+  "order": ["subscribe_overlay"]
+}

@@ -264,6 +264,7 @@
     data-dismiss-hours='{{ section.settings.dismiss_hours | default: 24 }}'
     data-delay-ms='{{ section.settings.show_delay_seconds | default: 10 | times: 1000 }}'
     data-turnstile-enabled='{% if overlay_turnstile %}true{% else %}false{% endif %}'
+    data-design-mode='{% if request.design_mode %}true{% else %}false{% endif %}'
     data-success-title='{{ section.settings.success_title | default: "Successfully signed up!" | escape }}'
     data-success-message='{{ section.settings.success_message | default: "Thanks for joining!" | escape }}'
     data-error-title='{{ section.settings.error_title | default: "Something went wrong" | escape }}'
@@ -445,6 +446,7 @@
       var dismissHours = parseInt(root.getAttribute('data-dismiss-hours') || '24', 10)
       var delayMs = parseInt(root.getAttribute('data-delay-ms') || '10000', 10)
       var turnstileEnabled = root.getAttribute('data-turnstile-enabled') === 'true'
+      var designMode = root.getAttribute('data-design-mode') === 'true'
       var form = document.getElementById('SubscribeOverlayForm')
       var frame = document.getElementById('SubscribeOverlayFrame')
       var submitBtn = root.querySelector('[data-subscribe-overlay-submit]')
@@ -496,16 +498,16 @@
       function openOverlay() {
         root.hidden = false
         root.classList.add('is-open')
-        document.body.classList.add('subscribe-overlay-open')
+        if (!designMode) document.body.classList.add('subscribe-overlay-open')
         var closeBtn = root.querySelector('.subscribe-overlay__close')
-        if (closeBtn) closeBtn.focus()
+        if (closeBtn && !designMode) closeBtn.focus()
       }
 
       function closeOverlay(persistDismiss) {
         root.classList.remove('is-open')
         root.hidden = true
         document.body.classList.remove('subscribe-overlay-open')
-        if (persistDismiss) dismissForHours()
+        if (persistDismiss && !designMode) dismissForHours()
         if (openTimer) {
           clearTimeout(openTimer)
           openTimer = null
@@ -652,7 +654,14 @@
       var statusEl = root.querySelector('[data-subscribe-form-status]')
       var formStatus = statusEl ? statusEl.getAttribute('data-status') : 'idle'
 
-      if (formStatus === 'success') {
+      if (designMode) {
+        document.addEventListener('shopify:section:select', function (event) {
+          if (event.target.contains(root)) openOverlay()
+        })
+        document.addEventListener('shopify:section:deselect', function (event) {
+          if (event.target.contains(root)) closeOverlay(false)
+        })
+      } else if (formStatus === 'success') {
         showSuccessToast()
         dismissLongTerm()
       } else if (formStatus === 'error') {
@@ -908,6 +917,9 @@
       ]
     }
   ],
+  "enabled_on": {
+    "groups": ["custom.subscribe"]
+  },
   "presets": [
     {
       "name": "Subscribe overlay"
