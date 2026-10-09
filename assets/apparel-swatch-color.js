@@ -2,7 +2,7 @@
   if (window.__kkApparelSwatchColor) return
   window.__kkApparelSwatchColor = true
 
-  var CACHE_KEY = 'kk_apparel_swatch_hex_v3'
+  var CACHE_KEY = 'kk_apparel_swatch_hex_v4'
   var NAME_HEX = {
     black: '#1a1a1a',
     charcoal: '#36454f',
@@ -71,9 +71,25 @@
     })
   }
 
+  function isHeadwear(btn) {
+    var card = btn.closest('[data-product]') || btn.closest('.product-card')
+    var title = ''
+    if (card) {
+      try {
+        var data = JSON.parse(card.getAttribute('data-product') || '{}')
+        title = String(data.title || data.handle || '')
+      } catch (e) {}
+      if (!title) {
+        var heading = card.querySelector('h2')
+        title = heading ? heading.textContent : ''
+      }
+    }
+    return /hat|beanie|cap\b|trucker/.test(String(title).toLowerCase())
+  }
+
   function sampleRegion(fac, img, box) {
     try {
-      return fac.getColor(img, {
+      var options = {
         algorithm: 'dominant',
         mode: 'precision',
         silent: true,
@@ -81,15 +97,18 @@
         top: box.top,
         width: box.width,
         height: box.height,
-      })
+      }
+      if (box.ignoredColor) options.ignoredColor = box.ignoredColor
+      return fac.getColor(img, options)
     } catch (e) {
       return null
     }
   }
 
-  function colorFromImage(url, label) {
+  function colorFromImage(url, label, lower) {
     var cache = readCache()
-    if (cache[url]) return Promise.resolve(cache[url])
+    var cacheId = (lower ? 'low:' : 'mid:') + url
+    if (cache[cacheId]) return Promise.resolve(cache[cacheId])
     if (!window.FastAverageColor) return Promise.resolve(hexFromName(label))
 
     var fac = new window.FastAverageColor()
@@ -97,17 +116,29 @@
       .then(function (img) {
         var w = img.naturalWidth || img.width || 1
         var h = img.naturalHeight || img.height || 1
-        var color = sampleRegion(fac, img, {
-          left: Math.round(w * 0.32),
-          top: Math.round(h * 0.62),
-          width: Math.max(1, Math.round(w * 0.36)),
-          height: Math.max(1, Math.round(h * 0.22)),
-        })
+        var color = sampleRegion(
+          fac,
+          img,
+          lower
+            ? {
+                left: Math.round(w * 0.32),
+                top: Math.round(h * 0.62),
+                width: Math.max(1, Math.round(w * 0.36)),
+                height: Math.max(1, Math.round(h * 0.22)),
+              }
+            : {
+                left: Math.round(w * 0.22),
+                top: Math.round(h * 0.22),
+                width: Math.max(1, Math.round(w * 0.56)),
+                height: Math.max(1, Math.round(h * 0.56)),
+                ignoredColor: [[255, 255, 255, 255, 40]],
+              }
+        )
         fac.destroy()
 
         var hex = (color && color.hex) || ''
         if (hex) {
-          cache[url] = hex
+          cache[cacheId] = hex
           writeCache(cache)
           return hex
         }
@@ -142,8 +173,9 @@
         paint(btn, hexFromName(label) || '#d1d5db')
         return
       }
+      var lower = !isHeadwear(btn)
       chain = chain.then(function () {
-        return colorFromImage(url, label).then(function (hex) {
+        return colorFromImage(url, label, lower).then(function (hex) {
           paint(btn, hex || hexFromName(label) || '#d1d5db')
         })
       })
