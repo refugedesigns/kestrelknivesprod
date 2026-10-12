@@ -12,6 +12,16 @@
     "template-testimonials": {
       "type": "template-testimonials",
       "blocks": {
+        "testimonial_LKrMYk": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "No complaints. I cut up about 70 geese gutted 3 deer and quartered a deer with it. Definitely some super good quality knives I love them!",
+            "author": "@hudbud.huntfish",
+            "author_image": "shopify://shop_images/hudbud.huntfish.png",
+            "object_fit": "cover",
+            "object_position": "center"
+          }
+        },
         "testimonial_qF4BLM": {
           "type": "testimonial",
           "settings": {
@@ -234,6 +244,7 @@
         }
       },
       "block_order": [
+        "testimonial_LKrMYk",
         "testimonial_qF4BLM",
         "testimonial_HyGpCE",
         "testimonial_N6iVk9",
