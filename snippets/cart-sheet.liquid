@@ -36,7 +36,23 @@
 
   <!-- Cart Items -->
   <div class='flex-1 overflow-y-auto p-6'>
-    <div x-show='cartItems.length === 0' class='text-center py-8'>
+    <div
+      x-show='isCartLoading && cartItems.length === 0'
+      class='text-center py-8'
+      role='status'
+      aria-live='polite'
+    >
+      <div
+        class='mx-auto mb-3 h-6 w-6 rounded-full border-2 border-gray-200 border-t-gray-900 animate-spin'
+        aria-hidden='true'
+      ></div>
+      <p class='text-gray-500'>Loading cart</p>
+    </div>
+
+    <div
+      x-show='!isCartLoading && cartItems.length === 0'
+      class='text-center py-8'
+    >
       <p class='text-gray-500'>Your cart is empty</p>
     </div>
 
@@ -201,6 +217,7 @@
     return {
       isOpen: false,
       cartItems: [],
+      isCartLoading: true,
       isLoading: false,
       isAddingToCart: false,
       isAddingMainButton: false,
@@ -382,6 +399,7 @@
       },
 
       async loadCart() {
+        this.isCartLoading = true
         try {
           await this.ensureOriginGatedCartDiscounts()
           const response = await fetch('/cart.js')
@@ -424,6 +442,8 @@
           this.updateTotals()
         } catch (error) {
           console.error('Error loading cart:', error)
+        } finally {
+          this.isCartLoading = false
         }
       },
 
