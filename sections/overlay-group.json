@@ -1,5 +1,5 @@
 {
-  "type": "custom.subscribe",
+  "type": "aside",
   "name": "Subscribe overlay",
   "sections": {
     "subscribe_overlay": {
