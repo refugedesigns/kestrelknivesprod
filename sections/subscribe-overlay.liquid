@@ -439,6 +439,15 @@
 
   <script>
     (function () {
+      var overlays = document.querySelectorAll('[data-subscribe-overlay]')
+      if (overlays.length > 1) {
+        for (var i = 1; i < overlays.length; i++) {
+          overlays[i].parentNode.removeChild(overlays[i])
+        }
+      }
+      if (window.__kkSubscribeOverlayInit) return
+      window.__kkSubscribeOverlayInit = true
+
       var root = document.querySelector('[data-subscribe-overlay]')
       if (!root) return
 
@@ -495,7 +504,15 @@
         } catch (e) {}
       }
 
+      function closeKlaviyoPopups() {
+        try {
+          window._klOnsite = window._klOnsite || []
+          window._klOnsite.push(['closeForm'])
+        } catch (e) {}
+      }
+
       function openOverlay() {
+        closeKlaviyoPopups()
         root.hidden = false
         root.classList.add('is-open')
         if (!designMode) document.body.classList.add('subscribe-overlay-open')
