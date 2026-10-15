@@ -4,7 +4,9 @@
   "sections": {
     "subscribe_overlay": {
       "type": "subscribe-overlay",
-      "settings": {}
+      "settings": {
+        "heading": "Win Free Knives & Gear!"
+      }
     }
   },
   "order": ["subscribe_overlay"]
