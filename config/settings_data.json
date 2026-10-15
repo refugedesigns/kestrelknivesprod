@@ -113,11 +113,6 @@
         "disabled": true,
         "settings": {}
       },
-      "4015264832934714879": {
-        "type": "shopify://apps/trustoo-email-popups/blocks/app/a5670cf8-5705-4b01-ad9e-447033feae26",
-        "disabled": true,
-        "settings": {}
-      },
       "14656832010101544780": {
         "type": "shopify://apps/apo-product-options/blocks/app-embed-block/a1199153-7462-4b5b-8a80-f0eefba85e99",
         "disabled": false,
@@ -133,16 +128,6 @@
         "disabled": false,
         "settings": {}
       },
-      "1884528899478270862": {
-        "type": "shopify://apps/shortly/blocks/app-embed/f8b85b17-5c26-444a-abdf-6ce2b3d1bdb0",
-        "disabled": false,
-        "settings": {}
-      },
-      "1987381849243170004": {
-        "type": "shopify://apps/apphero-free-gift/blocks/app-embed/775538df-2a18-473b-ada3-d731b074c1a3",
-        "disabled": false,
-        "settings": {}
-      },
       "6464650315188175684": {
         "type": "shopify://apps/dibs/blocks/lb-ordereasy-embed/7cc74442-1b61-4b87-afed-944e0def999c",
         "disabled": false,
@@ -150,11 +135,6 @@
           "ordereasy_custom_script": "<script></script>",
           "disable_form_product_validation": false
         }
-      },
-      "11242429557760608184": {
-        "type": "shopify://apps/referrly/blocks/main-app-embed/75b5ccd5-af90-4f81-ab89-2c28499171fd",
-        "disabled": false,
-        "settings": {}
       }
     }
   },
