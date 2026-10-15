@@ -8,8 +8,8 @@
   x-transition:leave='transition ease-in duration-200'
   x-transition:leave-start='translate-x-0'
   x-transition:leave-end='translate-x-full'
-  class='fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl z-50 flex flex-col'
-  style='display: none;'
+  class='fixed right-0 w-full max-w-md bg-white shadow-xl z-50 flex flex-col'
+  style='display: none; top: var(--header-height, 64px); height: calc(100dvh - var(--header-height, 64px));'
 >
   <div class='flex items-center justify-between p-6 border-b border-gray-200'>
     <h2 class='text-lg font-semibold text-gray-900 uppercase tracking-wide'>

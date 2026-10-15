@@ -38,11 +38,8 @@
   {% if handle_norm contains "early_access" %}
     {% assign is_early_access = true %}
   {% endif %}
-  {% assign kk_per_page = section.settings.number_of_products_per_page | default: 18 %}
-  {% if is_early_access %}
-    {%- comment -%} 4-col grid: keep leftover products on this page (Shopify max 50). {%- endcomment -%}
-    {% assign kk_per_page = 50 %}
-  {% endif %}
+  {%- comment -%} Shopify paginate max is 50. Remaining pages are appended in JS. {%- endcomment -%}
+  {% assign kk_per_page = 50 %}
   {% paginate collection.products by kk_per_page %}
     <h1 class='text-3xl font-bold text-center mb-2' x-html='getPageTitle()'>
       {{ collection_title_display }}
@@ -264,11 +261,13 @@
             {% endif %}
           </div>
 
-          <!-- Pagination -->
+          {%- comment -%} Pagination hidden; extra pages are loaded into #products-grid. {%- endcomment -%}
           {% if paginate.pages > 1 %}
-            <div class='mt-12'>
-              {% render "pagination", pagination: paginate %}
-            </div>
+            <script>
+              window.__kkCollectionPages = {{ paginate.pages | json }}
+              window.__kkCollectionCurrentPage = {{ paginate.current_page | json }}
+              window.__kkCollectionSectionId = {{ section.id | json }}
+            </script>
           {% endif %}
         </div>
       </div>
@@ -280,6 +279,7 @@
   function collectionPage() {
     return {
       init() {
+        this.loadRemainingCollectionPages()
         // Listen for legacy filter changes
         window.addEventListener('filter-products', event => {
           this.applyFilters(event.detail)
@@ -289,6 +289,45 @@
           const { min, max } = e.detail || {}
           this.applyPriceFilter(min, max)
         })
+      },
+
+      async loadRemainingCollectionPages() {
+        try {
+          const url = new URL(window.location.href)
+          const currentPage = Number(url.searchParams.get('page') || window.__kkCollectionCurrentPage || 1)
+          if (currentPage > 1) {
+            url.searchParams.delete('page')
+            window.location.replace(url.toString())
+            return
+          }
+
+          const pages = Number(window.__kkCollectionPages || 1)
+          const sectionId = window.__kkCollectionSectionId
+          const grid = document.getElementById('products-grid')
+          if (!grid || !sectionId || pages < 2) return
+
+          for (let page = 2; page <= pages; page++) {
+            const pageUrl = new URL(window.location.href)
+            pageUrl.searchParams.set('page', String(page))
+            pageUrl.searchParams.set('section_id', sectionId)
+            const res = await fetch(pageUrl.toString(), {
+              credentials: 'same-origin',
+              headers: { Accept: 'text/html' },
+            })
+            if (!res.ok) continue
+            const html = await res.text()
+            const doc = new DOMParser().parseFromString(html, 'text/html')
+            const more = doc.getElementById('products-grid')
+            if (!more) continue
+            const nodes = Array.from(more.children)
+            nodes.forEach(node => grid.appendChild(node))
+            if (window.Alpine && typeof window.Alpine.initTree === 'function') {
+              nodes.forEach(node => window.Alpine.initTree(node))
+            }
+          }
+        } catch (e) {
+          console.error('Failed to load remaining collection products', e)
+        }
       },
 
       toTitleCase(str) {
@@ -483,9 +522,9 @@
     {
       "type": "number",
       "id": "number_of_products_per_page",
-      "default": 18,
+      "default": 50,
       "label": "Number of products per page",
-      "info": "On early-access, all products show on one page so the 4-column grid is not left empty."
+      "info": "Unused. Collection pages load every matching product on one page (Shopify max 50 per request, extra pages are appended)."
     },
     {
       "type": "header",
