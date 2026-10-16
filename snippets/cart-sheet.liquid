@@ -327,6 +327,81 @@
         document.body.style.overflow = ''
       },
 
+      getStorefrontDiscountCode() {
+        let code = ''
+        try {
+          const match = document.cookie.match(/(?:^|; )discount_code=([^;]*)/)
+          if (match && match[1]) {
+            code = decodeURIComponent(match[1].replace(/\+/g, ' ')).trim()
+          }
+        } catch (e) {}
+        if (code) {
+          try {
+            sessionStorage.setItem('kk_storefront_discount_code', code)
+          } catch (e) {}
+          return code
+        }
+        try {
+          return String(sessionStorage.getItem('kk_storefront_discount_code') || '').trim()
+        } catch (e) {
+          return ''
+        }
+      },
+
+      cartHasDiscountTitle(cart, code) {
+        const wanted = String(code || '').trim().toLowerCase()
+        if (!wanted || !cart) return false
+        const apps = Array.isArray(cart.cart_level_discount_applications)
+          ? cart.cart_level_discount_applications
+          : []
+        return apps.some(
+          d => String((d && d.title) || '').trim().toLowerCase() === wanted
+        )
+      },
+
+      async applyDiscountCode(code) {
+        const trimmed = String(code || '').trim()
+        if (!trimmed) return false
+        const res = await fetch('/cart/update.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ discount: trimmed }),
+          credentials: 'same-origin',
+        })
+        if (!res.ok) {
+          const t = await res.text()
+          console.error('Discount apply failed', res.status, t)
+          return false
+        }
+        return true
+      },
+
+      async applyStorefrontDiscountCode() {
+        try {
+          const code = this.getStorefrontDiscountCode()
+          if (!code) return false
+          const gatedCode = String(
+            sessionStorage.getItem('kk_gated_cart_discount_code') || ''
+          ).trim()
+          const eligible =
+            sessionStorage.getItem('kk_gated_cart_discount') === '1'
+          if (
+            gatedCode &&
+            code.toLowerCase() === gatedCode.toLowerCase() &&
+            !eligible
+          ) {
+            return false
+          }
+          const cartRes = await fetch('/cart.js', { credentials: 'same-origin' })
+          const currentCart = await cartRes.json()
+          if (this.cartHasDiscountTitle(currentCart, code)) return true
+          return await this.applyDiscountCode(code)
+        } catch (e) {
+          console.error('applyStorefrontDiscountCode error', e)
+          return false
+        }
+      },
+
       async applyGatedDiscountCode() {
         try {
           const eligible =
@@ -366,7 +441,7 @@
       async ensureOriginGatedCartDiscounts() {
         try {
           if (!window.__gatedRemoveCartDiscountWhenIneligible) return
-          const ok =
+          const eligible =
             (() => {
               try {
                 return sessionStorage.getItem('kk_gated_cart_discount') === '1'
@@ -374,20 +449,15 @@
                 return false
               }
             })()
-          if (ok) return
-          const r = await fetch('/cart.js')
+          if (eligible) return
+          const gatedCode = String(
+            sessionStorage.getItem('kk_gated_cart_discount_code') || ''
+          ).trim()
+          if (!gatedCode) return
+          const r = await fetch('/cart.js', { credentials: 'same-origin' })
           const c = await r.json()
-          const hasDisc =
-            Number(c.total_discount || 0) > 0 ||
-            (Array.isArray(c.cart_level_discount_applications) &&
-              c.cart_level_discount_applications.length > 0)
-          if (!hasDisc) return
-          await fetch('/cart/update.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ discount: '' }),
-            credentials: 'same-origin',
-          })
+          if (!this.cartHasDiscountTitle(c, gatedCode)) return
+          await this.applyDiscountCode('')
           try {
             sessionStorage.removeItem('kk_gated_cart_discount_code')
           } catch (e) {
@@ -401,6 +471,7 @@
       async loadCart() {
         this.isCartLoading = true
         try {
+          await this.applyStorefrontDiscountCode()
           await this.ensureOriginGatedCartDiscounts()
           const response = await fetch('/cart.js')
           const cart = await response.json()
@@ -517,6 +588,7 @@
           })
 
           if (response.ok) {
+            await this.applyStorefrontDiscountCode()
             await this.applyGatedDiscountCode()
             await this.loadCart()
             this.openCart()
