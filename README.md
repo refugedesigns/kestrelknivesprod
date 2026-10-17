@@ -1,40 +1,78 @@
-# :wave: Say hi to Elizabeth :wave:
+# Kestrel Knives theme
 
-[![Generic badge](https://img.shields.io/badge/course%20available%3F-yes-green.svg)](https://shields.io/)
+Custom [Shopify Online Store 2.0](https://shopify.dev/docs/storefronts/themes) theme for [Kestrel Knives](https://kestrelknives.com) — ultralight knives, apparel, and accessories.
 
-This project is created and intended to be used for the [Shopify Theme Development – Online Store 2.0 + TailwindCSS course](https://weeklyhow.com/courses/)
+This repo is the live storefront theme. It started from a Tailwind-based OS 2.0 starter and has been rebuilt for the Kestrel catalog, merchandising, and signup flows.
 
-[Get the course!](https://weeklyhow.com/) | [Lessons covered](#lessons-covered) |
-[How to use](#how-to-use) | [Not a student?](#not-a-student)
+## Stack
 
-## Lessons covered
+- Liquid sections, templates, and snippets
+- [Tailwind CSS v4](https://tailwindcss.com/) compiled to `assets/application.css`
+- Alpine.js (`assets/alpine.min.js`) for collection filters and interactive UI
+- Shopify customer forms for newsletter signup (footer + subscribe overlay)
+- Storefront discount handling in the cart drawer (Klaviyo unique codes and collection-origin / Eastmans codes)
 
-| Status             | Lectures                     |
-| ------------------ | ---------------------------- |
-| :heavy_check_mark: | Installing Development Tools |
-| :heavy_check_mark: | Navigational Bar             |
-| :heavy_check_mark: | 404 Page                     |
-| :heavy_check_mark: | Article Page                 |
-| :heavy_check_mark: | Blog Page                    |
-| :heavy_check_mark: | Cart Page                    |
-| :heavy_check_mark: | Product Collection Page      |
-| :heavy_check_mark: | Collections Page             |
-| :heavy_check_mark: | Homepage (Index)             |
-| :heavy_check_mark: | Pages (About & Contact)      |
-| :heavy_check_mark: | Advanced Product Page        |
-| :heavy_check_mark: | Search Page                  |
-| :hourglass:        | More lessons coming          |
+## Local development
 
-## How to use
-
-To use this repository for making Shopify themes, use the following command of Shopify CLI.
+Install [Shopify CLI](https://shopify.dev/docs/api/shopify-cli) and Node.js, then from this directory:
 
 ```sh
-shopify theme init [ NAME OF YOUR THEME ] --clone-url https://github.com/polidario/Elizabeth_Clean
+npm install
+npm run build:css
 ```
 
-If you don't have Shopify CLI installed to your computer, navigate to the [installation page of Shopify CLI](https://shopify.dev/themes/tools/cli/installation).
+CSS watch compiles `src/tailwind.css` → `assets/application.css`. For a one-off production build:
 
-## Not a student
+```sh
+npm run build:css:prod
+```
 
-If you're not a student, you can still use this repository to start a new Shopify theme project. However, any issues that you will encounter throughout your development will not be supported as the instructor will only answer questions through the course's QnA page.
+Preview against the store:
+
+```sh
+shopify theme dev
+```
+
+Push a theme (only when you intend to update Shopify):
+
+```sh
+shopify theme push
+```
+
+## Git remotes
+
+`origin` fetches from the development GitHub account and **pushes to both** remotes:
+
+| Role | Repository |
+| --- | --- |
+| Fetch + push | `https://github.com/refugedesigns/kestrelknivesprod.git` |
+| Push | `https://github.com/kestrelknives26/kestrelknives_shopify.git` |
+
+```sh
+git push origin main
+```
+
+The second account must be signed in on this machine (`git credential-manager github login --username kestrelknives26 --device`) or `refugedesigns` needs write access on the kestrelknives26 repo.
+
+## Theme notes
+
+- **Collections** — Filters are grouped Ultralight Knives → Apparel → Accessories. Group tags (ending in ` Group`) drive subfilters. Collection grids load remaining pages in place so category products stay on one page.
+- **Apparel cards** — Color swatches are sampled from the variant image. The selected variant image stays on the card; hover shows the first media image.
+- **Subscribe overlay** — Static `{% section "subscribe-overlay" %}` in `layout/theme.liquid` (after the footer). Heading and dismiss timing are section settings in the theme editor, not hardcoded. Overlay copy currently defaults to “Win Free Knives & Gear!”.
+- **Cart drawer** — Opens below the header. Applies the storefront `discount_code` cookie (including Klaviyo Welcome Family unique codes) via `/cart/update.js` so the discount shows in the drawer, not only at checkout. Eastmans gated cleanup only removes the Eastmans origin code.
+- **Klaviyo onsite embed** is disabled in `config/settings_data.json` so it does not stack on the Shopify overlay.
+
+## Project layout
+
+```
+assets/      Compiled CSS, theme JS, and static images
+config/      Theme settings schema and data
+layout/      theme.liquid (and customer / auth layouts)
+locales/     Translations
+sections/    Section files (header, footer, templates, overlay)
+snippets/    Cards, filters, cart drawer, icons
+src/         Tailwind source (`tailwind.css`)
+templates/   JSON templates and alternate templates
+```
+
+`package.json`, `node_modules`, and `css/` are listed in `.shopifyignore` and are not uploaded with the theme.
