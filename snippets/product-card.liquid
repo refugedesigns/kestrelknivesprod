@@ -28,7 +28,8 @@
 
 {%- comment -%}
   Apparel: show the first variant's image, and select that variant.
-  Other products: use the featured image unless it belongs to an unavailable variant.
+  Knives and other products: show the selected variant image when it has one.
+  Otherwise use the featured image unless it belongs to an unavailable variant.
 {%- endcomment -%}
 {% assign card_initial_image = nil %}
 {% assign card_selected_variant = product_product.selected_or_first_available_variant %}
@@ -37,6 +38,8 @@
   {% if card_selected_variant.featured_image %}
     {% assign card_initial_image = card_selected_variant.featured_image %}
   {% endif %}
+{% elsif card_selected_variant.featured_image %}
+  {% assign card_initial_image = card_selected_variant.featured_image %}
 {% endif %}
 {% if card_initial_image == blank and product_product.featured_image %}
   {% assign replace_featured_image = false %}
@@ -95,14 +98,22 @@
 
 {% unless is_apparel %}
   {% if card_initial_image %}
-    {% for variant in product_product.variants %}
-      {% if variant.featured_image
-        and variant.featured_image.id == card_initial_image.id
-      %}
-        {% assign card_selected_variant = variant %}
-        {% break %}
-      {% endif %}
-    {% endfor %}
+    {% assign card_image_matches_selected = false %}
+    {% if card_selected_variant.featured_image
+      and card_selected_variant.featured_image.id == card_initial_image.id
+    %}
+      {% assign card_image_matches_selected = true %}
+    {% endif %}
+    {% unless card_image_matches_selected %}
+      {% for variant in product_product.variants %}
+        {% if variant.featured_image
+          and variant.featured_image.id == card_initial_image.id
+        %}
+          {% assign card_selected_variant = variant %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+    {% endunless %}
   {% endif %}
 {% endunless %}
 

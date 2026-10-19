@@ -615,13 +615,9 @@
           ) {
             return
           }
-          const hasComplexTag = this.useComplexOptionsTag
 
-          if (hasComplexTag && !forceVariantImage) {
-            return
-          }
-
-          // Update image when variant changes (for knives/non-apparels)
+          // Knives, including complex-option products: the selected variant
+          // image is the card photo. Hover stays the second media image.
           if (this.variantsData && this.variantsData.length > 0) {
             const selectedVariant = this.getVariantById(this.selectedVariant)
 
