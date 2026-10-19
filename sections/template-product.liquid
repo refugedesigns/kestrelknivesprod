@@ -941,24 +941,15 @@
                               data-option-value='{{ value | escape }}'
                               {% if is_complex_primary and has_blade_color %}
                                 data-complex-asset='{{ complex_asset_large }}'
+                              {% elsif is_complex_primary and option_image %}
+                                data-variant-image='{{ option_image | image_url: width: 2048 }}'
                               {% endif %}
                               {% if is_selected %}
                                 checked
                               {% endif %}
                             >
                             <div class='w-full aspect-square border-2 {% if is_selected %}border-black{% else %}border-gray-300 hover:border-black{% endif %} rounded-lg p-2 bg-white hover:bg-gray-100 transition-colors'>
-                              {% if use_complex_options and has_blade_color == false and option_image %}
-                                <img
-                                  src='{{ option_image | image_url: width: 256 }}'
-                                  srcset='{{ option_image | image_url: width: 128 }} 1x, {{ option_image | image_url: width: 256 }} 2x, {{ option_image | image_url: width: 384 }} 3x'
-                                  alt='{{ value }}'
-                                  class='w-full h-full object-contain rounded-md'
-                                  width='128'
-                                  height='128'
-                                  loading='lazy'
-                                  decoding='async'
-                                >
-                              {% elsif use_local_colors %}
+                              {% if use_local_colors %}
                                 {% assign option_name_token = option.name
                                   | strip
                                   | handleize
@@ -2585,6 +2576,21 @@
     primaryUsesVariantImage: {% if has_blade_color %}false{% else %}true{% endif %},
     defaultPrimaryValue: {{ complex_primary_default_value | json }},
     defaultPrimaryAsset: {{ complex_base_image_src | json }},
+    primaryVariantImages: {
+      {% if has_blade_color == false and product.options_with_values.size > 0 %}
+        {% assign kk_primary_option = product.options_with_values.first %}
+        {% for value in kk_primary_option.values %}
+          {% assign kk_primary_variant_image = '' %}
+          {% for variant in product.variants %}
+            {% if variant.option1 == value and variant.featured_image %}
+              {% assign kk_primary_variant_image = variant.featured_image | image_url: width: 2048 %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+          {{ value | json }}: {{ kk_primary_variant_image | json }}{% unless forloop.last %},{% endunless %}
+        {% endfor %}
+      {% endif %}
+    },
     options: [
       {% for option in product.options_with_values %}
         {
@@ -2832,7 +2838,10 @@
                 const value = input.value;
                 this.selectedOptions[optionIndex] = value;
                 if (this.useComplexOptions && optionIndex === 0) {
-                  this.handleComplexPrimarySelection(value, input.dataset.complexAsset || null);
+                  this.handleComplexPrimarySelection(
+                    value,
+                    input.dataset.variantImage || input.dataset.complexAsset || null
+                  );
                 }
                 this.updateSelectedVariantByOptions(this.selectedOptions);
               });
@@ -3190,7 +3199,10 @@
             if (defaultPrimaryInput) {
               this.selectedOptions[0] = defaultPrimaryInput.value;
               if (complexConfig.primaryUsesVariantImage) {
-                this.setComplexBaseImage(this.lookupPrimaryVariantImage(defaultPrimaryInput.value));
+                this.setComplexBaseImage(
+                  defaultPrimaryInput.dataset.variantImage ||
+                    this.lookupPrimaryVariantImage(defaultPrimaryInput.value)
+                );
               } else {
                 const asset = defaultPrimaryInput.dataset.complexAsset || this.lookupComplexAsset(0, defaultPrimaryInput.value);
                 const resolved = asset || complexConfig.defaultPrimaryAsset || complexConfig.fallbackImage || '';
@@ -3261,7 +3273,7 @@
             if (!this.useComplexOptions) return;
              this.ensureLayeredPreview();
             if (complexConfig.primaryUsesVariantImage) {
-              this.setComplexBaseImage(this.lookupPrimaryVariantImage(value));
+              this.setComplexBaseImage(assetUrl || this.lookupPrimaryVariantImage(value));
               return;
             }
             const resolvedAsset =
@@ -3369,13 +3381,23 @@
 
           lookupPrimaryVariantImage(value) {
             const desired = String(value || complexConfig.defaultPrimaryValue || '').trim();
+            const imageMap = complexConfig.primaryVariantImages || {};
+            if (imageMap[desired]) return imageMap[desired];
+            const mappedKey = Object.keys(imageMap).find(function (key) {
+              return String(key || '').trim().toLowerCase() === desired.toLowerCase();
+            });
+            if (mappedKey && imageMap[mappedKey]) return imageMap[mappedKey];
+
             const matches = variants.filter(function (variant) {
               return String((variant.options && variant.options[0]) || '').trim() === desired;
             });
             const withImage = matches.find(function (variant) {
               return variant.featured_image;
             });
-            return (withImage && withImage.featured_image) || complexConfig.fallbackImage || '';
+            const fromVariant = withImage && withImage.featured_image;
+            if (typeof fromVariant === 'string' && fromVariant) return fromVariant;
+            if (fromVariant && typeof fromVariant.src === 'string') return fromVariant.src;
+            return complexConfig.fallbackImage || '';
           },
 
           lookupComplexAsset(optionIndex, value) {
