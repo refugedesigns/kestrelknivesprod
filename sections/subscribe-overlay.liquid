@@ -16,9 +16,9 @@
 
   {% assign overlay_bg = section.settings.background_image %}
   {% if overlay_bg != blank %}
-    {% assign overlay_bg_url = overlay_bg | image_url: width: 2000 %}
+    {% assign overlay_bg_url = overlay_bg | image_url: width: 800 %}
   {% else %}
-    {% assign overlay_bg_url = 'subscribe.jpg' | asset_url %}
+    {% assign overlay_bg_url = 'subscribe.jpg' | asset_img_url: '800x' %}
   {% endif %}
 
   <link
@@ -305,7 +305,7 @@
     data-subscribe-overlay
     data-storage-key='{{ section.settings.storage_key | default: "kk_subscribe_overlay_dismissed_until" | escape }}'
     data-dismiss-hours='{{ section.settings.dismiss_hours | default: 24 }}'
-    data-delay-ms='{{ section.settings.show_delay_seconds | default: 10 | times: 1000 }}'
+    data-bg-url='{{ overlay_bg_url | escape }}'
     data-turnstile-enabled='{% if overlay_turnstile %}true{% else %}false{% endif %}'
     data-design-mode='{% if request.design_mode %}true{% else %}false{% endif %}'
     data-success-title='{{ section.settings.success_title | default: "Successfully signed up!" | escape }}'
@@ -313,7 +313,6 @@
     data-error-title='{{ section.settings.error_title | default: "Something went wrong" | escape }}'
     data-error-message='{{ section.settings.error_message | default: "Please try again." | escape }}'
     style='
-      --subscribe-overlay-bg: url({{ overlay_bg_url | escape }});
       --subscribe-overlay-scrim: {{ section.settings.overlay_opacity | default: 42 | divided_by: 100.0 }};
       --subscribe-input-bg: {{ section.settings.input_bg_color | default: "#1c1c1c" }};
       --subscribe-input-border: {{ section.settings.input_border_color | default: "#5c5c5c" }};
@@ -496,14 +495,13 @@
 
       var storageKey = root.getAttribute('data-storage-key') || 'kk_subscribe_overlay_dismissed_until'
       var dismissHours = parseInt(root.getAttribute('data-dismiss-hours') || '24', 10)
-      var delayMs = parseInt(root.getAttribute('data-delay-ms') || '10000', 10)
       var turnstileEnabled = root.getAttribute('data-turnstile-enabled') === 'true'
       var designMode = root.getAttribute('data-design-mode') === 'true'
       var form = document.getElementById('SubscribeOverlayForm')
       var frame = document.getElementById('SubscribeOverlayFrame')
       var submitBtn = root.querySelector('[data-subscribe-overlay-submit]')
-      var openTimer = null
       var awaitingResponse = false
+      var overlayArmed = false
 
       function setSubmitEnabled(enabled) {
         if (!submitBtn) return
@@ -554,7 +552,18 @@
         } catch (e) {}
       }
 
+      function applyOverlayImage() {
+        var bgUrl = root.getAttribute('data-bg-url')
+        if (!bgUrl) return
+        root.style.setProperty('--subscribe-overlay-bg', 'url("' + bgUrl.replace(/"/g, '\\"') + '")')
+      }
+
       function openOverlay() {
+        if (overlayArmed) return
+        overlayArmed = true
+        window.removeEventListener('scroll', onScrollOpen)
+        document.removeEventListener('mouseout', onExitIntent)
+        applyOverlayImage()
         closeKlaviyoPopups()
         root.hidden = false
         root.classList.add('is-open')
@@ -568,10 +577,6 @@
         root.hidden = true
         document.body.classList.remove('subscribe-overlay-open')
         if (persistDismiss && !designMode) dismissForHours()
-        if (openTimer) {
-          clearTimeout(openTimer)
-          openTimer = null
-        }
       }
 
       function whenToastrReady(cb) {
@@ -728,7 +733,19 @@
         showErrorToast()
         openOverlay()
       } else if (!isDismissed()) {
-        openTimer = setTimeout(openOverlay, Math.max(0, delayMs))
+        window.addEventListener('scroll', onScrollOpen, { passive: true })
+        document.addEventListener('mouseout', onExitIntent)
+      }
+
+      function onScrollOpen() {
+        if (window.scrollY < 240) return
+        openOverlay()
+      }
+
+      function onExitIntent(event) {
+        if (event.clientY > 8) return
+        if (event.relatedTarget || event.toElement) return
+        openOverlay()
       }
     })()
   </script>
@@ -753,7 +770,7 @@
       "step": 1,
       "unit": "s",
       "default": 10,
-      "info": "Wait this long after the page loads before showing the overlay."
+      "info": "Unused. The overlay opens after the visitor scrolls or moves to leave the page, so it does not count as the largest page paint."
     },
     {
       "type": "range",

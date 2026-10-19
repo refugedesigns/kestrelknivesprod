@@ -258,7 +258,9 @@ main[role='main'] {
     {% render "search-sheet" %}
 
     {% section "footer" %}
-    {% section "subscribe-overlay" %}
+    {% unless template.name == 'product' %}
+      {% section "subscribe-overlay" %}
+    {% endunless %}
 
   </body>
 </html>
