@@ -1,0 +1,91 @@
+{% comment %}
+  Product JSON-LD. selected_variant is passed from the product section so the
+  product-level SKU follows the same variant as the page, including sold-out
+  deep links. Review totals come from Klaviyo's Shopify review metafields.
+{% endcomment %}
+{% liquid
+  assign schema_variant = selected_variant
+  if schema_variant == blank
+    assign schema_variant = product.selected_variant | default: product.selected_or_first_available_variant
+  endif
+
+  assign brand_name = product.vendor | strip
+  if brand_name == blank
+    assign brand_name = shop.name
+  endif
+
+  assign rating_value = product.metafields.reviews.rating.value
+  assign rating_count = product.metafields.reviews.rating_count.value
+  if rating_count == blank
+    assign rating_count = product.metafields.reviews.rating_count
+  endif
+  assign rating_count_number = rating_count | plus: 0
+%}
+<script type='application/ld+json'>
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": {{ product.title | json }},
+    "description": {{ product.description | strip_html | strip | json }},
+    "url": {{ shop.url | append: product.url | json }}
+    {%- if product.images.size > 0 -%}
+      ,"image": [
+        {%- for image in product.images -%}
+          {%- assign img_url = image | image_url: width: 1200 -%}
+          {%- unless img_url contains '://' -%}
+            {%- assign img_url = img_url | prepend: 'https:' -%}
+          {%- endunless -%}
+          {{ img_url | json }}{%- unless forloop.last -%},{%- endunless -%}
+        {%- endfor -%}
+      ]
+    {%- endif -%}
+    ,"brand": {
+      "@type": "Brand",
+      "name": {{ brand_name | json }}
+    }
+    {%- if schema_variant.sku != blank -%}
+      ,"sku": {{ schema_variant.sku | json }}
+    {%- endif -%}
+    {%- if rating_count_number > 0 and rating_value != blank -%}
+      ,"aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": {{ rating_value | json }},
+        "reviewCount": {{ rating_count_number | json }},
+        "bestRating": 5,
+        "worstRating": 1
+      }
+    {%- endif -%}
+    ,"offers": [
+      {%- for variant in product.variants -%}
+        {%- assign barcode = variant.barcode | strip -%}
+        {%- assign barcode_non_digits = barcode | replace: '0', '' | replace: '1', '' | replace: '2', '' | replace: '3', '' | replace: '4', '' | replace: '5', '' | replace: '6', '' | replace: '7', '' | replace: '8', '' | replace: '9', '' -%}
+        {%- assign barcode_length = barcode | size -%}
+        {%- assign gtin_property = '' -%}
+        {%- if barcode != blank and barcode_non_digits == blank -%}
+          {%- if barcode_length == 8 -%}
+            {%- assign gtin_property = 'gtin8' -%}
+          {%- elsif barcode_length == 12 -%}
+            {%- assign gtin_property = 'gtin12' -%}
+          {%- elsif barcode_length == 13 -%}
+            {%- assign gtin_property = 'gtin13' -%}
+          {%- elsif barcode_length == 14 -%}
+            {%- assign gtin_property = 'gtin14' -%}
+          {%- endif -%}
+        {%- endif -%}
+        {
+          "@type": "Offer",
+          "price": {{ variant.price | divided_by: 100.0 | json }},
+          "priceCurrency": {{ cart.currency.iso_code | json }},
+          "availability": "https://schema.org/{% if variant.available %}InStock{% else %}OutOfStock{% endif %}",
+          "url": {{ shop.url | append: variant.url | json }}
+          {%- if variant.sku != blank -%}
+            ,"sku": {{ variant.sku | json }}
+          {%- endif -%}
+          {%- if gtin_property != blank -%}
+            ,"{{ gtin_property }}": {{ barcode | json }}
+          {%- endif -%}
+        }{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ]
+  }
+</script>

@@ -4435,6 +4435,9 @@
   {% render "ms_apo_helper" %}
 {% endif %}
 
+{% render 'product-json-ld', selected_variant: selected_variant %}
+{% render 'breadcrumb-json-ld' %}
+
 {% schema %}
 {
   "name": "Product",

@@ -139,6 +139,23 @@
         }
       }
     </script>
+    {%- if template.name == 'index' -%}
+      <script type='application/ld+json'>
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": {{ shop.name | json }},
+          "url": {{ shop.url | json }}
+          {%- if shop.brand.logo != blank -%}
+            {%- assign organization_logo = shop.brand.logo | image_url: width: 512 -%}
+            {%- unless organization_logo contains '://' -%}
+              {%- assign organization_logo = organization_logo | prepend: 'https:' -%}
+            {%- endunless -%}
+            ,"logo": {{ organization_logo | json }}
+          {%- endif -%}
+        }
+      </script>
+    {%- endif -%}
     <!-- Header hook for plugins -->
     {{ 'application.css' | asset_url | stylesheet_tag }}
     <script src='{{ 'application.js' | asset_url }}' defer></script>
