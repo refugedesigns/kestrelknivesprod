@@ -1,4 +1,8 @@
 {% assign selected_variant = product.selected_or_first_available_variant %}
+{% assign url_variant = product.selected_variant %}
+{% if url_variant %}
+  {% assign selected_variant = url_variant %}
+{% endif %}
 {% assign kk_status_raw = product.metafields.custom.product_status %}
 {% assign product_status_text = kk_status_raw.value | default: kk_status_raw %}
 {% assign kk_product_type_lower = product.type | default: "" | downcase %}
@@ -435,7 +439,7 @@
           | where: "option1", complex_primary_default_value
           | first
         %}
-        {% if complex_default_variant %}
+        {% if complex_default_variant and url_variant == blank %}
           {% assign selected_variant = complex_default_variant %}
         {% endif %}
 
@@ -852,16 +856,24 @@
                             | asset_img_url: "256x256"
                           %}
 
+                          {% assign url_option_value = "" %}
+                          {% if url_variant %}
+                            {% assign url_option_value = url_variant.options[option_index0] %}
+                          {% endif %}
+                          {% assign url_layer_selected = false %}
+                          {% if url_variant and url_option_value == value %}
+                            {% assign url_layer_selected = true %}
+                          {% endif %}
                           <div class='flex flex-col items-center'>
                             <button
                               type='button'
-                              class='complex-layer-option w-full aspect-square flex items-center justify-center'
+                              class='complex-layer-option w-full aspect-square flex items-center justify-center{% if url_layer_selected %} is-active{% endif %}'
                               data-complex-option-button
                               data-complex-option-index='{{ option_index0 }}'
                               data-option-name='{{ option.name | escape }}'
                               data-option-value='{{ value | escape }}'
                               data-asset='{{ complex_asset_large }}'
-                              aria-pressed='false'
+                              aria-pressed='{% if url_layer_selected %}true{% else %}false{% endif %}'
                             >
                               {% if use_local_colors
                                 and local_asset_thumb != blank
@@ -897,7 +909,15 @@
                       <div class='grid grid-cols-5 gap-3'>
                         {% for value in option.values %}
                           {% assign is_selected = false %}
-                          {% if is_complex_primary %}
+                          {% assign url_option_value = "" %}
+                          {% if url_variant %}
+                            {% assign url_option_value = url_variant.options[option_index0] %}
+                          {% endif %}
+                          {% if url_variant %}
+                            {% if url_option_value == value %}
+                              {% assign is_selected = true %}
+                            {% endif %}
+                          {% elsif is_complex_primary %}
                             {% if forloop.first %}
                               {% assign is_selected = true %}
                             {% endif %}
@@ -1072,7 +1092,15 @@
                       <div class='flex flex-wrap gap-2'>
                         {% for value in option.values %}
                           {% assign is_selected = false %}
-                          {% if is_complex_primary %}
+                          {% assign url_option_value = "" %}
+                          {% if url_variant %}
+                            {% assign url_option_value = url_variant.options[option_index0] %}
+                          {% endif %}
+                          {% if url_variant %}
+                            {% if url_option_value == value %}
+                              {% assign is_selected = true %}
+                            {% endif %}
+                          {% elsif is_complex_primary %}
                             {% if forloop.first %}
                               {% assign is_selected = true %}
                             {% endif %}
@@ -1165,7 +1193,15 @@
                       <div class='flex flex-wrap gap-2'>
                         {% for value in option.values %}
                           {% assign is_selected = false %}
-                          {% if is_complex_primary %}
+                          {% assign url_option_value = "" %}
+                          {% if url_variant %}
+                            {% assign url_option_value = url_variant.options[option_index0] %}
+                          {% endif %}
+                          {% if url_variant %}
+                            {% if url_option_value == value %}
+                              {% assign is_selected = true %}
+                            {% endif %}
+                          {% elsif is_complex_primary %}
                             {% if forloop.first %}
                               {% assign is_selected = true %}
                             {% endif %}
@@ -2769,41 +2805,53 @@
       });
       const forceFirstOptionDefaults = {{ kk_force_first_option_defaults | json }};
 
-      // Initial selected options: read from selected_or_first_available_variant if present
-      const initialVariant = (product.selected_or_first_available_variant) ? product.selected_or_first_available_variant : (variants[0] || null);
+      const requestedVariantId = new URLSearchParams(window.location.search).get('variant');
+      const urlVariantFromQuery = requestedVariantId
+        ? variants.find(v => String(v.id) === String(requestedVariantId)) || null
+        : null;
+
+      // Initial selected options: a valid ?variant= wins, including sold-out.
+      // Otherwise keep the existing first-option defaults.
       const initialOptions = [];
-      if (initialVariant) {
-        if (initialVariant.option1 !== undefined) initialOptions.push(initialVariant.option1);
-        if (initialVariant.option2 !== undefined) initialOptions.push(initialVariant.option2);
-        if (initialVariant.option3 !== undefined) initialOptions.push(initialVariant.option3);
-      }
-
-      if (forceFirstOptionDefaults && !useComplexOptions) {
-        initialOptions.length = 0;
-        const optionsWithValues = Array.isArray(product.options_with_values)
-          ? product.options_with_values
-          : [];
-        optionsWithValues.forEach(option => {
-          const values = Array.isArray(option && option.values) ? option.values : [];
-          initialOptions.push(values.length ? values[0] : '');
+      if (urlVariantFromQuery) {
+        urlVariantFromQuery.options.forEach(optionValue => {
+          initialOptions.push(optionValue || '');
         });
-      }
+      } else {
+        const initialVariant = (product.selected_or_first_available_variant) ? product.selected_or_first_available_variant : (variants[0] || null);
+        if (initialVariant) {
+          if (initialVariant.option1 !== undefined) initialOptions.push(initialVariant.option1);
+          if (initialVariant.option2 !== undefined) initialOptions.push(initialVariant.option2);
+          if (initialVariant.option3 !== undefined) initialOptions.push(initialVariant.option3);
+        }
 
-      if (useComplexOptions && initialOptions.length) {
-        const fallbackPrimary =
-          (product.options_with_values &&
-            product.options_with_values[0] &&
-            product.options_with_values[0].values &&
-            product.options_with_values[0].values[0]) ||
-          '';
-        const defaultPrimary =
-          complexConfig.defaultPrimaryValue ||
-          initialOptions[0] ||
-          fallbackPrimary ||
-          '';
-        initialOptions[0] = defaultPrimary;
-        for (let i = 1; i < initialOptions.length; i++) {
-          initialOptions[i] = '';
+        if (forceFirstOptionDefaults && !useComplexOptions) {
+          initialOptions.length = 0;
+          const optionsWithValues = Array.isArray(product.options_with_values)
+            ? product.options_with_values
+            : [];
+          optionsWithValues.forEach(option => {
+            const values = Array.isArray(option && option.values) ? option.values : [];
+            initialOptions.push(values.length ? values[0] : '');
+          });
+        }
+
+        if (useComplexOptions && initialOptions.length) {
+          const fallbackPrimary =
+            (product.options_with_values &&
+              product.options_with_values[0] &&
+              product.options_with_values[0].values &&
+              product.options_with_values[0].values[0]) ||
+            '';
+          const defaultPrimary =
+            complexConfig.defaultPrimaryValue ||
+            initialOptions[0] ||
+            fallbackPrimary ||
+            '';
+          initialOptions[0] = defaultPrimary;
+          for (let i = 1; i < initialOptions.length; i++) {
+            initialOptions[i] = '';
+          }
         }
       }
 
@@ -2848,6 +2896,9 @@
             // initial image set
             if (this.useComplexOptions) {
               this.initComplexOptions();
+              if (urlVariantFromQuery) {
+                this.applyUrlComplexLayers();
+              }
             } else {
               this.changeImage(0);
             }
@@ -2912,7 +2963,7 @@
                     input.dataset.variantImage || input.dataset.complexAsset || null
                   );
                 }
-                this.updateSelectedVariantByOptions(this.selectedOptions);
+                this.updateSelectedVariantByOptions(this.selectedOptions, true);
               });
             });
 
@@ -2937,7 +2988,16 @@
             return -1;
           },
 
-          updateSelectedVariantByOptions(optionsArray) {
+          syncVariantUrl(variantId) {
+            if (!variantId || !window.history || typeof window.history.replaceState !== 'function') return;
+            const url = new URL(window.location.href);
+            const nextId = String(variantId);
+            if (url.searchParams.get('variant') === nextId) return;
+            url.searchParams.set('variant', nextId);
+            window.history.replaceState({}, '', url);
+          },
+
+          updateSelectedVariantByOptions(optionsArray, syncUrl) {
             // Normalize length to product.options length
             const optionCount = (product.options || []).length;
             const normalized = new Array(optionCount).fill('');
@@ -3057,6 +3117,8 @@
                if (typeof window.syncStickySizeSelector === 'function') {
                  window.syncStickySizeSelector();
                }
+
+               if (syncUrl) this.syncVariantUrl(variant.id);
              }
           },
 
@@ -3335,7 +3397,27 @@
               this.updateComplexLayerElement(optionIndex, assetUrl);
               this.setComplexLayerButtonState(optionIndex, optionValue, true);
             }
-            this.updateSelectedVariantByOptions(this.selectedOptions);
+            this.updateSelectedVariantByOptions(this.selectedOptions, true);
+          },
+
+          applyUrlComplexLayers() {
+            if (!this.useComplexOptions || !urlVariantFromQuery) return;
+            for (let optionIndex = 1; optionIndex < this.selectedOptions.length; optionIndex++) {
+              const optionValue = this.selectedOptions[optionIndex];
+              if (!optionValue) continue;
+              const buttons = document.querySelectorAll(
+                `[data-complex-option-button][data-complex-option-index="${optionIndex}"]`
+              );
+              let assetUrl = this.lookupComplexAsset(optionIndex, optionValue);
+              buttons.forEach(button => {
+                if (button.dataset.optionValue === optionValue && button.dataset.asset) {
+                  assetUrl = button.dataset.asset;
+                }
+              });
+              this.complexLayerState[optionIndex] = { value: optionValue, asset: assetUrl };
+              this.updateComplexLayerElement(optionIndex, assetUrl);
+              this.setComplexLayerButtonState(optionIndex, optionValue, true);
+            }
           },
 
           handleComplexPrimarySelection(value, assetUrl) {
@@ -3940,7 +4022,7 @@
             }
             
             // Update the main product page variant selection
-            productPage._x_dataStack[0].updateSelectedVariantByOptions([selectedSize]);
+            productPage._x_dataStack[0].updateSelectedVariantByOptions([selectedSize], true);
           }
         }
       };
