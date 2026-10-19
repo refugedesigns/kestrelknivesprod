@@ -79,11 +79,12 @@
             {{ section.settings.button_text | default: "NOTIFY ME" }}
           </button>
           <div x-show='showForm' x-cloak class='max-w-md mx-auto mt-6 text-left'>
+            {% assign bt_button_text = section.settings.button_text | default: 'NOTIFY ME' %}
             {% render 'email-signup-form',
               form_id: 'BigTimerSignup',
               tags: 'newsletter,big-timer',
               placeholder: 'Email',
-              button_text: section.settings.button_text | default: 'NOTIFY ME',
+              button_text: bt_button_text,
               tone: 'on-dark'
             %}
           </div>
