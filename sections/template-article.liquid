@@ -76,7 +76,7 @@
   <div id='comments' class='my-8'>
     {% if article.comments_count > 0 %}
       <div class='flex-1 items-center justify-center mx-auto max-w-4xl px-4'>
-        <h1 class='text-lg mb-4 font-medium'>See what people are saying</h1>
+        <h2 class='text-lg mb-4 font-medium'>See what people are saying</h2>
 
         {% paginate article.comments by 5 %}
           {% for comment in article.comments %}

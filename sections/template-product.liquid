@@ -522,7 +522,7 @@
         class='text-center mb-4 px-6 py-4 rounded-lg flex items-center justify-center'
         style='background-color: {{ section.settings.hidden_offer_title_bg_color | default: "#ffffff" }};'
       >
-        <h1
+        <p
           class='text-2xl md:text-4xl font-bold text-gray-900 mb-4'
           style='color: {{ section.settings.hidden_offer_title_color | default: "#000000" }};'
         >
@@ -530,7 +530,7 @@
             section.settings.hidden_offer_title
             | default: "This Product is Currently Unavailable"
           }}
-        </h1>
+        </p>
       </div>
     {% endif %}
     <main class='product-page-main relative z-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8 {% unless tags_lower contains 'hidden_offer' %}md:pt-24{% endunless %}'>

@@ -188,12 +188,12 @@
             ></div>
           {% endif %}
           <div class='kk-text-content lg:mt-0'>
-            <h1
+            <h2
               class='hero-title-breaks text-4xl md:text-6xl font-bold mb-4'
               style='color: {{ block.settings.text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ block.settings.text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ text_opacity }});'
             >
               {{ slide_title }}
-            </h1>
+            </h2>
             {% assign subtitle_lines = slide_subtitle | split: '
 ' %}
             {% if subtitle_lines.size > 1 %}
