@@ -11,7 +11,12 @@
 
     <title>
       {%- if template.name == 'index' -%}
-        {{ shop.name }}{% if page_description != blank %} — {{ page_description | truncate: 70, '' }}{% endif %}
+        {%- if page_title != blank and page_title != shop.name -%}
+          {{- page_title -}}
+        {%- else -%}
+          {{- shop.name -}}
+          {%- if page_description != blank %} — {{ page_description | truncate: 70, '' }}{% endif -%}
+        {%- endif -%}
       {%- else -%}
         {{ page_title }}{% unless page_title contains shop.name %} — {{ shop.name }}{% endunless %}
       {%- endif -%}
