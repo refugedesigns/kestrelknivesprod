@@ -393,6 +393,7 @@
       {% assign use_local_colors = true %}
     {% endif %}
     {% assign use_complex_options = false %}
+    {% assign has_blade_color = false %}
     {% assign complex_primary_default_value = '' %}
     {% assign complex_primary_default_asset = '' %}
     {% assign complex_base_image_src = product.featured_image | img_url: '2048x2048' %}
@@ -409,6 +410,14 @@
     {% if tags_lower contains "use_complex_options" %}
       {% assign use_complex_options = true %}
     {% endif %}
+    {% if use_complex_options %}
+      {% for option in product.options_with_values %}
+        {% assign kk_option_name_lower = option.name | downcase %}
+        {% if kk_option_name_lower contains "blade" %}
+          {% assign has_blade_color = true %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
     {% if use_complex_options and product.options_with_values.size > 0 %}
       {% assign complex_primary_option = product.options_with_values.first %}
       {% assign complex_primary_default_value = complex_primary_option.values.first %}
@@ -418,37 +427,41 @@
           {% assign selected_variant = complex_default_variant %}
         {% endif %}
 
-        {% assign complex_primary_option_token = complex_primary_option.name
-          | strip
-          | downcase
-          | replace: " ", "_"
-          | replace: "-", "_"
-          | replace: "/", "_"
-          | replace: ".", "_"
-          | replace: "__", "_"
-          | replace: "__", "_"
-        %}
-        {% assign complex_primary_value_token = complex_primary_default_value
-          | strip
-          | downcase
-          | replace: " ", "_"
-          | replace: "-", "_"
-          | replace: "/", "_"
-          | replace: ".", "_"
-          | replace: "__", "_"
-          | replace: "__", "_"
-        %}
-  {% assign complex_primary_asset_filename = 'cmp_'
-    | append: complex_product_token
-    | append: '_'
-    | append: complex_primary_option_token
-    | append: '_'
-    | append: complex_primary_value_token
-    | append: '.png'
-  %}
-        {% assign complex_primary_default_asset = complex_primary_asset_filename | asset_img_url: '2048x2048' %}
-        {% if complex_primary_default_asset != blank %}
-          {% assign complex_base_image_src = complex_primary_default_asset %}
+        {% if has_blade_color %}
+          {% assign complex_primary_option_token = complex_primary_option.name
+            | strip
+            | downcase
+            | replace: " ", "_"
+            | replace: "-", "_"
+            | replace: "/", "_"
+            | replace: ".", "_"
+            | replace: "__", "_"
+            | replace: "__", "_"
+          %}
+          {% assign complex_primary_value_token = complex_primary_default_value
+            | strip
+            | downcase
+            | replace: " ", "_"
+            | replace: "-", "_"
+            | replace: "/", "_"
+            | replace: ".", "_"
+            | replace: "__", "_"
+            | replace: "__", "_"
+          %}
+          {% assign complex_primary_asset_filename = 'cmp_'
+            | append: complex_product_token
+            | append: '_'
+            | append: complex_primary_option_token
+            | append: '_'
+            | append: complex_primary_value_token
+            | append: '.png'
+          %}
+          {% assign complex_primary_default_asset = complex_primary_asset_filename | asset_img_url: '2048x2048' %}
+          {% if complex_primary_default_asset != blank %}
+            {% assign complex_base_image_src = complex_primary_default_asset %}
+          {% endif %}
+        {% elsif complex_default_variant.featured_image %}
+          {% assign complex_base_image_src = complex_default_variant.featured_image | img_url: '2048x2048' %}
         {% endif %}
       {% endif %}
     {% endif %}
@@ -857,7 +870,13 @@
                           {% endif %}
 
                           {% assign option_image = null %}
-                          {% unless use_local_colors %}
+                          {% assign kk_lookup_variant_swatch = true %}
+                          {% if use_local_colors %}
+                            {% unless use_complex_options and has_blade_color == false %}
+                              {% assign kk_lookup_variant_swatch = false %}
+                            {% endunless %}
+                          {% endif %}
+                          {% if kk_lookup_variant_swatch %}
                             {% for variant in product.variants %}
                               {% if option_position == 1
                                 and variant.option1 == value
@@ -880,7 +899,7 @@
                               {% endif %}
                               {% if option_image %}{% break %}{% endif %}
                             {% endfor %}
-                          {% endunless %}
+                          {% endif %}
                           {% assign complex_option_token = option.name
                             | strip
                             | downcase
@@ -920,7 +939,7 @@
                               class='sr-only'
                               data-option-index='{{ option_index0 }}'
                               data-option-value='{{ value | escape }}'
-                              {% if is_complex_primary %}
+                              {% if is_complex_primary and has_blade_color %}
                                 data-complex-asset='{{ complex_asset_large }}'
                               {% endif %}
                               {% if is_selected %}
@@ -928,7 +947,18 @@
                               {% endif %}
                             >
                             <div class='w-full aspect-square border-2 {% if is_selected %}border-black{% else %}border-gray-300 hover:border-black{% endif %} rounded-lg p-2 bg-white hover:bg-gray-100 transition-colors'>
-                              {% if use_local_colors %}
+                              {% if use_complex_options and has_blade_color == false and option_image %}
+                                <img
+                                  src='{{ option_image | image_url: width: 256 }}'
+                                  srcset='{{ option_image | image_url: width: 128 }} 1x, {{ option_image | image_url: width: 256 }} 2x, {{ option_image | image_url: width: 384 }} 3x'
+                                  alt='{{ value }}'
+                                  class='w-full h-full object-contain rounded-md'
+                                  width='128'
+                                  height='128'
+                                  loading='lazy'
+                                  decoding='async'
+                                >
+                              {% elsif use_local_colors %}
                                 {% assign option_name_token = option.name
                                   | strip
                                   | handleize
@@ -960,7 +990,7 @@
                                   decoding='async'
                                   onerror="if(!this.dataset.swFb){this.dataset.swFb='1';this.src='{{ option_asset_jpg | asset_img_url: "256x256" }}';this.srcset='{{ option_asset_jpg | asset_img_url: "128x128" }} 1x, {{ option_asset_jpg | asset_img_url: "256x256" }} 2x, {{ option_asset_jpg | asset_img_url: "384x384" }} 3x'}"
                                 >
-                              {% elsif use_complex_options and complex_asset_thumb != blank %}
+                              {% elsif use_complex_options and has_blade_color and complex_asset_thumb != blank %}
                                 <img
                                   src='{{ complex_asset_thumb }}'
                                   alt='{{ value }}'
@@ -1052,7 +1082,7 @@
                               class='sr-only'
                               data-option-index='{{ option_index0 }}'
                               data-option-value='{{ value | escape }}'
-                              {% if is_complex_primary %}
+                              {% if is_complex_primary and has_blade_color %}
                                 data-complex-asset='{{ complex_asset_large }}'
                               {% endif %}
                               {% if is_selected %}
@@ -1141,7 +1171,7 @@
                               class='sr-only'
                               data-option-index='{{ option_index0 }}'
                               data-option-value='{{ value | escape }}'
-                              {% if is_complex_primary %}
+                              {% if is_complex_primary and has_blade_color %}
                                 data-complex-asset='{{ complex_asset_large }}'
                               {% endif %}
                               {% if is_selected %}
@@ -2551,6 +2581,8 @@
     enabled: true,
     fallbackImage: '{{ product.featured_image | img_url: '2048x2048' }}',
     primaryOptionIndex: 0,
+    hasBladeColor: {{ has_blade_color | json }},
+    primaryUsesVariantImage: {% if has_blade_color %}false{% else %}true{% endif %},
     defaultPrimaryValue: {{ complex_primary_default_value | json }},
     defaultPrimaryAsset: {{ complex_base_image_src | json }},
     options: [
@@ -2927,8 +2959,12 @@
                // update availability
                this.updateAvailability(variant);
 
-               // update main image if variant has featured_image
-              if (!this.useComplexOptions && variant.featured_image) {
+               // Knives without blade color use the Shopify variant photo as the base.
+               // Sheath and other overlays stay on theme assets, so match by option 1 only.
+              if (this.useComplexOptions && complexConfig.primaryUsesVariantImage && this.complexPreviewMode) {
+                const primaryValue = (this.selectedOptions && this.selectedOptions[0]) || normalized[0] || '';
+                this.setComplexBaseImage(this.lookupPrimaryVariantImage(primaryValue));
+              } else if (!this.useComplexOptions && variant.featured_image) {
                  const mainImage = document.getElementById('mainImage');
                  if (mainImage && mainImage.src.indexOf(variant.featured_image) === -1) {
                    mainImage.src = variant.featured_image;
@@ -3152,10 +3188,16 @@
             const defaultPrimaryInput = document.querySelector('input[data-option-index="0"][type="radio"]:checked') ||
               document.querySelector('input[data-option-index="0"][type="radio"]');
             if (defaultPrimaryInput) {
-              const asset = defaultPrimaryInput.dataset.complexAsset || this.lookupComplexAsset(0, defaultPrimaryInput.value);
-              const resolved = asset || complexConfig.defaultPrimaryAsset || complexConfig.fallbackImage || '';
-              this.setComplexBaseImage(resolved);
               this.selectedOptions[0] = defaultPrimaryInput.value;
+              if (complexConfig.primaryUsesVariantImage) {
+                this.setComplexBaseImage(this.lookupPrimaryVariantImage(defaultPrimaryInput.value));
+              } else {
+                const asset = defaultPrimaryInput.dataset.complexAsset || this.lookupComplexAsset(0, defaultPrimaryInput.value);
+                const resolved = asset || complexConfig.defaultPrimaryAsset || complexConfig.fallbackImage || '';
+                this.setComplexBaseImage(resolved);
+              }
+            } else if (complexConfig.primaryUsesVariantImage) {
+              this.setComplexBaseImage(this.lookupPrimaryVariantImage(complexConfig.defaultPrimaryValue));
             } else {
               this.setComplexBaseImage(complexConfig.defaultPrimaryAsset || complexConfig.fallbackImage || '');
             }
@@ -3218,6 +3260,10 @@
           handleComplexPrimarySelection(value, assetUrl) {
             if (!this.useComplexOptions) return;
              this.ensureLayeredPreview();
+            if (complexConfig.primaryUsesVariantImage) {
+              this.setComplexBaseImage(this.lookupPrimaryVariantImage(value));
+              return;
+            }
             const resolvedAsset =
               assetUrl ||
               this.lookupComplexAsset(0, value) ||
@@ -3271,6 +3317,10 @@
           restoreLayeredBase() {
             if (!this.useComplexOptions) return;
             const primaryValue = this.selectedOptions[0];
+            if (complexConfig.primaryUsesVariantImage) {
+              this.setComplexBaseImage(this.lookupPrimaryVariantImage(primaryValue));
+              return;
+            }
             const asset =
               (primaryValue && this.lookupComplexAsset(0, primaryValue)) ||
               complexConfig.defaultPrimaryAsset ||
@@ -3315,6 +3365,17 @@
                 btn.setAttribute('aria-pressed', 'false');
               }
             });
+          },
+
+          lookupPrimaryVariantImage(value) {
+            const desired = String(value || complexConfig.defaultPrimaryValue || '').trim();
+            const matches = variants.filter(function (variant) {
+              return String((variant.options && variant.options[0]) || '').trim() === desired;
+            });
+            const withImage = matches.find(function (variant) {
+              return variant.featured_image;
+            });
+            return (withImage && withImage.featured_image) || complexConfig.fallbackImage || '';
           },
 
           lookupComplexAsset(optionIndex, value) {
