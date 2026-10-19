@@ -136,7 +136,13 @@
       </div>
 
       <div class='max-w-md mx-auto mb-10'>
-        <div class="klaviyo-form-RyAX8C"></div>
+        {% render 'email-signup-form',
+          form_id: 'PaboyzSignup',
+          tags: 'newsletter,paboyz',
+          placeholder: 'Email',
+          button_text: 'Sign up',
+          tone: 'on-dark'
+        %}
       </div>
     </div>
 

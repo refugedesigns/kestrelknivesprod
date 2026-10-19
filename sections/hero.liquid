@@ -185,23 +185,41 @@
 </div>
 
 <script type='text/javascript'>
-  function attachKlaviyoFormTrigger(selector) {
-    var elements = document.querySelectorAll(selector)
-    if (!elements.length) return
-    elements.forEach(function (el) {
-      el.addEventListener('click', function (event) {
-        event.preventDefault()
-        var formId = el.getAttribute('data-klaviyo-form-id')
-        if (!formId) return
-        window._klOnsite = window._klOnsite || []
-        window._klOnsite.push(['openForm', formId])
-      })
-    })
+  function openHeroSignup() {
+    var dialog = document.getElementById('heroSignupDialog')
+    if (!dialog) return
+    dialog.hidden = false
+    var input = dialog.querySelector('input[type="email"]')
+    if (input) input.focus()
   }
 
-  attachKlaviyoFormTrigger('.hero-slide-button[data-klaviyo-form-id]')
-  attachKlaviyoFormTrigger('.hero-slide-media[data-klaviyo-form-id]')
+  function closeHeroSignup() {
+    var dialog = document.getElementById('heroSignupDialog')
+    if (!dialog) return
+    dialog.hidden = true
+  }
+
+  document.querySelectorAll('[data-signup-form="hero"]').forEach(function (el) {
+    el.addEventListener('click', function (event) {
+      event.preventDefault()
+      openHeroSignup()
+    })
+  })
 </script>
+
+<div id='heroSignupDialog' class='hero-signup-dialog' hidden>
+  <button type='button' class='hero-signup-dialog__backdrop' onclick='closeHeroSignup()' aria-label='Close'></button>
+  <div class='hero-signup-dialog__panel' role='dialog' aria-modal='true' aria-labelledby='heroSignupTitle'>
+    <button type='button' class='hero-signup-dialog__close' onclick='closeHeroSignup()' aria-label='Close'>×</button>
+    <h2 id='heroSignupTitle' class='hero-signup-dialog__title'>Join the list</h2>
+    {% render 'email-signup-form',
+      form_id: 'HeroSignup',
+      tags: 'newsletter,hero',
+      placeholder: 'Email',
+      button_text: 'Sign up'
+    %}
+  </div>
+</div>
 
 <!-- Swiper Styles -->
 <style>
@@ -244,6 +262,45 @@
     position: relative;
     text-align: center;
     font-size: 18px;
+  }
+
+  .hero-signup-dialog[hidden] {
+    display: none;
+  }
+
+  .hero-signup-dialog {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+  }
+
+  .hero-signup-dialog__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+  }
+
+  .hero-signup-dialog__panel {
+    position: relative;
+    max-width: 28rem;
+    margin: 12vh auto 0;
+    background: #fff;
+    padding: 2rem 1.5rem 1.5rem;
+  }
+
+  .hero-signup-dialog__close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    font-size: 1.75rem;
+    line-height: 1;
+  }
+
+  .hero-signup-dialog__title {
+    margin: 0 0 1rem;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
   }
 
   .hero-slide-media {
@@ -929,7 +986,7 @@
             },
             {
               "value": "form",
-              "label": "Open Klaviyo form"
+              "label": "Open signup form"
             }
           ],
           "default": "link"
@@ -938,7 +995,7 @@
           "type": "text",
           "id": "button_form_id",
           "label": "Klaviyo form ID",
-          "info": "Used when action is Open Klaviyo form."
+          "info": "Unused. This action opens the Shopify signup form."
         },
         {
           "type": "url",

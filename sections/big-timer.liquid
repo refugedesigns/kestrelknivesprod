@@ -71,26 +71,27 @@
           </a>
         {% else %}
           <button
-            class='inline-block font-semibold py-4 px-8 transition-colors duration-300 klaviyo_form_trigger'
+            type='button'
+            @click='openForm()'
+            class='inline-block font-semibold py-4 px-8 transition-colors duration-300'
             style='background-color: {{ section.settings.button_color | default: "#2563eb" }}; color: {{ section.settings.button_text_color | default: "#ffffff" }};'
           >
             {{ section.settings.button_text | default: "NOTIFY ME" }}
           </button>
+          <div x-show='showForm' x-cloak class='max-w-md mx-auto mt-6 text-left'>
+            {% render 'email-signup-form',
+              form_id: 'BigTimerSignup',
+              tags: 'newsletter,big-timer',
+              placeholder: 'Email',
+              button_text: section.settings.button_text | default: 'NOTIFY ME',
+              tone: 'on-dark'
+            %}
+          </div>
         {% endif %}
       </div>
     </div>
   </div>
 {% endif %}
-
-<script type='text/javascript'>
-  const klaviyoTrigger = document.querySelector('.klaviyo_form_trigger')
-  if (klaviyoTrigger) {
-    klaviyoTrigger.addEventListener('click', function () {
-      window._klOnsite = window._klOnsite || []
-      window._klOnsite.push(['openForm', 'TRArE7'])
-    })
-  }
-</script>
 
 <!-- Countdown Timer Script -->
 <script>
@@ -333,7 +334,7 @@
       "label": "Button action",
       "default": "klaviyo",
       "options": [
-        { "value": "klaviyo", "label": "Open Klaviyo form" },
+        { "value": "klaviyo", "label": "Open signup form" },
         { "value": "link", "label": "Go to link" }
       ]
     },

@@ -128,9 +128,14 @@
             <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 18L18 6M6 6l12 12'/>
           </svg>
         </button>
-        <div class='max-w-2xl mx-auto px-4 sm:px-6 py-8'>
-          <div class='klaviyo-form-QReqgv hidden lg:block'></div>
-          <div class='klaviyo-form-XV8rPN lg:hidden'></div>
+        <div class='max-w-xl mx-auto px-4 sm:px-6 py-10'>
+          {% render 'email-signup-form',
+            form_id: 'CountdownSignup',
+            tags: 'newsletter,countdown',
+            placeholder: 'Email',
+            button_text: 'Notify me',
+            tone: 'on-dark'
+          %}
         </div>
       </div>
     </div>

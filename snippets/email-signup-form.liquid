@@ -1,0 +1,100 @@
+{% comment %}
+  Shopify email list signup.
+  Params: form_id, tags, placeholder, button_text, tone (light or on-dark)
+{% endcomment %}
+{% liquid
+  assign signup_id = form_id | default: 'EmailSignup'
+  assign signup_tags = tags | default: 'newsletter'
+  assign signup_placeholder = placeholder | default: 'Email'
+  assign signup_button = button_text | default: 'Sign up'
+  assign signup_tone = tone | default: 'light'
+%}
+
+<div class='kk-email-signup kk-email-signup--{{ signup_tone }}'>
+  {% form 'customer', id: signup_id %}
+    {% if form.posted_successfully? %}
+      <p class='kk-email-signup__success' role='status'>Thanks for signing up.</p>
+    {% else %}
+      <input type='hidden' name='contact[tags]' value='{{ signup_tags | escape }}'>
+      <input type='hidden' name='customer[accepts_marketing]' value='true'>
+      <div class='kk-email-signup__row'>
+        <label class='kk-email-signup__label' for='{{ signup_id }}-email'>Email</label>
+        <input
+          id='{{ signup_id }}-email'
+          type='email'
+          name='contact[email]'
+          value='{% if form.email %}{{ form.email | escape }}{% endif %}'
+          placeholder='{{ signup_placeholder | escape }}'
+          autocomplete='email'
+          required
+        >
+        <button type='submit'>{{ signup_button }}</button>
+      </div>
+      {% if form.errors %}
+        <div class='kk-email-signup__error'>{{ form.errors | default_errors }}</div>
+      {% endif %}
+    {% endif %}
+  {% endform %}
+</div>
+
+<style>
+  .kk-email-signup__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  .kk-email-signup__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .kk-email-signup input[type='email'] {
+    flex: 1 1 12rem;
+    min-width: 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: #111827;
+  }
+
+  .kk-email-signup button {
+    padding: 0.75rem 1.25rem;
+    background: #111827;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .kk-email-signup--on-dark input[type='email'] {
+    background: #111827;
+    color: #fff;
+    border-color: #9ca3af;
+  }
+
+  .kk-email-signup--on-dark input[type='email']::placeholder {
+    color: #9ca3af;
+  }
+
+  .kk-email-signup--on-dark button {
+    background: #fff;
+    color: #111827;
+  }
+
+  .kk-email-signup__success,
+  .kk-email-signup__error {
+    margin-top: 0.75rem;
+    text-align: center;
+  }
+
+  .kk-email-signup__success {
+    font-weight: 600;
+  }
+</style>

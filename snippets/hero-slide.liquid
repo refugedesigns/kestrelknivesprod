@@ -68,7 +68,7 @@
     <button
       type='button'
       class='hero-slide-media hero-slide-media-button block w-full'
-      data-klaviyo-form-id='{{ block.settings.button_form_id | escape }}'
+      data-signup-form='hero'
     >
   {% elsif button_action == 'link' and block.settings.image_link_enable %}
     <a href='{{ button_url }}' class='hero-slide-media block w-full'>
@@ -221,7 +221,7 @@
                 type='button'
                 class='hero-slide-button inline-block font-semibold py-3 px-8 rounded-lg transition-colors duration-300'
                 style='background-color: {{ block.settings.button_bg_color | default: "#2563eb" }}; color: {{ block.settings.button_text_color | default: "#ffffff" }};'
-                data-klaviyo-form-id='{{ block.settings.button_form_id | escape }}'
+                data-signup-form='hero'
               >
                 {{ block.settings.button_text }}
               </button>
