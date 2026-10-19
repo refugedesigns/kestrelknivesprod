@@ -1,6 +1,8 @@
 {% comment %}
   Homepage / site-wide newsletter overlay.
-  Dismiss (X) hides for 24 hours via localStorage; otherwise shows each visit.
+  Shown at most once per dismiss_days (default 7): seeing it or closing it hides it for that long (localStorage).
+  Never shown to known subscribers: newsletter/Klaviyo form submitted on this browser (kk_newsletter_subscribed_until),
+  logged-in customer with accepts_marketing, or a Klaviyo-identified visitor (_kx link, __kla_id cookie, klaviyo.isIdentified()).
 {% endcomment %}
 
 {% assign overlay_enabled = section.settings.enable %}
@@ -304,7 +306,8 @@
     hidden
     data-subscribe-overlay
     data-storage-key='{{ section.settings.storage_key | default: "kk_subscribe_overlay_dismissed_until" | escape }}'
-    data-dismiss-hours='{{ section.settings.dismiss_hours | default: 24 }}'
+    data-dismiss-hours='{{ section.settings.dismiss_days | default: 7 | times: 24 }}'
+    data-known-subscriber='{% if customer and customer.accepts_marketing %}true{% else %}false{% endif %}'
     data-bg-url='{{ overlay_bg_url | escape }}'
     data-turnstile-enabled='{% if overlay_turnstile %}true{% else %}false{% endif %}'
     data-design-mode='{% if request.design_mode %}true{% else %}false{% endif %}'
@@ -494,7 +497,8 @@
       if (!root) return
 
       var storageKey = root.getAttribute('data-storage-key') || 'kk_subscribe_overlay_dismissed_until'
-      var dismissHours = parseInt(root.getAttribute('data-dismiss-hours') || '24', 10)
+      var dismissHours = parseInt(root.getAttribute('data-dismiss-hours') || '168', 10)
+      var SUBSCRIBED_KEY = 'kk_newsletter_subscribed_until'
       var turnstileEnabled = root.getAttribute('data-turnstile-enabled') === 'true'
       var designMode = root.getAttribute('data-design-mode') === 'true'
       var form = document.getElementById('SubscribeOverlayForm')
@@ -532,6 +536,57 @@
         }
       }
 
+      function markSubscribed() {
+        try {
+          var until = String(Date.now() + 365 * 24 * 60 * 60 * 1000)
+          localStorage.setItem(SUBSCRIBED_KEY, until)
+          localStorage.setItem(storageKey, until)
+        } catch (e) {}
+      }
+      window.kkMarkNewsletterSubscribed = markSubscribed
+
+      function isSubscribed() {
+        try {
+          var until = parseInt(localStorage.getItem(SUBSCRIBED_KEY) || '0', 10)
+          if (until && Date.now() < until) return true
+        } catch (e) {}
+        return false
+      }
+
+      // Klaviyo: __kla_id cookie holds base64 JSON; identified profiles carry $exchange_id / $email / $phone_number
+      function klaviyoCookieIdentified() {
+        try {
+          var m = document.cookie.match(/(?:^|;\s*)__kla_id=([^;]+)/)
+          if (!m) return false
+          var data = JSON.parse(atob(decodeURIComponent(m[1])))
+          return !!(data && (data.$exchange_id || data.$email || data.$phone_number))
+        } catch (e) {
+          return false
+        }
+      }
+
+      // Resolves true only if Klaviyo onsite JS says the visitor is identified; false if missing/slow/error
+      function klaviyoIdentifiedAsync(cb) {
+        var done = false
+        function finish(v) {
+          if (done) return
+          done = true
+          cb(!!v)
+        }
+        try {
+          if (!window.klaviyo || typeof window.klaviyo.isIdentified !== 'function') return finish(false)
+          var r = window.klaviyo.isIdentified()
+          if (r && typeof r.then === 'function') {
+            r.then(finish, function () { finish(false) })
+            setTimeout(function () { finish(false) }, 1500)
+          } else {
+            finish(r)
+          }
+        } catch (e) {
+          finish(false)
+        }
+      }
+
       function dismissForHours() {
         try {
           var ms = Math.max(1, dismissHours) * 60 * 60 * 1000
@@ -563,11 +618,24 @@
         overlayArmed = true
         window.removeEventListener('scroll', onScrollOpen)
         document.removeEventListener('mouseout', onExitIntent)
+        if (designMode || formStatus === 'error') return showOverlay()
+        klaviyoIdentifiedAsync(function (identified) {
+          if (identified || isSubscribed()) {
+            if (identified) markSubscribed()
+            return
+          }
+          showOverlay()
+        })
+      }
+
+      function showOverlay() {
         applyOverlayImage()
         closeKlaviyoPopups()
         root.hidden = false
         root.classList.add('is-open')
         if (!designMode) document.body.classList.add('subscribe-overlay-open')
+        // Seen once counts as dismissed, so it does not reopen on the next page
+        if (!designMode && formStatus !== 'error') dismissForHours()
         var closeBtn = root.querySelector('.subscribe-overlay__close')
         if (closeBtn && !designMode) closeBtn.focus()
       }
@@ -620,6 +688,7 @@
         awaitingResponse = false
         showSuccessToast()
         dismissLongTerm()
+        markSubscribed()
         setTimeout(function () {
           closeOverlay(false)
           if (form) form.reset()
@@ -719,6 +788,20 @@
       var statusEl = root.querySelector('[data-subscribe-form-status]')
       var formStatus = statusEl ? statusEl.getAttribute('data-status') : 'idle'
 
+      // Known subscribers: logged-in customer with accepts_marketing, a successful customer form
+      // redirect (?customer_posted=true), a Klaviyo email click (_kx) or an identified __kla_id cookie
+      var search = window.location.search || ''
+      var knownSubscriber =
+        root.getAttribute('data-known-subscriber') === 'true' ||
+        /[?&]customer_posted=true/.test(search) ||
+        /[?&]_kx=/.test(search) ||
+        klaviyoCookieIdentified()
+
+      // Any Klaviyo signup form submitted on the site counts as subscribed
+      window.addEventListener('klaviyoForms', function (e) {
+        if (e && e.detail && (e.detail.type === 'submit' || e.detail.type === 'stepSubmit')) markSubscribed()
+      })
+
       if (designMode) {
         document.addEventListener('shopify:section:select', function (event) {
           if (event.target.contains(root)) openOverlay()
@@ -729,10 +812,13 @@
       } else if (formStatus === 'success') {
         showSuccessToast()
         dismissLongTerm()
+        markSubscribed()
       } else if (formStatus === 'error') {
         showErrorToast()
         openOverlay()
-      } else if (!isDismissed()) {
+      } else if (knownSubscriber) {
+        markSubscribed()
+      } else if (!isDismissed() && !isSubscribed()) {
         window.addEventListener('scroll', onScrollOpen, { passive: true })
         document.addEventListener('mouseout', onExitIntent)
       }
@@ -774,13 +860,14 @@
     },
     {
       "type": "range",
-      "id": "dismiss_hours",
-      "label": "Hide for (hours) after close",
-      "min": 2,
-      "max": 168,
-      "step": 2,
-      "unit": "h",
-      "default": 24
+      "id": "dismiss_days",
+      "label": "Show again after (days)",
+      "info": "Seeing or closing the pop-up hides it for this many days. Known subscribers never see it.",
+      "min": 1,
+      "max": 90,
+      "step": 1,
+      "unit": "d",
+      "default": 7
     },
     {
       "type": "text",

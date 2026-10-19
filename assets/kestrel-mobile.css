@@ -1,0 +1,146 @@
+/* =====================================================================
+   kestrel-mobile.css  —  Kestrel Knives live theme, phone fixes
+   Added 2026-10-19. Loaded last from layout/theme.liquid.
+   Everything is inside @media (max-width: 749px) except the two
+   .k-blog-* helper classes, which only exist inside blog article bodies
+   (and already apply at all widths via each article's inline <style>).
+   Desktop/tablet layout is unchanged. Remove this file + its one
+   stylesheet_tag to undo.
+   ===================================================================== */
+
+/* ---------- Blog article helpers (classes used in article HTML) ---------- */
+.k-blog-num { text-decoration: underline; text-underline-offset: 0.15em; font-weight: 700; margin-right: 0.35em; }
+.k-blog-img { margin: 1.5rem 0; text-align: center; }
+.k-blog-img img {
+  display: block;
+  width: 100%;
+  max-width: min(100%, 360px);
+  height: auto;
+  max-height: 55vh;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+@media screen and (max-width: 749px) {
+
+  /* ---------- M1. Mobile menu (sections/header.liquid .mobile-menu-panel) ----------
+     Before: panel is a transparent full-screen layer with an 8px gutter, so the
+     page showed through around the menu card and below it while scrolling;
+     scroll could chain to the page (no overscroll containment); 100vh
+     max-height lets the last links sit under the iOS Safari toolbar. */
+  .mobile-menu-panel {
+    background-color: rgb(15 16 14 / 0.55);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    height: 100vh;
+    max-height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 32px) !important;
+  }
+  .mobile-menu-panel > div { flex-shrink: 0; }
+  /* Lock the page behind the open menu (Alpine x-show removes display:none) */
+  html:has(.mobile-menu-panel:not([x-cloak]):not([style*="display: none"])),
+  html:has(.mobile-menu-panel:not([x-cloak]):not([style*="display: none"])) body {
+    overflow: hidden;
+  }
+
+  /* ---------- M2. Hero CTA on short phones (sections/hero.liquid .hero-root) ----------
+     Mobile hero is a fixed 520px. On ~548px-tall Safari viewports (iPhone SE /
+     mini with toolbars) "Get Yours Now!" fell below the fold. Cap the height to
+     the visible screen; on normal iPhones (>= ~610px visible) nothing changes. */
+  .hero-root {
+    min-height: 0 !important;
+    height: min(var(--hero-height-mobile, 520px), calc(100vh - var(--header-height, 77px) - 16px)) !important;
+    height: min(var(--hero-height-mobile, 520px), calc(100svh - var(--header-height, 77px) - 16px)) !important;
+  }
+
+  /* ---------- M3. PDP gallery dots guard (sections/template-product.liquid #mobileDots) ----------
+     Products with many images (Ovis once rendered 39 dots) overflow the
+     358px row. Wrap instead of overflowing. No visual change at <= ~20 dots. */
+  #mobileDots {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 0.4rem;
+    min-width: 0;
+    max-width: calc(100% - 6rem);
+  }
+
+  /* ---------- B1. Blog article (sections/template-article.liquid) ---------- */
+  article[itemscope] [itemprop="articleBody"] {
+    padding-left: 1.125rem !important;
+    padding-right: 1.125rem !important;
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+  }
+  article[itemscope] h1[itemprop="headline"] {
+    font-size: clamp(1.55rem, 6.5vw, 2.15rem) !important;
+    line-height: 1.2 !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: auto;
+    max-width: 100%;
+    padding-left: 1.125rem;
+    padding-right: 1.125rem;
+    margin-bottom: 1.25rem;
+    box-sizing: border-box;
+  }
+  article[itemscope] [itemprop="image"] {
+    margin-left: 1.125rem !important;
+    margin-right: 1.125rem !important;
+  }
+  article[itemscope] [itemprop="articleBody"] p {
+    margin-top: 0;
+    margin-bottom: 1.15rem;
+    line-height: 1.65;
+  }
+  /* Tailwind preflight strips heading styles; give in-body headings weight */
+  article[itemscope] [itemprop="articleBody"] h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-top: 1.9rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  article[itemscope] [itemprop="articleBody"] h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 1.4rem;
+    margin-bottom: 0.6rem;
+    line-height: 1.35;
+  }
+  article[itemscope] [itemprop="articleBody"] ul,
+  article[itemscope] [itemprop="articleBody"] ol {
+    margin: 1rem 0 1.35rem;
+    padding-left: 1.4rem;
+    list-style-position: outside;
+  }
+  article[itemscope] [itemprop="articleBody"] ul { list-style-type: disc; }
+  article[itemscope] [itemprop="articleBody"] ol { list-style-type: decimal; }
+  article[itemscope] [itemprop="articleBody"] li {
+    margin: 0.55rem 0;
+    padding-left: 0.25rem;
+    line-height: 1.55;
+  }
+  article[itemscope] [itemprop="articleBody"] li + li { margin-top: 0.7rem; }
+  article[itemscope] [itemprop="articleBody"] img {
+    max-width: 100%;
+    height: auto;
+    max-height: 55vh;
+    object-fit: contain;
+  }
+}
+
+/* 2026-10-19 cookie banner: hide Avada's X on the main consent banner.
+   Avada renders this X unconditionally (no admin setting). Clicking it saves no
+   choice, so the banner comes back on every page. Without it, visitors must use
+   Accept or Preferences -> Reject, and Avada remembers that for 365 days.
+   The X inside the Preferences pop-up (which only returns to the banner) is kept.
+   Applies at all widths (the desktop float card has the same X). */
+#Avada-CookiesBar [role="dialog"]:not(.Avada-CookiesBar-Preferences__PopUp) > .CookiesBar-Pop__Close {
+  display: none !important;
+}

@@ -615,6 +615,7 @@
     function handleSignupSuccess() {
       showSuccess()
       resetAfterSubmit(true)
+      try { localStorage.setItem('kk_newsletter_subscribed_until', String(Date.now() + 365 * 24 * 60 * 60 * 1000)) } catch (e) {}
     }
 
     function handleSignupError() {
@@ -623,6 +624,7 @@
     }
 
     if (postedSuccess) {
+      try { localStorage.setItem('kk_newsletter_subscribed_until', String(Date.now() + 365 * 24 * 60 * 60 * 1000)) } catch (e) {}
       showSuccess()
     } else if (postedError) {
       showError(errorMessage)
