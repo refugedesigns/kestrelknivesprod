@@ -49,6 +49,21 @@
         }
       }
 
+      /* Slim announcement mode (no timer, no button): one-line bar, 44px mobile / 48px desktop */
+      #countdownBanner.is-slim { min-height: 44px; height: 44px; display: flex; align-items: center; }
+      #countdownBanner.is-slim > div { width: 100%; }
+      #countdownBanner.is-slim .countdown-banner__row { padding-top: 0; padding-bottom: 0; }
+      #countdownBanner.is-slim .countdown-banner__title {
+        font-size: 14px; line-height: 1; font-weight: 700; letter-spacing: .01em;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: calc(100vw - 52px);
+      }
+      #countdownBanner.is-slim .countdown-banner__icon { width: 18px; height: 18px; flex: none; }
+      @media (min-width: 640px) {
+        #countdownBanner.is-slim { min-height: 48px; height: 48px; }
+        #countdownBanner.is-slim .countdown-banner__title { font-size: 15px; letter-spacing: .08em; text-transform: uppercase; }
+        #countdownBanner.is-slim .countdown-banner__icon { width: 20px; height: 20px; }
+      }
+
       @media (max-width: 639px) {
         .countdown-banner__title {
           line-height: 1.25;
@@ -62,17 +77,20 @@
     </style>
     <div
       id='countdownBanner'
-      class='fixed top-0 left-0 right-0 z-30 transition-transform duration-300'
+      class='fixed top-0 left-0 right-0 z-30 transition-transform duration-300{% if section.settings.countdown_show_timer == false and section.settings.notify_button_text == blank %} is-slim{% endif %}'
       style='background-color: {{ section.settings.countdown_bg_color | default: "#000000" }};'
     >
       <div class='mx-auto px-2 sm:px-4 max-w-8xl'>
-        <div class='flex flex-col sm:flex-row items-center justify-center py-2 gap-2 sm:gap-4 text-center'>
+        <div class='countdown-banner__row flex flex-col sm:flex-row items-center justify-center py-2 gap-2 sm:gap-4 text-center'>
           <div
             class='flex items-center justify-center flex-wrap gap-x-2 gap-y-1 w-full sm:w-auto sm:flex-nowrap text-[11px] sm:text-sm font-medium tabular-nums'
             style='color: {{ section.settings.countdown_text_color | default: "#ffffff" }};'
           >
             {% if section.settings.countdown_show_timer != false %}
               <span class='shrink-0 whitespace-nowrap' x-text='formattedTime'></span>
+            {% endif %}
+            {% if section.settings.countdown_show_timer == false and section.settings.notify_button_text == blank %}
+              <svg class='countdown-banner__icon' viewBox='0 0 24 24' fill='none' stroke='#ea580c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M1 3h15v13H1z'/><path d='M16 8h4l3 3v5h-7z'/><circle cx='5.5' cy='18.5' r='2.5'/><circle cx='18.5' cy='18.5' r='2.5'/></svg>
             {% endif %}
             {% if section.settings.countdown_title != blank %}
               <span
@@ -83,7 +101,9 @@
               </span>
             {% endif %}
           </div>
-          {% if section.settings.notify_button_action == "link"
+          {% if section.settings.notify_button_text == blank %}
+            {% comment %} No button in slim announcement mode {% endcomment %}
+          {% elsif section.settings.notify_button_action == "link"
             and section.settings.notify_button_link != blank
           %}
             <a

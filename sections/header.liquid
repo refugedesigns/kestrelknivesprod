@@ -21,6 +21,11 @@
   assign header_bar_desktop = logo_h_desktop | plus: header_pad_y | plus: header_border
   assign countdown_h_mobile = 80
   assign countdown_h_desktop = 48
+  # Slim mode: no timer and no button -> single-line announcement bar
+  if section.settings.countdown_show_timer == false and section.settings.notify_button_text == blank
+    assign countdown_h_mobile = 44
+    assign countdown_h_desktop = 48
+  endif
 %}
 
 <style>
