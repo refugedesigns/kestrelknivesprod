@@ -1302,9 +1302,9 @@
                 {% endfor %}
               {% endunless %}
 
-              <div class='flex items-center gap-2'>
+              <div class='kk-buy-row flex items-center gap-2 mb-6'>
                 <!-- Quantity Selector -->
-                <div class='mb-6 border border-gray-300 py-1.5'>
+                <div class='kk-qty border border-gray-300 py-1.5'>
                   <div class='flex items-center space-x-3'>
                     <button
                       type='button'
@@ -1347,7 +1347,7 @@
                 <button
                   id='addToCartBtn'
                   type='submit'
-                  class='w-full text-sm whitespace-nowrap md:text-base uppercase bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] mb-6 {% if product_status_text != blank %}opacity-50 cursor-not-allowed{% elsif selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
+                  class='w-full text-sm whitespace-nowrap md:text-base uppercase bg-black hover:bg-gray-800 text-white font-semibold py-4 px-8 cursor-pointer transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] {% if product_status_text != blank %}opacity-50 cursor-not-allowed{% elsif selected_variant.available == false %}opacity-50 cursor-not-allowed{% endif %}'
                   {% if product_status_text != blank %}
                     disabled
                   {% endif %}
