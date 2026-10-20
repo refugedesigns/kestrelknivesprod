@@ -346,9 +346,7 @@
         linkifyAnswers()
         document.addEventListener('alpine:init', linkifyAnswers)
         setTimeout(linkifyAnswers, 0)
-      } catch (e) {
-        console && console.warn && console.warn('FAQ linkify error:', e)
-      }
+      } catch (e) {}
     })
   </script>
 

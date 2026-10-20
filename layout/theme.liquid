@@ -288,6 +288,7 @@ main[role='main'] {
       {% render 'product-card-js' %}
     {%- endif -%}
 
+    <script src='{{ 'cart.js' | asset_url }}'></script>
     <!-- Cart Sheet -->
     {% render "cart-sheet" %}
     {% render "shipping-calculator" %}

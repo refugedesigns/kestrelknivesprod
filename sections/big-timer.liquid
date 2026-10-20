@@ -136,7 +136,7 @@
       updateCountdown() {
         var targetDateString =
           '{{ section.settings.target_date | default: "2024-12-31T23:59:59" }}'
-        console.log('Target date string:', targetDateString)
+        
 
         // Clean and validate the date string
         var cleanDateString = targetDateString.trim()
@@ -159,7 +159,7 @@
 
         // If date is invalid, use a fallback date
         if (isNaN(targetDate) || targetDate <= 0) {
-          console.warn('Invalid target date, using fallback')
+          
           targetDate = new Date('2025-12-31T23:59:59Z').getTime()
         }
 
@@ -171,7 +171,7 @@
           this.hours = '00'
           this.minutes = '00'
           this.seconds = '00'
-          console.log('Countdown reached zero - timer stopped')
+          
           // Clear the interval to stop the infinite loop
           if (this.timerInterval) {
             clearInterval(this.timerInterval)
@@ -272,7 +272,7 @@
             // For error statuses, attempt to parse the response to get message
             var text = await response.text()
             this.errorMessage = 'Submission failed. Please try again.'
-            console.warn('Form submission response text:', text)
+            
           }
         } catch (err) {
           console.error('Error submitting form:', err)

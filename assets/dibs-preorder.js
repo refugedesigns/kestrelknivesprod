@@ -742,20 +742,12 @@
       return true;
     }
 
-    const payload = {
+    await window.kkCart.add({
       id: variantId,
       quantity: quantity || 1,
-      properties: propsOverride && typeof propsOverride === 'object' ? { ...propsOverride } : {},
-    };
-    if (sellingPlanId) payload.selling_plan = Number(sellingPlanId);
-
-    const response = await fetch('/cart/add.js', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      properties: propsOverride,
+      sellingPlanId: sellingPlanId,
     });
-    if (!response.ok) throw new Error('Failed to add to cart');
-    window.dispatchEvent(new CustomEvent('open-cart'));
     return true;
   }
 

@@ -736,11 +736,12 @@
             if (cartSheet && cartSheet._x_dataStack && cartSheet._x_dataStack[0]) {
               await cartSheet._x_dataStack[0].addToCart(this.selectedVariant, 1)
             } else {
-              const formData = new FormData()
-              formData.append('id', this.selectedVariant)
-              formData.append('quantity', '1')
-              const res = await fetch('/cart/add.js', { method: 'POST', body: formData })
-              if (!res.ok) throw new Error('Add to cart failed')
+              await window.kkCart.add({
+                id: this.selectedVariant,
+                quantity: 1,
+                refresh: false,
+                open: false,
+              })
             }
             await this.applyDiscountCode()
             window.dispatchEvent(new CustomEvent('open-cart'))
@@ -851,10 +852,12 @@
             if (cartSheet && cartSheet._x_dataStack && cartSheet._x_dataStack[0]) {
               await cartSheet._x_dataStack[0].addToCart(variantId, quantity)
             } else {
-              const formData = new FormData()
-              formData.append('id', variantId)
-              formData.append('quantity', String(quantity))
-              await fetch('/cart/add.js', { method: 'POST', body: formData })
+              await window.kkCart.add({
+                id: variantId,
+                quantity: quantity,
+                refresh: false,
+                open: false,
+              })
             }
             await this.applyDiscountCode()
             this.closeQuickView()

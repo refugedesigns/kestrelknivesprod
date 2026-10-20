@@ -586,22 +586,12 @@
                   sellingPlanId
                 )
               } else {
-                const payload = {
+                await window.kkCart.add({
                   id: this.selectedVariant,
                   quantity: 1,
-                }
-                if (sellingPlanId) payload.selling_plan = sellingPlanId
-                const response = await fetch('/cart/add.js', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(payload),
+                  properties: preorderProps,
+                  sellingPlanId: sellingPlanId,
                 })
-
-                if (response.ok) {
-                  window.dispatchEvent(new CustomEvent('open-cart'))
-                } else {
-                  throw new Error('Failed to add to cart')
-                }
               }
             }
           } catch (error) {
@@ -642,15 +632,12 @@
                   sellingPlanId
                 )
               } else {
-                const payload = {
+                await window.kkCart.add({
                   id: this.qvSelectedVariantId || this.selectedVariant,
                   quantity: this.qvQuantity || 1,
-                }
-                if (sellingPlanId) payload.selling_plan = sellingPlanId
-                await fetch('/cart/add.js', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(payload),
+                  properties: preorderProps,
+                  sellingPlanId: sellingPlanId,
+                  open: false,
                 })
               }
             }
@@ -1267,17 +1254,13 @@
                   sellingPlanId
                 )
               } else {
-                const payload = {
+                await window.kkCart.add({
                   id: this.selectedVariant,
                   quantity: 1,
-                }
-                if (sellingPlanId) payload.selling_plan = sellingPlanId
-                const res = await fetch('/cart/add.js', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(payload),
+                  properties: preorderProps,
+                  sellingPlanId: sellingPlanId,
+                  open: false,
                 })
-                if (!res.ok) throw new Error('Add to cart failed')
               }
             }
             window.dispatchEvent(new CustomEvent('open-cart'))
@@ -1434,15 +1417,12 @@
                   sellingPlanId
                 )
               } else {
-                const payload = {
+                await window.kkCart.add({
                   id: this.qvSelectedVariantId || this.selectedVariant,
                   quantity: this.qvQuantity || 1,
-                }
-                if (sellingPlanId) payload.selling_plan = sellingPlanId
-                await fetch('/cart/add.js', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(payload),
+                  properties: preorderProps,
+                  sellingPlanId: sellingPlanId,
+                  open: false,
                 })
               }
             }

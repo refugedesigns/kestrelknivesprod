@@ -1084,49 +1084,12 @@
         const initCarousels = () => {
           document
             .querySelectorAll('.testimonials-carousel')
-            .forEach((el, index) => {
-              if (el && el.swiper) {
-                console.log(`Carousel ${index} already initialized`)
-                return
-              }
-              if (typeof el.initialize === 'function') {
-                // Count slides before initializing
-                const slides = el.querySelectorAll('swiper-slide')
-                console.log(`Carousel ${index} has ${slides.length} slides`)
-
-                // Only enable loop if there are multiple slides
-                if (slides.length > 1) {
-                  el.setAttribute('loop', 'true')
-                  console.log(
-                    `Enabled loop for carousel ${index} (${slides.length} slides)`
-                  )
-                } else {
-                  el.setAttribute('loop', 'false')
-                  console.log(
-                    `Disabled loop for carousel ${index} (${slides.length} slides)`
-                  )
-                }
-
-                el.initialize()
-                console.log(`Testimonials carousel ${index} initialized`)
-
-                // Check if pagination is working
-                setTimeout(() => {
-                  const pagination = el.querySelector('.swiper-pagination')
-                  console.log('Pagination element:', pagination)
-                  if (pagination) {
-                    console.log('Pagination found and should be visible')
-                  } else {
-                    console.log(
-                      'Pagination not found - this might be the issue'
-                    )
-                  }
-                }, 100)
-              } else {
-                console.log(
-                  `Carousel ${index} initialize function not available yet`
-                )
-              }
+            .forEach(el => {
+              if (el && el.swiper) return
+              if (typeof el.initialize !== 'function') return
+              const slides = el.querySelectorAll('swiper-slide')
+              el.setAttribute('loop', slides.length > 1 ? 'true' : 'false')
+              el.initialize()
             })
         }
 

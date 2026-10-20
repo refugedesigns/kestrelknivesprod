@@ -2041,13 +2041,7 @@
         }
 
         // Fallback: direct API call then open the cart
-        const cartResponse = await fetch('/cart/add.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: variantId, quantity: 1 }),
-        });
-        if (!cartResponse.ok) throw new Error('Failed to add to cart');
-        window.dispatchEvent(new CustomEvent('open-cart'));
+        await window.kkCart.add({ id: variantId, quantity: 1 });
         return;
       }
 
@@ -2090,13 +2084,7 @@
       }
 
       // Fallback: direct API call then open the cart
-      const cartResponse = await fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: variantObj.id, quantity: 1 }),
-      });
-      if (!cartResponse.ok) throw new Error('Failed to add to cart');
-      window.dispatchEvent(new CustomEvent('open-cart'));
+      await window.kkCart.add({ id: variantObj.id, quantity: 1 });
     } catch (error) {
       console.error('Error adding related product to cart:', error);
       alert('Failed to add item to cart. Please try again.');
@@ -2485,13 +2473,10 @@
               this.qty
             )
           } else {
-            await fetch('/cart/add.js', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                id: this.selectedVariantId,
-                quantity: this.qty,
-              }),
+            await window.kkCart.add({
+              id: this.selectedVariantId,
+              quantity: this.qty,
+              open: false,
             })
           }
           this.close()
@@ -2579,7 +2564,7 @@
 <script>
   window.__product = {{ product | json }};
   // Pre-format all variant prices using Shopify's money filter
-  console.log('product', {{ product | json }});
+  
 
   window.__formattedPrices = {
     {% for variant in product.variants %}
@@ -2773,7 +2758,7 @@
         {% endfor %}
       ]
     };
-    console.log('Complex options config:', window.__complexOptionsConfig);
+    
   </script>
 {% else %}
   <script>
@@ -3590,11 +3575,11 @@
             if (!complexConfig || !complexConfig.options) return '';
             const optionMeta = complexConfig.options.find(opt => Number(opt.index) === Number(optionIndex));
             if (!optionMeta || !optionMeta.assets) {
-              console.log('lookupComplexAsset: missing metadata', { optionIndex, value });
+              
               return '';
             }
             const asset = optionMeta.assets[value] || '';
-            console.log('lookupComplexAsset:', { optionIndex, value, asset });
+            
             return asset;
           },
 
@@ -3956,27 +3941,19 @@
                 restore();
               } else {
                 // Fallback: direct API call
-                const payload = {
+                const properties = {};
+                for (const [key, value] of formData.entries()) {
+                  if (key.startsWith('properties[')) {
+                    properties[key.slice('properties['.length, -1)] = value;
+                  }
+                }
+                await window.kkCart.add({
                   id: variantId,
                   quantity: quantity,
-                };
-                if (sellingPlanId) payload.selling_plan = Number(sellingPlanId);
-                const response = await fetch('/cart/add.js', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify(payload),
+                  properties: properties,
+                  sellingPlanId: sellingPlanId,
                 });
-
-                if (response.ok) {
-                  // Dispatch event to open cart
-                  window.dispatchEvent(new CustomEvent('open-cart'));
-                  // Ensure button is restored for fallback path
-                  restore();
-                } else {
-                  throw new Error('Failed to add to cart');
-                }
+                restore();
               }
     } catch (error) {
               console.error('Error adding to cart:', error);
@@ -4010,7 +3987,7 @@
         if (!sizeSelector) return;
         
         const selectedSize = sizeSelector.value;
-        console.log('Sticky size selector changed to:', selectedSize);
+        
         
         // Update the main product page size selection first
         const sizeInputs = document.querySelectorAll('input[name^="options["]');
@@ -4038,7 +4015,7 @@
           });
           
           if (matchingVariant) {
-            console.log('Found matching variant:', matchingVariant);
+            
             
             // Update the hidden variant input
             const variantInput = document.getElementById('variantIdInput');
@@ -4109,12 +4086,12 @@
             // Get the current variant ID from the hidden input
             const variantInput = form.querySelector('input[name="id"]')
             const variantId = variantInput ? variantInput.value : null
-            console.log('Sticky add to cart - variant ID:', variantId)
+            
             
             // If we have a size selector, make sure it's synced with the main page
             const sizeSelector = document.getElementById('stickySizeSelector')
             if (sizeSelector) {
-              console.log('Size selector value:', sizeSelector.value)
+              
               // Ensure the main page is updated with the current size selection
               const sizeInputs = document.querySelectorAll('input[name^="options["]')
               sizeInputs.forEach(input => {
@@ -4130,7 +4107,7 @@
               
               // Get the updated variant ID
               const updatedVariantId = variantInput ? variantInput.value : null
-              console.log('Updated variant ID after size sync:', updatedVariantId)
+              
             }
             
             const productPage = document.querySelector('[x-data*="productPage"]')
@@ -4160,7 +4137,7 @@
 
             // Use the updated variant ID if available, otherwise use the original
             const finalVariantId = sizeSelector && variantInput ? variantInput.value : variantId
-            console.log('Final variant ID for cart:', finalVariantId)
+            
             
             const cartSheet = document.querySelector('[x-data*="cartSheet"]')
             if (
@@ -4181,14 +4158,11 @@
             }
 
             // Fallback
-            const payload = { id: finalVariantId, quantity }
-            if (sellingPlanId) payload.selling_plan = Number(sellingPlanId)
-            const res = await fetch('/cart/add.js', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload),
+            await window.kkCart.add({
+              id: finalVariantId,
+              quantity: quantity,
+              sellingPlanId: sellingPlanId,
             })
-            if (res.ok) window.dispatchEvent(new CustomEvent('open-cart'))
           } catch (e) {
             console.error('Sticky add error (non-custom):', e)
           }
@@ -4486,18 +4460,12 @@
           }
 
           // Fallback
-          const payload = {
+          await window.kkCart.add({
             id: variantId,
             quantity: quantity,
             properties: apoProps,
-          }
-
-          const res = await fetch('/cart/add.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
+            open: false,
           })
-          if (res.ok) window.dispatchEvent(new CustomEvent('cart-updated'))
         } catch (e) {
           console.error('Sticky add error:', e)
         }
@@ -4730,7 +4698,7 @@
         window.kkSyncProductAvailability(fresh.variants || []);
       }
     } catch (e) {
-      console.log('Error in freshness check', e);
+      console.error('Error in freshness check', e);
     }
   });
 </script>

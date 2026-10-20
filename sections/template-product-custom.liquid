@@ -717,9 +717,9 @@
 <script>
   // Fetch related products using Shopify Recommendations API
   document.addEventListener('DOMContentLoaded', function() {
-  console.log(window.MWAPO);
-console.log(window.MageworxAPO)
-console.log(window.MWAPOOptions)
+  
+
+
 
     const productId = {{ product.id }};
     
@@ -875,13 +875,7 @@ console.log(window.MWAPOOptions)
       }
 
       // Fallback: direct API call then open the cart
-      const cartResponse = await fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: variantObj.id, quantity: 1 }),
-      });
-      if (!cartResponse.ok) throw new Error('Failed to add to cart');
-      window.dispatchEvent(new CustomEvent('open-cart'));
+      await window.kkCart.add({ id: variantObj.id, quantity: 1 });
     } catch (error) {
       console.error('Error adding related product to cart:', error);
       alert('Failed to add item to cart. Please try again.');
@@ -962,7 +956,7 @@ console.log(window.MWAPOOptions)
 
 <script>
   window.__product = {{ product | json }};
-  console.log("Product:", window.__product);
+  
   // Pre-format all variant prices using Shopify's money filter
   window.__formattedPrices = {
     {% for variant in product.variants %}
@@ -1010,7 +1004,7 @@ console.log(window.MWAPOOptions)
 
       // Build variants data from window.__product
       const product = window.__product || {};
-      console.log('Product:', product);
+      
       const variants = (product.variants || []).map(v => {
         const opts = [];
         if (v.option1 !== undefined) opts.push(v.option1);
@@ -1167,18 +1161,18 @@ console.log(window.MWAPOOptions)
             // Update all option inputs to reflect the selected state
             const optionInputs = document.querySelectorAll('input[name^="options["], select[name^="options["]');
             
-            console.log('Updating option button states:', selectedOptions);
+            
             
             optionInputs.forEach(input => {
               const name = input.name.replace(/^options\[(.+)\]$/, '$1');
               const optionIndex = this.getOptionIndexByName(name);
               
-              console.log(`Input: ${name}, Option Index: ${optionIndex}, Value: ${input.value}`);
+              
               
               if (optionIndex !== -1 && selectedOptions[optionIndex]) {
                 const isSelected = input.value === selectedOptions[optionIndex];
                 
-                console.log(`Is selected: ${isSelected} for ${input.value}`);
+                
                 
                 // Update radio button checked state
                 if (input.type === 'radio') {
@@ -1196,12 +1190,7 @@ console.log(window.MWAPOOptions)
             const label = input.closest('label');
             const button = label ? label.querySelector('div') : null;
             
-            console.log('Updating visual state:', {
-              input: input.value,
-              isSelected: isSelected,
-              button: button,
-              buttonClasses: button ? button.className : 'none'
-            });
+            
             
             if (button) {
               if (isSelected) {
@@ -1524,23 +1513,10 @@ console.log(window.MWAPOOptions)
                 await cartSheet._x_dataStack[0].addToCart(variantId, quantity);
               } else {
                 // Fallback: direct API call
-                const response = await fetch('/cart/add.js', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    id: variantId,
-                    quantity: quantity,
-                  }),
+                await window.kkCart.add({
+                  id: variantId,
+                  quantity: quantity,
                 });
-
-                if (response.ok) {
-                  // Dispatch event to open cart
-                  window.dispatchEvent(new CustomEvent('open-cart'));
-                } else {
-                  throw new Error('Failed to add to cart');
-                }
               }
     } catch (error) {
               console.error('Error adding to cart:', error);

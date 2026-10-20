@@ -335,7 +335,7 @@
             )
             // APO will proceed its own flow; ensure loaders reset on cart-updated/open-cart
           } catch (e) {
-            console.warn('APO cloned click failed, falling back', e)
+            
             this.addToCart(variantId, quantity, 'sticky-button')
           }
           return
@@ -619,13 +619,6 @@
             properties: {},
           }
 
-          console.log('[cartSheet.addToCart] start', {
-            source,
-            variantId,
-            quantity,
-            hasForm: !!form,
-          })
-
           const hasOverride =
             propsOverride &&
             typeof propsOverride === 'object' &&
@@ -644,33 +637,21 @@
             const formSellingPlan = formData.get('selling_plan')
             if (formSellingPlan) sellingPlanId = formSellingPlan
           }
-          if (sellingPlanId) {
-            payload.selling_plan = Number(sellingPlanId)
-          }
-
-          console.log('[cartSheet.addToCart] payload', source, {
-            ...payload,
-            properties: { ...payload.properties },
+          await window.kkCart.add({
+            id: variantId,
+            quantity: quantity,
+            properties: payload.properties,
+            sellingPlanId: sellingPlanId,
+            refresh: false,
+            open: false,
           })
 
-          const response = await fetch('/cart/add.js', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-          })
+          await this.applyStorefrontDiscountCode()
+          await this.applyGatedDiscountCode()
+          await this.loadCart()
+          this.openCart()
 
-          if (response.ok) {
-            await this.applyStorefrontDiscountCode()
-            await this.applyGatedDiscountCode()
-            await this.loadCart()
-            this.openCart()
-
-            window.dispatchEvent(new CustomEvent('cart-updated'))
-          } else {
-            throw new Error('Failed to add to cart')
-          }
+          window.dispatchEvent(new CustomEvent('cart-updated'))
         } catch (error) {
           console.error('Error adding to cart:', error)
           alert('Failed to add item to cart. Please try again.')
