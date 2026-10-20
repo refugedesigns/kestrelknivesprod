@@ -37,8 +37,34 @@
 {%- endfor -%}
 ]
 {%- endcapture -%}
+{%- liquid
+  assign kk_option_values_json = ''
+  for option in product_obj.options_with_values
+    assign kk_value_json = ''
+    assign kk_value_count = 0
+    for value in option.values
+      assign kk_value_label = value.name | default: value
+      assign kk_value_piece = kk_value_label | json
+      if kk_value_count > 0
+        assign kk_value_json = kk_value_json | append: ','
+      endif
+      assign kk_value_json = kk_value_json | append: kk_value_piece
+      assign kk_value_count = kk_value_count | plus: 1
+    endfor
+    assign kk_option_piece = '[' | append: kk_value_json | append: ']'
+    if kk_option_values_json != blank
+      assign kk_option_values_json = kk_option_values_json | append: ','
+    endif
+    assign kk_option_values_json = kk_option_values_json | append: kk_option_piece
+  endfor
+  if kk_option_values_json != blank
+    assign kk_option_values_json = '[' | append: kk_option_values_json | append: ']'
+  else
+    assign kk_option_values_json = '[]'
+  endif
+-%}
 {%- capture card_product_json -%}
-{"id":{{ product_obj.id | json }},"title":{{ product_obj.title | json }},"handle":{{ product_obj.handle | json }},"url":{{ product_obj.url | json }},"type":{{ product_obj.type | json }},"product_type":{{ product_obj.type | json }},"available":{{ product_obj.available | json }},"price":{{ product_obj.price | json }},"options":{{ product_obj.options | json }},"status":{{ kk_status | json }}}
+{"id":{{ product_obj.id | json }},"title":{{ product_obj.title | json }},"handle":{{ product_obj.handle | json }},"url":{{ product_obj.url | json }},"type":{{ product_obj.type | json }},"product_type":{{ product_obj.type | json }},"available":{{ product_obj.available | json }},"price":{{ product_obj.price | json }},"options":{{ product_obj.options | json }},"option_values":{{ kk_option_values_json }},"status":{{ kk_status | json }}}
 {%- endcapture -%}
 {%- capture card_seed_json -%}
 {%- if seed_variant -%}
