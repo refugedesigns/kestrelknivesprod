@@ -105,7 +105,7 @@
         "settings": {
           "enable": true,
           "show_delay_seconds": 10,
-          "dismiss_hours": 24,
+          "dismiss_days": 7,
           "storage_key": "kk_subscribe_overlay_dismissed_until",
           "overlay_opacity": 42,
           "heading": "Win Free Knives & Gear!",
@@ -139,11 +139,6 @@
     },
     "content_for_index": [],
     "blocks": {
-      "14656832010101544780": {
-        "type": "shopify://apps/apo-product-options/blocks/app-embed-block/a1199153-7462-4b5b-8a80-f0eefba85e99",
-        "disabled": false,
-        "settings": {}
-      },
       "3138269044488530766": {
         "type": "shopify://apps/uppromote-affiliate/blocks/core-script/64c32457-930d-4cb9-9641-e24c0d9cf1f4",
         "disabled": false,
@@ -192,6 +187,13 @@
         "type": "shopify://apps/avada-cookie-consent/blocks/auto-blocker/deacc407-65bc-4a4e-84d9-f90e9e492cf3",
         "disabled": false,
         "settings": {}
+      },
+      "14656832010101544780": {
+        "type": "shopify://apps/apo-product-options/blocks/app-embed-block/a1199153-7462-4b5b-8a80-f0eefba85e99",
+        "disabled": false,
+        "settings": {
+          "load_on_product_only": true
+        }
       }
     }
   },
