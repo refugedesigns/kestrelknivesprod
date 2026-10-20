@@ -139,11 +139,15 @@
         }
       }
     </script>
-    {%- if template.name == 'index' -%}
+    {%- if template.name == 'index'
+      or template.name == 'product'
+      or template.name == 'page' and page.handle == 'shipping-returns'
+    -%}
       <script type='application/ld+json'>
         {
           "@context": "https://schema.org",
           "@type": "Organization",
+          "@id": {{ shop.url | append: '/#organization' | json }},
           "name": {{ shop.name | json }},
           "url": {{ shop.url | json }}
           {%- if shop.brand.logo != blank -%}
@@ -160,6 +164,7 @@
             "https://www.youtube.com/@kestrelknives",
             "https://twitter.com/KestrelKnives"
           ]
+          {%- render 'merchant-policies-json-ld' -%}
         }
       </script>
     {%- endif -%}
