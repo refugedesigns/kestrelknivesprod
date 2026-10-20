@@ -22,5 +22,81 @@
         "info": "When enabled, clears all cart discount codes if the visitor is not currently eligible (see Product — Discount collection origins + discount percent, or the Eastmans collection page). Prevents a prior Eastmans session discount from applying after browsing elsewhere."
       }
     ]
+  },
+  {
+    "name": "Campaigns",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Handles and tags that recognize campaign pages. Clearing a field uses the built-in default."
+      },
+      {
+        "type": "header",
+        "content": "Eastmans"
+      },
+      {
+        "type": "text",
+        "id": "campaign_eastmans_collection",
+        "label": "Collection handle",
+        "default": "eastmans-offer",
+        "info": "Visiting this collection turns on the gated cart discount."
+      },
+      {
+        "type": "text",
+        "id": "campaign_eastmans_suffix",
+        "label": "Collection template suffix",
+        "default": "eastmans",
+        "info": "Turns on the gated cart discount and loads the carousel script."
+      },
+      {
+        "type": "text",
+        "id": "campaign_eastmans_promo_suffix",
+        "label": "Promo page template suffix",
+        "default": "eastmans-promo",
+        "info": "Loads the carousel script. Does not turn on the cart discount by itself."
+      },
+      {
+        "type": "header",
+        "content": "Paboyz"
+      },
+      {
+        "type": "text",
+        "id": "campaign_paboyz_suffix",
+        "label": "Page template suffix",
+        "default": "paboyzoutdoors",
+        "info": "Loads the carousel script on this page template."
+      },
+      {
+        "type": "text",
+        "id": "campaign_paboyz_tag",
+        "label": "Newsletter tag",
+        "default": "paboyz"
+      },
+      {
+        "type": "header",
+        "content": "Early access"
+      },
+      {
+        "type": "text",
+        "id": "campaign_early_access_handle",
+        "label": "Collection handle",
+        "default": "early-access",
+        "info": "Collections whose handle contains this value use the early-access grid. Hyphens and underscores match."
+      },
+      {
+        "type": "text",
+        "id": "campaign_early_access_tag",
+        "label": "Product tag",
+        "default": "hidden_offer",
+        "info": "Products with this tag are treated as early-access offers and stay out of public grids."
+      },
+      {
+        "type": "text",
+        "id": "campaign_early_access_position_prefix",
+        "label": "Position tag prefix",
+        "default": "early_access_position_",
+        "info": "Tags like early_access_position_1 set the sort order. Include the trailing underscore."
+      }
+    ]
   }
 ]

@@ -384,6 +384,11 @@
 <div class='bg-gray-50 mb-8' x-data='productPage()'>
   <!-- Main Product Section -->
   <div class=''>
+    {%- capture kk_early_tag -%}{%- render 'campaign-value', key: 'early_access_tag' -%}{%- endcapture -%}
+    {%- capture kk_early_handle_norm -%}{%- render 'campaign-value', key: 'early_access_handle_norm' -%}{%- endcapture -%}
+    {% assign kk_early_tag = kk_early_tag | strip %}
+    {% assign kk_early_handle_norm = kk_early_handle_norm | strip %}
+    {% assign kk_early_handle_token = "_" | append: kk_early_handle_norm %}
     {%- assign tags_lower = product.tags
       | join: "||"
       | downcase
@@ -411,6 +416,7 @@
       | replace: "__", "_"
       | replace: "_early_accessr", ""
       | replace: "_early_access", ""
+      | replace: kk_early_handle_token, ""
     %}
     {% if tags_lower contains "use_complex_options" %}
       {% assign use_complex_options = true %}
@@ -509,7 +515,7 @@
       | img_url: "2048x2048"
     -%}
 
-    {% if tags_lower contains "hidden_offer" %}
+    {% if tags_lower contains kk_early_tag %}
       <div
         class='text-center mb-4 px-6 py-4 rounded-lg flex items-center justify-center'
         style='background-color: {{ section.settings.hidden_offer_title_bg_color | default: "#ffffff" }};'
@@ -525,7 +531,7 @@
         </p>
       </div>
     {% endif %}
-    <main class='product-page-main relative z-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8 {% unless tags_lower contains 'hidden_offer' %}md:pt-24{% endunless %}'>
+    <main class='product-page-main relative z-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8 {% unless tags_lower contains kk_early_tag %}md:pt-24{% endunless %}'>
       <div class='lg:grid lg:grid-cols-12 lg:gap-12'>
         <!-- Left Column - Product Images -->
         <div class='lg:col-span-7'>
@@ -1894,8 +1900,9 @@
           products.forEach(product => {
             // Filter out products with hidden_offer tag
             const tags = product.tags || [];
-            const hasHiddenOfferTag = tags.some(tag => 
-              String(tag).toLowerCase().includes('hidden_offer')
+            const earlyAccessTag = {{ kk_early_tag | json }};
+            const hasHiddenOfferTag = tags.some(tag =>
+              String(tag).toLowerCase().replace(/[\s-]/g, '_').includes(earlyAccessTag)
             );
             
             if (hasHiddenOfferTag) {
@@ -4513,7 +4520,7 @@
       "type": "text",
       "id": "discount_collection_origins",
       "label": "Discount collection origins",
-      "info": "Comma-separated paths. Example: collections/eastmans-offer, collections/special-deals"
+      "info": "Comma-separated paths. Example: collections/eastmans-offer, collections/special-deals. The Eastmans collection handle also lives in Theme settings → Campaigns."
     },
     {
       "type": "range",

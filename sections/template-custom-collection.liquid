@@ -47,8 +47,13 @@
           (independent of knives collection product_N / position_N tags).
           Only render products tagged hidden_offer.
         {% endcomment %}
+        {%- capture kk_early_tag -%}{%- render 'campaign-value', key: 'early_access_tag' -%}{%- endcapture -%}
+        {%- capture kk_early_position -%}{%- render 'campaign-value', key: 'early_access_position_prefix' -%}{%- endcapture -%}
+        {% assign kk_early_tag = kk_early_tag | strip %}
+        {% assign kk_early_position = kk_early_position | strip %}
+        {% assign kk_early_tag_token = "||" | append: kk_early_tag | append: "||" %}
         {% for i in (1..999) %}
-          {% assign wanted = "early_access_position_" | append: i %}
+          {% assign wanted = kk_early_position | append: i %}
           {% assign wanted_token = "||" | append: wanted | append: "||" %}
           {% for product in collection.products %}
             {%- assign tags_hidden_check = product.tags
@@ -61,7 +66,7 @@
               | append: tags_hidden_check
               | append: "||"
             -%}
-            {% if tags_hidden_check contains "||hidden_offer||"
+            {% if tags_hidden_check contains kk_early_tag_token
               and tags_hidden_check contains wanted_token
             %}
               {% assign kk_card_n = kk_card_n | plus: 1 %}
@@ -93,7 +98,7 @@
               | append: tags_hidden_check
               | append: "||"
             -%}
-            {% if tags_hidden_check contains "||hidden_offer||" %}
+            {% if tags_hidden_check contains kk_early_tag_token %}
               {% assign kk_card_n = kk_card_n | plus: 1 %}
               {% if kk_card_n <= 4 %}
                 {% render "product-card", product_product: product, card_priority: true %}

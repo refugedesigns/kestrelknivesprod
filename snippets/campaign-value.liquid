@@ -1,0 +1,61 @@
+{%- comment -%}
+  Prints one campaign setting. A blank setting falls back to the handle
+  the theme used before these settings existed.
+  key: eastmans_collection | eastmans_suffix | eastmans_promo_suffix |
+       paboyz_suffix | paboyz_tag | early_access_handle |
+       early_access_handle_norm | early_access_tag | early_access_position_prefix
+{%- endcomment -%}
+{%- liquid
+  assign campaign_value = ''
+  case key
+    when 'eastmans_collection'
+      assign campaign_value = settings.campaign_eastmans_collection | strip
+      if campaign_value == blank
+        assign campaign_value = 'eastmans-offer'
+      endif
+    when 'eastmans_suffix'
+      assign campaign_value = settings.campaign_eastmans_suffix | strip
+      if campaign_value == blank
+        assign campaign_value = 'eastmans'
+      endif
+    when 'eastmans_promo_suffix'
+      assign campaign_value = settings.campaign_eastmans_promo_suffix | strip
+      if campaign_value == blank
+        assign campaign_value = 'eastmans-promo'
+      endif
+    when 'paboyz_suffix'
+      assign campaign_value = settings.campaign_paboyz_suffix | strip
+      if campaign_value == blank
+        assign campaign_value = 'paboyzoutdoors'
+      endif
+    when 'paboyz_tag'
+      assign campaign_value = settings.campaign_paboyz_tag | strip
+      if campaign_value == blank
+        assign campaign_value = 'paboyz'
+      endif
+    when 'early_access_handle'
+      assign campaign_value = settings.campaign_early_access_handle | strip
+      if campaign_value == blank
+        assign campaign_value = 'early-access'
+      endif
+    when 'early_access_handle_norm'
+      assign campaign_value = settings.campaign_early_access_handle | strip
+      if campaign_value == blank
+        assign campaign_value = 'early-access'
+      endif
+      assign campaign_value = campaign_value | downcase | replace: '-', '_'
+    when 'early_access_tag'
+      assign campaign_value = settings.campaign_early_access_tag | strip
+      if campaign_value == blank
+        assign campaign_value = 'hidden_offer'
+      endif
+      assign campaign_value = campaign_value | downcase | replace: '-', '_' | replace: ' ', '_'
+    when 'early_access_position_prefix'
+      assign campaign_value = settings.campaign_early_access_position_prefix | strip
+      if campaign_value == blank
+        assign campaign_value = 'early_access_position_'
+      endif
+      assign campaign_value = campaign_value | downcase | replace: '-', '_' | replace: ' ', '_'
+  endcase
+  echo campaign_value
+-%}

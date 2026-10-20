@@ -9,7 +9,17 @@
   if template.name == 'product'
     # Internal/merchandising collections never become the crumb. Prefer the
     # main shop collections, then any other public collection.
-    assign crumb_skip = 'featured,featured-mobile,eastmans-offer,all,frontpage,early-access,most-popular-apparel,most-popular-sweatshirts,pinterest-apparel-stickers,custom' | split: ','
+    capture kk_eastmans_collection
+      render 'campaign-value', key: 'eastmans_collection'
+    endcapture
+    capture kk_early_access_handle
+      render 'campaign-value', key: 'early_access_handle'
+    endcapture
+    assign kk_eastmans_collection = kk_eastmans_collection | strip
+    assign kk_early_access_handle = kk_early_access_handle | strip
+    assign crumb_skip = 'featured,featured-mobile,all,frontpage,most-popular-apparel,most-popular-sweatshirts,pinterest-apparel-stickers,custom' | split: ','
+    assign crumb_campaign_skip = kk_eastmans_collection | append: ',' | append: kk_early_access_handle | split: ','
+    assign crumb_skip = crumb_skip | concat: crumb_campaign_skip
     assign crumb_preferred = 'ultralight-knives,apparels,accessories' | split: ','
     if collection != blank
       unless crumb_skip contains collection.handle

@@ -9,6 +9,9 @@
   assign tablet_cols = section.settings.tablet_columns | default: 2
   assign desktop_cols = section.settings.desktop_columns | default: 4
 %}
+{%- capture kk_early_tag -%}{%- render 'campaign-value', key: 'early_access_tag' -%}{%- endcapture -%}
+{% assign kk_early_tag = kk_early_tag | strip %}
+{% assign kk_early_tag_token = "||" | append: kk_early_tag | append: "||" %}
 
 <div class='flex flex-col items-center my-8 px-4'>
   <h2 class='text-center text-3xl'>{{ section.settings.title }}</h2>
@@ -28,7 +31,7 @@
             | replace: " ", "_"
           -%}
           {%- assign tags_hidden = "||" | append: tags_hidden | append: "||" -%}
-          {% unless tags_hidden contains "||hidden_offer||" %}
+          {% unless tags_hidden contains kk_early_tag_token %}
             {% render "product-card-featured", product_product: product %}
             {% assign rendered_count = rendered_count | plus: 1 %}
           {% endunless %}

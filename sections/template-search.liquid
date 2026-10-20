@@ -1,3 +1,5 @@
+{%- capture kk_early_tag -%}{%- render 'campaign-value', key: 'early_access_tag' -%}{%- endcapture -%}
+{% assign kk_early_tag = kk_early_tag | strip %}
 <div class='container mx-auto min-h-[calc(100vh-40vh)]' x-data='searchPage()'>
   {% paginate search.results by 9 %}
     <h1 class='text-xl my-4 text-center'>Search Results</h1>
@@ -52,7 +54,7 @@
                       | downcase
                       | split: "||"
                     -%}
-                    {% unless tags_lower contains "hidden_offer" %}
+                    {% unless tags_lower contains kk_early_tag %}
                       {% assign kk_card_n = kk_card_n | plus: 1 %}
                       {% if kk_card_n <= 4 %}
                         {% render "product-card", product_product: item, card_priority: true %}

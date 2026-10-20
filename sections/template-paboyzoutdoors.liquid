@@ -126,9 +126,11 @@
       </div>
 
       <div class='max-w-md mx-auto mb-10'>
+        {%- capture kk_paboyz_tag -%}{%- render 'campaign-value', key: 'paboyz_tag' -%}{%- endcapture -%}
+        {% assign kk_paboyz_tags = 'newsletter,' | append: kk_paboyz_tag | strip %}
         {% render 'email-signup-form',
           form_id: 'PaboyzSignup',
-          tags: 'newsletter,paboyz',
+          tags: kk_paboyz_tags,
           placeholder: 'Email',
           button_text: 'Sign up',
           tone: 'on-dark'

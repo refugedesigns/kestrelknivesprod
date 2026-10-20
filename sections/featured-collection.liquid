@@ -20,6 +20,8 @@
     assign show_tablet = false
   endif
 %}
+{%- capture kk_early_tag -%}{%- render 'campaign-value', key: 'early_access_tag' -%}{%- endcapture -%}
+{% assign kk_early_tag = kk_early_tag | strip %}
 
 <div class='flex flex-col items-center mt-2 mb-8'>
   <h2 class='text-center text-3xl'>{{ section.settings.title }}</h2>
@@ -37,7 +39,7 @@
               | downcase
               | split: "||"
             -%}
-            {% unless tags_lower contains "hidden_offer" %}
+            {% unless tags_lower contains kk_early_tag %}
               {% render "product-card-featured", product_product: product %}
             {% endunless %}
           {% else %}
@@ -61,7 +63,7 @@
               | downcase
               | split: "||"
             -%}
-            {% unless tags_lower contains "hidden_offer" %}
+            {% unless tags_lower contains kk_early_tag %}
               {% render "product-card-featured", product_product: product %}
             {% endunless %}
           {% else %}
@@ -87,7 +89,7 @@
               | downcase
               | split: "||"
             -%}
-            {% unless tags_lower contains "hidden_offer" %}
+            {% unless tags_lower contains kk_early_tag %}
               {% render "product-card-featured", product_product: product %}
             {% endunless %}
           {% else %}

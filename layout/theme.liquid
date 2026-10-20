@@ -188,12 +188,20 @@
       Product templates load their own Swiper asset.
       Homepage: defer until after load so it does not compete with LCP.
     {%- endcomment -%}
+    {%- capture kk_paboyz_suffix -%}{%- render 'campaign-value', key: 'paboyz_suffix' -%}{%- endcapture -%}
+    {%- capture kk_eastmans_suffix -%}{%- render 'campaign-value', key: 'eastmans_suffix' -%}{%- endcapture -%}
+    {%- capture kk_eastmans_promo_suffix -%}{%- render 'campaign-value', key: 'eastmans_promo_suffix' -%}{%- endcapture -%}
+    {%- capture kk_eastmans_collection -%}{%- render 'campaign-value', key: 'eastmans_collection' -%}{%- endcapture -%}
+    {%- assign kk_paboyz_suffix = kk_paboyz_suffix | strip -%}
+    {%- assign kk_eastmans_suffix = kk_eastmans_suffix | strip -%}
+    {%- assign kk_eastmans_promo_suffix = kk_eastmans_promo_suffix | strip -%}
+    {%- assign kk_eastmans_collection = kk_eastmans_collection | strip -%}
     {%- if template.name == 'collection'
       or template.name == 'list-collections'
       or template.suffix == 'testimonials'
-      or template.suffix == 'paboyzoutdoors'
-      or template.suffix == 'eastmans'
-      or template.suffix == 'eastmans-promo'
+      or template.suffix == kk_paboyz_suffix
+      or template.suffix == kk_eastmans_suffix
+      or template.suffix == kk_eastmans_promo_suffix
     -%}
       <script src='{{ 'swiper-element-bundle.min.js' | asset_url }}' defer></script>
     {%- elsif template.name == 'index' -%}
@@ -260,7 +268,7 @@ main[role='main'] {
     <script>
       try {
         {% if template.name == 'collection' %}
-          {% if collection.handle == 'eastmans-offer' or template.suffix == 'eastmans' %}
+          {% if collection.handle == kk_eastmans_collection or template.suffix == kk_eastmans_suffix %}
             sessionStorage.setItem('kk_gated_cart_discount', '1');
           {% else %}
             sessionStorage.setItem('kk_gated_cart_discount', '0');

@@ -31,9 +31,15 @@
     >
   {% endcomment %}
 
+  {%- capture kk_early_handle_norm -%}{%- render 'campaign-value', key: 'early_access_handle_norm' -%}{%- endcapture -%}
+  {%- capture kk_early_tag -%}{%- render 'campaign-value', key: 'early_access_tag' -%}{%- endcapture -%}
+  {%- capture kk_early_position -%}{%- render 'campaign-value', key: 'early_access_position_prefix' -%}{%- endcapture -%}
+  {% assign kk_early_handle_norm = kk_early_handle_norm | strip %}
+  {% assign kk_early_tag = kk_early_tag | strip %}
+  {% assign kk_early_position = kk_early_position | strip %}
   {% assign handle_norm = collection.handle | downcase | replace: "-", "_" %}
   {% assign is_early_access = false %}
-  {% if handle_norm contains "early_access" %}
+  {% if handle_norm contains kk_early_handle_norm %}
     {% assign is_early_access = true %}
   {% endif %}
   {%- comment -%} Shopify paginate max is 50. Remaining pages are appended in JS. {%- endcomment -%}
@@ -67,7 +73,7 @@
 
           {% assign handle_norm = collection.handle | downcase | replace: "-", "_" %}
           {% assign is_early_access = false %}
-          {% if handle_norm contains "early_access" %}
+          {% if handle_norm contains kk_early_handle_norm %}
             {% assign is_early_access = true %}
           {% endif %}
 
@@ -128,7 +134,7 @@
             {% if is_early_access %}
               {% assign rendered_ids = "," %}
               {% for i in (1..999) %}
-                {% assign wanted = "early_access_position_" | append: i %}
+                {% assign wanted = kk_early_position | append: i %}
                 {% assign wanted_token = "||" | append: wanted | append: "||" %}
                 {% for product in collection.products %}
                   {%- assign tags_joined = product.tags
@@ -198,7 +204,7 @@
                     {% assign has_wanted_tag = true %}
                   {% endif %}
                   {% if has_wanted_tag %}
-                    {% assign hidden_token = "||hidden_offer||" %}
+                    {% assign hidden_token = "||" | append: kk_early_tag | append: "||" %}
                     {% unless tags_joined contains hidden_token %}
                       {% assign kk_card_n = kk_card_n | plus: 1 %}
                       {% if kk_card_n <= 4 %}
@@ -224,7 +230,7 @@
                     | downcase
                     | split: "||"
                   -%}
-                  {% unless tags_lower contains "hidden_offer" %}
+                  {% unless tags_lower contains kk_early_tag %}
                     {% assign kk_card_n = kk_card_n | plus: 1 %}
                     {% if kk_card_n <= 4 %}
                       {% render "product-card", product_product: product, card_priority: true %}
@@ -241,7 +247,7 @@
                   | downcase
                   | split: "||"
                 -%}
-                {% unless tags_lower contains "hidden_offer" %}
+                {% unless tags_lower contains kk_early_tag %}
                   {% assign kk_card_n = kk_card_n | plus: 1 %}
                   {% if kk_card_n <= 4 %}
                     {% render "product-card", product_product: product, card_priority: true %}
