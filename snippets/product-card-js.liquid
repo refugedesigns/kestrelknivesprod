@@ -101,6 +101,7 @@
           if (typeof component.checkAvailability === 'function') {
             component.checkAvailability()
           }
+          kkPaintCardSwatches(component)
           return component.variantsData
         })
         .catch(err => {
@@ -109,6 +110,153 @@
           return component.variantsData
         })
       return component._variantsPromise
+    }
+
+    const kkVariantWaiters = []
+    let kkVariantActive = 0
+
+    function kkPumpVariants() {
+      while (kkVariantActive < 3 && kkVariantWaiters.length) {
+        const release = kkVariantWaiters.shift()
+        kkVariantActive += 1
+        release(() => {
+          kkVariantActive -= 1
+          kkPumpVariants()
+        })
+      }
+    }
+
+    function kkScheduleVariants(component) {
+      if (!component) return Promise.resolve(null)
+      if (component._variantSchedule) return component._variantSchedule
+      if (component._variantsLoaded || component._variantsPromise) {
+        component._variantSchedule = kkEnsureVariants(component)
+        return component._variantSchedule
+      }
+      component._variantSchedule = new Promise(resolve => {
+        kkVariantWaiters.push(resolve)
+        kkPumpVariants()
+      }).then(done => kkEnsureVariants(component).finally(done))
+      return component._variantSchedule
+    }
+
+    function kkWatchCard(component) {
+      const el = component && component.$el
+      if (!el) return
+      if (!window.IntersectionObserver) {
+        kkScheduleVariants(component)
+        return
+      }
+      const observer = new IntersectionObserver(
+        entries => {
+          if (!entries.some(entry => entry.isIntersecting)) return
+          observer.disconnect()
+          kkScheduleVariants(component)
+        },
+        { rootMargin: '200px' }
+      )
+      observer.observe(el)
+    }
+
+    function kkSyncSwatchRings(component) {
+      if (!component || !component.$el) return
+      const slot = component.$el.querySelector('[data-card-swatches]')
+      if (!slot) return
+      const mode = slot.getAttribute('data-swatch-mode')
+      const current =
+        mode === 'color'
+          ? String(component.selectedColorLc || '')
+          : String(component.selectedOption1Lc || '')
+      slot.querySelectorAll('button').forEach(btn => {
+        const key = mode === 'color' ? btn.dataset.colorLc : btn.dataset.handleLc
+        const on = !!key && key === current
+        btn.classList.toggle('ring-2', on)
+        btn.classList.toggle('ring-black', on)
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false')
+      })
+    }
+
+    function kkPaintCardSwatches(component) {
+      if (!component || component._swatchesPainted || !component.$el) return
+      const root = component.$el
+      const slot = root.querySelector('[data-card-swatches]')
+      if (!slot) {
+        component._swatchesPainted = true
+        return
+      }
+      const colors = kkReadJson(root, 'data-card-colors', [])
+      if (!Array.isArray(colors) || colors.length < 2) {
+        component._swatchesPainted = true
+        return
+      }
+      const mode = slot.getAttribute('data-swatch-mode') === 'color' ? 'color' : 'handle'
+      const key =
+        mode === 'color' && typeof component.colorOptionKey === 'function'
+          ? component.colorOptionKey()
+          : 'option1'
+      const wrap = document.createElement('div')
+      wrap.className =
+        mode === 'color'
+          ? 'flex flex-wrap gap-1 md:gap-2 justify-center'
+          : 'flex gap-2 justify-center flex-wrap max-w-[260px] sm:max-w-none md:max-w-full mx-auto'
+      colors.forEach(entry => {
+        const name = String((entry && entry.name) || '').trim()
+        if (!name) return
+        const hex = entry && entry.hex ? String(entry.hex) : ''
+        const variant = (component.variantsData || []).find(
+          item =>
+            String(item[key] || '') === name &&
+            item.featured_image &&
+            item.featured_image.src
+        )
+        const btn = document.createElement('button')
+        btn.type = 'button'
+        btn.className =
+          'h-6 w-6 rounded-full border-2 border-gray-300 overflow-hidden focus:outline-none focus:ring-2 focus:ring-black'
+        btn.title = name
+        btn.setAttribute('aria-label', name)
+        btn.dataset.handleLc = name.toLowerCase()
+        btn.dataset.colorLc = name.toLowerCase()
+        if (hex) {
+          const fill = document.createElement('span')
+          fill.className = 'block w-full h-full rounded-full'
+          fill.setAttribute('data-swatch-fill', '')
+          fill.style.backgroundColor = hex
+          btn.appendChild(fill)
+        } else if (variant) {
+          const src = kkSizedImageUrl(variant.featured_image.src, mode === 'color' ? 120 : 64)
+          if (mode === 'color') {
+            btn.setAttribute('data-swatch-src', src)
+            const fill = document.createElement('span')
+            fill.className = 'block w-full h-full rounded-full bg-gray-200'
+            fill.setAttribute('data-swatch-fill', '')
+            btn.appendChild(fill)
+          } else {
+            const img = document.createElement('img')
+            img.width = 48
+            img.height = 48
+            img.alt = name
+            img.className = 'w-full h-full object-cover'
+            img.src = src
+            btn.appendChild(img)
+          }
+        } else {
+          const fill = document.createElement('span')
+          fill.className = 'block w-full h-full rounded-full bg-gray-200'
+          btn.appendChild(fill)
+        }
+        btn.addEventListener('click', event => {
+          event.preventDefault()
+          event.stopPropagation()
+          if (mode === 'color') component.selectByColor(name)
+          else component.selectByHandle(name)
+        })
+        wrap.appendChild(btn)
+      })
+      if (!wrap.childElementCount) return
+      slot.appendChild(wrap)
+      component._swatchesPainted = true
+      kkSyncSwatchRings(component)
     }
 
     function kkOpenSharedQuickView(component) {
@@ -296,7 +444,7 @@
         },
 
         prefetchVariants() {
-          kkEnsureVariants(this)
+          kkScheduleVariants(this)
         },
 
         async selectByColor(colorValue) {
@@ -436,6 +584,8 @@
 
           // Ensure initial image reflects the initially selected variant if it has a featured image
           this.updateImage()
+          this.$watch('selectedVariant', () => kkSyncSwatchRings(this))
+          kkWatchCard(this)
           this.initDibsPreorder()
         },
 
@@ -884,11 +1034,13 @@
           this.updateImage()
           this.updateTitle()
           this.checkAvailability()
+          this.$watch('selectedVariant', () => kkSyncSwatchRings(this))
+          kkWatchCard(this)
           this.initDibsPreorder()
         },
 
         prefetchVariants() {
-          kkEnsureVariants(this)
+          kkScheduleVariants(this)
         },
 
         // Price text
