@@ -79,10 +79,79 @@
       return Array.from(values)
     }
 
+    function kkNormOption(val) {
+      return String(val || '')
+        .trim()
+        .toLowerCase()
+    }
+
+    function kkSortSizeValues(values) {
+      const rankOf = val => {
+        const key = String(val || '')
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, '')
+        const order = [
+          'xxs',
+          'xs',
+          's',
+          'm',
+          'l',
+          'xl',
+          'xxl',
+          '2xl',
+          '3xl',
+          '4xl',
+          '5xl',
+        ]
+        const idx = order.indexOf(key)
+        return idx === -1 ? 100 : idx
+      }
+      return values.slice().sort((a, b) => {
+        const diff = rankOf(a) - rankOf(b)
+        return diff !== 0 ? diff : String(a).localeCompare(String(b))
+      })
+    }
+
+    function kkRebuildComboIndex(component) {
+      const index = {}
+      const colorImages = {}
+      ;(component.variantsData || []).forEach(variant => {
+        const option1 = String(variant.option1 || '').trim()
+        const option2 = String(variant.option2 || '').trim()
+        index[kkNormOption(option1) + '|' + kkNormOption(option2)] = true
+        const src =
+          variant.featured_image && variant.featured_image.src
+            ? variant.featured_image.src
+            : ''
+        if (option1 && src && !colorImages[option1]) {
+          colorImages[option1] = src
+        }
+      })
+      component.qvComboIndex = index
+      component.qvColorImages = colorImages
+      component.qvComboReady = !!component._variantsLoaded
+    }
+
+    function kkComboExists(component, val1, val2) {
+      if (!component || !component._variantsLoaded) return true
+      const index = component.qvComboIndex || {}
+      if (!Object.keys(index).length) return true
+      return !!index[kkNormOption(val1) + '|' + kkNormOption(val2)]
+    }
+
     function kkRefreshQuickViewOptions(component) {
       if (!component) return
+      kkRebuildComboIndex(component)
       component.qvValues1 = kkUniqueOptionValues(component, 1)
-      component.qvValues2 = kkUniqueOptionValues(component, 2)
+      let second = kkUniqueOptionValues(component, 2)
+      const secondName = String(
+        (component.optionNames && component.optionNames[1]) || ''
+      ).toLowerCase()
+      if (!secondName || secondName.includes('size')) {
+        second = kkSortSizeValues(second)
+      }
+      component.qvValues2 = second
     }
 
     function kkLoadVariants(handle) {
@@ -411,6 +480,9 @@
         optionValueLists: [],
         qvValues1: [],
         qvValues2: [],
+        qvComboIndex: {},
+        qvColorImages: {},
+        qvComboReady: false,
         qvImage: null,
         qvImageFit: 'contain',
         qvRespectStatus: true,
@@ -468,6 +540,15 @@
           this.optionValueLists = Array.isArray(this.productData.option_values)
             ? this.productData.option_values
             : []
+          this.optionNames = (
+            Array.isArray(this.productData.options)
+              ? this.productData.options
+              : []
+          )
+            .map(option =>
+              typeof option === 'string' ? option : (option && option.name) || ''
+            )
+            .filter(Boolean)
           this._variantsLoaded = false
           kkRefreshQuickViewOptions(this)
           this.syncApparelSelectionToImage()
@@ -709,26 +790,24 @@
           }
         },
         imageForOptionValue(index, val) {
-          // Try to find a variant whose option matches and has an image
+          if (index === 1 && this.qvColorImages && this.qvColorImages[val]) {
+            return this.sizedImageUrl(this.qvColorImages[val], 800)
+          }
           const key = index === 1 ? 'option1' : 'option2'
+          const needle = kkNormOption(val)
           const variantWithImage = (this.variantsData || []).find(
             v =>
-              String(v[key] || '') === String(val) &&
+              kkNormOption(v[key]) === needle &&
               v.featured_image &&
               v.featured_image.src
           )
           if (variantWithImage) {
             return this.sizedImageUrl(variantWithImage.featured_image.src, 800)
           }
-          // Fallback to current product image
           return this.qvImage || this.currentImage
         },
         isComboAvailable(val1, val2) {
-          return !!(this.variantsData || []).find(v => {
-            const ok1 = val1 ? String(v.option1 || '') === String(val1) : true
-            const ok2 = val2 ? String(v.option2 || '') === String(val2) : true
-            return ok1 && ok2
-          })
+          return kkComboExists(this, val1, val2)
         },
         updateQVSelectedVariant() {
           // Find variant matching current option selections (prefer available)
@@ -736,10 +815,10 @@
           if (this.qvOption1 || this.qvOption2) {
             const matches = (this.variantsData || []).filter(v => {
               const ok1 = this.qvOption1
-                ? String(v.option1 || '') === String(this.qvOption1)
+                ? kkNormOption(v.option1) === kkNormOption(this.qvOption1)
                 : true
               const ok2 = this.qvOption2
-                ? String(v.option2 || '') === String(this.qvOption2)
+                ? kkNormOption(v.option2) === kkNormOption(this.qvOption2)
                 : true
               return ok1 && ok2
             })
@@ -866,6 +945,9 @@
         optionValueLists: [],
         qvValues1: [],
         qvValues2: [],
+        qvComboIndex: {},
+        qvColorImages: {},
+        qvComboReady: false,
         qvImage: null,
         qvImageFit: 'cover',
         qvRespectStatus: false,
@@ -900,6 +982,17 @@
             this.optionValueLists = Array.isArray(this.productData.option_values)
               ? this.productData.option_values
               : []
+            this.optionNames = (
+              Array.isArray(this.productData.options)
+                ? this.productData.options
+                : []
+            )
+              .map(option =>
+                typeof option === 'string'
+                  ? option
+                  : (option && option.name) || ''
+              )
+              .filter(Boolean)
             this._variantsLoaded = false
             kkRefreshQuickViewOptions(this)
 
@@ -1379,9 +1472,13 @@
           }
         },
         imageForOptionValue(index, val) {
+          if (index === 1 && this.qvColorImages && this.qvColorImages[val]) {
+            return this.sizedImageUrl(this.qvColorImages[val], 800)
+          }
           const key = index === 1 ? 'option1' : 'option2'
+          const needle = kkNormOption(val)
           const variantWithImage = (this.variantsData || []).find(
-            v => String(v[key] || '') === String(val)
+            v => kkNormOption(v[key]) === needle
           )
           if (variantWithImage) {
             const src = this.resolveImageSrc(
@@ -1392,21 +1489,17 @@
           return this.qvImage || this.currentImage || this.productImageSrc || ''
         },
         isComboAvailable(val1, val2) {
-          return !!(this.variantsData || []).find(v => {
-            const ok1 = val1 ? String(v.option1 || '') === String(val1) : true
-            const ok2 = val2 ? String(v.option2 || '') === String(val2) : true
-            return ok1 && ok2
-          })
+          return kkComboExists(this, val1, val2)
         },
         updateQVSelectedVariant() {
           let chosen = null
           if (this.qvOption1 || this.qvOption2) {
             const matches = (this.variantsData || []).filter(v => {
               const ok1 = this.qvOption1
-                ? String(v.option1 || '') === String(this.qvOption1)
+                ? kkNormOption(v.option1) === kkNormOption(this.qvOption1)
                 : true
               const ok2 = this.qvOption2
-                ? String(v.option2 || '') === String(this.qvOption2)
+                ? kkNormOption(v.option2) === kkNormOption(this.qvOption2)
                 : true
               return ok1 && ok2
             })
@@ -1612,9 +1705,9 @@
                     <button
                       type='button'
                       @click='card.qvOption2 = val; card.updateQVSelectedVariant()'
-                      :disabled='!card.isComboAvailable(card.qvOption1, val)'
+                      :disabled='!!card.qvComboReady && !card.isComboAvailable(card.qvOption1, val)'
                       :title='val'
-                      :class="'w-12 h-12 rounded-md border overflow-hidden ' + (card.qvOption2 === val ? 'ring-2 ring-black' : '') + (!card.isComboAvailable(card.qvOption1, val) ? ' opacity-40 cursor-not-allowed' : '')"
+                      :class="'w-12 h-12 rounded-md border overflow-hidden ' + (card.qvOption2 === val ? 'ring-2 ring-black' : '') + (card.qvComboReady && !card.isComboAvailable(card.qvOption1, val) ? ' opacity-40 cursor-not-allowed' : '')"
                     >
                       <img
                         :src='card.imageForOptionValue(2, val)'
@@ -1631,8 +1724,8 @@
                     <button
                       type='button'
                       @click='card.qvOption2 = val; card.updateQVSelectedVariant()'
-                      :disabled='!card.isComboAvailable(card.qvOption1, val)'
-                      :class="((card.qvOption2 === val ? 'ring-2 ring-black ' : '') + 'px-4 py-3 border rounded-md text-sm ') + (!card.isComboAvailable(card.qvOption1, val) ? 'opacity-40 cursor-not-allowed' : '')"
+                      :disabled='!!card.qvComboReady && !card.isComboAvailable(card.qvOption1, val)'
+                      :class="((card.qvOption2 === val ? 'ring-2 ring-black ' : '') + 'px-4 py-3 border rounded-md text-sm ') + (card.qvComboReady && !card.isComboAvailable(card.qvOption1, val) ? 'opacity-40 cursor-not-allowed' : '')"
                     >
                       <span x-text='val'></span>
                     </button>
