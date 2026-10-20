@@ -1,0 +1,152 @@
+/* =====================================================================
+   kestrel-klaviyo-bis.css  —  Back-in-stock layout fixes (2026-10-20)
+   1) Klaviyo "Notify me when it's back" popup (form VEpjaP). The live
+      form definition puts every block (logo, heading, text, email,
+      checkbox, button) in ONE row, and Klaviyo lays a row's blocks out
+      side by side inside a 320px ("small") form. These rules stack
+      them in one column and widen the modal. Scoped by the form's
+      accessible name, so no other Klaviyo form is affected.
+   2) PDP buy row (sections/template-product.liquid .kk-buy-row): the
+      quantity selector, Add to cart and Klaviyo's injected
+      notify button share one 56px height and line up top and bottom.
+   Layout only: no submit, variant or Klaviyo wiring changes.
+   Remove this file + its one stylesheet_tag in layout/theme.liquid
+   (and the kk-* classes in template-product.liquid) to undo.
+   ===================================================================== */
+
+/* ---------- 1) Back-in-stock popup ---------- */
+[role='dialog'][aria-label='Back in stock notification'] form.klaviyo-form {
+  flex-direction: column !important;
+  width: 460px !important;
+  min-width: 0 !important;
+  max-width: 90vw !important;
+  padding: 32px 28px 28px !important;
+}
+/* column wrapper + the single "row" that holds every block */
+[role='dialog'][aria-label='Back in stock notification'] form.klaviyo-form > div,
+[role='dialog'][aria-label='Back in stock notification'] form.klaviyo-form > div > div {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  min-height: 0 !important;
+}
+/* each block wrapper: full width, natural height */
+[role='dialog'][aria-label='Back in stock notification'] form.klaviyo-form > div > div > div {
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+}
+[role='dialog'][aria-label='Back in stock notification'] form.klaviyo-form > div > div > div > :not(button) {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+}
+/* logo */
+[role='dialog'][aria-label='Back in stock notification'] .klaviyo-form-image {
+  justify-content: center !important;
+  height: auto !important;
+}
+[role='dialog'][aria-label='Back in stock notification'] .klaviyo-form-image img {
+  width: 140px !important;
+  max-width: 140px !important;
+  height: auto !important;
+  margin: 0 auto !important;
+}
+/* heading + subtext */
+[role='dialog'][aria-label='Back in stock notification'] .klaviyo-form-richtext {
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+}
+/* email input */
+[role='dialog'][aria-label='Back in stock notification'] .klaviyo-emailinput,
+[role='dialog'][aria-label='Back in stock notification'] .klaviyo-emailinput input {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+/* consent checkbox: box inline with its label */
+[role='dialog'][aria-label='Back in stock notification'] .klaviyo-promocheckbox fieldset,
+[role='dialog'][aria-label='Back in stock notification'] .klaviyo-promocheckbox label {
+  width: 100% !important;
+  height: auto !important;
+}
+[role='dialog'][aria-label='Back in stock notification'] .klaviyo-promocheckbox label {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px;
+}
+[role='dialog'][aria-label='Back in stock notification'] .klaviyo-promocheckbox label > svg {
+  flex: 0 0 auto !important;
+}
+[role='dialog'][aria-label='Back in stock notification'] .klaviyo-promocheckbox label > div {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  height: auto !important;
+  white-space: normal !important;
+}
+/* submit button. The form puts the orange on the block wrapper and leaves
+   the button Klaviyo's default slate (#303B43), so paint the button itself. */
+[role='dialog'][aria-label='Back in stock notification'] form.klaviyo-form > div > div > div:has(> .klaviyo-form-button) {
+  background: transparent !important;
+}
+[role='dialog'][aria-label='Back in stock notification'] form.klaviyo-form .klaviyo-form-button {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 50px !important;
+  padding: 0 16px !important;
+  background: #c2410c !important;
+  color: #fff !important;
+  border-radius: 4px !important;
+  line-height: 1.2 !important;
+  white-space: normal !important;
+  word-break: normal !important;
+}
+[role='dialog'][aria-label='Back in stock notification'] form.klaviyo-form .klaviyo-form-button:hover {
+  background: #9a3412 !important;
+}
+
+/* ---------- 2) PDP buy row ---------- */
+.kk-buy-row {
+  align-items: stretch !important;
+}
+.kk-buy-row > * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+.kk-buy-row > .kk-qty {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  height: 56px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.kk-buy-row > #addToCartBtn {
+  height: 56px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+/* Klaviyo inserts <div><div data-a11y-identifier="bis-button-…"><button …> */
+.kk-buy-row > div:not(.kk-qty) {
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+}
+.kk-buy-row [data-a11y-identifier^='bis-button'] {
+  height: 56px !important;
+  min-height: 56px !important;
+  margin: 0 !important;
+}
+.kk-buy-row button[data-a11y-identifier^='bis-button'] {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  padding: 0 12px !important;
+  line-height: 1.15 !important;
+  white-space: normal !important;
+}
