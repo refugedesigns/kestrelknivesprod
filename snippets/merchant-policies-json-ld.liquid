@@ -1,0 +1,107 @@
+{% comment %}
+  Store-wide return and shipping policies for Google merchant listings.
+  Rendered inside the Organization JSON-LD in layout/theme.liquid, so this
+  outputs object properties that start with a comma, not a full object.
+  Offers in snippets/product-json-ld.liquid point at these by @id.
+
+  Source: the live Refund policy, the Shipping policy and
+  /pages/shipping-returns, plus the Shopify shipping rates (2026-10-20).
+  If the policy or the rates change, change this file too.
+
+  free_standard_campaign: set to false (or delete the first shipping
+  condition) when free standard shipping on $200+ (Lower 48 + DC) ends.
+{% endcomment %}
+{%- liquid
+  assign free_standard_campaign = true
+  assign free_standard_min_order = 200
+  # Highest cost we state for standard ground under $200. Paid rates are
+  # carrier-calculated USPS/UPS quotes plus a $3 fee, so this is an upper
+  # bound, not a quote (see the PR for the data behind it).
+  assign standard_ground_max_rate = 15
+  assign policy_page_url = shop.url | append: '/pages/shipping-returns'
+-%}
+,"hasMerchantReturnPolicy": {
+  "@type": "MerchantReturnPolicy",
+  "@id": {{ policy_page_url | append: '#return-policy' | json }},
+  "merchantReturnLink": {{ policy_page_url | json }},
+  "applicableCountry": "US",
+  "returnPolicyCountry": "US",
+  "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+  "merchantReturnDays": 5,
+  "returnMethod": "https://schema.org/ReturnByMail",
+  "itemCondition": "https://schema.org/NewCondition",
+  "returnFees": "https://schema.org/ReturnFeesCustomerResponsibility",
+  "customerRemorseReturnFees": "https://schema.org/ReturnFeesCustomerResponsibility",
+  "returnLabelSource": "https://schema.org/ReturnLabelCustomerResponsibility",
+  "itemDefectReturnFees": "https://schema.org/FreeReturn",
+  "restockingFee": 15
+}
+,"hasShippingService": {
+  "@type": "ShippingService",
+  "@id": {{ policy_page_url | append: '#shipping-policy' | json }},
+  "name": "Standard ground shipping (US)",
+  "description": {% if free_standard_campaign %}"Lower 48 states and DC: free standard ground shipping (3–7 business days) on orders of ${{ free_standard_min_order }} or more. Other orders pay carrier-calculated USPS or UPS rates shown at checkout. Alaska, Hawaii and U.S. territories pay the rates shown at checkout."{% else %}"Lower 48 states and DC: carrier-calculated USPS or UPS standard ground rates shown at checkout (3–7 business days). Alaska, Hawaii and U.S. territories pay the rates shown at checkout."{% endif %},
+  "fulfillmentType": "https://schema.org/FulfillmentTypeDelivery",
+  "shippingConditions": [
+    {%- if free_standard_campaign -%}
+    {
+      "@type": "ShippingConditions",
+      "shippingDestination": {
+        "@type": "DefinedRegion",
+        "addressCountry": "US",
+        "addressRegion": ["AL","AZ","AR","CA","CO","CT","DE","DC","FL","GA","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"]
+      },
+      "orderValue": {
+        "@type": "MonetaryAmount",
+        "minValue": {{ free_standard_min_order }},
+        "currency": "USD"
+      },
+      "shippingRate": {
+        "@type": "MonetaryAmount",
+        "value": 0,
+        "currency": "USD"
+      },
+      "transitTime": {
+        "@type": "ServicePeriod",
+        "businessDays": ["https://schema.org/Monday","https://schema.org/Tuesday","https://schema.org/Wednesday","https://schema.org/Thursday","https://schema.org/Friday"],
+        "duration": {
+          "@type": "QuantitativeValue",
+          "minValue": 3,
+          "maxValue": 7,
+          "unitCode": "DAY"
+        }
+      }
+    },
+    {%- endif -%}
+    {
+      "@type": "ShippingConditions",
+      "shippingDestination": {
+        "@type": "DefinedRegion",
+        "addressCountry": "US",
+        "addressRegion": ["AL","AZ","AR","CA","CO","CT","DE","DC","FL","GA","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"]
+      }
+      {%- if free_standard_campaign -%}
+      ,"orderValue": {
+        "@type": "MonetaryAmount",
+        "maxValue": {{ free_standard_min_order | minus: 0.01 }},
+        "currency": "USD"
+      }
+      {%- endif -%}
+      ,"shippingRate": {
+        "@type": "MonetaryAmount",
+        "maxValue": {{ standard_ground_max_rate }},
+        "currency": "USD"
+      },
+      "transitTime": {
+        "@type": "ServicePeriod",
+        "businessDays": ["https://schema.org/Monday","https://schema.org/Tuesday","https://schema.org/Wednesday","https://schema.org/Thursday","https://schema.org/Friday"],
+        "duration": {
+          "@type": "QuantitativeValue",
+          "minValue": 3,
+          "maxValue": 7,
+          "unitCode": "DAY"
+        }
+      }
+    }
+  ]
+}

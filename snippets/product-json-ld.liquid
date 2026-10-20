@@ -2,6 +2,9 @@
   Product JSON-LD. selected_variant is passed from the product section so the
   product-level SKU follows the same variant as the page, including sold-out
   deep links. Review totals come from Klaviyo's Shopify review metafields.
+  Offers point at the store-wide return and shipping policies by @id. Those
+  are defined in snippets/merchant-policies-json-ld.liquid and output in the
+  Organization JSON-LD in layout/theme.liquid on product pages.
 {% endcomment %}
 {% liquid
   assign schema_variant = selected_variant
@@ -39,6 +42,18 @@
   endif
 
   assign schema_sku = schema_variant.sku | strip
+
+  # Final-sale items in the refund policy can't be returned: custom and
+  # Build-A-Knife knives, gift cards, sale items (checked per variant below)
+  # and anything tagged final-sale (e.g. as-is / blemished knives).
+  assign policy_page_url = shop.url | append: '/pages/shipping-returns'
+  assign return_policy_id = policy_page_url | append: '#return-policy'
+  assign shipping_policy_id = policy_page_url | append: '#shipping-policy'
+  assign product_final_sale = false
+  assign product_type_down = product.type | downcase
+  if product_type_down == 'custom' or product.handle contains 'build-your-knife' or product.gift_card? or product.tags contains 'final-sale'
+    assign product_final_sale = true
+  endif
 %}
 {%- if has_offers or has_rating -%}
 <script type='application/ld+json'>
@@ -111,6 +126,23 @@
           {%- if gtin_property != blank -%}
             ,"{{ gtin_property }}": {{ barcode | json }}
           {%- endif -%}
+          {%- assign offer_final_sale = product_final_sale -%}
+          {%- if variant.compare_at_price > variant.price -%}
+            {%- assign offer_final_sale = true -%}
+          {%- endif -%}
+          {%- if offer_final_sale -%}
+            ,"hasMerchantReturnPolicy": {
+              "@type": "MerchantReturnPolicy",
+              "applicableCountry": "US",
+              "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted"
+            }
+          {%- else -%}
+            ,"hasMerchantReturnPolicy": { "@id": {{ return_policy_id | json }} }
+          {%- endif -%}
+          ,"shippingDetails": {
+            "@type": "OfferShippingDetails",
+            "hasShippingService": { "@id": {{ shipping_policy_id | json }} }
+          }
         }{%- unless forloop.last -%},{%- endunless -%}
       {%- endfor -%}
     ]
