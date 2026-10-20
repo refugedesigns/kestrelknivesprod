@@ -765,6 +765,8 @@ console.log(window.MWAPOOptions)
           const swiperContainer = document.getElementById('related-products-swiper');
           
           // Generate HTML for each product as swiper-slide
+          const relatedSlides = [];
+          const relatedSlideMeta = [];
           products.forEach(product => {
             const productSlide = `
               <swiper-slide style="height: 100%;">
@@ -794,7 +796,8 @@ console.log(window.MWAPOOptions)
                       </div>
                     </div>
                     <button
-                      onclick="addRelatedProductToCart('${product.handle}', '${product.url}')"
+                      type="button"
+                      data-related-action
                       class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0"
                     >
                       ADD TO CART
@@ -803,7 +806,20 @@ console.log(window.MWAPOOptions)
                 </div>
               </swiper-slide>
             `;
-            swiperContainer.innerHTML += productSlide;
+            relatedSlides.push(productSlide);
+            relatedSlideMeta.push({
+              handle: product.handle,
+              url: product.url,
+            });
+          });
+          swiperContainer.innerHTML = relatedSlides.join('');
+          swiperContainer.querySelectorAll('swiper-slide').forEach((slide, index) => {
+            const meta = relatedSlideMeta[index];
+            const action = slide.querySelector('[data-related-action]');
+            if (!meta || !action) return;
+            action.addEventListener('click', () => {
+              addRelatedProductToCart(meta.handle, meta.url);
+            });
           });
           
            // Initialize Swiper after adding slides

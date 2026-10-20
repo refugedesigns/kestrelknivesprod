@@ -1897,6 +1897,8 @@
           const swiperContainer = document.getElementById('related-products-swiper');
           
           // Generate HTML for each product as swiper-slide
+          const relatedSlides = [];
+          const relatedSlideMeta = [];
           products.forEach(product => {
             // Filter out products with hidden_offer tag
             const tags = product.tags || [];
@@ -1921,9 +1923,7 @@
               ? (product.variants.find(v => v.available) || product.variants[0])
               : null;
             
-            const actionButton = isApparel
-              ? `<button onclick="openRelatedProductQuickView('${product.handle}')" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0">QUICK VIEW</button>`
-              : `<button onclick="addRelatedProductToCart('${product.handle}', '${product.url}', ${displayVariant ? displayVariant.id : 'null'})" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0">ADD TO CART</button>`;
+            const actionButton = `<button type="button" data-related-action class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] flex-shrink-0">${isApparel ? 'QUICK VIEW' : 'ADD TO CART'}</button>`;
             
             const productTitleUpper = (product.title || '').toUpperCase();
 
@@ -1961,7 +1961,7 @@
               <swiper-slide style="height: 100%;">
                 <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 h-full flex flex-col">
                   <div class="aspect-square bg-white rounded-t-lg overflow-hidden flex-shrink-0">
-                  <a href="${product.url}" class="aspect-square hover:cursor-pointer bg-white rounded-t-lg overflow-hidden flex-shrink-0 block">
+                  <a data-related-product-link class="aspect-square hover:cursor-pointer bg-white rounded-t-lg overflow-hidden flex-shrink-0 block">
                     <img
                       src="${displayImage}"
                       alt="${displayTitle}"
@@ -1991,7 +1991,29 @@
                 </div>
               </swiper-slide>
             `;
-            swiperContainer.innerHTML += productSlide;
+            relatedSlides.push(productSlide);
+            relatedSlideMeta.push({
+              isApparel: isApparel,
+              handle: product.handle,
+              url: product.url,
+              variantId: displayVariant ? displayVariant.id : null,
+            });
+          });
+          swiperContainer.innerHTML = relatedSlides.join('');
+          swiperContainer.querySelectorAll('swiper-slide').forEach((slide, index) => {
+            const meta = relatedSlideMeta[index];
+            if (!meta) return;
+            const link = slide.querySelector('[data-related-product-link]');
+            if (link && meta.url) link.href = meta.url;
+            const action = slide.querySelector('[data-related-action]');
+            if (!action) return;
+            action.addEventListener('click', () => {
+              if (meta.isApparel) {
+                openRelatedProductQuickView(meta.handle);
+              } else {
+                addRelatedProductToCart(meta.handle, meta.url, meta.variantId);
+              }
+            });
           });
           
            // Initialize Swiper after adding slides
