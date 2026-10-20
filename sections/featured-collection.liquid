@@ -1,17 +1,37 @@
+{% liquid
+  assign desktop_collection = section.settings.featured_collection
+  assign mobile_collection = section.settings.mobile_collection
+  assign tablet_collection = section.settings.tablet_collection
+  assign desktop_limit = section.settings.number_of_products_to_show | default: 4
+  assign mobile_limit = section.settings.mobile_products_to_show | default: desktop_limit
+  assign tablet_limit = section.settings.tablet_products_to_show | default: desktop_limit
+  assign mobile_cols = section.settings.mobile_columns | default: 2
+  assign tablet_cols = section.settings.tablet_columns | default: 2
+  assign desktop_cols = section.settings.desktop_columns | default: 4
+  assign show_mobile = false
+  assign show_tablet = false
+  if mobile_collection != blank and desktop_collection != blank and mobile_collection.id != desktop_collection.id
+    assign show_mobile = true
+  endif
+  if tablet_collection != blank and desktop_collection != blank and tablet_collection.id != desktop_collection.id
+    assign show_tablet = true
+  endif
+  if mobile_collection != blank and tablet_collection != blank and mobile_collection.id == tablet_collection.id and show_mobile
+    assign show_tablet = false
+  endif
+%}
+
 <div class='flex flex-col items-center mt-2 mb-8'>
   <h2 class='text-center text-3xl'>{{ section.settings.title }}</h2>
 
   <div class='max-w-5xl mx-auto flex flex-col items-center w-full'>
-    <!-- Mobile Collection -->
-    <div class='block md:hidden'>
-      <div
-        class='grid w-full gap-2 md:gap-6'
-        style='grid-template-columns: repeat({{ section.settings.mobile_columns | default: 2 }}, 1fr);'
-      >
-        {% if section.settings.mobile_collection %}
-          {% for product in section.settings.mobile_collection.products
-            limit: section.settings.mobile_products_to_show
-          %}
+    {% if show_mobile %}
+      <div class='block md:hidden w-full'>
+        <div
+          class='grid w-full gap-2 md:gap-6'
+          style='grid-template-columns: repeat({{ mobile_cols }}, 1fr);'
+        >
+          {% for product in mobile_collection.products limit: mobile_limit %}
             {%- assign tags_lower = product.tags
               | join: "||"
               | downcase
@@ -25,27 +45,16 @@
               {% render "product-card-placeholder" %}
             {% endfor %}
           {% endfor %}
-        {% else %}
-          {% for item in (1..4) %}
-            {% render "product-card-placeholder" %}
-          {% endfor %}
-        {% endif %}
+        </div>
       </div>
-    </div>
+    {% endif %}
 
-    <!-- Tablet Collection -->
-    <div class='hidden md:block lg:hidden'>
-      <div
-        class='grid w-full gap-2 md:gap-6'
-        style='grid-template-columns: repeat({{ section.settings.tablet_columns | default: 2 }}, 1fr);'
-      >
-        {% assign tablet_collection = section.settings.tablet_collection
-          | default: section.settings.featured_collection
-        %}
-        {% assign tablet_limit = section.settings.tablet_products_to_show
-          | default: section.settings.number_of_products_to_show
-        %}
-        {% if tablet_collection %}
+    {% if show_tablet %}
+      <div class='hidden md:block lg:hidden w-full'>
+        <div
+          class='grid w-full gap-2 md:gap-6'
+          style='grid-template-columns: repeat({{ tablet_cols }}, 1fr);'
+        >
           {% for product in tablet_collection.products limit: tablet_limit %}
             {%- assign tags_lower = product.tags
               | join: "||"
@@ -60,24 +69,19 @@
               {% render "product-card-placeholder" %}
             {% endfor %}
           {% endfor %}
-        {% else %}
-          {% for item in (1..4) %}
-            {% render "product-card-placeholder" %}
-          {% endfor %}
-        {% endif %}
+        </div>
       </div>
-    </div>
+    {% endif %}
 
-    <!-- Desktop Collection -->
-    <div class='hidden lg:block'>
+    <div
+      class='w-full {% if show_mobile and show_tablet %}hidden lg:block{% elsif show_mobile %}hidden md:block{% elsif show_tablet %}md:hidden lg:block{% endif %}'
+    >
       <div
-        class='grid w-full gap-2 md:gap-6'
-        style='grid-template-columns: repeat({{ section.settings.desktop_columns | default: 4 }}, 1fr);'
+        class='grid w-full gap-2 md:gap-6 featured-collection-grid'
+        style='--fc-mobile-cols: {{ mobile_cols }}; --fc-tablet-cols: {{ tablet_cols }}; --fc-desktop-cols: {{ desktop_cols }};'
       >
-        {% if section.settings.featured_collection %}
-          {% for product in section.settings.featured_collection.products
-            limit: section.settings.number_of_products_to_show
-          %}
+        {% if desktop_collection %}
+          {% for product in desktop_collection.products limit: desktop_limit %}
             {%- assign tags_lower = product.tags
               | join: "||"
               | downcase
@@ -100,6 +104,22 @@
     </div>
   </div>
 </div>
+
+<style>
+  .featured-collection-grid {
+    grid-template-columns: repeat(var(--fc-mobile-cols), 1fr);
+  }
+  @media (min-width: 768px) {
+    .featured-collection-grid {
+      grid-template-columns: repeat(var(--fc-tablet-cols), 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .featured-collection-grid {
+      grid-template-columns: repeat(var(--fc-desktop-cols), 1fr);
+    }
+  }
+</style>
 
 {% schema %}
 {

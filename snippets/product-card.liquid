@@ -78,7 +78,14 @@
   {% assign card_initial_image = product_product.images[0] %}
 {% endif %}
 
-{%- comment -%} Lean card payloads + WebP (avoid full product/variant JSON + full-res CDN URLs) {%- endcomment -%}
+{%- comment -%}
+  First paint stays small. Variant lists load from /products/{handle}.js
+  on hover, focus, swatch, add to cart, or quick view.
+{%- endcomment -%}
+{% assign kk_status = product_product.metafields.custom.product_status
+  | default: product_product.metafields.custom_fields.product_status
+  | default: product_product.metafields.global.product_status
+%}
 {%- capture card_images_json -%}
 [
 {%- for image in product_product.images limit: 2 -%}
@@ -87,14 +94,14 @@
 ]
 {%- endcapture -%}
 {%- capture card_product_json -%}
-{"id":{{ product_product.id | json }},"title":{{ product_product.title | json }},"handle":{{ product_product.handle | json }},"type":{{ product_product.type | json }},"product_type":{{ product_product.type | json }},"available":{{ product_product.available | json }},"price":{{ product_product.price | json }},"options":{{ product_product.options | json }}}
+{"id":{{ product_product.id | json }},"title":{{ product_product.title | json }},"handle":{{ product_product.handle | json }},"url":{{ product_product.url | json }},"type":{{ product_product.type | json }},"product_type":{{ product_product.type | json }},"available":{{ product_product.available | json }},"price":{{ product_product.price | json }},"options":{{ product_product.options | json }},"status":{{ kk_status | json }}}
 {%- endcapture -%}
-{%- capture card_variants_json -%}
-[
-{%- for variant in product_product.variants -%}
-{"id":{{ variant.id | json }},"title":{{ variant.title | json }},"available":{{ variant.available | json }},"price":{{ variant.price | json }},"option1":{{ variant.option1 | json }},"option2":{{ variant.option2 | json }},"option3":{{ variant.option3 | json }}{% if variant.featured_image %},"featured_image":{"id":{{ variant.featured_image.id | json }},"src":{{ variant.featured_image | image_url: width: 400, format: 'webp' | json }}}{% else %},"featured_image":null{% endif %}}{%- unless forloop.last -%},{%- endunless -%}
-{%- endfor -%}
-]
+{%- capture card_seed_json -%}
+{%- if card_selected_variant -%}
+{"id":{{ card_selected_variant.id | json }},"title":{{ card_selected_variant.title | json }},"available":{{ card_selected_variant.available | json }},"price":{{ card_selected_variant.price | json }},"option1":{{ card_selected_variant.option1 | json }},"option2":{{ card_selected_variant.option2 | json }},"option3":{{ card_selected_variant.option3 | json }},"featured_image":null}
+{%- else -%}
+{}
+{%- endif -%}
 {%- endcapture -%}
 {% assign is_priority_card = false %}
 {% if card_priority %}
@@ -108,11 +115,13 @@
 <div
   class='py-2 md:py-3 px-3 hover:cursor-pointer product-card w-full'
   data-product='{{ card_product_json | strip_newlines | escape }}'
-  data-variants='{{ card_variants_json | strip_newlines | escape }}'
+  data-seed-variant='{{ card_seed_json | strip_newlines | escape }}'
   data-images='{{ card_images_json | strip_newlines | escape }}'
   {% if card_initial_image %}
     data-initial-image-id='{{ card_initial_image.id }}'
   {% endif %}
+  @mouseenter='prefetchVariants()'
+  @focusin='prefetchVariants()'
   x-data='
     productCard(
       {{ card_selected_variant.id }},
@@ -130,10 +139,6 @@
     <!-- Product Image -->
     <div class='relative h-[180px] md:h-[300px] lg:h-[300px] bg-white overflow-hidden'>
       <!-- Status / SOLD OUT Badge -->
-      {% assign kk_status = product_product.metafields.custom.product_status
-        | default: product_product.metafields.custom_fields.product_status
-        | default: product_product.metafields.global.product_status
-      %}
       {% if kk_status != blank %}
         <div class='absolute top-2 left-2 md:top-4 md:left-4 bg-black text-white font-bold px-2 py-1 text-xs md:text-sm uppercase z-10'>
           {{ kk_status }}
@@ -404,192 +409,4 @@
       {% endif %}
     </div>
   </div>
-
-  <!-- Quick View Drawer (Apparels, teleported to body) -->
-  <template x-if='isQuickViewOpen'>
-    <div class='fixed inset-0 z-50' x-cloak>
-      <div class='absolute inset-0 bg-black/50' @click='closeQuickView()'></div>
-      <div
-        x-ref='qvPanel'
-        class='absolute right-0 top-0 h-full w-full max-w-lg bg-white shadow-xl flex flex-col transform transition-transform duration-300 translate-x-full'
-        x-init='requestAnimationFrame(() => $el.classList.remove("translate-x-full"))'
-      >
-        <div class='flex items-center justify-between p-5 border-b border-gray-200'>
-          {% comment %} <h3 class='text-xl font-semibold' x-text='baseTitle'></h3> {% endcomment %}
-          <h3 class='text-lg font-semibold'>Select options</h3>
-          <button
-            @click='closeQuickView()'
-            class='text-gray-500 hover:text-gray-700 text-2xl leading-none'
-          >
-            ×
-          </button>
-        </div>
-        <div class='p-6 flex-1 overflow-y-auto'>
-          <div class='flex items-start space-x-6'>
-            <img
-              :src='qvImage || currentImage'
-              alt=''
-              width='160'
-              height='160'
-              class='w-40 h-40 object-contain'
-            >
-            <div class='min-w-0'>
-              <p
-                class='text-gray-900 uppercase text-lg truncate'
-                x-text='baseTitle'
-              ></p>
-              <p class='text-base mt-2' x-text='qvFormattedPrice'></p>
-            </div>
-          </div>
-
-          {% unless product_product.has_only_default_variant %}
-            <template x-if='(optionNames && optionNames.length) || (variantsData && variantsData.length)'>
-              <div>
-                <!-- Option 1 -->
-                <div class='mt-6' x-show='uniqueOptionValues(1).length'>
-                  <p
-                    class='text-xs font-semibold text-gray-700 mb-2 uppercase'
-                    x-text='(optionNames[0] || "Option 1") + ":"'
-                  ></p>
-                  <div class='flex flex-wrap gap-3' x-show='isColorOption(1)'>
-                    <template
-                      x-for='val in uniqueOptionValues(1)'
-                      :key='`c1-${val}`'
-                    >
-                      <button
-                        @click='qvOption1 = val; updateQVSelectedVariant()'
-                        :title='val'
-                        :class="'w-12 h-12 rounded-md border overflow-hidden ' + (qvOption1 === val ? 'ring-2 ring-black' : '')"
-                      >
-                        <img
-                          :src='imageForOptionValue(1,val)'
-                          alt=''
-                          width='48'
-                          height='48'
-                          class='w-full h-full object-contain'
-                        >
-                      </button>
-                    </template>
-                  </div>
-                  <div class='flex flex-wrap gap-2' x-show='!isColorOption(1)'>
-                    <template
-                      x-for='val in uniqueOptionValues(1)'
-                      :key='`t1-${val}`'
-                    >
-                      <button
-                        @click='qvOption1 = val; updateQVSelectedVariant()'
-                        :class="(qvOption1 === val ? 'ring-2 ring-black ' : '') + 'px-4 py-3 border rounded-md text-sm'"
-                      >
-                        <span x-text='val'></span>
-                      </button>
-                    </template>
-                  </div>
-                </div>
-
-                <!-- Option 2 (if present) -->
-                <div class='mt-6' x-show='uniqueOptionValues(2).length'>
-                  <p
-                    class='text-xs font-semibold text-gray-700 mb-2 uppercase'
-                    x-text='(optionNames[1] || "Option 2") + ":"'
-                  ></p>
-                  <div class='flex flex-wrap gap-3' x-show='isColorOption(2)'>
-                    <template
-                      x-for='val in uniqueOptionValues(2)'
-                      :key='`c2-${val}`'
-                    >
-                      <button
-                        @click='qvOption2 = val; updateQVSelectedVariant()'
-                        :disabled='!isComboAvailable(qvOption1, val)'
-                        :title='val'
-                        :class="'w-12 h-12 rounded-md border overflow-hidden ' + (qvOption2 === val ? 'ring-2 ring-black' : '') + (!isComboAvailable(qvOption1,val) ? ' opacity-40 cursor-not-allowed' : '')"
-                      >
-                        <img
-                          :src='imageForOptionValue(2,val)'
-                          alt=''
-                          width='48'
-                          height='48'
-                          class='w-full h-full object-contain'
-                        >
-                      </button>
-                    </template>
-                  </div>
-                  <div class='flex flex-wrap gap-2' x-show='!isColorOption(2)'>
-                    <template
-                      x-for='val in uniqueOptionValues(2)'
-                      :key='`t2-${val}`'
-                    >
-                      <button
-                        @click='qvOption2 = val; updateQVSelectedVariant()'
-                        :disabled='!isComboAvailable(qvOption1, val)'
-                        :class="((qvOption2 === val ? 'ring-2 ring-black ' : '') + 'px-4 py-3 border rounded-md text-sm ') + (!isComboAvailable(qvOption1, val) ? 'opacity-40 cursor-not-allowed' : '')"
-                      >
-                        <span x-text='val'></span>
-                      </button>
-                    </template>
-                  </div>
-                </div>
-              </div>
-            </template>
-          {% endunless %}
-
-          <div class='mt-8'>
-            <p class='text-xs font-semibold text-gray-700 mb-2 uppercase'>
-              Quantity
-            </p>
-            <div class='inline-flex items-center border'>
-              <button
-                class='w-10 h-10 text-lg'
-                @click='qvQuantity = Math.max(1, (qvQuantity||1) - 1)'
-              >
-                −
-              </button>
-              <input
-                type='number'
-                min='1'
-                x-model.number='qvQuantity'
-                class='w-14 h-10 text-center outline-none border-none'
-              >
-              <button
-                class='w-10 h-10 text-lg'
-                @click='qvQuantity = (qvQuantity||1) + 1'
-              >
-                +
-              </button>
-            </div>
-          </div>
-
-          <!-- Primary action placed near options/quantity -->
-          <div class='mt-6 space-y-3'>
-            {% if kk_status != blank %}
-              <button
-                disabled
-                class='w-full uppercase bg-gray-400 text-white font-bold py-4 text-base cursor-not-allowed'
-              >
-                {{ kk_status }}
-              </button>
-            {% else %}
-              <button
-                @click='qvAddToCart()'
-                :disabled='!qvCanPurchase'
-                class='w-full text-white font-bold py-4 text-base transition-colors duration-200'
-                :class="qvCanPurchase ? 'cursor-pointer bg-black hover:bg-gray-900' : 'bg-gray-400 cursor-not-allowed opacity-80'"
-              >
-                <span x-text="qvAddToCartLabel"></span>
-              </button>
-            {% endif %}
-            <a
-              href='{{ product_product.url }}'
-              class='block text-center underline text-gray-700 hover:text-gray-900'
-              >View details</a
-            >
-          </div>
-        </div>
-      </div>
-    </div>
-  </template>
 </div>
-
-
-<!--
-  Removed duplicate Quick View template (handled above within component scope)
--->

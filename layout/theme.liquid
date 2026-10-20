@@ -273,6 +273,13 @@ main[role='main'] {
       {{ content_for_layout }}
     </main>
 
+    {%- if template.name == 'index'
+      or template.name == 'collection'
+      or template.name == 'search'
+    -%}
+      {% render 'product-card-js' %}
+    {%- endif -%}
+
     <!-- Cart Sheet -->
     {% render "cart-sheet" %}
 

@@ -15,6 +15,123 @@
       }
     }
 
+    const kkVariantCache = new Map()
+    const kkVariantInflight = new Map()
+
+    function kkReadJson(el, name, fallback) {
+      if (!el) return fallback
+      const raw = el.getAttribute(name)
+      if (!raw) return fallback
+      try {
+        const txt = document.createElement('textarea')
+        txt.innerHTML = raw
+        return JSON.parse(txt.value)
+      } catch (e) {
+        return fallback
+      }
+    }
+
+    function kkMapAjaxProduct(product) {
+      return {
+        variants: (product.variants || []).map(variant => {
+          const image = variant.featured_image
+          let featured = null
+          if (image) {
+            featured = {
+              id: image.id || null,
+              src: typeof image === 'string' ? image : image.src || '',
+            }
+          }
+          return {
+            id: variant.id,
+            title: variant.title,
+            available: !!variant.available,
+            price: variant.price,
+            option1: variant.option1,
+            option2: variant.option2,
+            option3: variant.option3,
+            featured_image: featured,
+          }
+        }),
+      }
+    }
+
+    function kkLoadVariants(handle) {
+      if (!handle) return Promise.resolve(null)
+      if (kkVariantCache.has(handle)) return Promise.resolve(kkVariantCache.get(handle))
+      if (kkVariantInflight.has(handle)) return kkVariantInflight.get(handle)
+      const request = fetch(
+        '/products/' + encodeURIComponent(handle) + '.js',
+        { headers: { Accept: 'application/json' } }
+      )
+        .then(res => {
+          if (!res.ok) throw new Error('Product JSON ' + res.status)
+          return res.json()
+        })
+        .then(product => {
+          const mapped = kkMapAjaxProduct(product)
+          kkVariantCache.set(handle, mapped)
+          kkVariantInflight.delete(handle)
+          return mapped
+        })
+        .catch(err => {
+          kkVariantInflight.delete(handle)
+          throw err
+        })
+      kkVariantInflight.set(handle, request)
+      return request
+    }
+
+    function kkEnsureVariants(component) {
+      if (!component) return Promise.resolve(null)
+      if (component._variantsLoaded) return Promise.resolve(component.variantsData)
+      if (component._variantsPromise) return component._variantsPromise
+      const handle = component.productData && component.productData.handle
+      if (!handle) {
+        component._variantsLoaded = true
+        return Promise.resolve(component.variantsData)
+      }
+      component._variantsPromise = kkLoadVariants(handle)
+        .then(mapped => {
+          if (mapped && mapped.variants && mapped.variants.length) {
+            component.variantsData = mapped.variants
+          }
+          component._variantsLoaded = true
+          if (typeof component.updateTitle === 'function') component.updateTitle()
+          if (typeof component.checkAvailability === 'function') {
+            component.checkAvailability()
+          }
+          return component.variantsData
+        })
+        .catch(err => {
+          component._variantsPromise = null
+          console.error('Card variant load failed', handle, err)
+          return component.variantsData
+        })
+      return component._variantsPromise
+    }
+
+    function kkOpenSharedQuickView(component) {
+      const root = document.querySelector('[data-kk-quick-view]')
+      const state = root && root._x_dataStack && root._x_dataStack[0]
+      if (state && typeof state.openFrom === 'function') {
+        state.openFrom(component)
+        return
+      }
+      component.isQuickViewOpen = true
+      document.body.style.overflow = 'hidden'
+    }
+
+    function kkCloseSharedQuickView(component) {
+      const root = document.querySelector('[data-kk-quick-view]')
+      const state = root && root._x_dataStack && root._x_dataStack[0]
+      if (state && state.open && typeof state.close === 'function') {
+        state.close()
+        return true
+      }
+      return false
+    }
+
     Alpine.data(
       'productCard',
       (
@@ -49,7 +166,7 @@
           }
 
           const selectedVariant = this.variantsData.find(
-            v => v.id === this.selectedVariant
+            v => String(v.id) === String(this.selectedVariant)
           )
           if (selectedVariant && selectedVariant.price != null) {
             return this.formatMoney(selectedVariant.price)
@@ -110,7 +227,7 @@
         // Computed: currently selected handle color (option1)
         get selectedOption1() {
           const v = (this.variantsData || []).find(
-            v => v.id === this.selectedVariant
+            v => String(v.id) === String(this.selectedVariant)
           )
           return v && v.option1 ? String(v.option1) : null
         },
@@ -178,7 +295,12 @@
           }
         },
 
-        selectByColor(colorValue) {
+        prefetchVariants() {
+          kkEnsureVariants(this)
+        },
+
+        async selectByColor(colorValue) {
+          await kkEnsureVariants(this)
           const hv = String(colorValue || '').trim()
           const key = this.colorOptionKey()
           const matches = (this.variantsData || []).filter(
@@ -250,6 +372,8 @@
         qvOption2: null,
         optionNames: [],
         qvImage: null,
+        qvImageFit: 'contain',
+        qvRespectStatus: true,
 
         // Safely decode HTML-escaped JSON from data attributes
         decodeHtmlEntities(str) {
@@ -297,13 +421,11 @@
         },
 
         init() {
-          // Get product data from data attributes (HTML entities decoded first)
-          const rawProduct = this.$el.getAttribute('data-product') || '{}'
-          const rawVariants = this.$el.getAttribute('data-variants') || '[]'
-          const rawImages = this.$el.getAttribute('data-images') || '[]'
-          this.productData = JSON.parse(this.decodeHtmlEntities(rawProduct))
-          this.variantsData = JSON.parse(this.decodeHtmlEntities(rawVariants))
-          this.imagesData = JSON.parse(this.decodeHtmlEntities(rawImages))
+          this.productData = kkReadJson(this.$el, 'data-product', {})
+          this.imagesData = kkReadJson(this.$el, 'data-images', [])
+          const seed = kkReadJson(this.$el, 'data-seed-variant', null)
+          this.variantsData = seed && seed.id ? [seed] : []
+          this._variantsLoaded = false
           this.syncApparelSelectionToImage()
 
           // Set initial title with first variant color
@@ -317,7 +439,8 @@
           this.initDibsPreorder()
         },
 
-        openQuickView() {
+        async openQuickView() {
+          await kkEnsureVariants(this)
           this.qvSelectedVariantId = this.selectedVariant
           this.qvQuantity = 1
           // Capture option names from product
@@ -354,10 +477,10 @@
           this.qvImage = this.currentImage
           this.updateQVSelectedVariant()
           this.syncQvDibsPlanSelection()
-          this.isQuickViewOpen = true
-          document.body.style.overflow = 'hidden'
+          kkOpenSharedQuickView(this)
         },
         closeQuickView() {
+          if (kkCloseSharedQuickView(this)) return
           const panel = this.$refs && this.$refs.qvPanel
           if (panel) {
             // Trigger slide-out
@@ -394,7 +517,8 @@
         },
 
         // Select by handle color (option1). Prefer an available variant; fallback to first match.
-        selectByHandle(handleValue) {
+        async selectByHandle(handleValue) {
+          await kkEnsureVariants(this)
           const hv = String(handleValue || '').trim()
           const matches = (this.variantsData || []).filter(
             v => String(v.option1 || '') === hv
@@ -424,11 +548,14 @@
         },
 
         async addToCart() {
-          if (!this.canPurchase || this.isAddingToCart) return
+          if (this.isAddingToCart) return
 
           this.isAddingToCart = true
 
           try {
+            await kkEnsureVariants(this)
+            if (!this.canPurchase) return
+
             if (this.cardHasPreorder && !this.getDibsSellingPlanId()) {
               await this.loadDibsPreorder()
             }
@@ -540,7 +667,7 @@
           const values = new Set()
           ;(this.variantsData || []).forEach(v => {
             const val = v[key]
-            if (val) values.add(String(val))
+            if (val && String(val) !== 'Default Title') values.add(String(val))
           })
           return Array.from(values)
         },
@@ -651,7 +778,7 @@
 
             if (validVariants.length > 0) {
               const selectedVariant = validVariants.find(
-                v => v.id === this.selectedVariant
+                v => String(v.id) === String(this.selectedVariant)
               )
               const opt = selectedVariant ? selectedVariant.option1 : null
 
@@ -690,5 +817,868 @@
         },
       })
     )
+    Alpine.data('fcCard', () => ({
+        ...(window.KKDibsPreorder ? window.KKDibsPreorder.createState() : {}),
+        currentImage: '',
+        productImageSrc: '',
+        baseTitle: '',
+        productData: {},
+        variantsData: [],
+        imagesData: null,
+        selectedVariant: null,
+        isAvailable: true,
+        isAddingToCart: false,
+        isHovering: false,
+        hoverImageLoaded: false,
+
+        // Quick View state
+        isQuickViewOpen: false,
+        qvSelectedVariantId: null,
+        qvQuantity: 1,
+        qvOption1: null,
+        qvOption2: null,
+        optionNames: [],
+        qvImage: null,
+        qvImageFit: 'cover',
+        qvRespectStatus: false,
+
+        get qvSelectedVariantObj() {
+          return this.getVariantById(
+            this.qvSelectedVariantId || this.selectedVariant
+          )
+        },
+        get qvCanPurchase() {
+          if (typeof this.isQvPurchasable === 'function') {
+            return this.isQvPurchasable()
+          }
+          const selected = this.qvSelectedVariantObj
+          if (selected) return !!selected.available
+          return !!this.isAvailable
+        },
+        get qvAddToCartLabel() {
+          if (typeof this.getQvPurchaseLabel === 'function') {
+            return this.getQvPurchaseLabel()
+          }
+          return this.qvCanPurchase ? 'Add to Cart' : 'SOLD OUT'
+        },
+
+        init() {
+          try {
+            const el = this.$el
+            this.productData = kkReadJson(el, 'data-product', {})
+            this.imagesData = kkReadJson(el, 'data-images', [])
+            const seed = kkReadJson(el, 'data-seed-variant', null)
+            this.variantsData = seed && seed.id ? [seed] : []
+            this._variantsLoaded = false
+
+            const renderedImage = el.querySelector('img[src]')
+            const initialSrc =
+              (renderedImage && renderedImage.getAttribute('src')) || ''
+            const firstGallery =
+              this.imagesData && this.imagesData.length
+                ? this.imagesData[0]
+                : null
+            this.productImageSrc =
+              initialSrc || this.resolveImageSrc(firstGallery) || ''
+            if (this.productImageSrc) {
+              this.currentImage = this.productImageSrc
+            }
+          } catch (e) {}
+
+          if (
+            !this.selectedVariant &&
+            this.variantsData &&
+            this.variantsData[0]
+          ) {
+            this.selectedVariant = this.variantsData[0].id
+          }
+
+          this.syncApparelSelectionToImage()
+          this.updateImage()
+          this.updateTitle()
+          this.checkAvailability()
+          this.initDibsPreorder()
+        },
+
+        prefetchVariants() {
+          kkEnsureVariants(this)
+        },
+
+        // Price text
+        get formattedPrice() {
+          if (!this.variantsData || this.variantsData.length === 0) {
+            return this.productData.price != null
+              ? this.formatMoney(Number(this.productData.price))
+              : ''
+          }
+          const v = this.getVariantById(this.selectedVariant)
+          if (v && v.price != null) return this.formatMoney(Number(v.price))
+          return this.productData.price != null
+            ? this.formatMoney(Number(this.productData.price))
+            : ''
+        },
+
+        get qvFormattedPrice() {
+          const selected = this.getVariantById(
+            this.qvSelectedVariantId || this.selectedVariant
+          )
+          if (selected && selected.price != null) {
+            return this.formatMoney(Number(selected.price))
+          }
+          return this.formattedPrice
+        },
+
+        imageEntrySrc(img) {
+          if (!img) return null
+          if (typeof img === 'string') return this.sizedImageUrl(img, 400)
+          return img.src ? this.sizedImageUrl(img.src, 400) : null
+        },
+
+        isApparelProduct() {
+          const typeLower = (
+            this.productData.type ||
+            this.productData.product_type ||
+            ''
+          ).toLowerCase()
+          return typeLower.includes('apparel')
+        },
+
+        // Apparel hover uses the first media image; other products use the second gallery image.
+        get secondImageSrc() {
+          if (!this.imagesData || !this.imagesData.length) return null
+          if (this.isApparelProduct()) {
+            const firstMediaSrc = this.imageEntrySrc(this.imagesData[0])
+            if (!firstMediaSrc) return null
+            if (
+              this.imageSrcKey(firstMediaSrc) ===
+              this.imageSrcKey(this.currentImage)
+            ) {
+              return null
+            }
+            return firstMediaSrc
+          }
+          if (this.imagesData.length < 2) return null
+          return this.imageEntrySrc(this.imagesData[1])
+        },
+
+        sizedImageUrl(src, width = 400) {
+          if (!src || typeof src !== 'string') return src
+          try {
+            const u = new URL(src, window.location.href)
+            u.searchParams.set('width', String(width))
+            u.searchParams.set('format', 'webp')
+            return u.toString()
+          } catch (e) {
+            return src
+          }
+        },
+
+        formatMoney(cents) {
+          if (!cents || typeof cents !== 'number') return ''
+          try {
+            return new Intl.NumberFormat('{{ shop.locale }}', {
+              style: 'currency',
+              currency: '{{ shop.currency }}',
+            }).format(cents / 100)
+          } catch (e) {
+            return '$' + (cents / 100).toFixed(2)
+          }
+        },
+
+        checkAvailability() {
+          if (this.variantsData && this.variantsData.length > 0) {
+            const v = this.getVariantById(this.selectedVariant)
+            this.isAvailable = v ? !!v.available : !!this.productData.available
+          } else {
+            this.isAvailable = !!this.productData.available
+          }
+          if (typeof this.refreshPurchaseState === 'function') {
+            this.refreshPurchaseState()
+          }
+        },
+
+        // Computed: currently selected handle color (option1)
+        get selectedOption1() {
+          const v = (this.variantsData || []).find(
+            v => String(v.id) === String(this.selectedVariant)
+          )
+          return v && v.option1 ? String(v.option1) : null
+        },
+        get selectedOption1Lc() {
+          return String(this.selectedOption1 || '')
+            .trim()
+            .toLowerCase()
+        },
+
+        colorOptionKey() {
+          const raw =
+            (this.optionNames && this.optionNames.length
+              ? this.optionNames
+              : this.productData.options) || []
+          const names = raw.map(n =>
+            typeof n === 'string' ? n : (n && n.name) || ''
+          )
+          let idx = 0
+          names.forEach((n, i) => {
+            const ln = String(n || '').toLowerCase()
+            if (
+              ['color', 'colour', 'shade', 'finish'].some(k =>
+                ln.includes(k)
+              )
+            ) {
+              idx = i
+            }
+          })
+          if (idx === 1) return 'option2'
+          if (idx === 2) return 'option3'
+          return 'option1'
+        },
+
+        get selectedColorLc() {
+          const v = this.getVariantById(this.selectedVariant)
+          if (!v) return ''
+          return String(v[this.colorOptionKey()] || '')
+            .trim()
+            .toLowerCase()
+        },
+
+        imageSrcKey(src) {
+          if (!src) return ''
+          try {
+            return new URL(src, window.location.href).pathname
+          } catch (e) {
+            return String(src).split('?')[0]
+          }
+        },
+
+        syncApparelSelectionToImage() {
+          if (!this.isApparelProduct()) return
+
+          const firstVariant = (this.variantsData || [])[0]
+          if (!firstVariant) return
+
+          this.selectedVariant = firstVariant.id
+          const variantImage = this.resolveImageSrc(
+            firstVariant.featured_image || firstVariant.image || null
+          )
+          if (variantImage) {
+            this.currentImage = variantImage
+            this.hoverImageLoaded = false
+          }
+        },
+
+        async selectByColor(colorValue) {
+          await kkEnsureVariants(this)
+          const hv = String(colorValue || '').trim()
+          const key = this.colorOptionKey()
+          const matches = (this.variantsData || []).filter(
+            v => String(v[key] || '') === hv
+          )
+          if (!matches.length) return
+          const available = matches.find(v => !!v.available)
+          const chosen = available || matches[0]
+          this.selectedVariant = chosen.id
+          this.updateTitle()
+          this.checkAvailability()
+          this.updateImage(true)
+          this.syncDibsPlanSelection()
+        },
+
+        // Select by handle color (option1). Prefer an available variant; fallback to first match.
+        async selectByHandle(handleValue) {
+          await kkEnsureVariants(this)
+          const hv = String(handleValue || '').trim()
+          const matches = (this.variantsData || []).filter(
+            v => String(v.option1 || '') === hv
+          )
+          if (!matches.length) return
+          const available = matches.find(v => !!v.available)
+          const chosen = available || matches[0]
+          this.selectedVariant = chosen.id
+          this.updateTitle()
+          this.checkAvailability()
+          this.updateImage()
+          this.syncDibsPlanSelection()
+        },
+
+        getVariantById(id) {
+          if (id == null) return null
+          const target = String(id)
+          return (
+            (this.variantsData || []).find(v => String(v.id) === target) ||
+            null
+          )
+        },
+
+        updateTitle() {
+          const productTitleUpper = (this.productData.title || '').toUpperCase()
+          const typeLower = (this.productData.type || '').toLowerCase()
+          const shouldAppend = !(
+            typeLower.includes('apparel') || typeLower.includes('accessories')
+          )
+
+          let variantLabel = null
+          if (
+            shouldAppend &&
+            this.variantsData &&
+            this.variantsData.length > 0
+          ) {
+            const variant = this.getVariantById(this.selectedVariant)
+            if (variant) {
+              const raw = String(
+                variant.option1 || variant.title || ''
+              ).trim()
+              const parts = raw.split('/')
+              let primary = (parts[0] || '').trim()
+              const hadMoreAfterSlash = parts
+                .slice(1)
+                .some(p => p.trim().length > 0)
+              if (primary && hadMoreAfterSlash) primary += '...'
+              if (
+                primary &&
+                primary !== 'Default Title' &&
+                !this.isSizeValue(primary)
+              ) {
+                variantLabel = primary.toUpperCase()
+              }
+            }
+          }
+
+          this.baseTitle = variantLabel
+            ? `${productTitleUpper} - ${variantLabel}`
+            : productTitleUpper
+        },
+
+        // Heuristic: treat common size labels as size-like (not for title)
+        isSizeValue(val) {
+          if (!val) return false
+          const v = String(val).toLowerCase().trim()
+          const sizeValues = [
+            'xxs',
+            'xs',
+            's',
+            'm',
+            'l',
+            'xl',
+            'xxl',
+            '2xl',
+            '3xl',
+            '4xl',
+            '5xl',
+            'small',
+            'medium',
+            'large',
+            'extra large',
+          ]
+          return sizeValues.includes(v)
+        },
+
+        updateImage(forceVariantImage = false) {
+          const typeLower = (this.productData.type || '').toLowerCase()
+          if (
+            (typeLower.includes('apparel') ||
+              typeLower.includes('accessories')) &&
+            !forceVariantImage
+          ) {
+            return
+          }
+
+          const variant = this.getVariantById(this.selectedVariant)
+          const variantImage = variant
+            ? this.resolveImageSrc(
+                variant.featured_image || variant.image || null
+              )
+            : null
+
+          this.currentImage =
+            variantImage || this.productImageSrc || this.currentImage || ''
+          this.hoverImageLoaded = false
+        },
+
+        resolveImageSrc(image) {
+          if (!image) return null
+          if (typeof image === 'string') return this.sizedImageUrl(image, 400)
+          if (Array.isArray(image) && image.length) {
+            return this.resolveImageSrc(image[0])
+          }
+          if (typeof image === 'object') {
+            const raw =
+              image.src ||
+              image.url ||
+              image.originalSrc ||
+              image.original_url ||
+              null
+            return raw ? this.sizedImageUrl(raw, 400) : null
+          }
+          return null
+        },
+
+        handleImageHover(isEntering) {
+          if (this.secondImageSrc) {
+            if (isEntering) this.preloadSecondImage()
+            this.isHovering = isEntering
+          }
+        },
+
+        preloadSecondImage() {
+          if (this.hoverImageLoaded) return
+          const src = this.secondImageSrc
+          if (!src) return
+          const img = new Image()
+          img.onload = () => {
+            this.hoverImageLoaded = true
+          }
+          img.src = src
+        },
+
+        async addToCart() {
+          if (this.isAddingToCart) return
+          this.isAddingToCart = true
+          try {
+            await kkEnsureVariants(this)
+            if (!this.canPurchase || !this.selectedVariant) return
+            if (this.cardHasPreorder && !this.getDibsSellingPlanId()) {
+              await this.loadDibsPreorder()
+            }
+            const sellingPlanId = this.getDibsSellingPlanId()
+            const preorderProps = sellingPlanId
+              ? this.getDibsCartLineProperties()
+              : null
+            if (window.KKDibsPreorder) {
+              await window.KKDibsPreorder.addToCartWithPlan(
+                this.selectedVariant,
+                1,
+                sellingPlanId,
+                'featured-card',
+                preorderProps
+              )
+            } else {
+              const cartSheet = document.querySelector('[x-data*="cartSheet"]')
+              if (
+                cartSheet &&
+                cartSheet._x_dataStack &&
+                cartSheet._x_dataStack[0]
+              ) {
+                await cartSheet._x_dataStack[0].addToCart(
+                  this.selectedVariant,
+                  1,
+                  'featured-card',
+                  preorderProps,
+                  sellingPlanId
+                )
+              } else {
+                const payload = {
+                  id: this.selectedVariant,
+                  quantity: 1,
+                }
+                if (sellingPlanId) payload.selling_plan = sellingPlanId
+                const res = await fetch('/cart/add.js', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload),
+                })
+                if (!res.ok) throw new Error('Add to cart failed')
+              }
+            }
+            window.dispatchEvent(new CustomEvent('open-cart'))
+          } catch (e) {
+            console.error('Featured addToCart error', e)
+          } finally {
+            this.isAddingToCart = false
+          }
+        },
+
+        // Quick View
+        async openQuickView() {
+          await kkEnsureVariants(this)
+          this.qvSelectedVariantId = this.selectedVariant
+          this.qvQuantity = 1
+          try {
+            const opts = Array.isArray(this.productData.options)
+              ? this.productData.options
+              : []
+            this.optionNames = opts
+              .map(o => (typeof o === 'string' ? o : (o && o.name) || ''))
+              .filter(Boolean)
+          } catch (e) {
+            this.optionNames = []
+          }
+          const currentVariant = this.getVariantById(this.selectedVariant)
+          if (currentVariant) {
+            this.qvOption1 = currentVariant.option1 || null
+            this.qvOption2 = currentVariant.option2 || null
+          } else {
+            const firstAvailable =
+              (this.variantsData || []).find(v => !!v.available) ||
+              (this.variantsData || [])[0] ||
+              null
+            if (firstAvailable) {
+              this.qvSelectedVariantId = firstAvailable.id
+              this.qvOption1 = firstAvailable.option1 || null
+              this.qvOption2 = firstAvailable.option2 || null
+            }
+          }
+          const selectedImage = currentVariant
+            ? this.resolveImageSrc(
+                currentVariant.featured_image || currentVariant.image
+              )
+            : null
+          this.qvImage =
+            selectedImage || this.currentImage || this.productImageSrc || ''
+          this.updateQVSelectedVariant()
+          this.syncQvDibsPlanSelection()
+          kkOpenSharedQuickView(this)
+        },
+        closeQuickView() {
+          if (kkCloseSharedQuickView(this)) return
+          this.isQuickViewOpen = false
+          document.body.style.overflow = ''
+        },
+        uniqueOptionValues(index) {
+          const key = index === 1 ? 'option1' : 'option2'
+          const values = new Set()
+          ;(this.variantsData || []).forEach(v => {
+            const val = v[key]
+            if (val && String(val) !== 'Default Title') values.add(String(val))
+          })
+          return Array.from(values)
+        },
+        isColorOption(index) {
+          try {
+            const name = String(
+              (this.optionNames && this.optionNames[index - 1]) || ''
+            ).toLowerCase()
+            return ['color', 'colour', 'shade', 'finish'].some(k =>
+              name.includes(k)
+            )
+          } catch (e) {
+            return false
+          }
+        },
+        imageForOptionValue(index, val) {
+          const key = index === 1 ? 'option1' : 'option2'
+          const variantWithImage = (this.variantsData || []).find(
+            v => String(v[key] || '') === String(val)
+          )
+          if (variantWithImage) {
+            const src = this.resolveImageSrc(
+              variantWithImage.featured_image || variantWithImage.image || null
+            )
+            if (src) return src
+          }
+          return this.qvImage || this.currentImage || this.productImageSrc || ''
+        },
+        isComboAvailable(val1, val2) {
+          return !!(this.variantsData || []).find(v => {
+            const ok1 = val1 ? String(v.option1 || '') === String(val1) : true
+            const ok2 = val2 ? String(v.option2 || '') === String(val2) : true
+            return ok1 && ok2
+          })
+        },
+        updateQVSelectedVariant() {
+          let chosen = null
+          if (this.qvOption1 || this.qvOption2) {
+            const matches = (this.variantsData || []).filter(v => {
+              const ok1 = this.qvOption1
+                ? String(v.option1 || '') === String(this.qvOption1)
+                : true
+              const ok2 = this.qvOption2
+                ? String(v.option2 || '') === String(this.qvOption2)
+                : true
+              return ok1 && ok2
+            })
+            chosen =
+              matches.find(v => !!v.available) || matches[0] || null
+          }
+          if (chosen) {
+            this.qvSelectedVariantId = chosen.id
+            const chosenImage = this.resolveImageSrc(
+              chosen.featured_image || chosen.image || null
+            )
+            if (chosenImage) this.qvImage = chosenImage
+          } else {
+            this.qvSelectedVariantId = this.selectedVariant
+          }
+          if (!this.qvImage) {
+            this.qvImage = this.currentImage || this.productImageSrc || ''
+          }
+          this.syncQvDibsPlanSelection()
+        },
+        async qvAddToCart() {
+          if (!this.qvCanPurchase) return
+          try {
+            const sellingPlanId = this.getQvDibsSellingPlanId()
+            const preorderProps = sellingPlanId
+              ? this.getQvDibsCartLineProperties()
+              : null
+            if (window.KKDibsPreorder) {
+              await window.KKDibsPreorder.addToCartWithPlan(
+                this.qvSelectedVariantId || this.selectedVariant,
+                this.qvQuantity,
+                sellingPlanId,
+                'featured-card-qv',
+                preorderProps
+              )
+            } else {
+              const cartSheet = document.querySelector('[x-data*="cartSheet"]')
+              if (
+                cartSheet &&
+                cartSheet._x_dataStack &&
+                cartSheet._x_dataStack[0]
+              ) {
+                await cartSheet._x_dataStack[0].addToCart(
+                  this.qvSelectedVariantId || this.selectedVariant,
+                  this.qvQuantity,
+                  'featured-card-qv',
+                  preorderProps,
+                  sellingPlanId
+                )
+              } else {
+                const payload = {
+                  id: this.qvSelectedVariantId || this.selectedVariant,
+                  quantity: this.qvQuantity || 1,
+                }
+                if (sellingPlanId) payload.selling_plan = sellingPlanId
+                await fetch('/cart/add.js', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload),
+                })
+              }
+            }
+            this.closeQuickView()
+            window.dispatchEvent(new CustomEvent('open-cart'))
+          } catch (e) {
+            console.error('qv addToCart failed', e)
+          }
+        },
+    }))
+
+
+    Alpine.data('kkCardQuickView', () => ({
+      open: false,
+      card: null,
+      openFrom(card) {
+        this.card = card
+        this.open = true
+        document.body.style.overflow = 'hidden'
+        this.$nextTick(() => {
+          const panel = this.$refs.qvPanel
+          if (!panel) return
+          panel.classList.add('translate-x-full')
+          requestAnimationFrame(() => panel.classList.remove('translate-x-full'))
+        })
+      },
+      close() {
+        const panel = this.$refs.qvPanel
+        const finish = () => {
+          this.open = false
+          this.card = null
+          document.body.style.overflow = ''
+        }
+        if (!panel) {
+          finish()
+          return
+        }
+        panel.classList.add('translate-x-full')
+        let settled = false
+        const done = () => {
+          if (settled) return
+          settled = true
+          panel.removeEventListener('transitionend', onEnd)
+          finish()
+        }
+        const onEnd = event => {
+          if (event && event.target !== panel) return
+          done()
+        }
+        panel.addEventListener('transitionend', onEnd)
+        setTimeout(done, 320)
+      },
+    }))
+
   })
 </script>
+
+<div
+  x-data='kkCardQuickView()'
+  x-cloak
+  x-show='open'
+  data-kk-quick-view
+  class='fixed inset-0 z-50'
+>
+  <div class='absolute inset-0 bg-black/50' @click='close()'></div>
+  <div
+    x-ref='qvPanel'
+    class='absolute right-0 top-0 h-full w-full max-w-lg bg-white shadow-xl flex flex-col transform transition-transform duration-300 translate-x-full'
+  >
+    <template x-if='card'>
+      <div class='flex flex-col h-full'>
+        <div class='flex items-center justify-between p-5 border-b border-gray-200'>
+          <h3 class='text-lg font-semibold'>Select options</h3>
+          <button
+            type='button'
+            @click='close()'
+            class='text-gray-500 hover:text-gray-700 text-2xl leading-none'
+            aria-label='Close'
+          >
+            ×
+          </button>
+        </div>
+        <div class='p-6 flex-1 overflow-y-auto'>
+          <div class='flex items-start space-x-6'>
+            <img
+              :src='card.qvImage || card.currentImage'
+              alt=''
+              width='160'
+              height='160'
+              class='w-40 h-40'
+              :class="card.qvImageFit === 'cover' ? 'object-cover' : 'object-contain'"
+            >
+            <div class='min-w-0'>
+              <p
+                class='text-gray-900 uppercase text-lg whitespace-normal break-words'
+                x-text='card.baseTitle'
+              ></p>
+              <p class='text-base mt-2' x-text='card.qvFormattedPrice'></p>
+            </div>
+          </div>
+
+          <template x-if='(card.optionNames && card.optionNames.length) || (card.variantsData && card.variantsData.length)'>
+            <div>
+              <div class='mt-6' x-show='card.uniqueOptionValues(1).length'>
+                <p
+                  class='text-xs font-semibold text-gray-700 mb-2 uppercase'
+                  x-text='(card.optionNames[0] || "Option 1") + ":"'
+                ></p>
+                <div class='flex flex-wrap gap-3' x-show='card.isColorOption(1)'>
+                  <template x-for='val in card.uniqueOptionValues(1)' :key='`c1-${val}`'>
+                    <button
+                      type='button'
+                      @click='card.qvOption1 = val; card.updateQVSelectedVariant()'
+                      :title='val'
+                      :class="'w-12 h-12 rounded-md border overflow-hidden ' + (card.qvOption1 === val ? 'ring-2 ring-black' : '')"
+                    >
+                      <img
+                        :src='card.imageForOptionValue(1, val)'
+                        alt=''
+                        width='48'
+                        height='48'
+                        class='w-full h-full object-contain'
+                      >
+                    </button>
+                  </template>
+                </div>
+                <div class='flex flex-wrap gap-2' x-show='!card.isColorOption(1)'>
+                  <template x-for='val in card.uniqueOptionValues(1)' :key='`t1-${val}`'>
+                    <button
+                      type='button'
+                      @click='card.qvOption1 = val; card.updateQVSelectedVariant()'
+                      :class="(card.qvOption1 === val ? 'ring-2 ring-black ' : '') + 'px-4 py-3 border rounded-md text-sm'"
+                    >
+                      <span x-text='val'></span>
+                    </button>
+                  </template>
+                </div>
+              </div>
+
+              <div class='mt-6' x-show='card.uniqueOptionValues(2).length'>
+                <p
+                  class='text-xs font-semibold text-gray-700 mb-2 uppercase'
+                  x-text='(card.optionNames[1] || "Option 2") + ":"'
+                ></p>
+                <div class='flex flex-wrap gap-3' x-show='card.isColorOption(2)'>
+                  <template x-for='val in card.uniqueOptionValues(2)' :key='`c2-${val}`'>
+                    <button
+                      type='button'
+                      @click='card.qvOption2 = val; card.updateQVSelectedVariant()'
+                      :disabled='!card.isComboAvailable(card.qvOption1, val)'
+                      :title='val'
+                      :class="'w-12 h-12 rounded-md border overflow-hidden ' + (card.qvOption2 === val ? 'ring-2 ring-black' : '') + (!card.isComboAvailable(card.qvOption1, val) ? ' opacity-40 cursor-not-allowed' : '')"
+                    >
+                      <img
+                        :src='card.imageForOptionValue(2, val)'
+                        alt=''
+                        width='48'
+                        height='48'
+                        class='w-full h-full object-contain'
+                      >
+                    </button>
+                  </template>
+                </div>
+                <div class='flex flex-wrap gap-2' x-show='!card.isColorOption(2)'>
+                  <template x-for='val in card.uniqueOptionValues(2)' :key='`t2-${val}`'>
+                    <button
+                      type='button'
+                      @click='card.qvOption2 = val; card.updateQVSelectedVariant()'
+                      :disabled='!card.isComboAvailable(card.qvOption1, val)'
+                      :class="((card.qvOption2 === val ? 'ring-2 ring-black ' : '') + 'px-4 py-3 border rounded-md text-sm ') + (!card.isComboAvailable(card.qvOption1, val) ? 'opacity-40 cursor-not-allowed' : '')"
+                    >
+                      <span x-text='val'></span>
+                    </button>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <div class='mt-8'>
+            <p class='text-xs font-semibold text-gray-700 mb-2 uppercase'>
+              Quantity
+            </p>
+            <div class='inline-flex items-center border'>
+              <button
+                type='button'
+                class='w-10 h-10 text-lg'
+                @click='card.qvQuantity = Math.max(1, (card.qvQuantity || 1) - 1)'
+              >
+                −
+              </button>
+              <input
+                type='number'
+                min='1'
+                :value='card.qvQuantity'
+                @input='card.qvQuantity = Math.max(1, Number($event.target.value) || 1)'
+                class='w-14 h-10 text-center outline-none border-none'
+              >
+              <button
+                type='button'
+                class='w-10 h-10 text-lg'
+                @click='card.qvQuantity = (card.qvQuantity || 1) + 1'
+              >
+                +
+              </button>
+            </div>
+          </div>
+
+          <div class='mt-6 space-y-3'>
+            <template x-if='card.qvRespectStatus && card.productData.status'>
+              <button
+                type='button'
+                disabled
+                class='w-full uppercase bg-gray-400 text-white font-bold py-4 text-base cursor-not-allowed'
+                x-text='card.productData.status'
+              ></button>
+            </template>
+            <template x-if='!card.qvRespectStatus || !card.productData.status'>
+              <button
+                type='button'
+                @click='card.qvAddToCart()'
+                :disabled='!card.qvCanPurchase'
+                class='w-full text-white font-bold py-4 text-base transition-colors duration-200'
+                :class="card.qvCanPurchase ? 'cursor-pointer bg-black hover:bg-gray-900' : 'bg-gray-400 cursor-not-allowed opacity-80'"
+              >
+                <span x-text='card.qvAddToCartLabel'></span>
+              </button>
+            </template>
+            <a
+              :href="card.productData.url || ('/products/' + card.productData.handle)"
+              class='block text-center underline text-gray-700 hover:text-gray-900'
+              >View details</a
+            >
+          </div>
+        </div>
+      </div>
+    </template>
+  </div>
+</div>
