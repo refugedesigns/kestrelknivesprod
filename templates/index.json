@@ -30,7 +30,7 @@
             "overlay_enable": true,
             "overlay_opacity": 20,
             "title": "Free Shipping Over $200",
-            "subtitle": "Lower 48. No code needed.",
+            "subtitle": "Lower 48.\nNo code needed.",
             "text_color": "#ffffff",
             "text_shadow_strength": "strong",
             "text_shadow_blur": 10,
