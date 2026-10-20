@@ -94,10 +94,42 @@
                           {% endif %}
                         </div>
                         <div class='text-right ml-4'>
-                          <p class='text-lg font-bold text-gray-900'>
-                            {{ item.final_price | money }}
-                          </p>
-                          <p class='text-sm text-gray-500'>Each</p>
+                          {% if item.original_line_price > item.final_line_price %}
+                            <div
+                              aria-label='Sale price {{ item.final_line_price | money }}, original price {{ item.original_line_price | money }}'
+                            >
+                              <p
+                                class='text-sm text-gray-500 line-through'
+                                aria-hidden='true'
+                              >
+                                {{ item.original_line_price | money }}
+                              </p>
+                              <p class='text-lg font-bold text-gray-900'>
+                                {{ item.final_line_price | money }}
+                              </p>
+                            </div>
+                          {% else %}
+                            <p class='text-lg font-bold text-gray-900'>
+                              {{ item.final_line_price | money }}
+                            </p>
+                          {% endif %}
+                          {% if item.quantity > 1 %}
+                            <p class='text-sm text-gray-500'>
+                              {{ item.final_price | money }} each
+                            </p>
+                          {% else %}
+                            <p class='text-sm text-gray-500'>Each</p>
+                          {% endif %}
+                          {% if item.line_level_discount_allocations.size > 0 %}
+                            <ul class='mt-2 space-y-1'>
+                              {% for allocation in item.line_level_discount_allocations %}
+                                <li class='text-xs text-green-700'>
+                                  {{ allocation.discount_application.title }}
+                                  (−{{ allocation.amount | money }})
+                                </li>
+                              {% endfor %}
+                            </ul>
+                          {% endif %}
                         </div>
                       </div>
 

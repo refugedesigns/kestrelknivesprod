@@ -75,11 +75,33 @@
                 class='text-sm font-medium text-gray-900 leading-snug'
                 x-text='item.title'
               ></h3>
-              <p
-                class='text-sm font-medium text-gray-900 flex-shrink-0'
-                x-text='item.price'
-              ></p>
+              <div
+                class='text-right flex-shrink-0'
+                :aria-label='item.priceLabel'
+              >
+                <p
+                  x-show='item.hasLineDiscount'
+                  class='text-xs text-gray-500 line-through'
+                  aria-hidden='true'
+                  x-text='item.originalLinePrice'
+                ></p>
+                <p
+                  class='text-sm font-medium text-gray-900'
+                  x-text='item.finalLinePrice'
+                ></p>
+              </div>
             </div>
+            <ul
+              x-show='item.lineDiscounts.length > 0'
+              class='mt-1 space-y-0.5'
+            >
+              <template x-for='discount in item.lineDiscounts' :key='discount.key'>
+                <li class='text-xs text-green-700'>
+                  <span x-text='discount.title'></span>
+                  <span x-text='discount.amountLabel'></span>
+                </li>
+              </template>
+            </ul>
 
             <template x-if='item.preorder && item.preorder.isPreorder'>
               <div class='mt-1 space-y-0.5'>
@@ -483,12 +505,54 @@
                 ? window.KKDibsPreorder.parsePreorderLineItem(item)
                 : { isPreorder: false, name: null, shipsOn: null, note: null }
 
+            const finalLineRaw = Number(
+              item.final_line_price != null
+                ? item.final_line_price
+                : item.line_price
+            )
+            const finalLine = Number.isFinite(finalLineRaw) ? finalLineRaw : 0
+            const originalLineRaw = Number(
+              item.original_line_price != null
+                ? item.original_line_price
+                : item.original_price
+            )
+            const originalLine = Number.isFinite(originalLineRaw)
+              ? originalLineRaw
+              : finalLine
+            const lineDiscounts = Array.isArray(
+              item.line_level_discount_allocations
+            )
+              ? item.line_level_discount_allocations.map((allocation, index) => {
+                  const application = allocation.discount_application || {}
+                  const title =
+                    application.title || application.key || 'Discount'
+                  const amount = Number(allocation.amount || 0)
+                  return {
+                    key: `${item.key}-${title}-${index}`,
+                    title,
+                    amount,
+                    amountLabel: `(−${this.formatMoney(amount)})`,
+                  }
+                })
+              : []
+            const hasLineDiscount =
+              originalLine > finalLine || lineDiscounts.length > 0
+            const originalLinePrice = this.formatMoney(originalLine)
+            const finalLinePrice = this.formatMoney(finalLine)
+
             return {
               key: item.key,
               id: item.id,
               title: item.product_title,
               variant: item.variant_title,
-              price: this.formatMoney(item.price),
+              price: finalLinePrice,
+              originalLinePrice,
+              finalLinePrice,
+              hasLineDiscount,
+              priceLabel: hasLineDiscount
+                ? `Sale price ${finalLinePrice}, original price ${originalLinePrice}`
+                : `Price ${finalLinePrice}`,
+              lineDiscounts,
               quantity: item.quantity,
               image: item.image,
               properties: item.properties,
