@@ -56,7 +56,7 @@
           "name": "Featured Questions",
           "settings": {
             "question": "Do Kestrel knives come with free lifetime sharpening?",
-            "answer": "Yes! Free lifetime sharpening is part of Kestrel For Life. We pay return shipping to U.S. addresses.\nYou ship the knife to us.  We'll put a fresh edge on it, clean it up and ship it back to you.\nThese knives are meant to be used.  Don't be afraid to use yours.",
+            "answer": "Yes! Free lifetime sharpening for fixed-blade knives is part of Kestrel For Life.\nYou ship the knife to us.  We'll put a fresh edge on it, clean it up and ship it back to you. Return shipping is free within the U.S.; customers outside the U.S. pay return shipping.\nThese knives are meant to be used.  Don't be afraid to use yours.",
             "category": "Featured Questions",
             "show_item": true
           }
@@ -176,7 +176,7 @@
           "name": "Sharpening & Service",
           "settings": {
             "question": "Do Kestrel knives include free lifetime sharpening?",
-            "answer": "Yes.\nFree lifetime sharpening is part of Kestrel For Life. We pay return shipping to U.S. addresses.\nYou ship it to us.  We'll sharpen it, clean it up and ship it back to you.\nContact us before sending your knife in so we can give you the current shipping instructions.",
+            "answer": "Yes.\nFree lifetime sharpening for fixed-blade knives is part of Kestrel For Life.\nYou ship it to us.  We'll sharpen it, clean it up and ship it back to you. Return shipping is free within the U.S.; customers outside the U.S. pay return shipping.\nContact us before sending your knife in so we can give you the current shipping instructions.",
             "category": "Sharpening & Service",
             "show_item": true
           }
