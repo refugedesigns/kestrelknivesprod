@@ -4216,6 +4216,52 @@
         }
       });
 
+      window.kkSyncProductAvailability = function (freshVariants) {
+        if (!Array.isArray(freshVariants)) return;
+        const byId = new Map(
+          freshVariants.map(variant => [String(variant.id), !!variant.available])
+        );
+        let changed = false;
+        variants.forEach(variant => {
+          const id = String(variant.id);
+          if (!byId.has(id) || variant.available === byId.get(id)) return;
+          variant.available = byId.get(id);
+          changed = true;
+        });
+        const rawVariants =
+          window.__product && Array.isArray(window.__product.variants)
+            ? window.__product.variants
+            : [];
+        rawVariants.forEach(variant => {
+          const id = String(variant.id);
+          if (!byId.has(id)) return;
+          variant.available = byId.get(id);
+        });
+        if (!changed) return;
+
+        const applyUi = () => {
+          const el = document.querySelector('[x-data*="productPage"]');
+          const page = el && el._x_dataStack && el._x_dataStack[0];
+          if (!page) return false;
+          const current = variants.find(
+            variant => String(variant.id) === String(page.currentVariantId)
+          );
+          if (current) {
+            if (typeof page.updateAvailability === 'function') {
+              page.updateAvailability(current);
+            }
+            if (typeof page.updateAddToCartState === 'function') {
+              page.updateAddToCartState(current);
+            }
+          }
+          return true;
+        };
+
+        if (!applyUi()) {
+          document.addEventListener('alpine:initialized', applyUi, { once: true });
+        }
+      };
+
     })();
 
   // Define fullscreenGallery function globally for Alpine.js
@@ -4674,27 +4720,17 @@
 {% endschema %}
 
 <script>
-  // Freshness check: if CDN served stale availability, reload once with cache-busting
+  // Freshness check: if CDN served stale availability, update the page in place
   document.addEventListener('DOMContentLoaded', async function () {
     try {
-      const onceKey = 'kk_p_refresh_' + {{ product.id }};
-      if (sessionStorage.getItem(onceKey)) return;
       const res = await fetch('/products/{{ product.handle }}.js', { cache: 'no-store' });
       if (!res.ok) return;
       const fresh = await res.json();
-      const freshVariant = (fresh.variants || []).find(v => v.id === {{ selected_variant.id }});
-      if (!freshVariant) return;
-      const staleAvail = {{ selected_variant.available | json }};
-      const freshAvail = !!freshVariant.available;
-      if (staleAvail !== freshAvail) {
-        sessionStorage.setItem(onceKey, '1');
-        const url = new URL(window.location.href);
-        url.searchParams.set('t', String(Date.now()));
-        window.location.replace(url.toString());
+      if (typeof window.kkSyncProductAvailability === 'function') {
+        window.kkSyncProductAvailability(fresh.variants || []);
       }
     } catch (e) {
-      // silent
-      console.log("Error in freshness check", e)
+      console.log('Error in freshness check', e);
     }
   });
 </script>
