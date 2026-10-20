@@ -86,21 +86,76 @@
         </a>
       </div>
 
+      <form
+        action='{{ routes.search_url }}'
+        method='get'
+        role='search'
+        class='not-found-search'
+      >
+        <label for='NotFoundSearch' class='sr-only'>Search</label>
+        <input
+          id='NotFoundSearch'
+          type='search'
+          name='q'
+          placeholder='Search knives, apparel, and more'
+        >
+        <button type='submit'>Search</button>
+      </form>
+
+      <nav class='not-found-categories' aria-label='Shop categories'>
+        <ul>
+          {% if section.settings.category_menu != blank
+            and section.settings.category_menu.links.size > 0
+          %}
+            {% for link in section.settings.category_menu.links %}
+              <li>
+                <a href='{{ link.url }}'>{{ link.title }}</a>
+              </li>
+            {% endfor %}
+          {% else %}
+            {% if collections['ultralight-knives'] != blank %}
+              <li>
+                <a href='{{ collections["ultralight-knives"].url }}'>Ultralight Knives</a>
+              </li>
+            {% endif %}
+            {% if collections['apparel'] != blank %}
+              <li>
+                <a href='{{ collections.apparel.url }}'>Apparel</a>
+              </li>
+            {% endif %}
+            {% if collections['knives'] != blank %}
+              <li>
+                <a href='{{ collections.knives.url }}'>Knives</a>
+              </li>
+            {% endif %}
+          {% endif %}
+        </ul>
+      </nav>
+
       <!-- Additional help text -->
       <div class='text-center'>
+        {% assign support_email = section.settings.support_email
+          | default: 'sales@kestrelknives.com'
+          | strip
+        %}
+        {% if support_email contains 'mailto:' %}
+          {% assign support_href = support_email %}
+        {% elsif support_email != blank %}
+          {% assign support_href = support_email | prepend: 'mailto:' %}
+        {% else %}
+          {% assign support_href = 'mailto:sales@kestrelknives.com' %}
+        {% endif %}
         <p class='text-gray-400 text-sm'>
           {{
             section.settings.help_text
-            | default: "Still lost? Try searching or contact support"
+            | default: "Still lost? Try searching or"
           }}
-          {% if section.settings.support_email %}
-            <a
-              href='mailto:{{ section.settings.support_email }}'
-              class='text-white hover:text-gray-300 underline underline-offset-2 transition-colors'
-            >
-              contact support
-            </a>
-          {% endif %}
+          <a
+            href='{{ support_href }}'
+            class='text-white hover:text-gray-300 underline underline-offset-2 transition-colors'
+          >
+            contact support
+          </a>
         </p>
       </div>
     </div>
@@ -156,6 +211,77 @@
 
   .text-shadow {
     text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+  }
+
+  .not-found-search {
+    display: flex;
+    width: 100%;
+    max-width: 36rem;
+    margin: 0 auto 2.5rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .not-found-search input {
+    min-width: 0;
+    flex: 1;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+  }
+
+  .not-found-search input:focus {
+    outline: none;
+  }
+
+  .not-found-search input::placeholder {
+    color: #9ca3af;
+  }
+
+  .not-found-search button {
+    border: 0;
+    background: #fff;
+    color: #000;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .not-found-search button:hover {
+    background: #e5e7eb;
+  }
+
+  .not-found-categories {
+    margin-bottom: 2.5rem;
+  }
+
+  .not-found-categories ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .not-found-categories a {
+    display: inline-block;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 999px;
+    padding: 0.5rem 1rem;
+    color: #fff;
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+
+  .not-found-categories a:hover {
+    background: rgba(255, 255, 255, 0.1);
   }
 </style>
 
@@ -217,14 +343,21 @@
       "type": "text",
       "id": "help_text",
       "label": "Help Text",
-      "default": "Still lost? Try searching or contact support",
-      "info": "Text shown below the buttons"
+      "default": "Still lost? Try searching or",
+      "info": "Text shown before the contact support link"
     },
     {
       "type": "text",
       "id": "support_email",
       "label": "Support Email",
-      "info": "Email address for support contact (optional)"
+      "default": "sales@kestrelknives.com",
+      "info": "Used for the contact support link. A blank value falls back to sales@kestrelknives.com."
+    },
+    {
+      "type": "link_list",
+      "id": "category_menu",
+      "label": "Category links",
+      "info": "Optional. When empty, the page links to Ultralight Knives, Apparel, and Knives."
     }
   ]
 }
