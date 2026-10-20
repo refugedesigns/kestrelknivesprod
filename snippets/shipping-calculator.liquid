@@ -1,0 +1,434 @@
+<dialog
+  id='ShippingCalculator'
+  class='shipping-calculator'
+  aria-labelledby='ShippingCalculatorTitle'
+  aria-modal='true'
+>
+  <div class='shipping-calculator__header'>
+    <h2 id='ShippingCalculatorTitle'>Calculate shipping</h2>
+    <button type='button' data-shipping-calculator-close aria-label='Close'>
+      <svg viewBox='0 0 24 24' aria-hidden='true' focusable='false'>
+        <path d='M6 6l12 12M18 6L6 18' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'></path>
+      </svg>
+    </button>
+  </div>
+
+  <div data-shipping-calculator-empty hidden>
+    <p>Add an item to your cart to calculate shipping.</p>
+  </div>
+
+  <form data-shipping-calculator-form hidden>
+    <p class='shipping-calculator__note'>
+      Estimate for the items currently in your cart.
+    </p>
+
+    <div class='shipping-calculator__field'>
+      <label for='ShippingCalculatorCountry'>Country</label>
+      <select id='ShippingCalculatorCountry' name='country' autocomplete='country-name' required>
+        {{ all_country_option_tags }}
+      </select>
+    </div>
+
+    <div class='shipping-calculator__field'>
+      <label id='ShippingCalculatorProvinceLabel' for='ShippingCalculatorProvince'>Province / state</label>
+      <select id='ShippingCalculatorProvince' name='province' autocomplete='address-level1'></select>
+      <input
+        id='ShippingCalculatorProvinceText'
+        name='province_text'
+        type='text'
+        autocomplete='address-level1'
+        hidden
+      >
+    </div>
+
+    <div class='shipping-calculator__field'>
+      <label for='ShippingCalculatorZip'>ZIP / postal code</label>
+      <input
+        id='ShippingCalculatorZip'
+        name='zip'
+        type='text'
+        autocomplete='postal-code'
+        required
+        aria-required='true'
+      >
+    </div>
+
+    <p class='shipping-calculator__error' data-shipping-calculator-error role='alert' hidden></p>
+
+    <button type='submit' data-shipping-calculator-submit>Calculate</button>
+
+    <ul data-shipping-calculator-results aria-live='polite'></ul>
+  </form>
+</dialog>
+
+<style>
+  .shipping-calculator-trigger {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: #000;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
+
+  .shipping-calculator-trigger:hover {
+    color: #111;
+  }
+
+  .shipping-calculator-pdp {
+    margin-top: 0.75rem;
+  }
+
+  .shipping-calculator {
+    width: calc(100% - 2rem);
+    max-width: 24rem;
+    padding: 1.25rem;
+    border: 0;
+    border-radius: 0.5rem;
+    color: #111;
+  }
+
+  .shipping-calculator::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .shipping-calculator__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .shipping-calculator__header h2 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+  .shipping-calculator__header button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  .shipping-calculator__header svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .shipping-calculator__note,
+  .shipping-calculator [data-shipping-calculator-empty] p {
+    margin: 0 0 1rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .shipping-calculator__field {
+    margin-bottom: 0.75rem;
+  }
+
+  .shipping-calculator__field label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .shipping-calculator__field select,
+  .shipping-calculator__field input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    color: #111;
+    background: #fff;
+  }
+
+  .shipping-calculator [data-shipping-calculator-submit] {
+    width: 100%;
+    margin-top: 0.25rem;
+    padding: 0.75rem 1rem;
+    border: 0;
+    background: #000;
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .shipping-calculator [data-shipping-calculator-submit]:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  .shipping-calculator__error {
+    margin: 0 0 0.75rem;
+    color: #b91c1c;
+    font-size: 0.875rem;
+  }
+
+  .shipping-calculator [data-shipping-calculator-results] {
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .shipping-calculator [data-shipping-calculator-results] li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+  }
+</style>
+
+<script>
+  ;(function () {
+    const dialog = document.getElementById('ShippingCalculator')
+    if (!dialog || dialog.dataset.bound === 'true') return
+    dialog.dataset.bound = 'true'
+
+    const emptyPanel = dialog.querySelector('[data-shipping-calculator-empty]')
+    const form = dialog.querySelector('[data-shipping-calculator-form]')
+    const countrySelect = dialog.querySelector('#ShippingCalculatorCountry')
+    const provinceLabel = dialog.querySelector('#ShippingCalculatorProvinceLabel')
+    const provinceSelect = dialog.querySelector('#ShippingCalculatorProvince')
+    const provinceText = dialog.querySelector('#ShippingCalculatorProvinceText')
+    const zipInput = dialog.querySelector('#ShippingCalculatorZip')
+    const errorEl = dialog.querySelector('[data-shipping-calculator-error]')
+    const resultsEl = dialog.querySelector('[data-shipping-calculator-results]')
+    const submitButton = dialog.querySelector('[data-shipping-calculator-submit]')
+    const closeButton = dialog.querySelector('[data-shipping-calculator-close]')
+    let lastTrigger = null
+
+    function setHidden(element, hidden) {
+      if (!element) return
+      element.hidden = hidden
+    }
+
+    function showError(message) {
+      errorEl.textContent = message || ''
+      setHidden(errorEl, !message)
+    }
+
+    function formatRate(price) {
+      const amount = Number(price)
+      if (!Number.isFinite(amount)) return String(price || '')
+      if (amount === 0) return 'Free'
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(amount)
+    }
+
+    function syncProvinces() {
+      const option = countrySelect.options[countrySelect.selectedIndex]
+      let provinces = []
+      try {
+        provinces = JSON.parse(
+          (option && option.getAttribute('data-provinces')) || '[]'
+        )
+      } catch (error) {
+        provinces = []
+      }
+      if (!Array.isArray(provinces)) provinces = []
+
+      provinceSelect.innerHTML = ''
+      if (provinces.length) {
+        provinces.forEach(function (pair) {
+          const entry = document.createElement('option')
+          const first = Array.isArray(pair) ? String(pair[0] || '') : String(pair || '')
+          const second = Array.isArray(pair) ? String(pair[1] || '') : first
+          const name =
+            first.length === 2 && second.length > 2 ? second : first || second
+          entry.value = name
+          entry.textContent = name
+          provinceSelect.appendChild(entry)
+        })
+        setHidden(provinceSelect, false)
+        setHidden(provinceText, true)
+        provinceSelect.required = true
+        provinceText.required = false
+        provinceText.value = ''
+        provinceLabel.setAttribute('for', 'ShippingCalculatorProvince')
+      } else {
+        setHidden(provinceSelect, true)
+        setHidden(provinceText, false)
+        provinceSelect.required = false
+        provinceText.required = false
+        provinceLabel.setAttribute('for', 'ShippingCalculatorProvinceText')
+      }
+    }
+
+    function provinceValue() {
+      if (!provinceText.hidden) return provinceText.value.trim()
+      return provinceSelect.value.trim()
+    }
+
+    function showEmpty() {
+      setHidden(emptyPanel, false)
+      setHidden(form, true)
+      showError('')
+      resultsEl.innerHTML = ''
+    }
+
+    function showForm() {
+      setHidden(emptyPanel, true)
+      setHidden(form, false)
+      showError('')
+      resultsEl.innerHTML = ''
+      syncProvinces()
+    }
+
+    function errorMessage(body) {
+      if (!body || typeof body !== 'object') {
+        return 'Enter a valid address to see shipping rates.'
+      }
+      const parts = []
+      Object.keys(body).forEach(function (key) {
+        const value = body[key]
+        if (Array.isArray(value)) parts.push(value.join(' '))
+        else if (typeof value === 'string') parts.push(value)
+      })
+      return parts.join(' ') || 'Enter a valid address to see shipping rates.'
+    }
+
+    function renderRates(rates) {
+      resultsEl.innerHTML = ''
+      if (!Array.isArray(rates) || rates.length === 0) {
+        showError('No shipping rates were returned for that address.')
+        return
+      }
+      rates.forEach(function (rate) {
+        const item = document.createElement('li')
+        const name = document.createElement('span')
+        const price = document.createElement('span')
+        name.textContent = rate.name || 'Shipping'
+        price.textContent = formatRate(rate.price)
+        item.appendChild(name)
+        item.appendChild(price)
+        resultsEl.appendChild(item)
+      })
+    }
+
+    async function fetchRates(country, province, zip) {
+      const params = new URLSearchParams({
+        'shipping_address[country]': country,
+        'shipping_address[province]': province,
+        'shipping_address[zip]': zip,
+      })
+      const url = '/cart/shipping_rates.json?' + params.toString()
+      for (let attempt = 0; attempt < 8; attempt += 1) {
+        const response = await fetch(url, { credentials: 'same-origin' })
+        if (response.status === 200) return response.json()
+        if (response.status === 202) {
+          await new Promise(function (resolve) {
+            window.setTimeout(resolve, 400)
+          })
+          continue
+        }
+        let body = null
+        try {
+          body = await response.json()
+        } catch (error) {
+          body = null
+        }
+        const failure = new Error(errorMessage(body))
+        failure.shippingError = true
+        throw failure
+      }
+      throw new Error('Shipping rates are still calculating. Try again.')
+    }
+
+    async function openFrom(trigger) {
+      lastTrigger = trigger
+      let itemCount = 0
+      try {
+        const cart = await fetch('/cart.js', { credentials: 'same-origin' }).then(
+          function (response) {
+            return response.json()
+          }
+        )
+        itemCount = Number(cart.item_count || 0)
+      } catch (error) {
+        itemCount = 0
+      }
+      if (itemCount > 0) showForm()
+      else showEmpty()
+      if (!dialog.open) dialog.showModal()
+      const focusTarget = itemCount > 0 ? countrySelect : closeButton
+      if (focusTarget) focusTarget.focus()
+    }
+
+    document.addEventListener('click', function (event) {
+      const trigger = event.target.closest('[data-shipping-calculator-open]')
+      if (!trigger) return
+      event.preventDefault()
+      openFrom(trigger)
+    })
+
+    closeButton.addEventListener('click', function () {
+      dialog.close()
+    })
+
+    dialog.addEventListener('click', function (event) {
+      if (event.target === dialog) dialog.close()
+    })
+
+    dialog.addEventListener('close', function () {
+      if (lastTrigger) lastTrigger.focus()
+    })
+
+    countrySelect.addEventListener('change', syncProvinces)
+
+    form.addEventListener('submit', async function (event) {
+      event.preventDefault()
+      showError('')
+      resultsEl.innerHTML = ''
+      submitButton.disabled = true
+      submitButton.textContent = 'Calculating…'
+      try {
+        const cart = await fetch('/cart.js', { credentials: 'same-origin' }).then(
+          function (response) {
+            return response.json()
+          }
+        )
+        if (!Number(cart.item_count || 0)) {
+          showEmpty()
+          closeButton.focus()
+          return
+        }
+        const rates = await fetchRates(
+          countrySelect.value,
+          provinceValue(),
+          zipInput.value.trim()
+        )
+        renderRates(rates.shipping_rates || rates)
+      } catch (error) {
+        showError(
+          error && error.shippingError
+            ? error.message
+            : error && error.message
+              ? error.message
+              : 'Enter a valid address to see shipping rates.'
+        )
+      } finally {
+        submitButton.disabled = false
+        submitButton.textContent = 'Calculate'
+      }
+    })
+  })()
+</script>

@@ -198,6 +198,16 @@
       <span class='text-lg font-bold text-gray-900' x-text='subtotal'></span>
     </div>
 
+    <div class='text-right'>
+      <button
+        type='button'
+        class='shipping-calculator-trigger'
+        data-shipping-calculator-open
+      >
+        Calculate shipping
+      </button>
+    </div>
+
     <template x-if='hasDiscount'>
       <div class='space-y-2'>
         <template x-for='discount in cartLevelDiscounts' :key='discount.title'>
