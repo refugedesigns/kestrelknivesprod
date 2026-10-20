@@ -47,7 +47,6 @@
   # Build-A-Knife knives, gift cards, sale items (checked per variant below)
   # and anything tagged final-sale (e.g. as-is / blemished knives).
   assign policy_page_url = shop.url | append: '/pages/shipping-returns'
-  assign return_policy_id = policy_page_url | append: '#return-policy'
   assign shipping_policy_id = policy_page_url | append: '#shipping-policy'
   assign product_final_sale = false
   assign product_type_down = product.type | downcase
@@ -131,13 +130,9 @@
             {%- assign offer_final_sale = true -%}
           {%- endif -%}
           {%- if offer_final_sale -%}
-            ,"hasMerchantReturnPolicy": {
-              "@type": "MerchantReturnPolicy",
-              "applicableCountry": "US",
-              "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted"
-            }
+            ,"hasMerchantReturnPolicy": {% render 'merchant-policies-json-ld', part: 'final-sale' %}
           {%- else -%}
-            ,"hasMerchantReturnPolicy": { "@id": {{ return_policy_id | json }} }
+            ,"hasMerchantReturnPolicy": {% render 'merchant-policies-json-ld', part: 'offer-refs' %}
           {%- endif -%}
           ,"shippingDetails": {
             "@type": "OfferShippingDetails",
