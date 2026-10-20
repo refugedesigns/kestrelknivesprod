@@ -180,19 +180,30 @@
       return request
     }
 
+    function kkHasIncompleteVariants(component) {
+      const loaded = (component.variantsData || []).length
+      const lists = component.optionValueLists || []
+      const colorCount = (lists[0] && lists[0].length) || 0
+      const sizeCount = (lists[1] && lists[1].length) || 0
+      if (colorCount > 1 && loaded < colorCount) return true
+      if (sizeCount > 1 && loaded <= 1) return true
+      return false
+    }
+
     function kkEnsureVariants(component) {
       if (!component) return Promise.resolve(null)
-      if (component._variantsLoaded) return Promise.resolve(component.variantsData)
-      if (component._variantsPromise) return component._variantsPromise
-      const handle = component.productData && component.productData.handle
-      if (!handle) {
-        component._variantsLoaded = true
+      if (component._variantsLoaded && !kkHasIncompleteVariants(component)) {
+        kkRefreshQuickViewOptions(component)
         return Promise.resolve(component.variantsData)
       }
+      if (component._variantsPromise) return component._variantsPromise
+      const handle = component.productData && component.productData.handle
+      if (!handle) return Promise.resolve(component.variantsData)
       component._variantsPromise = kkLoadVariants(handle)
         .then(mapped => {
           if (mapped && mapped.variants && mapped.variants.length) {
-            component.variantsData = mapped.variants
+            component.variantsData = mapped.variants.slice()
+            component._variantsLoaded = true
           }
           if (
             mapped &&
@@ -201,7 +212,6 @@
           ) {
             component.optionValueLists = mapped.optionValues
           }
-          component._variantsLoaded = true
           kkRefreshQuickViewOptions(component)
           if (typeof component.updateTitle === 'function') component.updateTitle()
           if (typeof component.checkAvailability === 'function') {
@@ -210,9 +220,11 @@
           return component.variantsData
         })
         .catch(err => {
-          component._variantsPromise = null
           console.error('Card variant load failed', handle, err)
           return component.variantsData
+        })
+        .finally(() => {
+          component._variantsPromise = null
         })
       return component._variantsPromise
     }
@@ -565,45 +577,46 @@
         },
 
         async openQuickView() {
-          await kkEnsureVariants(this)
-          this.qvSelectedVariantId = this.selectedVariant
-          this.qvQuantity = 1
+          const self = this
+          await kkEnsureVariants(self)
+          self.qvSelectedVariantId = self.selectedVariant
+          self.qvQuantity = 1
           // Capture option names from product
           try {
-            const opts = Array.isArray(this.productData.options)
-              ? this.productData.options
+            const opts = Array.isArray(self.productData.options)
+              ? self.productData.options
               : []
-            this.optionNames = opts
+            self.optionNames = opts
               .map(o => (typeof o === 'string' ? o : (o && o.name) || ''))
               .filter(Boolean)
           } catch (e) {
-            this.optionNames = []
+            self.optionNames = []
           }
           // Seed option selections from current variant if available
-          const current = this.getVariantById(
-            this.selectedVariant || this.qvSelectedVariantId
+          const current = self.getVariantById(
+            self.selectedVariant || self.qvSelectedVariantId
           )
           if (current) {
-            this.qvOption1 = current.option1 || null
-            this.qvOption2 = current.option2 || null
+            self.qvOption1 = current.option1 || null
+            self.qvOption2 = current.option2 || null
           } else {
             // Fall back to first available variant's options
             const firstAvailable =
-              (this.variantsData || []).find(v => !!v.available) ||
-              (this.variantsData || [])[0] ||
+              (self.variantsData || []).find(v => !!v.available) ||
+              (self.variantsData || [])[0] ||
               null
             if (firstAvailable) {
-              this.qvSelectedVariantId = firstAvailable.id
-              this.qvOption1 = firstAvailable.option1 || null
-              this.qvOption2 = firstAvailable.option2 || null
+              self.qvSelectedVariantId = firstAvailable.id
+              self.qvOption1 = firstAvailable.option1 || null
+              self.qvOption2 = firstAvailable.option2 || null
             }
           }
           // Initialize drawer image from current card image
-          this.qvImage = this.currentImage
-          kkRefreshQuickViewOptions(this)
-          this.updateQVSelectedVariant()
-          this.syncQvDibsPlanSelection()
-          kkOpenSharedQuickView(this)
+          self.qvImage = self.currentImage
+          kkRefreshQuickViewOptions(self)
+          self.updateQVSelectedVariant()
+          self.syncQvDibsPlanSelection()
+          kkOpenSharedQuickView(self)
         },
         closeQuickView() {
           if (kkCloseSharedQuickView(this)) return
@@ -1411,45 +1424,46 @@
 
         // Quick View
         async openQuickView() {
-          await kkEnsureVariants(this)
-          this.qvSelectedVariantId = this.selectedVariant
-          this.qvQuantity = 1
+          const self = this
+          await kkEnsureVariants(self)
+          self.qvSelectedVariantId = self.selectedVariant
+          self.qvQuantity = 1
           try {
-            const opts = Array.isArray(this.productData.options)
-              ? this.productData.options
+            const opts = Array.isArray(self.productData.options)
+              ? self.productData.options
               : []
-            this.optionNames = opts
+            self.optionNames = opts
               .map(o => (typeof o === 'string' ? o : (o && o.name) || ''))
               .filter(Boolean)
           } catch (e) {
-            this.optionNames = []
+            self.optionNames = []
           }
-          const currentVariant = this.getVariantById(this.selectedVariant)
+          const currentVariant = self.getVariantById(self.selectedVariant)
           if (currentVariant) {
-            this.qvOption1 = currentVariant.option1 || null
-            this.qvOption2 = currentVariant.option2 || null
+            self.qvOption1 = currentVariant.option1 || null
+            self.qvOption2 = currentVariant.option2 || null
           } else {
             const firstAvailable =
-              (this.variantsData || []).find(v => !!v.available) ||
-              (this.variantsData || [])[0] ||
+              (self.variantsData || []).find(v => !!v.available) ||
+              (self.variantsData || [])[0] ||
               null
             if (firstAvailable) {
-              this.qvSelectedVariantId = firstAvailable.id
-              this.qvOption1 = firstAvailable.option1 || null
-              this.qvOption2 = firstAvailable.option2 || null
+              self.qvSelectedVariantId = firstAvailable.id
+              self.qvOption1 = firstAvailable.option1 || null
+              self.qvOption2 = firstAvailable.option2 || null
             }
           }
           const selectedImage = currentVariant
-            ? this.resolveImageSrc(
+            ? self.resolveImageSrc(
                 currentVariant.featured_image || currentVariant.image
               )
             : null
-          this.qvImage =
-            selectedImage || this.currentImage || this.productImageSrc || ''
-          kkRefreshQuickViewOptions(this)
-          this.updateQVSelectedVariant()
-          this.syncQvDibsPlanSelection()
-          kkOpenSharedQuickView(this)
+          self.qvImage =
+            selectedImage || self.currentImage || self.productImageSrc || ''
+          kkRefreshQuickViewOptions(self)
+          self.updateQVSelectedVariant()
+          self.syncQvDibsPlanSelection()
+          kkOpenSharedQuickView(self)
         },
         closeQuickView() {
           if (kkCloseSharedQuickView(this)) return
@@ -1571,22 +1585,40 @@
     Alpine.data('kkCardQuickView', () => ({
       open: false,
       card: null,
+      generation: 0,
+      viewKey: 0,
       openFrom(card) {
-        this.card = card
+        const token = ++this.generation
         this.open = true
         document.body.style.overflow = 'hidden'
+        this.card = null
+        this.viewKey = 0
         this.$nextTick(() => {
-          const panel = this.$refs.qvPanel
-          if (!panel) return
-          panel.classList.add('translate-x-full')
-          requestAnimationFrame(() => panel.classList.remove('translate-x-full'))
+          if (this.generation !== token) return
+          this.card = card
+          this.viewKey = token
+          if (typeof kkRefreshQuickViewOptions === 'function') {
+            kkRefreshQuickViewOptions(card)
+          }
+          this.$nextTick(() => {
+            if (this.generation !== token) return
+            const panel = this.$refs.qvPanel
+            if (!panel) return
+            panel.classList.add('translate-x-full')
+            requestAnimationFrame(() =>
+              panel.classList.remove('translate-x-full')
+            )
+          })
         })
       },
       close() {
+        const token = this.generation
         const panel = this.$refs.qvPanel
         const finish = () => {
+          if (this.generation !== token) return
           this.open = false
           this.card = null
+          this.viewKey = 0
           document.body.style.overflow = ''
         }
         if (!panel) {
@@ -1625,8 +1657,8 @@
     x-ref='qvPanel'
     class='absolute right-0 top-0 h-full w-full max-w-lg bg-white shadow-xl flex flex-col transform transition-transform duration-300 translate-x-full'
   >
-    <template x-if='card'>
-      <div class='flex flex-col h-full'>
+    <template x-if='card && viewKey'>
+      <div class='flex flex-col h-full' :key='viewKey'>
         <div class='flex items-center justify-between p-5 border-b border-gray-200'>
           <h3 class='text-lg font-semibold'>Select options</h3>
           <button
@@ -1665,7 +1697,7 @@
                   x-text='(card.optionNames[0] || "Option 1") + ":"'
                 ></p>
                 <div class='flex flex-wrap gap-3' x-show='card.isColorOption(1)'>
-                  <template x-for='val in card.qvValues1' :key='"c1-"+val'>
+                  <template x-for='val in card.qvValues1' :key='"c1-"+viewKey+"-"+val'>
                     <button
                       type='button'
                       @click='card.qvOption1 = val; card.updateQVSelectedVariant()'
@@ -1683,7 +1715,7 @@
                   </template>
                 </div>
                 <div class='flex flex-wrap gap-2' x-show='!card.isColorOption(1)'>
-                  <template x-for='val in card.qvValues1' :key='"t1-"+val'>
+                  <template x-for='val in card.qvValues1' :key='"t1-"+viewKey+"-"+val'>
                     <button
                       type='button'
                       @click='card.qvOption1 = val; card.updateQVSelectedVariant()'
@@ -1701,7 +1733,7 @@
                   x-text='(card.optionNames[1] || "Option 2") + ":"'
                 ></p>
                 <div class='flex flex-wrap gap-3' x-show='card.isColorOption(2)'>
-                  <template x-for='val in card.qvValues2' :key='"c2-"+val'>
+                  <template x-for='val in card.qvValues2' :key='"c2-"+viewKey+"-"+val'>
                     <button
                       type='button'
                       @click='card.qvOption2 = val; card.updateQVSelectedVariant()'
@@ -1720,7 +1752,7 @@
                   </template>
                 </div>
                 <div class='flex flex-wrap gap-2' x-show='!card.isColorOption(2)'>
-                  <template x-for='val in card.qvValues2' :key='"t2-"+val'>
+                  <template x-for='val in card.qvValues2' :key='"t2-"+viewKey+"-"+val'>
                     <button
                       type='button'
                       @click='card.qvOption2 = val; card.updateQVSelectedVariant()'
