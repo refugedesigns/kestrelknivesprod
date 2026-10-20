@@ -14,8 +14,8 @@
         {%- if page_title != blank and page_title != shop.name -%}
           {{- page_title -}}
         {%- else -%}
-          {{- shop.name -}}
-          {%- if page_description != blank %} — {{ page_description | truncate: 70, '' }}{% endif -%}
+          {%- comment -%} Never a bare shop name on the homepage {%- endcomment -%}
+          {{- shop.name }} | Ultralight American-Made Hunting Knives
         {%- endif -%}
       {%- else -%}
         {{ page_title }}{% unless page_title contains shop.name %} — {{ shop.name }}{% endunless %}
@@ -153,6 +153,13 @@
             {%- endunless -%}
             ,"logo": {{ organization_logo | json }}
           {%- endif -%}
+          ,"email": "sales@kestrelknives.com"
+          ,"sameAs": [
+            "https://www.instagram.com/kestrelknives/",
+            "https://www.facebook.com/kestrelknives",
+            "https://www.youtube.com/@kestrelknives",
+            "https://twitter.com/KestrelKnives"
+          ]
         }
       </script>
     {%- endif -%}

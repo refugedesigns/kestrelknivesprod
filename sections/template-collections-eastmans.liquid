@@ -211,12 +211,12 @@
                 {% endif %}
                 <div class='eastmans-hero-text-content'>
                   {% assign banner_title_text = section.settings.banner_title | default: banner_default_heading %}
-                  <h2
+                  <h1
                     class='eastmans-banner-title eastmans-banner-title-breaks font-bold mb-0'
                     style='--eastmans-banner-title-size-desktop: {{ section.settings.banner_title_size_desktop | default: 72 }}px; --eastmans-banner-title-size-mobile: {{ section.settings.banner_title_size_mobile | default: 40 }}px; color: {{ section.settings.banner_text_color | default: "#ffffff" }}; text-shadow: 0 2px {{ section.settings.banner_text_shadow_blur | default: 6 }}px rgba(0,0,0,{{ banner_shadow_opacity }});'
                   >
                     {{ banner_title_text }}
-                  </h2>
+                  </h1>
                 </div>
               </div>
             </div>
@@ -226,6 +226,10 @@
     </div>
   </div>
 {% endif %}
+
+{% unless section.settings.show_banner and section.settings.banner_show_text_overlay %}
+  <h1 class='sr-only'>{{ collection.title }}</h1>
+{% endunless %}
 
 <div class='px-4 pt-6 lg:pt-10 pb-0 mx-auto'>
   {% paginate collection.products by section.settings.number_of_products_per_page %}

@@ -1,15 +1,41 @@
 {% comment %}
   BreadcrumbList JSON-LD only. No visible breadcrumb markup.
-  Product pages use the collection from the URL when present, otherwise the
-  product's first collection. Collection pages list Home and that collection.
+  Product pages use the collection from the URL unless it is an internal one,
+  otherwise ultralight-knives / apparels / accessories, otherwise the first
+  non-internal collection. Collection pages list Home and that collection.
 {% endcomment %}
 {% liquid
   assign crumb_collection = nil
   if template.name == 'product'
+    # Internal/merchandising collections never become the crumb. Prefer the
+    # main shop collections, then any other public collection.
+    assign crumb_skip = 'featured,featured-mobile,eastmans-offer,all,frontpage,early-access,most-popular-apparel,most-popular-sweatshirts,pinterest-apparel-stickers,custom' | split: ','
+    assign crumb_preferred = 'ultralight-knives,apparels,accessories' | split: ','
     if collection != blank
-      assign crumb_collection = collection
-    else
-      assign crumb_collection = product.collections.first
+      unless crumb_skip contains collection.handle
+        assign crumb_collection = collection
+      endunless
+    endif
+    if crumb_collection == blank
+      for preferred_handle in crumb_preferred
+        for c in product.collections
+          if c.handle == preferred_handle
+            assign crumb_collection = c
+            break
+          endif
+        endfor
+        if crumb_collection != blank
+          break
+        endif
+      endfor
+    endif
+    if crumb_collection == blank
+      for c in product.collections
+        unless crumb_skip contains c.handle
+          assign crumb_collection = c
+          break
+        endunless
+      endfor
     endif
   elsif template.name == 'collection'
     assign crumb_collection = collection
