@@ -47,95 +47,12 @@
 {}
 {%- endif -%}
 {%- endcapture -%}
-{%- liquid
-  assign swatch_type = product_obj.type | default: '' | downcase
-  assign swatch_apparel = false
-  assign swatch_accessory = false
-  if swatch_type contains 'apparel'
-    assign swatch_apparel = true
-  endif
-  if swatch_type contains 'accessories'
-    assign swatch_accessory = true
-  endif
-  assign swatch_json = ''
-  assign swatch_count = 0
-  assign card_colors_json = '[]'
-
-  if swatch_accessory or product_obj.has_only_default_variant
-    assign card_colors_json = '[]'
-  elsif swatch_apparel
-    assign swatch_opt_index = 0
-    for option in product_obj.options_with_values
-      assign swatch_opt_name = option.name | downcase
-      if swatch_opt_name contains 'color' or swatch_opt_name contains 'colour' or swatch_opt_name contains 'shade' or swatch_opt_name contains 'finish'
-        assign swatch_opt_index = forloop.index
-        break
-      endif
-    endfor
-    if swatch_opt_index == 0
-      assign swatch_first = product_obj.options | first | downcase
-      unless swatch_first contains 'size' or swatch_first contains 'title'
-        assign swatch_opt_index = 1
-      endunless
-    endif
-    if swatch_opt_index > 0
-      for option in product_obj.options_with_values
-        if forloop.index == swatch_opt_index and option.values.size > 1
-          for value in option.values
-            assign swatch_label = value.name | default: value
-            assign swatch_label_json = swatch_label | json
-            assign swatch_hex = ''
-            if value.swatch.color != blank
-              assign swatch_hex = value.swatch.color | color_to_hex
-            endif
-            assign swatch_piece = '{"name":' | append: swatch_label_json
-            if swatch_hex != blank
-              assign swatch_hex_json = swatch_hex | json
-              assign swatch_piece = swatch_piece | append: ',"hex":' | append: swatch_hex_json
-            endif
-            assign swatch_piece = swatch_piece | append: '}'
-            if swatch_count > 0
-              assign swatch_json = swatch_json | append: ','
-            endif
-            assign swatch_json = swatch_json | append: swatch_piece
-            assign swatch_count = swatch_count | plus: 1
-          endfor
-        endif
-      endfor
-    endif
-    if swatch_count > 1
-      assign card_colors_json = '[' | append: swatch_json | append: ']'
-    endif
-  else
-    assign swatch_seen = ''
-    for variant in product_obj.variants
-      if variant.option1 and variant.title != 'Default Title'
-        assign swatch_token = '|' | append: variant.option1 | downcase | append: '|'
-        unless swatch_seen contains swatch_token
-          assign swatch_seen = swatch_seen | append: swatch_token
-          assign swatch_name_json = variant.option1 | json
-          assign swatch_piece = '{"name":' | append: swatch_name_json | append: '}'
-          if swatch_count > 0
-            assign swatch_json = swatch_json | append: ','
-          endif
-          assign swatch_json = swatch_json | append: swatch_piece
-          assign swatch_count = swatch_count | plus: 1
-        endunless
-      endif
-    endfor
-    if swatch_count > 1
-      assign card_colors_json = '[' | append: swatch_json | append: ']'
-    endif
-  endif
-  assign card_colors_json = card_colors_json | strip
--%}
 
 <div
   class='product-card w-full box-border py-4 px-2 sm:py-6 sm:px-3'
   data-product='{{ card_product_json | strip_newlines | escape }}'
   data-seed-variant='{{ card_seed_json | strip_newlines | escape }}'
   data-images='{{ card_images_json | strip_newlines | escape }}'
-  data-card-colors='{{ card_colors_json | escape }}'
   {% if product_obj.featured_image %}
     data-initial-image-id='{{ product_obj.featured_image.id }}'
   {% endif %}
@@ -246,16 +163,161 @@
           {% endunless %}
         </a>
 
-        {%- assign type_lower = product_obj.type | default: "" | downcase -%}
-        {%- unless card_colors_json == blank or card_colors_json == '[]' -%}
-          <div
-            class='mb-2'
-            data-card-swatches
-            data-swatch-mode='{% if type_lower contains "apparel" %}color{% else %}handle{% endif %}'
-            role='group'
-            aria-label='{% if type_lower contains "apparel" %}Color{% else %}Handle color{% endif %}'
-          ></div>
-        {%- endunless -%}
+        <!-- Handle Color Variants (hide for Apparels) -->
+        {% assign type_lower = product_obj.type | default: "" | downcase %}
+        {% if type_lower contains "apparel" %}
+          {% render 'product-card-apparel-swatches',
+            product_product: product_obj
+          %}
+        {% endif %}
+        {% unless product_obj.has_only_default_variant
+          or type_lower contains "apparel"
+          or type_lower contains "accessories"
+        %}
+          {% assign handle_option_name = product_obj.options
+            | first
+            | default: "Handle Color"
+          %}
+          <div class='mb-2'>
+            <div class='flex gap-2 justify-center flex-wrap max-w-[260px] sm:max-w-none md:max-w-full mx-auto'>
+              {% assign unique_handle_colors = "" %}
+              {% for variant in product_obj.variants %}
+                {% if variant.option1 and variant.title != "Default Title" %}
+                  {% assign color_token = "|"
+                    | append: variant.option1
+                    | downcase
+                    | append: "|"
+                  %}
+                  {% unless unique_handle_colors contains color_token %}
+                    {% assign unique_handle_colors = unique_handle_colors
+                      | append: color_token
+                    %}
+                    <button
+                      type='button'
+                      class='w-6 h-6 rounded-full border-2 border-gray-300 overflow-hidden focus:outline-none focus:ring-2 focus:ring-black'
+                      @click='selectByHandle({{ variant.option1 | json }})'
+                      :class="$el.dataset.handleLc && selectedOption1Lc === $el.dataset.handleLc ? 'ring-2 ring-black' : ''"
+                      title='{{ variant.option1 }}'
+                      data-handle-lc='{{ variant.option1 | strip | downcase }}'
+                    >
+                      {% assign option_lower = variant.option1 | downcase %}
+                      {% assign cmp_option_token = handle_option_name
+                        | strip
+                        | downcase
+                        | replace: " ", "_"
+                        | replace: "-", "_"
+                        | replace: "/", "_"
+                        | replace: ".", "_"
+                        | replace: "__", "_"
+                        | replace: "__", "_"
+                      %}
+                      {% assign cmp_value_token = variant.option1
+                        | strip
+                        | downcase
+                        | replace: " ", "_"
+                        | replace: "-", "_"
+                        | replace: "/", "_"
+                        | replace: ".", "_"
+                        | replace: "__", "_"
+                        | replace: "__", "_"
+                      %}
+                      {% assign cmp_asset_filename = ""
+                        | append: cmp_option_token
+                        | append: "_"
+                        | append: cmp_value_token
+                        | append: ".png"
+                      %}
+                      {% assign cmp_asset_thumb = cmp_asset_filename
+                        | asset_img_url: "64x64"
+                      %}
+                      {% assign color_image = "" %}
+                      {% if cmp_asset_thumb != blank %}
+                        <img
+                          src='{{ cmp_asset_thumb }}'
+                          width='48'
+                          height='48'
+                          alt='{{ variant.option1 }}'
+                          class='w-full h-full object-contain'
+                        >
+                      {% else %}
+                        {% if option_lower contains "black"
+                          and option_lower contains "orange"
+                        %}
+                          {% if section.settings.black_orange_image %}
+                            {% assign color_image = section.settings.black_orange_image
+                              | image_url: width: 48
+                            %}
+                          {% else %}
+                            {% assign color_image = "black_w_orange_liner.png" %}
+                          {% endif %}
+                        {% elsif option_lower contains "orange" %}
+                          {% if section.settings.orange_image %}
+                            {% assign color_image = section.settings.orange_image
+                              | image_url: width: 48
+                            %}
+                          {% else %}
+                            {% assign color_image = "orange.png" %}
+                          {% endif %}
+                        {% elsif option_lower contains "black" %}
+                          {% if section.settings.black_image %}
+                            {% assign color_image = section.settings.black_image
+                              | image_url: width: 48
+                            %}
+                          {% else %}
+                            {% assign color_image = "black_w_orange_liner.png" %}
+                          {% endif %}
+                        {% elsif option_lower contains "green" %}
+                          {% if section.settings.green_image %}
+                            {% assign color_image = section.settings.green_image
+                              | image_url: width: 48
+                            %}
+                          {% else %}
+                            {% assign color_image = "od_green.png" %}
+                          {% endif %}
+                        {% elsif option_lower contains "camo"
+                          or option_lower contains "earth"
+                        %}
+                          {% if section.settings.camo_image %}
+                            {% assign color_image = section.settings.camo_image
+                              | image_url: width: 48
+                            %}
+                          {% else %}
+                            {% assign color_image = "earth_camo.png" %}
+                          {% endif %}
+                        {% endif %}
+
+                        {% if color_image != "" %}
+                          {% if color_image contains "//" %}
+                            <img
+                              src='{{ color_image }}'
+                              width='48'
+                              height='48'
+                              alt='{{ variant.option1 }}'
+                              class='w-full h-full object-cover'
+                            >
+                          {% else %}
+                            <img
+                              src='{{ color_image | asset_url }}'
+                              width='48'
+                              height='48'
+                              alt='{{ variant.option1 }}'
+                              class='w-full h-full object-cover'
+                            >
+                          {% endif %}
+                        {% else %}
+                          <div
+                            class='w-full h-full rounded-full'
+                            style='background-color: {{ variant.option1 | downcase | replace: ' ', '' }}'
+                          ></div>
+                        {% endif %}
+                      {% endif %}
+                    </button>
+                  {% endunless %}
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endunless %}
       </div>
     </div>
 
