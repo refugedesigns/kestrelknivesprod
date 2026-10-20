@@ -141,14 +141,113 @@
   .footer-newsletter__nav--turnstile {
     margin-top: 0.5rem;
   }
-</style>
 
-<link
-  rel='stylesheet'
-  href='https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css'
-  crossorigin='anonymous'
-  referrerpolicy='no-referrer'
->
+  .kk-toast-stack {
+    position: fixed;
+    z-index: 100000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: min(22rem, calc(100vw - 1.5rem));
+    pointer-events: none;
+  }
+
+  .kk-toast-stack.toast-top-right {
+    top: 1rem;
+    right: 0.75rem;
+  }
+
+  .kk-toast-stack.toast-top-left {
+    top: 1rem;
+    left: 0.75rem;
+  }
+
+  .kk-toast-stack.toast-top-center {
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .kk-toast-stack.toast-bottom-right {
+    bottom: 1rem;
+    right: 0.75rem;
+  }
+
+  .kk-toast-stack.toast-bottom-left {
+    bottom: 1rem;
+    left: 0.75rem;
+  }
+
+  .kk-toast-stack.toast-bottom-center {
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .kk-toast {
+    position: relative;
+    overflow: hidden;
+    pointer-events: auto;
+    background: #fff;
+    color: #111;
+    border: 1px solid #111;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    padding: 0.85rem 2.25rem 0.95rem 0.9rem;
+  }
+
+  .kk-toast--error {
+    border-color: #9f1239;
+  }
+
+  .kk-toast__title {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .kk-toast__message {
+    margin: 0.2rem 0 0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  .kk-toast__close {
+    position: absolute;
+    top: 0.35rem;
+    right: 0.45rem;
+    border: 0;
+    background: transparent;
+    color: #111;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .kk-toast__bar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 100%;
+    background: #111;
+    transform-origin: left center;
+    animation: kk-toast-bar linear forwards;
+  }
+
+  .kk-toast--error .kk-toast__bar {
+    background: #9f1239;
+  }
+
+  @keyframes kk-toast-bar {
+    from {
+      transform: scaleX(1);
+    }
+    to {
+      transform: scaleX(0);
+    }
+  }
+</style>
 
 <footer
   class='py-8 md:py-10'
@@ -503,11 +602,122 @@
   </div>
 </footer>
 
-<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js' defer></script>
-<script
-  src='https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js'
-  defer
-></script>
+<div
+  class='kk-toast-stack {{ section.settings.toastr_position | default: "toast-top-right" }}'
+  x-data='kkToast()'
+  x-cloak
+  data-position='{{ section.settings.toastr_position | default: "toast-top-right" }}'
+  data-timeout='{{ section.settings.toastr_timeout | default: 5000 }}'
+  :class='positionClass'
+  aria-live='polite'
+>
+  <template x-for='toast in toasts' :key='toast.id'>
+    <div
+      class='kk-toast'
+      :class="toast.type === 'error' ? 'kk-toast--error' : ''"
+      :role="toast.type === 'error' ? 'alert' : 'status'"
+    >
+      <button
+        type='button'
+        class='kk-toast__close'
+        @click='dismiss(toast.id)'
+        aria-label='Close'
+      >
+        ×
+      </button>
+      <p class='kk-toast__title' x-show='toast.title' x-text='toast.title'></p>
+      <p class='kk-toast__message' x-show='toast.message' x-text='toast.message'></p>
+      <span
+        class='kk-toast__bar'
+        :style="'animation-duration:' + toast.timeout + 'ms'"
+      ></span>
+    </div>
+  </template>
+</div>
+<script>
+  ;(function () {
+    function emitToast(type, message, title) {
+      var detail = {
+        type: type,
+        message: message || '',
+        title: title || '',
+      }
+      if (typeof window.__kkToastPush === 'function') {
+        window.__kkToastPush(detail)
+        return
+      }
+      window.__kkToastQueue = window.__kkToastQueue || []
+      window.__kkToastQueue.push(detail)
+    }
+
+    window.toastr = {
+      options: {},
+      success: function (message, title) {
+        emitToast('success', message, title)
+      },
+      error: function (message, title) {
+        emitToast('error', message, title)
+      },
+      info: function (message, title) {
+        emitToast('info', message, title)
+      },
+      warning: function (message, title) {
+        emitToast('warning', message, title)
+      },
+    }
+
+    document.addEventListener('alpine:init', function () {
+      if (window.__kkToastRegistered) return
+      window.__kkToastRegistered = true
+      Alpine.data('kkToast', function () {
+        return {
+          toasts: [],
+          positionClass: 'toast-top-right',
+          defaultTimeout: 5000,
+          nextId: 1,
+          init: function () {
+            var self = this
+            this.positionClass =
+              this.$el.getAttribute('data-position') || 'toast-top-right'
+            this.defaultTimeout =
+              Number(this.$el.getAttribute('data-timeout')) || 5000
+            window.__kkToastPush = function (detail) {
+              self.add(detail)
+            }
+            var queued = window.__kkToastQueue || []
+            window.__kkToastQueue = []
+            queued.forEach(function (detail) {
+              self.add(detail)
+            })
+          },
+          add: function (detail) {
+            var options = (window.toastr && window.toastr.options) || {}
+            if (options.positionClass) this.positionClass = options.positionClass
+            var timeout =
+              Number(options.timeOut || this.defaultTimeout) || 5000
+            var id = this.nextId++
+            this.toasts.unshift({
+              id: id,
+              type: detail.type || 'success',
+              title: detail.title || '',
+              message: detail.message || '',
+              timeout: timeout,
+            })
+            var self = this
+            window.setTimeout(function () {
+              self.dismiss(id)
+            }, timeout)
+          },
+          dismiss: function (id) {
+            this.toasts = this.toasts.filter(function (toast) {
+              return toast.id !== id
+            })
+          },
+        }
+      })
+    })
+  })()
+</script>
 {% if turnstile_enabled %}
   <script
     src='https://challenges.cloudflare.com/turnstile/v0/api.js'
@@ -556,14 +766,14 @@
     }
 
     function whenToastrReady(callback) {
-      if (window.toastr && window.jQuery) {
+      if (window.toastr) {
         callback()
         return
       }
       var tries = 0
       var timer = setInterval(function () {
         tries += 1
-        if (window.toastr && window.jQuery) {
+        if (window.toastr) {
           clearInterval(timer)
           callback()
         } else if (tries > 50) {

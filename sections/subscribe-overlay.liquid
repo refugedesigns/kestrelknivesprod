@@ -648,14 +648,14 @@
       }
 
       function whenToastrReady(cb) {
-        if (window.toastr && window.jQuery) {
+        if (window.toastr) {
           cb()
           return
         }
         var tries = 0
         var timer = setInterval(function () {
           tries += 1
-          if (window.toastr && window.jQuery) {
+          if (window.toastr) {
             clearInterval(timer)
             cb()
           } else if (tries > 40) {
