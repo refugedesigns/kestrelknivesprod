@@ -20,7 +20,7 @@
         <h1 class='text-8xl sm:text-9xl lg:text-[12rem] font-black text-white text-shadow select-none'>
           {{ section.settings.title | default: "404" }}
         </h1>
-        <div class='absolute inset-0 flex items-center justify-center pointer-events-none'>
+        <div class='absolute inset-0 flex items-center justify-center pointer-events-none' aria-hidden='true'>
           <div class='text-6xl sm:text-7xl lg:text-8xl font-black text-white/5'>
             {{ section.settings.title | default: "404" }}
           </div>
@@ -145,7 +145,7 @@
         {% else %}
           {% assign support_href = 'mailto:sales@kestrelknives.com' %}
         {% endif %}
-        <p class='text-gray-400 text-sm'>
+        <p class='text-gray-300 text-sm'>
           {{
             section.settings.help_text
             | default: "Still lost? Try searching or"

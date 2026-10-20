@@ -1,8 +1,17 @@
+{% liquid
+  assign media_alt = media.alt | strip
+  if media_alt == blank
+    assign media_alt = media.preview_image.alt | strip
+  endif
+  if media_alt == blank and product.title != blank
+    assign media_alt = product.title
+  endif
+%}
 {% case media.media_type %}
   {% when "image" %}
     <img
       src='{{ media | img_url: 'large' }}'
-      alt='{{ media.preview_image.alt }}'
+      alt='{{ media_alt | escape }}'
       class='w-full h-full object-contain'
     >
 

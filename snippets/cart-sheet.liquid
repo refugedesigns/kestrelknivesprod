@@ -20,8 +20,10 @@
       Cart
     </h2>
     <button
+      type='button'
       @click='closeCart'
-      class='text-gray-400 hover:text-gray-600 transition-colors'
+      class='text-gray-700 hover:text-black transition-colors'
+      aria-label='Close cart'
     >
       <svg
         class='w-6 h-6'
@@ -132,9 +134,11 @@
           <!-- Quantity Controls -->
           <div class='flex items-center space-x-2'>
             <button
+              type='button'
               @click='updateQuantity(item.key, item.quantity - 1)'
               :disabled='item.quantity <= 1'
               class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+              :aria-label="'Decrease quantity of ' + item.title"
             >
               <svg
                 class='w-4 h-4'
@@ -150,8 +154,10 @@
               x-text='item.quantity'
             ></span>
             <button
+              type='button'
               @click='updateQuantity(item.key, item.quantity + 1)'
               class='w-8 h-8 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-50'
+              :aria-label="'Increase quantity of ' + item.title"
             >
               <svg
                 class='w-4 h-4'
@@ -166,8 +172,10 @@
 
           <!-- Remove Button -->
           <button
+            type='button'
             @click='removeItem(item.key)'
-            class='text-gray-400 hover:text-red-500 transition-colors'
+            class='text-gray-700 hover:text-red-500 transition-colors'
+            :aria-label="'Remove ' + item.title"
           >
             <svg
               class='w-5 h-5'

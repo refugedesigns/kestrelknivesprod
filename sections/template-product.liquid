@@ -596,8 +596,10 @@
 
               <!-- Magnifying Glass Button -->
               <button
+                type='button'
                 @click='openGallery()'
                 class='absolute top-4 right-4 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
+                aria-label='View larger image'
               >
                 <svg
                   class='w-5 h-5'
@@ -611,8 +613,10 @@
 
               <!-- Navigation Arrows -->
               <button
+                type='button'
                 @click='previousImage()'
                 class='absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
+                aria-label='Previous image'
               >
                 <svg
                   class='w-5 h-5'
@@ -624,8 +628,10 @@
                 </svg>
               </button>
               <button
+                type='button'
                 @click='nextImage()'
                 class='absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg'
+                aria-label='Next image'
               >
                 <svg
                   class='w-5 h-5'
@@ -1310,6 +1316,7 @@
                       type='button'
                       @click='decreaseQuantity()'
                       class='w-10 h-10 flex items-center justify-center'
+                      aria-label='Decrease quantity'
                     >
                       <svg
                         class='w-4 h-4'
@@ -1320,16 +1327,20 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
                       </svg>
                     </button>
+                    <label for='ProductQuantity' class='sr-only'>Quantity</label>
                     <input
+                      id='ProductQuantity'
                       type='number'
                       x-model='quantity'
                       min='1'
                       class='w-20 text-center border-none bg-transparent'
+                      aria-label='Quantity'
                     >
                     <button
                       type='button'
                       @click='increaseQuantity()'
                       class='w-10 h-10 flex items-center justify-center'
+                      aria-label='Increase quantity'
                     >
                       <svg
                         class='w-4 h-4'
@@ -2113,8 +2124,10 @@
       <div class='flex items-center justify-between p-5 border-b border-gray-200'>
         <h3 class='text-lg font-semibold'>Select options</h3>
         <button
+          type='button'
           @click='close'
-          class='text-gray-500 hover:text-gray-700 text-2xl leading-none'
+          class='text-gray-700 hover:text-black text-2xl leading-none'
+          aria-label='Close'
         >
           ×
         </button>
@@ -2123,7 +2136,7 @@
         <div class='flex items-start space-x-6'>
           <img
             :src='image'
-            alt=''
+            :alt='product?.title || "Product"'
             width='160'
             height='160'
             class='w-40 h-40 object-cover'
@@ -2151,13 +2164,15 @@
                   :key='`c1-${val}`'
                 >
                   <button
+                    type='button'
                     @click='sel1 = val; updateSelectedVariant()'
                     :title='val'
+                    :aria-label='val'
                     :class="'w-12 h-12 rounded-md border overflow-hidden ' + (sel1 === val ? 'ring-2 ring-black' : '')"
                   >
                     <img
                       :src='imageForOptionValue(1,val)'
-                      alt=''
+                      :alt='val'
                       width='48'
                       height='48'
                       class='w-full h-full object-cover'
@@ -2192,14 +2207,16 @@
                   :key='`c2-${val}`'
                 >
                   <button
+                    type='button'
                     @click='sel2 = val; updateSelectedVariant()'
                     :disabled='!isComboAvailable(sel1, val)'
                     :title='val'
+                    :aria-label='val'
                     :class="'w-12 h-12 rounded-md border overflow-hidden ' + (sel2 === val ? 'ring-2 ring-black' : '') + (!isComboAvailable(sel1,val) ? ' opacity-40 cursor-not-allowed' : '')"
                   >
                     <img
                       :src='imageForOptionValue(2,val)'
-                      alt=''
+                      :alt='val'
                       width='48'
                       height='48'
                       class='w-full h-full object-cover'
@@ -2226,23 +2243,37 @@
         </template>
 
         <div class='mt-8'>
-          <p class='text-xs font-semibold text-gray-700 mb-2 uppercase'>
+          <label
+            for='RelatedQuantity'
+            class='text-xs font-semibold text-gray-700 mb-2 uppercase block'
+          >
             Quantity
-          </p>
+          </label>
           <div class='inline-flex items-center border'>
             <button
+              type='button'
               class='w-10 h-10 text-lg'
               @click='qty = Math.max(1, qty - 1)'
+              aria-label='Decrease quantity'
             >
               −
             </button>
             <input
+              id='RelatedQuantity'
               type='number'
               min='1'
               x-model.number='qty'
               class='w-14 h-10 text-center outline-none border-none'
+              aria-label='Quantity'
             >
-            <button class='w-10 h-10 text-lg' @click='qty = qty + 1'>+</button>
+            <button
+              type='button'
+              class='w-10 h-10 text-lg'
+              @click='qty = qty + 1'
+              aria-label='Increase quantity'
+            >
+              +
+            </button>
           </div>
         </div>
 
@@ -2513,8 +2544,10 @@
 >
   <!-- Close Button -->
   <button
+    type='button'
     @click='closeGallery'
     class='absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-10'
+    aria-label='Close gallery'
   >
     <svg class='w-8 h-8' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -2533,9 +2566,18 @@
       {% for media in product.media %}
         {% if media.media_type == "image" %}
           <swiper-slide class='flex items-center justify-center'>
+            {% liquid
+              assign gallery_alt = media.alt | strip
+              if gallery_alt == blank
+                assign gallery_alt = media.preview_image.alt | strip
+              endif
+              if gallery_alt == blank
+                assign gallery_alt = product.title
+              endif
+            %}
             <img
               src='{{ media | img_url: 'large' }}'
-              alt='{{ media.preview_image.alt }}'
+              alt='{{ gallery_alt | escape }}'
               class='w-full h-full object-contain'
             >
           </swiper-slide>
