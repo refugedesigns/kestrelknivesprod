@@ -55,18 +55,8 @@
           "type": "faq_item",
           "name": "Featured Questions",
           "settings": {
-            "question": "Do Kestrel Knives come with free lifetime sharpening?",
-            "answer": "Yes! Our fixed-blade knives include free lifetime sharpening for customers in the continental United States.\nYou ship the knife to us.  We'll put a fresh edge on it, clean it up and ship it back to you free of charge.\nThese knives are meant to be used.  Don't be afraid to use yours.",
-            "category": "Featured Questions",
-            "show_item": true
-          }
-        },
-        "faq_item_BmwNA3": {
-          "type": "faq_item",
-          "name": "Featured Questions",
-          "settings": {
-            "question": "Do you rewrap paracord handles?",
-            "answer": "Yes.  Paracord rewraps are free.\nIf you're sending your knife in for sharpening, just put a note in the package telling us you'd like the paracord replaced.\nIf that old wrap has been on a few hunts and you'd rather keep it, we'll leave it alone and can include a fresh piece of paracord for when you're ready to change it.",
+            "question": "Do Kestrel knives come with free lifetime sharpening?",
+            "answer": "Yes! Free lifetime sharpening is part of Kestrel For Life. We pay return shipping to U.S. addresses.\nYou ship the knife to us.  We'll put a fresh edge on it, clean it up and ship it back to you.\nThese knives are meant to be used.  Don't be afraid to use yours.",
             "category": "Featured Questions",
             "show_item": true
           }
@@ -75,8 +65,8 @@
           "type": "faq_item",
           "name": "Featured Questions",
           "settings": {
-            "question": "What does the Kestrel Knives Lifetime Warranty cover?",
-            "answer": "Our Lifetime Warranty covers manufacturing defects in materials and workmanship for the functional life of the knife.\nIf we determine your knife has a manufacturing defect, we'll repair or replace it at no charge at our discretion.\nIt doesn't cover misuse, abuse, prying, batoning, improper sharpening, unauthorized modifications, neglect, corrosion or damage caused by using the knife outside its intended purpose.  Normal scratches and finish wear aren't defects either.  They're usually just signs that you're actually using your knife.\nIf something happens, contact us.  Photos help, but we may need to physically inspect the knife before determining what happened and what we can do.",
+            "question": "What does Kestrel For Life cover?",
+            "answer": "Kestrel For Life includes our Lifetime Warranty, which covers manufacturing defects in materials and workmanship for the functional life of the knife.\nIf we determine your knife has a manufacturing defect, we'll repair or replace it at no charge at our discretion.\nIt doesn't cover misuse, abuse, prying, batoning, improper sharpening, unauthorized modifications, neglect, corrosion or damage caused by using the knife outside its intended purpose.  Normal scratches and finish wear aren't defects either.  They're usually just signs that you're actually using your knife.\nIf something happens, contact us.  Photos help, but we may need to physically inspect the knife before determining what happened and what we can do.",
             "category": "Featured Questions",
             "show_item": true
           }
@@ -175,7 +165,7 @@
           "type": "faq_item",
           "name": "General",
           "settings": {
-            "question": "Do Kestrel fixed-blade knives include free lifetime sharpening?",
+            "question": "Which Kestrel knife is right for me?",
             "answer": "It really comes down to what you want the knife to do.\n\nThe Ovis Hunter is our do-it-all hunting knife. The Mouflon Skinner is more specialized toward skinning. The Mountain Caper is built for detailed caping. The Ovis Scalpel gives you replaceable blades.\n\nStill not sure? Email us at sales@kestrelknives.com.",
             "category": "General",
             "show_item": true
@@ -185,18 +175,8 @@
           "type": "faq_item",
           "name": "Sharpening & Service",
           "settings": {
-            "question": "Do Kestrel fixed-blade knives include free lifetime sharpening?",
-            "answer": "Yes.\nOur fixed-blade knives include free lifetime sharpening for customers in the continental United States.\nYou ship it to us.  We'll sharpen it, clean it up and ship it back to you free of charge.\nContact us before sending your knife in so we can give you the current shipping instructions.",
-            "category": "Sharpening & Service",
-            "show_item": true
-          }
-        },
-        "faq_item_Jem3Rh": {
-          "type": "faq_item",
-          "name": "Sharpening & Service",
-          "settings": {
-            "question": "Do you rewrap paracord handles?",
-            "answer": "Yes. We rewrap them for free.\nIf you're sending your knife in for sharpening, include a note telling us you want the paracord replaced.\nIf you don't want us removing the old wrap, that's fine too. We'll leave it on and can include fresh paracord for when you're ready.",
+            "question": "Do Kestrel knives include free lifetime sharpening?",
+            "answer": "Yes.\nFree lifetime sharpening is part of Kestrel For Life. We pay return shipping to U.S. addresses.\nYou ship it to us.  We'll sharpen it, clean it up and ship it back to you.\nContact us before sending your knife in so we can give you the current shipping instructions.",
             "category": "Sharpening & Service",
             "show_item": true
           }
@@ -206,7 +186,7 @@
           "name": "Sharpening & Service",
           "settings": {
             "question": "Can I sharpen my Kestrel knife myself?",
-            "answer": "Absolutely.\nThese are tools and they're meant to be maintained. Just make sure you're using an appropriate sharpening system and aren't drastically changing the edge geometry.\nDamage caused by improper sharpening isn't a manufacturing defect.\nAnd remember, if you don't want to mess with it, our fixed blades come with free lifetime sharpening.",
+            "answer": "Absolutely.\nThese are tools and they're meant to be maintained. Just make sure you're using an appropriate sharpening system and aren't drastically changing the edge geometry.\nDamage caused by improper sharpening isn't a manufacturing defect.\nAnd remember, if you don't want to mess with it, free lifetime sharpening is part of Kestrel For Life.",
             "category": "Sharpening & Service",
             "show_item": true
           }
@@ -275,8 +255,8 @@
           "type": "faq_item",
           "name": "Warranty & Repairs",
           "settings": {
-            "question": "What does the Kestrel Knives Lifetime Warranty cover?",
-            "answer": "Our Lifetime Warranty covers manufacturing defects in materials and workmanship for the functional life of the knife.\nIf we determine there's a manufacturing defect, we'll repair or replace the knife at no charge at our discretion.\nIt doesn't cover misuse, abuse, prying, batoning, improper sharpening, unauthorized modifications, neglect, corrosion or using the knife outside its intended purpose.\nNormal scratches, sharpening marks and finish wear aren't manufacturing defects.\nContact us before shipping anything in.  Photos are helpful, but sometimes we need the knife in our hands to determine exactly what happened.",
+            "question": "What does Kestrel For Life cover?",
+            "answer": "Kestrel For Life includes our Lifetime Warranty, which covers manufacturing defects in materials and workmanship for the functional life of the knife.\nIf we determine there's a manufacturing defect, we'll repair or replace the knife at no charge at our discretion.\nIt doesn't cover misuse, abuse, prying, batoning, improper sharpening, unauthorized modifications, neglect, corrosion or using the knife outside its intended purpose.\nNormal scratches, sharpening marks and finish wear aren't manufacturing defects.\nContact us before shipping anything in.  Photos are helpful, but sometimes we need the knife in our hands to determine exactly what happened.",
             "category": "Warranty & Repairs",
             "show_item": true
           }
@@ -438,7 +418,6 @@
         "faq_item_T9xUkQ",
         "faq_item_MfN4qJ",
         "faq_item_MmtgPh",
-        "faq_item_BmwNA3",
         "faq_item_DK7F8A",
         "faq_item_EGtMd7",
         "faq_item_ycFC8t",
@@ -451,7 +430,6 @@
         "faq_item_G6nNCg",
         "faq_item_ydPkrn",
         "faq_item_EwpeMP",
-        "faq_item_Jem3Rh",
         "faq_item_Xyg3Hw",
         "faq_item_9AwcgQ",
         "faq_item_Em86bX",
