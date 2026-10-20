@@ -21,3 +21,15 @@
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
 }
+
+/*
+  Section overrides that must beat utilities belong in this layer.
+  It is declared after Tailwind's utilities, so rules here win without !important.
+  Inline styles (pasted Word HTML, Alpine x-show) still need !important, and those
+  rules must stay outside this layer.
+*/
+@layer kestrel {
+  :root {
+    --kestrel-layer: 1;
+  }
+}

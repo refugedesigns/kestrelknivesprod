@@ -1,4 +1,5 @@
 <style>
+  /* Pasted Word HTML sets inline margin and text-indent. Only !important overrides an inline style. */
   .remove-list-indent ul,
   .remove-list-indent ol {
     padding-left: 0 !important;
@@ -45,8 +46,8 @@
     {% endcase %}
 
     <div
-      class='w-full'
-      style='height: {{ section.settings.header_image_height_mobile | default: 300 }}px;'
+      class='page-header-media w-full'
+      style='--page-header-height: {{ section.settings.header_image_height_mobile | default: 300 }}px; --page-header-height-md: {{ section.settings.header_image_height | default: 400 }}px;'
     >
       <img
         src='{{ section.settings.header_image | image_url: width: 1920 }}'
@@ -57,9 +58,12 @@
     </div>
 
     <style>
+      .page-header-media {
+        height: var(--page-header-height, 300px);
+      }
       @media (min-width: 768px) {
-        .relative.w-full.overflow-hidden > div:first-child {
-          height: {{ section.settings.header_image_height | default: 400 }}px !important;
+        .page-header-media {
+          height: var(--page-header-height-md, 400px);
         }
       }
     </style>

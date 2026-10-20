@@ -38,31 +38,34 @@
   }
   @media (min-width: 1100px) {
     .header-logo {
-      height: {{ section.settings.logo_height_desktop | default: 80 }}px !important;
+      height: {{ section.settings.logo_height_desktop | default: 80 }}px;
     }
   }
 
-  /* Child menu link hover styles */
-  .child-menu-link {
-    transition: background-color 0.2s ease, color 0.2s ease;
-  }
-  .child-menu-link:hover {
-    background-color: {{ section.settings.child_menu_hover_bg_color | default: "#374151" }} !important;
-  }
-  .child-menu-link:hover p {
-    color: {{ section.settings.child_menu_hover_text_color | default: "#ffffff" }} !important;
-  }
-
-  /* Mobile child links background */
-  @media (max-width: 1099px) {
-    .mobile-child-container {
-      background-color: #dcdcdd !important;
-      border-radius: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      margin: 0.5rem 0;
+  @layer kestrel {
+    .child-menu-link {
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
-    .mobile-child-link span {
-      color: #1f2937 !important;
+    .child-menu-link p {
+      color: {{ section.settings.child_menu_link_color | default: "#ffffff" }};
+    }
+    .child-menu-link:hover {
+      background-color: {{ section.settings.child_menu_hover_bg_color | default: "#374151" }};
+    }
+    .child-menu-link:hover p {
+      color: {{ section.settings.child_menu_hover_text_color | default: "#ffffff" }};
+    }
+
+    @media (max-width: 1099px) {
+      .mobile-child-container {
+        background-color: #dcdcdd;
+        border-radius: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        margin: 0.5rem 0;
+      }
+      .mobile-child-link span {
+        color: #1f2937;
+      }
     }
   }
 
@@ -75,14 +78,14 @@
   }
   @media (min-width: 1100px) {
     .header-mobile-trigger {
-      display: none !important;
+      display: none;
     }
     .header-desktop-nav {
-      display: flex !important;
+      display: flex;
     }
   }
 
-  /* Hide mobile menu on desktop; Alpine x-show + x-cloak control mobile */
+  /* Alpine x-show writes an inline display value. A layer cannot override that. */
   @media (min-width: 1100px) {
     .mobile-menu-panel {
       display: none !important;
@@ -152,7 +155,7 @@
               src='{{ logo_image | image_url: width: 600 }}'
               width='{{ logo_width_mobile }}'
               height='{{ logo_height_mobile }}'
-              class='header-logo lg:h-auto'
+              class='header-logo'
               alt='{{ shop.name }} Logo'
               loading='eager'
               fetchpriority='high'
@@ -170,7 +173,7 @@
               src='{{ "logo_white.png" | asset_url }}'
               width='{{ fallback_logo_width }}'
               height='{{ logo_height_mobile }}'
-              class='header-logo lg:h-auto'
+              class='header-logo'
               alt='{{ shop.name }} Logo'
               loading='eager'
               fetchpriority='high'
@@ -242,10 +245,7 @@
                         class='-m-3 p-3 flex items start rounded-lg child-menu-link'
                       >
                         <div class='ml-4'>
-                          <p
-                            class='text-base font-medium'
-                            style='color: {{ section.settings.child_menu_link_color | default: "#ffffff" }};'
-                          >
+                          <p class='text-base font-medium'>
                             {{ childlink.title }}
                           </p>
                         </div>
