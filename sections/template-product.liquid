@@ -546,6 +546,7 @@
             >
               <img
                 id='apoBaseImage'
+                fetchpriority='high'
                 src='{{ apo_base_image_src }}'
                 alt='{{ product.title | escape }}'
                 width='{{ product.featured_image.width | default: 2048 }}'
@@ -565,6 +566,7 @@
             >
               <img
                 id='complexBaseImage'
+                fetchpriority='high'
                 src='{{ complex_base_image_src }}'
                 alt='{{ product.title | escape }} base layer'
                 width='{{ product.featured_image.width | default: 2048 }}'
@@ -586,6 +588,7 @@
             <div class='aspect-square bg-white rounded-lg overflow-hidden mb-6 relative group'>
               <img
                 id='mainImage'
+                fetchpriority='high'
                 src='{{ product.featured_image | img_url: '2048x2048' }}'
                 alt='{{ product.title | escape }}'
                 width='{{ product.featured_image.width | default: 2048 }}'
