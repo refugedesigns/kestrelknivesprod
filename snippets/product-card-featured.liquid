@@ -47,7 +47,7 @@
 {}
 {%- endif -%}
 {%- endcapture -%}
-{%- capture card_colors_json -%}{%- render 'product-card-colors', product_product: product_obj -%}{%- endcapture -%}
+{%- capture card_colors_json -%}{%- render 'product-card-apparel-swatches', product_product: product_obj, colors_only: true -%}{%- endcapture -%}
 {%- assign card_colors_json = card_colors_json | strip -%}
 
 <div

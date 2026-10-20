@@ -1,14 +1,88 @@
 {% doc %}
   Apparel color swatches on product cards.
 
-  Solid color chips. Prefers a Shopify option swatch hex; otherwise
-  Fast Average Color samples the variant image and ignores the white
-  background. Clicking still swaps the card image.
-
-  Shown only when the product has more than one color value.
+  Pass colors_only to echo a JSON array of {name, hex} instead of buttons.
+  That list is what the card script uses to draw swatches after the product loads.
 
   @param {object} product_product - Product drop
+  @param {boolean} [colors_only] - Echo JSON instead of swatch buttons
 {% enddoc %}
+{%- if colors_only -%}
+{%- liquid
+  assign card_type = product_product.type | default: '' | downcase
+  assign is_apparel_card = false
+  assign is_accessory_card = false
+  if card_type contains 'apparel'
+    assign is_apparel_card = true
+  endif
+  if card_type contains 'accessories'
+    assign is_accessory_card = true
+  endif
+  assign color_json = ''
+  assign color_count = 0
+-%}
+{%- if is_accessory_card or product_product.has_only_default_variant -%}
+[]
+{%- elsif is_apparel_card -%}
+  {%- liquid
+    assign color_opt_index = 0
+    for option in product_product.options_with_values
+      assign option_name_down = option.name | downcase
+      if option_name_down contains 'color' or option_name_down contains 'colour' or option_name_down contains 'shade' or option_name_down contains 'finish'
+        assign color_opt_index = forloop.index
+        break
+      endif
+    endfor
+    if color_opt_index == 0
+      assign first_option_name = product_product.options | first | downcase
+      unless first_option_name contains 'size' or first_option_name contains 'title'
+        assign color_opt_index = 1
+      endunless
+    endif
+  -%}
+  {%- if color_opt_index > 0 -%}
+    {%- for option in product_product.options_with_values -%}
+      {%- if forloop.index == color_opt_index and option.values.size > 1 -%}
+        {%- for value in option.values -%}
+          {%- liquid
+            assign color_label = value.name | default: value
+            assign color_hex = ''
+            if value.swatch.color != blank
+              assign color_hex = value.swatch.color | color_to_hex
+            endif
+            if color_count > 0
+              assign color_json = color_json | append: ','
+            endif
+            assign color_count = color_count | plus: 1
+          -%}
+          {%- capture color_piece -%}{"name":{{ color_label | json }}{%- if color_hex != blank -%},"hex":{{ color_hex | json }}{%- endif -}}{%- endcapture -%}
+          {%- assign color_json = color_json | append: color_piece -%}
+        {%- endfor -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+  {%- if color_count > 1 -%}[{{ color_json }}]{%- else -%}[]{%- endif -%}
+{%- else -%}
+  {%- assign seen_colors = '' -%}
+  {%- for variant in product_product.variants -%}
+    {%- if variant.option1 and variant.title != 'Default Title' -%}
+      {%- assign color_token = '|' | append: variant.option1 | downcase | append: '|' -%}
+      {%- unless seen_colors contains color_token -%}
+        {%- liquid
+          assign seen_colors = seen_colors | append: color_token
+          if color_count > 0
+            assign color_json = color_json | append: ','
+          endif
+          assign color_count = color_count | plus: 1
+        -%}
+        {%- capture color_piece -%}{"name":{{ variant.option1 | json }}}{%- endcapture -%}
+        {%- assign color_json = color_json | append: color_piece -%}
+      {%- endunless -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- if color_count > 1 -%}[{{ color_json }}]{%- else -%}[]{%- endif -%}
+{%- endif -%}
+{%- else -%}
 
 {% assign color_opt_index = 0 %}
 {% assign color_opt_name = '' %}
@@ -93,3 +167,4 @@
     {% endif %}
   {% endfor %}
 {% endif %}
+{%- endif -%}

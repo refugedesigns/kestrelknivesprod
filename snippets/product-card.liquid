@@ -103,7 +103,7 @@
 {}
 {%- endif -%}
 {%- endcapture -%}
-{%- capture card_colors_json -%}{%- render 'product-card-colors', product_product: product_product -%}{%- endcapture -%}
+{%- capture card_colors_json -%}{%- render 'product-card-apparel-swatches', product_product: product_product, colors_only: true -%}{%- endcapture -%}
 {%- assign card_colors_json = card_colors_json | strip -%}
 {% assign is_priority_card = false %}
 {% if card_priority %}
