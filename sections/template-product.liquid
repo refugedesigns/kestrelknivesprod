@@ -206,14 +206,6 @@
       -moz-appearance: textfield;
     }
 
-  #stickySizeSelector {
-    appearance: none !important;
-    min-height: 30px !important; /* CRITICAL FIX */
-    height: 30px !important;
-    line-height: 20px !important;
-    padding: 0 14px 0 6px !important;
-    font-size: 0.75rem !important;
-  }
 
 
 
@@ -1438,7 +1430,7 @@
             <div class='flex flex-col items-center'>
               <select
                 id='stickySizeSelector'
-                class='border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-black focus:border-black text-center uppercase'
+                class='appearance-none h-[30px] min-h-[30px] leading-5 text-xs py-0 pl-[6px] pr-[14px] border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-black focus:border-black text-center uppercase'
                 onchange='updateStickyVariant()'
               >
                 {% for value in option.values %}

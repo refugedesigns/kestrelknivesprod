@@ -71,9 +71,6 @@
     z-index: 1;
     pointer-events: auto;
   }
-  .guide-outfitter-form-section__form.pifyform.formloading iframe {
-    visibility: hidden !important;
-  }
   .guide-outfitter-form-section__form.pifyform.formloading {
     background-image: url(https://form-builder.pifyapp.com/assets/images/loading.gif?v=4.6);
     background-position: center 30px;
@@ -114,7 +111,7 @@
   <div class='guide-outfitter-form-section__content'>
     <div
       id='pifyform-35653'
-      class='guide-outfitter-form-section__form pifyform'
+      class='guide-outfitter-form-section__form pifyform [&.formloading_iframe]:invisible!'
       style='margin: 10px 0;'
     >
       <script charset='UTF-8' defer>

@@ -20,9 +20,6 @@
           /* Reserve space before Pify posts real height (CLS) */
           min-height: 520px;
         }
-        .contact-pifyform.pifyform.formloading iframe {
-          visibility: hidden !important;
-        }
         .contact-pifyform.pifyform.formloading {
           background-image: url(https://form-builder.pifyapp.com/assets/images/loading.gif?v=4.6);
           background-position: center 30px;
@@ -36,7 +33,7 @@
           border: 0;
         }
       </style>
-      <div id='pifyform-35649' class='contact-pifyform pifyform'>
+      <div id='pifyform-35649' class='contact-pifyform pifyform [&.formloading_iframe]:invisible!'>
         <script charset='UTF-8' defer>
           document.getElementById('pifyform-35649').classList.add('formloading')
           ;(function (h) {
@@ -184,7 +181,7 @@
 
     <!-- Information Section (Right Side) -->
     <div class='lg:col-span-2 px-4'>
-      <div class='prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-headings:uppercase prose-headings:tracking-wide prose-headings:text-lg prose-headings:mb-3 prose-p:text-gray-700 prose-p:mb-6 prose-a:text-black prose-a:hover:text-gray-900 prose-a:underline contact-content'>
+      <div class='prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-headings:uppercase prose-headings:tracking-wide prose-headings:text-lg prose-headings:mb-3 prose-p:text-gray-700 prose-p:mb-6 prose-a:text-black prose-a:hover:text-gray-900 prose-a:underline contact-content [&_svg]:inline-block [&_svg]:overflow-visible [&_svg]:align-middle [&_svg]:size-5 [&_svg]:text-black! [&_svg_*]:fill-current! [&_svg_*]:stroke-current! [&_svg_*]:text-black! [&_a_svg]:size-6 [&_a:hover_svg]:text-gray-500! [&_a:hover_svg_*]:text-gray-500! [&_.text-white]:text-black!'>
         {{ page.content }}
       </div>
     </div>
@@ -192,34 +189,6 @@
 </div>
 
 <style>
-  /* Force icons within Shopify page content to render black */
-  .contact-content svg,
-  .contact-content svg * {
-    color: #000 !important;
-  }
-  .contact-content svg * {
-    fill: currentColor !important;
-    stroke: currentColor !important;
-  }
-  .contact-content svg {
-    display: inline-block;
-    overflow: visible;
-    vertical-align: middle;
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-  .contact-content a svg {
-    width: 24px;
-    height: 24px;
-  }
-  .contact-content a:hover svg,
-  .contact-content a:hover svg * {
-    color: #6b7280 !important;
-  }
-  .contact-content .text-white {
-    color: #000 !important;
-  }
-
   /* Reserve map space so embed paint cannot shift layout */
   .contact-map {
     position: relative;

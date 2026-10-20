@@ -89,14 +89,6 @@
   @media (max-width: 1099px) {
     .eastmans-hero {
       padding-top: calc(var(--header-height, 64px) + 16px);
-      align-items: center !important;
-      justify-content: center !important;
-      top: 0 !important;
-      bottom: 0 !important;
-    }
-    .eastmans-hero .eastmans-hero-overlay__inner {
-      margin-left: 0 !important;
-      text-align: center !important;
     }
     .eastmans-hero-media {
       height: var(--eastmans-hero-height-desktop, 520px);
@@ -199,8 +191,8 @@
             {% when "strong" %}
               {% assign banner_shadow_opacity = "0.85" %}
           {% endcase %}
-          <div class='absolute inset-0 flex items-end justify-center z-10 pointer-events-none eastmans-hero'>
-            <div class='text-center max-w-5xl px-4 mb-6 lg:mb-10 eastmans-hero-overlay__inner'>
+          <div class='absolute inset-0 flex items-center justify-center lg:items-end z-10 pointer-events-none eastmans-hero'>
+            <div class='text-center ml-0 max-w-5xl px-4 mb-6 lg:mb-10 eastmans-hero-overlay__inner'>
               <div class='eastmans-hero-text-wrap'>
                 {% if section.settings.banner_text_bg_enable %}
                   {% assign banner_text_bg_alpha = section.settings.banner_text_bg_opacity | default: 50 | divided_by: 100.0 %}

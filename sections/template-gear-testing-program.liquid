@@ -81,9 +81,6 @@
     z-index: 1;
     pointer-events: auto;
   }
-  .gear-testing-form-section__form.pifyform.formloading iframe {
-    visibility: hidden !important;
-  }
   .gear-testing-form-section__form.pifyform.formloading {
     background-image: url(https://form-builder.pifyapp.com/assets/images/loading.gif?v=4.6);
     background-position: center 30px;
@@ -114,7 +111,7 @@
   <div class='gear-testing-form-section__content py-10 px-4 sm:px-6 lg:px-8'>
     <div
       id='pifyform-36391'
-      class='gear-testing-form-section__form pifyform'
+      class='gear-testing-form-section__form pifyform [&.formloading_iframe]:invisible!'
       style='margin: 10px 0;'
     >
       <script charset='UTF-8' defer>

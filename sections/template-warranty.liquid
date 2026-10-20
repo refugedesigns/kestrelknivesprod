@@ -74,8 +74,8 @@
     %}
 
     <div
-      class='w-full'
-      style='height: {{ section.settings.header_image_height_mobile | default: 300 }}px;'
+      class='page-header-media w-full h-(--page-header-height) md:h-(--page-header-height-md)'
+      style='--page-header-height: {{ section.settings.header_image_height_mobile | default: 300 }}px; --page-header-height-md: {{ section.settings.header_image_height | default: 400 }}px;'
     >
       <img
         src='{{ section.settings.header_image | image_url: width: 1920 }}'
@@ -86,14 +86,6 @@
         loading='eager'
       >
     </div>
-
-    <style>
-      @media (min-width: 768px) {
-        .relative.w-full.overflow-hidden > div:first-child {
-          height: {{ section.settings.header_image_height | default: 400 }}px !important;
-        }
-      }
-    </style>
 
     <div class='absolute inset-0 bg-black/20'></div>
   </div>

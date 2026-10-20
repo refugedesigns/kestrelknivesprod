@@ -1,34 +1,3 @@
-<style>
-  /* Pasted Word HTML sets inline margin and text-indent. Only !important overrides an inline style. */
-  .remove-list-indent ul,
-  .remove-list-indent ol {
-    padding-left: 0 !important;
-    margin-left: 0 !important;
-  }
-
-  .remove-list-indent li {
-    padding-left: 0 !important;
-    margin-left: 0 !important;
-    list-style-position: inside;
-  }
-
-  /* Override Microsoft Word generated styles */
-  .remove-list-indent p[style*='text-indent'] {
-    text-indent: 0 !important;
-    margin-left: 0 !important;
-    padding-left: 0 !important;
-  }
-
-  .remove-list-indent p[style*='margin: 0in 0in 12.0pt .5in'] {
-    margin-left: 0 !important;
-  }
-
-  .remove-list-indent p.MsoNormal {
-    margin-left: 0 !important;
-    text-indent: 0 !important;
-  }
-</style>
-
 <!-- Header Section -->
 {% if section.settings.header_image
   and section.settings.header_image != blank
@@ -46,7 +15,7 @@
     {% endcase %}
 
     <div
-      class='page-header-media w-full'
+      class='page-header-media w-full h-(--page-header-height) md:h-(--page-header-height-md)'
       style='--page-header-height: {{ section.settings.header_image_height_mobile | default: 300 }}px; --page-header-height-md: {{ section.settings.header_image_height | default: 400 }}px;'
     >
       <img
@@ -57,24 +26,13 @@
       >
     </div>
 
-    <style>
-      .page-header-media {
-        height: var(--page-header-height, 300px);
-      }
-      @media (min-width: 768px) {
-        .page-header-media {
-          height: var(--page-header-height-md, 400px);
-        }
-      }
-    </style>
-
     <!-- Optional overlay for text if needed -->
     <div class='absolute inset-0 bg-black/20'></div>
   </div>
 
   <!-- Content Section with custom header -->
   <div class='max-w-4xl mx-auto px-4 py-6 md:py-8'>
-    <div class='prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6 prose-h1:text-3xl prose-h1:mb-8 prose-h2:text-2xl prose-h2:mb-6 prose-h2:mt-8 prose-h3:text-xl prose-h3:mb-4 prose-h3:mt-6 remove-list-indent'>
+    <div class='prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6 prose-h1:text-3xl prose-h1:mb-8 prose-h2:text-2xl prose-h2:mb-6 prose-h2:mt-8 prose-h3:text-xl prose-h3:mb-4 prose-h3:mt-6 remove-list-indent [&_ul]:ml-0! [&_ul]:pl-0! [&_ol]:ml-0! [&_ol]:pl-0! [&_li]:ml-0! [&_li]:pl-0! [&_li]:list-inside [&_p]:ml-0! [&_p]:pl-0! [&_p]:indent-0!'>
       {{ page.content }}
     </div>
   </div>
@@ -106,7 +64,7 @@
     <div class='container mx-auto px-4 py-16'>
       <div class='max-w-4xl mx-auto'>
         <div class='bg-white p-8 md:p-12'>
-          <div class='prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-headings:mb-6 prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6 prose-h1:text-3xl prose-h1:mb-8 prose-h2:text-2xl prose-h2:mb-6 prose-h2:mt-8 prose-h3:text-xl prose-h3:mb-4 prose-h3:mt-6 prose-ul:text-gray-700 prose-ol:text-gray-700 prose-li:text-gray-700 prose-a:text-black prose-a:font-medium prose-a:underline prose-a:decoration-2 prose-a:underline-offset-2 prose-strong:text-gray-900 prose-strong:font-semibold prose-blockquote:text-gray-600 prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-6 prose-blockquote:italic prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-pre:bg-gray-100 prose-pre:border prose-pre:border-gray-200 prose-pre:rounded-lg prose-pre:p-4 prose-table:text-sm prose-th:bg-gray-50 prose-th:font-semibold prose-th:text-gray-900 prose-td:border prose-td:border-gray-200 prose-td:px-4 prose-td:py-2 remove-list-indent'>
+          <div class='prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-headings:mb-6 prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6 prose-h1:text-3xl prose-h1:mb-8 prose-h2:text-2xl prose-h2:mb-6 prose-h2:mt-8 prose-h3:text-xl prose-h3:mb-4 prose-h3:mt-6 prose-ul:text-gray-700 prose-ol:text-gray-700 prose-li:text-gray-700 prose-a:text-black prose-a:font-medium prose-a:underline prose-a:decoration-2 prose-a:underline-offset-2 prose-strong:text-gray-900 prose-strong:font-semibold prose-blockquote:text-gray-600 prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-6 prose-blockquote:italic prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-pre:bg-gray-100 prose-pre:border prose-pre:border-gray-200 prose-pre:rounded-lg prose-pre:p-4 prose-table:text-sm prose-th:bg-gray-50 prose-th:font-semibold prose-th:text-gray-900 prose-td:border prose-td:border-gray-200 prose-td:px-4 prose-td:py-2 remove-list-indent [&_ul]:ml-0! [&_ul]:pl-0! [&_ol]:ml-0! [&_ol]:pl-0! [&_li]:ml-0! [&_li]:pl-0! [&_li]:list-inside [&_p]:ml-0! [&_p]:pl-0! [&_p]:indent-0!'>
             {{ page.content }}
           </div>
         </div>

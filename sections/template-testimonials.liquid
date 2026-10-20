@@ -381,7 +381,7 @@
                         <div class='carousel-review-footer'>
                           <button
                             type='button'
-                            class='carousel-review-toggle'
+                            class='carousel-review-toggle [&[hidden]]:hidden!'
                           >
                             Read more
                           </button>
@@ -497,7 +497,7 @@
                         <div class='carousel-review-footer'>
                           <button
                             type='button'
-                            class='carousel-review-toggle'
+                            class='carousel-review-toggle [&[hidden]]:hidden!'
                           >
                             Read more
                           </button>
@@ -574,7 +574,7 @@
                       <div class='carousel-review-footer'>
                         <button
                           type='button'
-                          class='carousel-review-toggle'
+                          class='carousel-review-toggle [&[hidden]]:hidden!'
                         >
                           Read more
                         </button>
@@ -915,7 +915,7 @@
         }
       }
 
-      /* Beat text-size utilities on the modal without !important. */
+      /* Modal type sits in the kestrel layer so it beats text-size utilities. */
       @layer kestrel {
         @media (max-width: 767px) {
           .testimonial-modal-quote {
@@ -1064,10 +1064,6 @@
         border: 0;
         padding: 0;
         cursor: pointer;
-      }
-      /* The hidden attribute must beat a utility display value. */
-      .carousel-review-toggle[hidden] {
-        display: none !important;
       }
       @layer kestrel {
       @media (max-width: 767px) {
